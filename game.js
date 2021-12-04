@@ -14,13 +14,15 @@ class Game {
 
     constructor(props) {
         super.constructor(props);
+        this.level = props.level;
         this.layoutBuilder = new LayoutBuilder(props);
         this.gameLayout = this.layoutBuilder.getLayout();
-        
     }
 
     start() {
-        console.dir(this.gameLayout)
+
+        console.log(`Starting scene ${this.level}`);
+        console.dir(this.gameLayout);
     }
 }
 

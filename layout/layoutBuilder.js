@@ -54,7 +54,7 @@ class LayoutBuilder {
                     name: structure.name,
                     location: structure.location? structure.location : this.randomLocation()}});
 
-        this.entities = this.levelManager.getStructures()
+        this.entities = this.levelManager.getEntities()
             .map(entity => {
                 return {
                     name: entity.name, 

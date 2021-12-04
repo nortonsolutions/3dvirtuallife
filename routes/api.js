@@ -22,7 +22,7 @@ module.exports = function (app) {
         .get((req,res) => {
 
             var options = {
-
+                level: req.params.level
             }
             res.render(process.cwd() + '/views/scene.hbs', options);
         })
