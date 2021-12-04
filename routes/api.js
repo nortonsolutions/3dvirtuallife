@@ -11,7 +11,10 @@ module.exports = function (app) {
 
     app.route('/')
         .get((req,res) => {
-            res.send('/index.html');
+            var options = {
+                
+            }
+            res.render(process.cwd() + '/views/index.hbs', options);
         })
         
     app.route('/scene/:level')
@@ -21,7 +24,7 @@ module.exports = function (app) {
             var options = {
 
             }
-            res.render(process.cwd() + '/views/threeScene.hbs', options);
+            res.render(process.cwd() + '/views/scene.hbs', options);
         })
 
 }

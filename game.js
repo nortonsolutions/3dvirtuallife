@@ -10,12 +10,13 @@
 import {LayoutBuilder} from './layout/layoutBuilder.js';
 
 
-class NortonGame {
+class Game {
 
     constructor(props) {
         super.constructor(props);
         this.layoutBuilder = new LayoutBuilder(props);
         this.gameLayout = this.layoutBuilder.getLayout();
+        
     }
 
     start() {
@@ -23,12 +24,4 @@ class NortonGame {
     }
 }
 
-var initialProps = {
-    level: 0,
-    numberOfOthers: 2,
-    heroName: 'Ian'
-}
-
-var game = new NortonGame(initialProps);
-
-export {game};
+export {Game};

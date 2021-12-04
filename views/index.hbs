@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        {{>headerStuff fontAwesome=true jQuery=true bootStrap=true}}
+
+    </head>
+    <body>
+        <header>
+            {{>navbar mainActive=true}}
+        </header>
+        <main>
+            <div class="jumbotron">
+                <h1 class="display-3">Norton's Adventure</h1>
+                <p class="lead">Classic Plus</p>
+                <hr class="my-2">
+                <p>...</p>
+                <p class="lead">
+                    <a class="startCurrentLevel btn btn-primary btn-lg" href="/scene/0" role="button">Start Level 0</a>
+                </p>
+            </div>
+        </main>
+    </body>
+
+    <script type="module">
+
+        // Some character details will be provided, either new or restored game
+        var props = {
+            heroName: 'Dave',
+            level: 0
+        }
+
+        import { Game } from '/game.js';
+
+        // Assume new game for now:
+        var game = new Game(props);
+
+        import { applyIndexListeners } from '/viewScripts/indexScripts.js';
+        applyIndexListeners(game.level, () => {
+            game.start();
+        })
+
+    </script>
+
+</html>
