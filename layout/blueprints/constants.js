@@ -25,7 +25,8 @@ export const Entity = {
             size: Size.small,
             strength: 0,
             agility: 1,
-            wisdom: 0
+            wisdom: 0,
+            life: 2
         }
     }
 }
