@@ -9,6 +9,11 @@ var expect             = require('chai').expect;
 
 module.exports = function (app) {
 
+    app.route('/')
+        .get((req,res) => {
+            res.send('/index.html');
+        })
+        
     app.route('/scene/:level')
         // Get and render the index view
         .get((req,res) => {
@@ -17,6 +22,6 @@ module.exports = function (app) {
 
             }
             res.render(process.cwd() + '/views/threeScene.hbs', options);
-    })
+        })
 
 }
