@@ -11,16 +11,30 @@ var velocity = new THREE.Vector3();
 var direction = new THREE.Vector3();
 var vertex = new THREE.Vector3();
 var color = new THREE.Color();
+var multiplier = 100;
+
+var navbarHeight;
+
+/**
+ * The Scene has graphical display (THREE.js), animates using requestAnimationFrame,
+ * and uses controls.  It accepts an initial layout of objects to setup the layout, 
+ * then updates the objects array with locations after each animation.
+ */
 
 class Scene {
 
-    constructor(props) {
+    constructor(height, width, player, objects) {
         
-        this.planeWidth = props.planeWidth? props.planeWidth : 2000;
-        this.planeHeight = props.planeHeight? props.planeHeight : 2000;
-        this.widthSegments = props.widthSegments? props.widthSegments : 100;
-        this.heightSegments = props.heightSegments? props.heightSegments : 100;
-        this.objects = [];
+        this.planeWidth = width? width * multiplier : 2000;
+        this.planeHeight = height? height * multiplier : 2000;
+        this.widthSegments = 100;
+        this.heightSegments = 100;
+
+        this.player = player;
+        this.objects = objects;
+
+        // objects3D is used for raycast intersections
+        this.objects3D = [];
 
         this.controls = null;
 
@@ -28,12 +42,17 @@ class Scene {
         this.onWindowResize = this.onWindowResize.bind(this);
     }
 
+    getObjects() {
+        return this.objects;
+    }
     
     init() {
-        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+
+        navbarHeight = document.querySelector('.navbar').clientHeight;
+        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / (window.innerHeight - navbarHeight), 1, 1000 );
     
         scene = new THREE.Scene();
-        scene.background = new THREE.Color( 'white' );
+        scene.background = new THREE.Color( 'lightgrey' );
         scene.fog = new THREE.Fog( 'white', 0, 750 );
         
         var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
@@ -46,7 +65,11 @@ class Scene {
         this.controls = new THREE.PointerLockControls( camera );
 
         scene.add( this.controls.getObject() );
-    
+
+        // Set player location:
+        this.controls.getObject().translateX( this.player.location.x * multiplier );
+        this.controls.getObject().translateZ( this.player.location.z * multiplier );
+
         var onKeyDown = function ( event ) {
     
             switch ( event.keyCode ) {
@@ -140,77 +163,48 @@ class Scene {
         var floor = new THREE.Mesh( floorGeometry, floorMaterial );
         scene.add( floor );
     
-        // BOXES
-        // var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
-        // boxGeometry = boxGeometry.toNonIndexed(); // ensure each face has unique vertices
-        // var position = boxGeometry.attributes.position;
-        // var colors = [];
-        // for ( var i = 0, l = position.count; i < l; i ++ ) {
-        //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-        //     colors.push( color.r, color.g, color.b );
-        // }
-        // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-        // for ( var i = 0; i < 500; i ++ ) {
-        //     var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
-        //     boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-        //     var box = new THREE.Mesh( boxGeometry, boxMaterial );
-        //     box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
-        //     box.position.y = Math.floor( Math.random() * 20 ) * 20 + 10;
-        //     box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
-        //     scene.add( box );
-        //     this.objects.push( box );
-        // }
-
-        var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
-        boxGeometry = boxGeometry.toNonIndexed();
-        var position = boxGeometry.attributes.position;
-        var colors = [];
-        for ( var i = 0, l = position.count; i < l; i ++ ) {
-            color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-            colors.push( color.r, color.g, color.b );
-        }
-
-        boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+        // Create 3D representation of each object:
+        // Boxes for structures, spheres for entites, small boxes for items
         
-        var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
-        boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-        var box = new THREE.Mesh( boxGeometry, boxMaterial );
-        box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
-        box.position.y = 10;
-        box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
-        scene.add( box );
-        this.objects.push( box );
-        
-
         // model
         var loader = new THREE.FBXLoader();
-        loader.load( '/models/fbx/Sphere.fbx', function ( object ) {
-            // mixer = new THREE.AnimationMixer( object );
-            // var action = mixer.clipAction( object.animations[ 0 ] );
-            // action.play();
+        loader.load( '/models/fbx/Sphere.fbx', (object) => {
 
-            object.traverse( function ( child ) {
+            object.scale.x = .2;
+            object.scale.y = .2;
+            object.scale.z = .2;
 
-                if ( child.isMesh ) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                }
-            } );
+            var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+            boxGeometry = boxGeometry.toNonIndexed();
+            // var position = boxGeometry.attributes.position;
+            // var colors = [];
+            // for ( var i = 0, l = position.count; i < l; i ++ ) {
+            //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+            //     colors.push( color.r, color.g, color.b );
+            // }
+    
+            // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+            
+            // var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+            var boxMaterial = new THREE.MeshBasicMaterial();
+            // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+            var box = new THREE.Mesh( boxGeometry, boxMaterial );
+            
+            box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
+            box.position.y = 10;
+            box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
 
             
-            scene.add( object );
+            box.add( object );
+            this.objects3D.push( box );
+            
+            scene.add(box);
 
-            object.position.x = 100;
-            object.position.z = 100;
-            object.scale.x = .5;
-            object.scale.y = .5;
-            object.scale.z = .5;
-            console.log("test");
         } );
     
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
         let main = document.querySelector('main');
         main.innerHTML = `<div id="blocker" style="display: block;">
 
@@ -252,10 +246,10 @@ class Scene {
 
     onWindowResize() {
 
-        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.aspect = window.innerWidth / (window.innerHeight - navbarHeight);
         camera.updateProjectionMatrix();
 
-        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight) );
 
     }
 
@@ -268,7 +262,7 @@ class Scene {
             raycaster.ray.origin.copy( this.controls.getObject().position );
             raycaster.ray.origin.y -= 10;
 
-            var intersections = raycaster.intersectObjects( this.objects );
+            var intersections = raycaster.intersectObjects( this.objects3D );
 
             var onObject = intersections.length > 0;
 

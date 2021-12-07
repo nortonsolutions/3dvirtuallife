@@ -21,7 +21,7 @@ const app = express();
 app.use('/', express.static(process.cwd() + '/'));
 app.use('/cdn', express.static(process.cwd() + '/cdn'));
 app.use('/assets', express.static(process.cwd() + '/assets'));
-app.use('/viewScripts', express.static(process.cwd() + '/views/viewScripts'));
+app.use('/scene', express.static(process.cwd() + '/views/scene'));
   
 hbsHelpers(hbs);
 

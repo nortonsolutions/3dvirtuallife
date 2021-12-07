@@ -19,7 +19,7 @@ class Game {
         this.gameLayout = this.layoutBuilder.getLayout();
     }
 
-    start() {
+    stats() {
 
         console.log(`Starting scene ${this.level}`);
         console.dir(this.gameLayout);

@@ -59,6 +59,9 @@ class LayoutBuilder {
                 return {
                     name: entity.name, 
                     location: entity.location? entity.location : this.randomLocation()}});
+
+        this.width = this.levelManager.getWidth();
+        this.height = this.levelManager.getHeight();
     }
 
     getLayout() {
@@ -66,7 +69,9 @@ class LayoutBuilder {
             player: this.player,
             items: this.items,
             structures: this.structures,
-            entities: this.entities   
+            entities: this.entities,
+            width: this.width,
+            height: this.height   
         }
 
         return layout;
@@ -74,8 +79,9 @@ class LayoutBuilder {
 
     randomLocation() {
         return {
-            x: Math.floor(Math.random() * this.levelManager.getWidth()),
-            y: Math.floor(Math.random() * this.levelManager.getHeight())
+            x: this.levelManager.getWidth()/2 - Math.floor(Math.random() * this.levelManager.getWidth()),
+            y: 0,
+            z: this.levelManager.getHeight()/2 - Math.floor(Math.random() * this.levelManager.getHeight())
         }
     }
 }

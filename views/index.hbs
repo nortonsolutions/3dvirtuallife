@@ -16,7 +16,7 @@
                 <hr class="my-2">
                 <p>...</p>
                 <p class="lead">
-                    <a class="startGame btn btn-primary btn-lg" href="/scene/0" role="button">Start Level 0</a>
+                    <a class="startGame btn btn-primary btn-lg" href="#" role="button">Start Level 0</a>
                 </p>
             </div>
         </main>
@@ -25,8 +25,8 @@
     <script src="/cdn/threejs/examples/js/controls/PointerLockControls.js"></script>    
     <script src="/cdn/threejs/examples/js/libs/inflate.min.js"></script>
     <script src="/cdn/threejs/examples/js/loaders/FBXLoader.js"></script>
+    {{!-- <script src="/cdn/threejs/examples/js/loaders/OBJLoader.js"></script> --}}
     </body>
-    {{!-- <script src="/viewScripts/indexScripts.js"></script> --}}
     <script type="module">
 
 
@@ -47,7 +47,7 @@
         unique game. */
         
         import { Game } from '/game.js';
-        import { Scene } from '/viewScripts/scene.js';
+        import { SceneController } from '/scene/sceneController.js'
 
         /** When the user clicks START, it will instantiate the game and start.
         An empty layout for the given level will cause the layoutBuilder to
@@ -58,10 +58,10 @@
             el.addEventListener('click', e => {
                 e.preventDefault();
                 var game = new Game(props);
-                game.start(); // currently just dumps objects to console
-                var scene = new Scene(game.gameLayout);
-                scene.init();
-                scene.animate();
+                game.stats(); // currently just dumps objects to console
+
+                var sceneController = new SceneController(game.gameLayout);
+                sceneController.animateScene();
             })
         })
     </script>
