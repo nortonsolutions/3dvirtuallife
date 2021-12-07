@@ -9,13 +9,12 @@ export class SceneController {
 
     constructor(layout) {
         this.layout = layout;
-        this.objects = [...this.layout.entities, ...this.layout.items, ...this.layout.structures];
         this.player = this.layout.player;
 
     }
 
     animateScene() {
-        var scene = new Scene(this.layout.height, this.layout.width, this.player, this.objects);
+        var scene = new Scene(this.layout.height, this.layout.width, this.layout);
         scene.init();
         scene.animate();
     }

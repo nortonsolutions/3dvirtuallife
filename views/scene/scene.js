@@ -23,15 +23,17 @@ var navbarHeight;
 
 class Scene {
 
-    constructor(height, width, player, objects) {
+    constructor(height, width, layout) {
         
         this.planeWidth = width? width * multiplier : 2000;
         this.planeHeight = height? height * multiplier : 2000;
-        this.widthSegments = 100;
-        this.heightSegments = 100;
+        // this.widthSegments = 100;
+        // this.heightSegments = 100;
 
-        this.player = player;
-        this.objects = objects;
+        this.player = layout.player;
+        this.entities = layout.entities;
+        this.structures = layout.structures;
+        this.items = layout.items;
 
         // objects3D is used for raycast intersections
         this.objects3D = [];
@@ -40,12 +42,116 @@ class Scene {
 
         this.animate = this.animate.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
+        this.seedObjects3D = this.seedObjects3D.bind(this);
     }
 
     getObjects() {
         return this.objects;
     }
+
+
+    // var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+    // boxGeometry = boxGeometry.toNonIndexed();
+    // // var position = boxGeometry.attributes.position;
+    // // var colors = [];
+    // // for ( var i = 0, l = position.count; i < l; i ++ ) {
+    // //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+    // //     colors.push( color.r, color.g, color.b );
+    // // }
+
+    // // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
     
+    // // var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+    // var boxMaterial = new THREE.MeshBasicMaterial();
+    // // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+    // var box = new THREE.Mesh( boxGeometry, boxMaterial );
+    
+    // box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
+    // box.position.y = 10;
+    // box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
+
+    
+    // box.add( object );
+    // this.objects3D.push( box );
+    
+    // scene.add(box);
+
+    /** 
+     * Create 3D representation of each object:
+     * Boxes for structures, spheres for entites, small boxes for items
+     */ 
+    seedObjects3D() {
+        this.entities.forEach(entity => {
+            
+            // Use information from the 'structure' for location
+            var loader = new THREE.GLTFLoader();
+            loader.load( '/models/3d/gltf/greenball.gltf', gltf => {
+            
+                let obj = gltf.scene.children[0];
+                obj.position.x = entity.location.x * multiplier;
+                obj.position.y = 10;
+                obj.position.z = entity.location.z * multiplier;
+
+                this.objects3D.push( obj );
+                scene.add( obj );
+                obj.scale.x = .1;
+                obj.scale.y = .1;
+                obj.scale.z = .1;
+            
+            }, undefined, function ( error ) {
+            
+                console.error( error );
+            
+            } );
+        }, this)
+
+        this.items.forEach(item => {
+            
+            // Use information from the 'structure' for location
+            var loader = new THREE.GLTFLoader();
+            loader.load( '/models/3d/gltf/blueball.gltf', gltf => {
+            
+                let obj = gltf.scene.children[0];
+                obj.position.x = item.location.x * multiplier;
+                obj.position.y = 10;
+                obj.position.z = item.location.z * multiplier;
+
+                this.objects3D.push( obj );
+                scene.add( obj );
+                obj.scale.x = .025;
+                obj.scale.y = .025;
+                obj.scale.z = .025;
+
+            
+            }, undefined, function ( error ) {
+            
+                console.error( error );
+            
+            } );
+        }, this)
+
+        this.structures.forEach(structure => {
+            
+            // Use information from the 'structure' for location
+            var loader = new THREE.GLTFLoader();
+            loader.load( '/models/3d/gltf/sceneHouse.gltf', gltf => {
+            
+                let obj = gltf.scene.children[0];
+                obj.position.x = structure.location.x * multiplier;
+                obj.position.y = 0;
+                obj.position.z = structure.location.z * multiplier;
+                this.objects3D.push( obj );
+                scene.add( obj );
+            
+            }, undefined, function ( error ) {
+            
+                console.error( error );
+            
+            } );
+        }, this)
+    }
+
+
     init() {
 
         navbarHeight = document.querySelector('.navbar').clientHeight;
@@ -55,12 +161,12 @@ class Scene {
         scene.background = new THREE.Color( 'lightgrey' );
         scene.fog = new THREE.Fog( 'white', 0, 750 );
         
-        var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
-        light.position.set( 0.5, 1, 0.75 );
-        scene.add( light );
+        // var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
+        // light.position.set( 0.5, 1, 0.75 );
+        // scene.add( light );
 
-        var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-        scene.add( directionalLight );
+        // var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+        // scene.add( directionalLight );
 
         this.controls = new THREE.PointerLockControls( camera );
 
@@ -163,45 +269,46 @@ class Scene {
         var floor = new THREE.Mesh( floorGeometry, floorMaterial );
         scene.add( floor );
     
-        // Create 3D representation of each object:
-        // Boxes for structures, spheres for entites, small boxes for items
+
         
         // model
-        var loader = new THREE.FBXLoader();
-        loader.load( '/models/fbx/Sphere.fbx', (object) => {
+        // var loader = new THREE.FBXLoader();
+        // loader.load( '/models/fbx/Sphere.fbx', (object) => {
 
-            object.scale.x = .2;
-            object.scale.y = .2;
-            object.scale.z = .2;
+        //     object.scale.x = .2;
+        //     object.scale.y = .2;
+        //     object.scale.z = .2;
 
-            var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
-            boxGeometry = boxGeometry.toNonIndexed();
-            // var position = boxGeometry.attributes.position;
-            // var colors = [];
-            // for ( var i = 0, l = position.count; i < l; i ++ ) {
-            //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-            //     colors.push( color.r, color.g, color.b );
-            // }
+        //     var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+        //     boxGeometry = boxGeometry.toNonIndexed();
+        //     // var position = boxGeometry.attributes.position;
+        //     // var colors = [];
+        //     // for ( var i = 0, l = position.count; i < l; i ++ ) {
+        //     //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+        //     //     colors.push( color.r, color.g, color.b );
+        //     // }
     
-            // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+        //     // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
             
-            // var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
-            var boxMaterial = new THREE.MeshBasicMaterial();
-            // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-            var box = new THREE.Mesh( boxGeometry, boxMaterial );
+        //     // var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+        //     var boxMaterial = new THREE.MeshBasicMaterial();
+        //     // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+        //     var box = new THREE.Mesh( boxGeometry, boxMaterial );
             
-            box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
-            box.position.y = 10;
-            box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
+        //     box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
+        //     box.position.y = 10;
+        //     box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
 
             
-            box.add( object );
-            this.objects3D.push( box );
+        //     box.add( object );
+        //     this.objects3D.push( box );
             
-            scene.add(box);
+        //     scene.add(box);
 
-        } );
-    
+        // } );
+
+        this.seedObjects3D();
+
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
