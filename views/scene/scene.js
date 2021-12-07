@@ -23,17 +23,16 @@ var navbarHeight;
 
 class Scene {
 
-    constructor(height, width, layout) {
+    constructor(height, width, player, objects, background) {
         
         this.planeWidth = width? width * multiplier : 2000;
         this.planeHeight = height? height * multiplier : 2000;
         // this.widthSegments = 100;
         // this.heightSegments = 100;
 
-        this.player = layout.player;
-        this.entities = layout.entities;
-        this.structures = layout.structures;
-        this.items = layout.items;
+        this.player = player;
+        this.objects = objects;
+        this.background = background;
 
         // objects3D is used for raycast intersections
         this.objects3D = [];
@@ -58,88 +57,40 @@ class Scene {
     // //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
     // //     colors.push( color.r, color.g, color.b );
     // // }
-
     // // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-    
     // // var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
     // var boxMaterial = new THREE.MeshBasicMaterial();
     // // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
     // var box = new THREE.Mesh( boxGeometry, boxMaterial );
-    
-    // box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
-    // box.position.y = 10;
-    // box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
 
     
-    // box.add( object );
-    // this.objects3D.push( box );
-    
-    // scene.add(box);
-
     /** 
      * Create 3D representation of each object:
      * Boxes for structures, spheres for entites, small boxes for items
      */ 
     seedObjects3D() {
-        this.entities.forEach(entity => {
+        this.objects.forEach(object => {
             
             // Use information from the 'structure' for location
             var loader = new THREE.GLTFLoader();
-            loader.load( '/models/3d/gltf/greenball.gltf', gltf => {
+            loader.load( '/models/3d/gltf/' + object.gltf + '.gltf', gltf => {
             
-                let obj = gltf.scene.children[0];
-                obj.position.x = entity.location.x * multiplier;
-                obj.position.y = 10;
-                obj.position.z = entity.location.z * multiplier;
+                var obj = gltf.scene;
+                switch (object.type) {
+                    case 'building':
+                            obj.position.y = 0;
+                            break;
+                    default:
+                            obj.position.y = 10;
+                            obj.scale.x = .1;
+                            obj.scale.y = .1;
+                            obj.scale.z = .1;
+                            break;
+                }
 
-                this.objects3D.push( obj );
-                scene.add( obj );
-                obj.scale.x = .1;
-                obj.scale.y = .1;
-                obj.scale.z = .1;
-            
-            }, undefined, function ( error ) {
-            
-                console.error( error );
-            
-            } );
-        }, this)
+                obj.position.x = object.location.x * multiplier;
+                obj.position.z = object.location.z * multiplier;
 
-        this.items.forEach(item => {
-            
-            // Use information from the 'structure' for location
-            var loader = new THREE.GLTFLoader();
-            loader.load( '/models/3d/gltf/blueball.gltf', gltf => {
-            
-                let obj = gltf.scene.children[0];
-                obj.position.x = item.location.x * multiplier;
-                obj.position.y = 10;
-                obj.position.z = item.location.z * multiplier;
-
-                this.objects3D.push( obj );
-                scene.add( obj );
-                obj.scale.x = .025;
-                obj.scale.y = .025;
-                obj.scale.z = .025;
-
-            
-            }, undefined, function ( error ) {
-            
-                console.error( error );
-            
-            } );
-        }, this)
-
-        this.structures.forEach(structure => {
-            
-            // Use information from the 'structure' for location
-            var loader = new THREE.GLTFLoader();
-            loader.load( '/models/3d/gltf/sceneHouse.gltf', gltf => {
-            
-                let obj = gltf.scene.children[0];
-                obj.position.x = structure.location.x * multiplier;
-                obj.position.y = 0;
-                obj.position.z = structure.location.z * multiplier;
                 this.objects3D.push( obj );
                 scene.add( obj );
             
@@ -149,25 +100,71 @@ class Scene {
             
             } );
         }, this)
+
     }
 
+    addBackground() {
+        // BACKGROUND - EQUIRECT thanks to Paul Debevec! 
+        if (this.background && this.background.length > 0) {
 
-    init() {
+            // var textureLoader = new THREE.TextureLoader();
+            // var textureEquirec, backgroundMesh;
 
-        navbarHeight = document.querySelector('.navbar').clientHeight;
-        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / (window.innerHeight - navbarHeight), 1, 1000 );
-    
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color( 'lightgrey' );
-        scene.fog = new THREE.Fog( 'white', 0, 750 );
-        
+            // textureEquirec = textureLoader.load( "/models/textures/" + this.background );
+            // textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
+            // // textureEquirec.encoding = THREE.sRGBEncoding;
+
+            // // Materials
+            // var equirectShader = THREE.ShaderLib[ "equirect" ];
+            // var equirectMaterial = new THREE.ShaderMaterial( {
+            //     fragmentShader: equirectShader.fragmentShader,
+            //     vertexShader: equirectShader.vertexShader,
+            //     uniforms: equirectShader.uniforms,
+            //     depthWrite: false,
+            //     side: THREE.BackSide
+            // } );
+
+            // equirectMaterial.uniforms[ "tEquirect" ].value = textureEquirec;
+
+            // Object.defineProperty( equirectMaterial, 'map', {
+
+            //     get: function () {
+            //         return this.uniforms.tEquirect.value;
+            //     }
+            // } );
+
+            // backgroundMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( this.planeWidth, this.planeHeight, this.planeHeight ), equirectMaterial );
+            // backgroundMesh.position.y = this.planeHeight/2;
+
+            // More simplistic equirectangular mapping to the inverse of a sphere geometry:
+            var geometry = new THREE.SphereBufferGeometry(this.planeHeight);
+            geometry.scale (-1,1,1);
+
+            var material = new THREE.MeshBasicMaterial( {
+                map: new THREE.TextureLoader().load("/models/textures/" + this.background)
+            });
+
+            var backgroundMesh = new THREE.Mesh(geometry, material)
+            
+            scene.add( backgroundMesh );
+
+        } else {
+            scene.background = new THREE.Color( 'white' );
+        }
+
+        scene.fog = new THREE.Fog( 'white', 0, 490 );
+    }
+
+    addLights() {
         // var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
         // light.position.set( 0.5, 1, 0.75 );
         // scene.add( light );
 
         // var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
         // scene.add( directionalLight );
+    }
 
+    addControls() {
         this.controls = new THREE.PointerLockControls( camera );
 
         scene.add( this.controls.getObject() );
@@ -242,19 +239,11 @@ class Scene {
     
         raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
     
+    }
+
+    addFloor() {
         var floorGeometry = new THREE.PlaneBufferGeometry( this.planeWidth, this.planeHeight, this.widthSegments, this.heightSegments );
         floorGeometry.rotateX( - Math.PI / 2 );
-    
-        // FLOOR VERTEX DISPLACEMENT
-        // var position = floorGeometry.attributes.position;  // Has a count
-        // for ( var i = 0, l = position.count; i < l; i ++ ) {
-        //     vertex.fromBufferAttribute( position, i );
-        //     vertex.x += Math.random() * 20 - 10;
-        //     vertex.y += Math.random() * 2;
-        //     vertex.z += Math.random() * 20 - 10;
-        //     position.setXYZ( i, vertex.x, vertex.y, vertex.z );
-        // }
-        // floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
     
         // FLOOR VERTEX COLORS
         // position = floorGeometry.attributes.position;
@@ -269,49 +258,15 @@ class Scene {
         var floor = new THREE.Mesh( floorGeometry, floorMaterial );
         scene.add( floor );
     
-
-        
-        // model
-        // var loader = new THREE.FBXLoader();
-        // loader.load( '/models/fbx/Sphere.fbx', (object) => {
-
-        //     object.scale.x = .2;
-        //     object.scale.y = .2;
-        //     object.scale.z = .2;
-
         //     var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
         //     boxGeometry = boxGeometry.toNonIndexed();
-        //     // var position = boxGeometry.attributes.position;
-        //     // var colors = [];
-        //     // for ( var i = 0, l = position.count; i < l; i ++ ) {
-        //     //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-        //     //     colors.push( color.r, color.g, color.b );
-        //     // }
-    
-        //     // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-            
         //     // var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
         //     var boxMaterial = new THREE.MeshBasicMaterial();
         //     // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
         //     var box = new THREE.Mesh( boxGeometry, boxMaterial );
-            
-        //     box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
-        //     box.position.y = 10;
-        //     box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
+    }
 
-            
-        //     box.add( object );
-        //     this.objects3D.push( box );
-            
-        //     scene.add(box);
-
-        // } );
-
-        this.seedObjects3D();
-
-        renderer = new THREE.WebGLRenderer( { antialias: true } );
-        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
+    addEventListeners() {
         let main = document.querySelector('main');
         main.innerHTML = `<div id="blocker" style="display: block;">
 
@@ -350,27 +305,40 @@ class Scene {
         window.addEventListener( 'resize', this.onWindowResize, false );
     }
 
+    init() {
+
+        navbarHeight = document.querySelector('.navbar').clientHeight;
+        camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, 1000 );
+    
+        scene = new THREE.Scene();
+
+        this.addBackground();
+        this.addLights();
+        this.addControls();
+        this.addFloor();
+
+        this.seedObjects3D();
+
+        renderer = new THREE.WebGLRenderer( { antialias: true } );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
+        
+        this.addEventListeners();
+    }
 
     onWindowResize() {
-
         camera.aspect = window.innerWidth / (window.innerHeight - navbarHeight);
         camera.updateProjectionMatrix();
-
         renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight) );
-
     }
 
     animate() {
-
         requestAnimationFrame( this.animate );
-
         if ( this.controls.isLocked === true ) {
 
             raycaster.ray.origin.copy( this.controls.getObject().position );
             raycaster.ray.origin.y -= 10;
-
             var intersections = raycaster.intersectObjects( this.objects3D );
-
             var onObject = intersections.length > 0;
 
             var time = performance.now();

@@ -9,12 +9,15 @@ export const levels = [
         width: 4,
         height: 4,
         name: "Introduction",
+        background: 'clouds.png',
+
         self: {
 
         },
         items: [
             {
                 name: 'keyToShed',
+                gltf: 'blueball',
                 description: 'A rusty old key with faint engravings',
                 type: 'key',
                 attributes: {
@@ -26,6 +29,7 @@ export const levels = [
         structures: [
             {
                 name: 'shed',
+                gltf: 'sceneHouse',
                 description: 'Wooden Shed with a locked door',
                 type: 'building',
                 attributes: {
@@ -38,6 +42,7 @@ export const levels = [
         entities: [
             {
                 name: 'john',
+                gltf: 'greenball',
                 description: 'A strappling middle-aged man with a friendly face',
                 type: 'man',
                 attributes: {
@@ -57,9 +62,11 @@ export const levels = [
         width: 4,
         height: 4,
         name: "Inside the Shed",
+        background: 'chamber.jpg',
         items: [
             {
                 name: 'bagOfGems',
+                gltf: 'blueball',
                 description: 'A small velvet bag full of gems',
                 type: 'gems',
                 attributes: {
@@ -71,6 +78,7 @@ export const levels = [
         structures: [
             {
                 name: 'ancientChest',
+                gltf: 'sceneHouse',
                 description: 'An old but sturdy wooden chest',
                 type: 'chest',
                 attributes: {

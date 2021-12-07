@@ -46,22 +46,30 @@ class LayoutBuilder {
             .map(item => {
                 return {
                     name: item.name, 
-                    location: item.location? item.location : this.randomLocation()}});
+                    type: item.type, 
+                    location: item.location? item.location : this.randomLocation(),
+                    gltf: item.gltf? item.gltf : 'redball'}});
+                    
 
         this.structures = this.levelManager.getStructures()
             .map(structure => {
                 return {
                     name: structure.name,
-                    location: structure.location? structure.location : this.randomLocation()}});
+                    type: structure.type, 
+                    location: structure.location? structure.location : this.randomLocation(),
+                    gltf: structure.gltf? structure.gltf : 'redball'}});
 
         this.entities = this.levelManager.getEntities()
             .map(entity => {
                 return {
                     name: entity.name, 
-                    location: entity.location? entity.location : this.randomLocation()}});
+                    type: entity.type,
+                    location: entity.location? entity.location : this.randomLocation(),
+                    gltf: entity.gltf? entity.gltf : 'redball'}});
 
         this.width = this.levelManager.getWidth();
         this.height = this.levelManager.getHeight();
+        this.background = this.levelManager.getBackground();
     }
 
     getLayout() {
@@ -71,7 +79,8 @@ class LayoutBuilder {
             structures: this.structures,
             entities: this.entities,
             width: this.width,
-            height: this.height   
+            height: this.height,   
+            background: this.background
         }
 
         return layout;

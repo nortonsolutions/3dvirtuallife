@@ -6,6 +6,10 @@ class LevelManager {
         this.level = levels[level];
     }
 
+    getBackground() {
+        return this.level.background;
+    }
+
     getHeight() {
         return this.level.height;
     }

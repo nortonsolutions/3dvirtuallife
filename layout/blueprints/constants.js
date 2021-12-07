@@ -19,6 +19,7 @@ export const Size = {
 export const Entity = {
     evilOne: {
         name: 'evilOne',
+        gltf: 'redball',
         description: 'A small but menacing humanoid beast, with fire in its eyes and ready to attack',
         type: 'beast',
         attributes: {
