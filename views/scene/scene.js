@@ -1,4 +1,4 @@
-var camera, scene, renderer, controls, raycaster;
+var camera, scene, renderer, downRaycaster, movementRaycaster
 
 var moveForward = false;
 var moveBackward = false;
@@ -44,26 +44,34 @@ class Scene {
         this.seedObjects3D = this.seedObjects3D.bind(this);
     }
 
+
     getObjects() {
         return this.objects;
     }
 
+    init() {
 
-    // var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
-    // boxGeometry = boxGeometry.toNonIndexed();
-    // // var position = boxGeometry.attributes.position;
-    // // var colors = [];
-    // // for ( var i = 0, l = position.count; i < l; i ++ ) {
-    // //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-    // //     colors.push( color.r, color.g, color.b );
-    // // }
-    // // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-    // // var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
-    // var boxMaterial = new THREE.MeshBasicMaterial();
-    // // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-    // var box = new THREE.Mesh( boxGeometry, boxMaterial );
-
+        navbarHeight = document.querySelector('.navbar').clientHeight;
+        camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, 1000 );
     
+        scene = new THREE.Scene();
+
+        this.addBackground();
+        this.addLights();
+        this.addControls();
+        this.addFloor();
+
+        this.seedObjects3D();
+
+        renderer = new THREE.WebGLRenderer( { antialias: true } );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
+        
+        this.addEventListeners();
+
+        console.dir(this.objects3D);
+    }
+
     /** 
      * Create 3D representation of each object:
      * Boxes for structures, spheres for entites, small boxes for items
@@ -88,6 +96,7 @@ class Scene {
                             break;
                 }
 
+                obj.name = object.name;
                 obj.position.x = object.location.x * multiplier;
                 obj.position.z = object.location.z * multiplier;
 
@@ -101,6 +110,23 @@ class Scene {
             } );
         }, this)
 
+        var boxGeometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
+        boxGeometry = boxGeometry.toNonIndexed();
+        // var position = boxGeometry.attributes.position;
+        // var colors = [];
+        // for ( var i = 0, l = position.count; i < l; i ++ ) {
+        //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+        //     colors.push( color.r, color.g, color.b );
+        // }
+        // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+        // var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+        var boxMaterial = new THREE.MeshBasicMaterial();
+        // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+        var box = new THREE.Mesh( boxGeometry, boxMaterial );
+        box.name = 'randomBox';
+
+        this.objects3D.push(box);
+        scene.add(box);
     }
 
     addBackground() {
@@ -172,6 +198,7 @@ class Scene {
         // Set player location:
         this.controls.getObject().translateX( this.player.location.x * multiplier );
         this.controls.getObject().translateZ( this.player.location.z * multiplier );
+        this.controls.getObject().translateY( 20 );
 
         var onKeyDown = function ( event ) {
     
@@ -237,7 +264,13 @@ class Scene {
         document.addEventListener( 'keydown', onKeyDown, false );
         document.addEventListener( 'keyup', onKeyUp, false );
     
-        raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+        downRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
+        new THREE.Vector3( 0, - 1, 0 ), 
+        0, 10 );
+
+        movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
+        new THREE.Vector3( 0, 0, 0 ),
+        0, 10 );
     
     }
 
@@ -305,26 +338,7 @@ class Scene {
         window.addEventListener( 'resize', this.onWindowResize, false );
     }
 
-    init() {
 
-        navbarHeight = document.querySelector('.navbar').clientHeight;
-        camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, 1000 );
-    
-        scene = new THREE.Scene();
-
-        this.addBackground();
-        this.addLights();
-        this.addControls();
-        this.addFloor();
-
-        this.seedObjects3D();
-
-        renderer = new THREE.WebGLRenderer( { antialias: true } );
-        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
-        
-        this.addEventListeners();
-    }
 
     onWindowResize() {
         camera.aspect = window.innerWidth / (window.innerHeight - navbarHeight);
@@ -336,9 +350,11 @@ class Scene {
         requestAnimationFrame( this.animate );
         if ( this.controls.isLocked === true ) {
 
-            raycaster.ray.origin.copy( this.controls.getObject().position );
-            raycaster.ray.origin.y -= 10;
-            var intersections = raycaster.intersectObjects( this.objects3D );
+            let thisLocation = this.controls.getObject();
+            
+            downRaycaster.ray.origin.copy( thisLocation.position );
+            downRaycaster.ray.origin.y -= 30;
+            var intersections = downRaycaster.intersectObjects( this.objects3D, true );
             var onObject = intersections.length > 0;
 
             var time = performance.now();
@@ -352,27 +368,44 @@ class Scene {
             direction.x = Number( moveLeft ) - Number( moveRight );
             direction.normalize(); // this ensures consistent movements in all directions
 
+            // console.log('direction:')
+            // console.dir(direction);
             if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
             if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
-
+            
+            // console.log('velocity:');
+            // console.dir(velocity);
             if ( onObject === true ) {
-
+                console.dir(intersections);
                 velocity.y = Math.max( 0, velocity.y );
                 canJump = true;
 
             }
 
-            this.controls.getObject().translateX( velocity.x * delta );
-            this.controls.getObject().translateY( velocity.y * delta );
-            this.controls.getObject().translateZ( velocity.z * delta );
+            // Only perform the translation if I will not invade another:
+            movementRaycaster.ray.origin.copy( thisLocation.position );
+            movementRaycaster.ray.origin.y -= 20;
+            movementRaycaster.ray.direction.x = direction.x;
+            movementRaycaster.ray.direction.z = direction.z;
+            console.log('ray:');
+            console.dir(movementRaycaster.ray);
 
-            // Stay grounded
-            if ( this.controls.getObject().position.y < 10 ) {
+            if (movementRaycaster.intersectObjects(this.objects3D, true).length > 0) {
+                console.dir(movementRaycaster.intersectObjects(this.objects3D, true));
+            } else {
+                thisLocation.translateX( velocity.x * delta );
+                thisLocation.translateY( velocity.y * delta );
+                thisLocation.translateZ( velocity.z * delta );
+            }
+
+            // Grounded means elevation 30
+            if ( this.controls.getObject().position.y < 30 ) {
                 velocity.y = 0;
-                this.controls.getObject().position.y = 10;
+                this.controls.getObject().position.y = 30;
                 canJump = true;
             }
             prevTime = time;
+            // console.log("Current position: " + this.controls.getObject().position.y);
         }
         renderer.render( scene, camera );
     }
