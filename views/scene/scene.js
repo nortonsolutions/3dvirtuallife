@@ -1,4 +1,6 @@
-var camera, scene, renderer, downRaycaster, movementRaycaster, intersects, helper;
+var camera, scene, renderer, 
+    downRaycaster, movementRaycaster, selectRaycaster, 
+    intersects, selectIntersects, helper;
 
 var moveForward = false;
 var moveBackward = false;
@@ -200,7 +202,7 @@ class Scene {
         // Set player location:
         this.controls.getObject().translateX( this.player.location.x * multiplier );
         this.controls.getObject().translateZ( this.player.location.z * multiplier );
-        this.controls.getObject().translateY( 20 );
+        this.controls.getObject().translateY( this.player.height? this.player.height : 15 );
 
         var onKeyDown = function ( event ) {
     
@@ -266,6 +268,16 @@ class Scene {
         document.addEventListener( 'keydown', onKeyDown, false );
         document.addEventListener( 'keyup', onKeyUp, false );
     
+        /**
+         * Raycasters:
+         * 
+         * downRaycaster - cast directly beneath the camera for terrain, objects, verticle elevation
+         * 
+         * movementRaycaster - cast at height 10 in the direction of controls movement
+         * 
+         * selectRaycaster - cast immediately in front of the camera for item selection, etc.
+         */
+
         downRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
         new THREE.Vector3( 0, - 1, 0 ), 
         0, 10 );
@@ -277,6 +289,9 @@ class Scene {
         helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(5), new THREE.MeshBasicMaterial({ color: 'red' }));
         scene.add( helper );
     
+        selectRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
+        new THREE.Vector3( 0, 0, 0 ),
+        0, 20 );
     }
 
     addFloor() {
@@ -343,8 +358,6 @@ class Scene {
         window.addEventListener( 'resize', this.onWindowResize, false );
     }
 
-
-
     onWindowResize() {
         camera.aspect = window.innerWidth / (window.innerHeight - navbarHeight);
         camera.updateProjectionMatrix();
@@ -356,7 +369,7 @@ class Scene {
         if ( this.controls.isLocked === true ) {
 
             downRaycaster.ray.origin.copy( this.controls.getObject().position );
-            downRaycaster.ray.origin.y -= 20;
+            downRaycaster.ray.origin.y -= this.player.height? this.player.height : 15;
             var intersections = downRaycaster.intersectObjects( this.objects3D, true );
             var onObject = intersections.length > 0;
 
@@ -379,22 +392,37 @@ class Scene {
                 canJump = true;
             }
             
-            // Only perform the translation if I will not invade another.
-            // this.controls.getObject().rotation.y returns the yaw rotation of the controls
-            var rotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
-            rotation.set( 0, this.controls.getObject().rotation.y, 0 );
-            let worldDirection = direction.applyEuler( rotation );
+            // this.controls.getObject().rotation.y returns the yaw rotation of the pointer control (mouse)
+
+            // MOVEMENT
+            var movementRaycasterRotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
+            movementRaycasterRotation.set( 0, this.controls.getObject().rotation.y, 0 );
+            let worldDirection = new THREE.Vector3().copy(direction).applyEuler( movementRaycasterRotation );
 
             movementRaycaster.ray.origin.copy( this.controls.getObject().position );
-            movementRaycaster.ray.origin.y -= 15;
+            movementRaycaster.ray.origin.y -= 5;
             movementRaycaster.ray.direction.x = - worldDirection.x;
             movementRaycaster.ray.direction.z = - worldDirection.z;
 
-            intersects = movementRaycaster.intersectObjects(this.objects3D, true);
-            if (intersects.length > 0) {
-                // helper.visible = true;
-                // helper.position.copy(intersects[0].point);
+            // SELECTION
+            selectRaycaster.ray.origin.copy( this.controls.getObject().position );
+            selectRaycaster.ray.origin.y -= 5;
+            let v = new THREE.Vector3();
+            selectRaycaster.ray.direction.x = this.controls.getDirection(v).x;
+            selectRaycaster.ray.direction.z = this.controls.getDirection(v).z;
+
+            selectIntersects = selectRaycaster.intersectObjects(this.objects3D,true);
+            if (selectIntersects.length > 0) {
+                helper.visible = true;
+                helper.position.copy(selectIntersects[0].point);
+                console.dir(selectIntersects[0].object);
             } else {
+                helper.visible = false;
+            }
+
+            // Only perform the translation if I will not invade another.
+            intersects = movementRaycaster.intersectObjects(this.objects3D, true);
+            if (intersects.length == 0) {
                 // helper.visible = false;
                 this.controls.getObject().translateX( velocity.x * delta );
                 this.controls.getObject().translateY( velocity.y * delta );
@@ -408,9 +436,12 @@ class Scene {
                     this.controls.getObject().translateY( -velocity.y * delta );
                     this.controls.getObject().translateZ( -velocity.z * delta );
                 }
+            } else {
+                // console.log("MovementRaycaster:");
+                // console.dir(movementRaycaster.ray);
             }
             // Grounded means elevation 30
-            if ( this.controls.getObject().position.y < 20 ) {
+            if ( this.controls.getObject().position.y < this.player.height? this.player.height : 15 ) {
                 velocity.y = 0;
                 this.controls.getObject().position.y = 20;
                 canJump = true;
