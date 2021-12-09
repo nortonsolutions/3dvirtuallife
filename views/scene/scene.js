@@ -1,4 +1,4 @@
-var camera, scene, renderer, downRaycaster, movementRaycaster
+var camera, scene, renderer, downRaycaster, movementRaycaster, intersects, helper;
 
 var moveForward = false;
 var moveBackward = false;
@@ -25,8 +25,8 @@ class Scene {
 
     constructor(height, width, player, objects, background) {
         
-        this.planeWidth = width? width * multiplier : 2000;
-        this.planeHeight = height? height * multiplier : 2000;
+        this.planeWidth = width? width * multiplier * 1.1 : 2000;
+        this.planeHeight = height? height * multiplier * 1.1 : 2000;
         // this.widthSegments = 100;
         // this.heightSegments = 100;
 
@@ -112,6 +112,7 @@ class Scene {
 
         var boxGeometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
         boxGeometry = boxGeometry.toNonIndexed();
+        // boxGeometry.computeBoundingBox();
         // var position = boxGeometry.attributes.position;
         // var colors = [];
         // for ( var i = 0, l = position.count; i < l; i ++ ) {
@@ -127,6 +128,7 @@ class Scene {
 
         this.objects3D.push(box);
         scene.add(box);
+
     }
 
     addBackground() {
@@ -271,6 +273,9 @@ class Scene {
         movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
         new THREE.Vector3( 0, 0, 0 ),
         0, 10 );
+
+        helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(5), new THREE.MeshBasicMaterial({ color: 'red' }));
+        scene.add( helper );
     
     }
 
@@ -350,10 +355,8 @@ class Scene {
         requestAnimationFrame( this.animate );
         if ( this.controls.isLocked === true ) {
 
-            let thisLocation = this.controls.getObject();
-            
-            downRaycaster.ray.origin.copy( thisLocation.position );
-            downRaycaster.ray.origin.y -= 30;
+            downRaycaster.ray.origin.copy( this.controls.getObject().position );
+            downRaycaster.ray.origin.y -= 20;
             var intersections = downRaycaster.intersectObjects( this.objects3D, true );
             var onObject = intersections.length > 0;
 
@@ -367,45 +370,53 @@ class Scene {
             direction.z = Number( moveForward ) - Number( moveBackward );
             direction.x = Number( moveLeft ) - Number( moveRight );
             direction.normalize(); // this ensures consistent movements in all directions
-
-            // console.log('direction:')
-            // console.dir(direction);
-            if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
-            if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
             
-            // console.log('velocity:');
-            // console.dir(velocity);
+            if ( moveForward || moveBackward ) velocity.z -= direction.z * 600.0 * delta;
+            if ( moveLeft || moveRight ) velocity.x -= direction.x * 600.0 * delta;
+            
             if ( onObject === true ) {
-                console.dir(intersections);
                 velocity.y = Math.max( 0, velocity.y );
                 canJump = true;
-
             }
+            
+            // Only perform the translation if I will not invade another.
+            // this.controls.getObject().rotation.y returns the yaw rotation of the controls
+            var rotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
+            rotation.set( 0, this.controls.getObject().rotation.y, 0 );
+            let worldDirection = direction.applyEuler( rotation );
 
-            // Only perform the translation if I will not invade another:
-            movementRaycaster.ray.origin.copy( thisLocation.position );
-            movementRaycaster.ray.origin.y -= 20;
-            movementRaycaster.ray.direction.x = direction.x;
-            movementRaycaster.ray.direction.z = direction.z;
-            console.log('ray:');
-            console.dir(movementRaycaster.ray);
+            movementRaycaster.ray.origin.copy( this.controls.getObject().position );
+            movementRaycaster.ray.origin.y -= 15;
+            movementRaycaster.ray.direction.x = - worldDirection.x;
+            movementRaycaster.ray.direction.z = - worldDirection.z;
 
-            if (movementRaycaster.intersectObjects(this.objects3D, true).length > 0) {
-                console.dir(movementRaycaster.intersectObjects(this.objects3D, true));
+            intersects = movementRaycaster.intersectObjects(this.objects3D, true);
+            if (intersects.length > 0) {
+                // helper.visible = true;
+                // helper.position.copy(intersects[0].point);
             } else {
-                thisLocation.translateX( velocity.x * delta );
-                thisLocation.translateY( velocity.y * delta );
-                thisLocation.translateZ( velocity.z * delta );
-            }
+                // helper.visible = false;
+                this.controls.getObject().translateX( velocity.x * delta );
+                this.controls.getObject().translateY( velocity.y * delta );
+                this.controls.getObject().translateZ( velocity.z * delta );
 
+                // Test and bounce back if needed
+                let controlsObj = this.controls.getObject();
+                if (Math.abs(controlsObj.getWorldPosition(controlsObj.position).x) >= this.planeHeight/2 || 
+                Math.abs(controlsObj.getWorldPosition(controlsObj.position).z) >= this.planeWidth/2) {
+                    this.controls.getObject().translateX( -velocity.x * delta );
+                    this.controls.getObject().translateY( -velocity.y * delta );
+                    this.controls.getObject().translateZ( -velocity.z * delta );
+                }
+            }
             // Grounded means elevation 30
-            if ( this.controls.getObject().position.y < 30 ) {
+            if ( this.controls.getObject().position.y < 20 ) {
                 velocity.y = 0;
-                this.controls.getObject().position.y = 30;
+                this.controls.getObject().position.y = 20;
                 canJump = true;
             }
             prevTime = time;
-            // console.log("Current position: " + this.controls.getObject().position.y);
+
         }
         renderer.render( scene, camera );
     }
