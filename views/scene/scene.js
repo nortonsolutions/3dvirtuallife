@@ -25,12 +25,13 @@ var navbarHeight;
 
 class Scene {
 
-    constructor(hero, height, width, terrain, objects, background) {
+    constructor(hero, height, width, terrain, objects, background, controller) {
+
+        // SceneController has access to layoutBuilder, which has levelManager
+        this.controller = controller;
         
         this.planeWidth = width? width * multiplier * 1.1 : 2000;
         this.planeHeight = height? height * multiplier * 1.1 : 2000;
-        // this.widthSegments = 100;
-        // this.heightSegments = 100;
 
         this.hero = hero;
         this.objects = objects;
@@ -45,11 +46,6 @@ class Scene {
         this.animate = this.animate.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
         this.seedObjects3D = this.seedObjects3D.bind(this);
-    }
-
-
-    getObjects() {
-        return this.objects;
     }
 
     init() {
@@ -134,9 +130,9 @@ class Scene {
     }
 
     addLights() {
-        // var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
-        // light.position.set( 0.5, 1, 0.75 );
-        // scene.add( light );
+        var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
+        light.position.set( 0.5, 1, 0.75 );
+        scene.add( light );
 
         // var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
         // scene.add( directionalLight );
@@ -381,6 +377,8 @@ class Scene {
                 if (selectIntersects.length > 0) {
                     helper.visible = true;
                     helper.position.copy(selectIntersects[0].point);
+                    document.exitPointerLock();
+                    this.controller.eventDepot.fire('modal', { name: selectIntersects[0].object.name });
                     console.log(selectIntersects[0].object.name);
                 }
                 break;
@@ -420,6 +418,14 @@ class Scene {
 
         var blocker = document.getElementById( 'blocker' );
         var instructions = document.getElementById( 'instructions' );
+
+        this.controller.eventDepot.addListener('lockControls', () => {
+            this.controls.lock();
+        })
+
+        this.controller.eventDepot.addListener('unlockControls', () => {
+            this.controls.unlock();
+        })
 
         instructions.addEventListener( 'click', () => {
 

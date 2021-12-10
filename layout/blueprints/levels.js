@@ -32,7 +32,7 @@ export const levels = [
                 type: 'building',
                 location: { x: 0, y: 0, z: 0},
                 attributes: {
-                    key: 'Rusty Old Key',
+                    key: 'keyToShed',
                     scale: 1,
                     elevation: 0,
                     routeToLevel: 1

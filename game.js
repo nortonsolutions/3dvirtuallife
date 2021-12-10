@@ -8,7 +8,7 @@
  */
 
 import {LayoutBuilder} from './layout/layoutBuilder.js';
-
+import {EventDepot} from '/public/eventDepot.js'
 
 class Game {
 
@@ -17,6 +17,7 @@ class Game {
         this.level = props.level;
         this.layoutBuilder = new LayoutBuilder(props);
         this.gameLayout = this.layoutBuilder.getLayout();
+        this.eventDepot = new EventDepot();
     }
 
     stats() {

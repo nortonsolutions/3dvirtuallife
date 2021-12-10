@@ -10,15 +10,18 @@ import { Scene } from '/scene/scene.js';
 
 export class SceneController {
 
-    constructor(layout) {
-        this.layout = layout;
+    constructor(layoutBuilder, eventDepot) {
+        
+        this.eventDepot = eventDepot;
+        this.layoutBuilder = layoutBuilder;
+        this.layout = layoutBuilder.getLayout();
         this.background = this.layout.background;
         this.terrain = this.layout.terrain;
         this.objects = [...this.layout.entities, ...this.layout.structures, ...this.layout.items];
     }
 
     animateScene() {
-        var scene = new Scene(this.layout.hero, this.layout.height, this.layout.width, this.terrain, this.objects, this.background);
+        var scene = new Scene(this.layout.hero, this.layout.height, this.layout.width, this.terrain, this.objects, this.background, this);
         scene.init();
         scene.animate();
     }

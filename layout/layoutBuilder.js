@@ -70,6 +70,11 @@ class LayoutBuilder {
         this.terrain = this.levelManager.getTerrain();
     }
 
+    /**
+     * The layout model presented here should only contain information
+     * about the layout for the objects in the scene, like location, 
+     * gltf, scale, elevation.
+     */
     getLayout() {
         var layout = {
             hero: this.hero,
