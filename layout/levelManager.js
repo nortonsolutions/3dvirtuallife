@@ -10,6 +10,10 @@ class LevelManager {
         return this.level.background;
     }
 
+    getTerrain() {
+        return this.level.terrain;
+    }
+
     getHeight() {
         return this.level.height;
     }

@@ -6,23 +6,21 @@ import {Size,Color,Entity} from './constants.js'
 export const levels = [
     {
         level: 0,
-        width: 4,
-        height: 4,
+        width: 8,
+        height: 8,
         name: "Introduction",
         background: 'clouds.png',
+        terrain: 'valley',
 
-        self: {
-
-        },
         items: [
             {
                 name: 'keyToShed',
-                gltf: 'blueball',
+                gltf: 'key',
                 description: 'A rusty old key with faint engravings',
                 type: 'key',
                 attributes: {
-                    color: Color.bronze,
-                    size: Size.small
+                    scale: .1,
+                    elevation: 0
                 }
             }
         ],
@@ -32,21 +30,34 @@ export const levels = [
                 gltf: 'sceneHouse',
                 description: 'Wooden Shed with a locked door',
                 type: 'building',
+                location: { x: -1, y: 0, z: -1},
                 attributes: {
-                    color: Color.brown,
                     key: 'Rusty Old Key',
+                    scale: 1,
+                    elevation: 0,
                     routeToLevel: 1
+                }
+            },
+            {
+                name: 'rock1',
+                gltf: 'rock1',
+                description: 'Standard rock',
+                type: 'rock',
+                attributes: {
+                    scale: 1,
+                    elevation: 0
                 }
             }
         ],
         entities: [
             {
                 name: 'john',
-                gltf: 'greenball',
+                gltf: 'john',
                 description: 'A strappling middle-aged man with a friendly face',
                 type: 'man',
                 attributes: {
-                    size: Size.medium,
+                    scale: 1,
+                    elevation: 0,
                     conversation: [],
                     offers: [],
                     accepts: []
@@ -63,6 +74,8 @@ export const levels = [
         height: 4,
         name: "Inside the Shed",
         background: 'chamber.jpg',
+        terrain: 'valley1',
+
         items: [
             {
                 name: 'bagOfGems',

@@ -11,8 +11,8 @@ var canJump = false;
 var prevTime = performance.now();
 var velocity = new THREE.Vector3();
 var direction = new THREE.Vector3();
-var vertex = new THREE.Vector3();
-var color = new THREE.Color();
+// var vertex = new THREE.Vector3();
+// var color = new THREE.Color();
 var multiplier = 100;
 
 var navbarHeight;
@@ -25,16 +25,17 @@ var navbarHeight;
 
 class Scene {
 
-    constructor(height, width, player, objects, background) {
+    constructor(hero, height, width, terrain, objects, background) {
         
         this.planeWidth = width? width * multiplier * 1.1 : 2000;
         this.planeHeight = height? height * multiplier * 1.1 : 2000;
         // this.widthSegments = 100;
         // this.heightSegments = 100;
 
-        this.player = player;
+        this.hero = hero;
         this.objects = objects;
         this.background = background;
+        this.terrain = terrain;
 
         // objects3D is used for raycast intersections
         this.objects3D = [];
@@ -54,16 +55,19 @@ class Scene {
     init() {
 
         navbarHeight = document.querySelector('.navbar').clientHeight;
-        camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, 1000 );
+        camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, 1200 );
     
         scene = new THREE.Scene();
 
         this.addBackground();
         this.addLights();
         this.addControls();
-        this.addFloor();
-
-        this.seedObjects3D();
+        this.addFloor(() => {
+            this.seedObjects3D()
+            console.dir(this.objects3D);
+        });
+        
+        // this.seedObjects3D();
 
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
@@ -71,69 +75,12 @@ class Scene {
         
         this.addEventListeners();
 
-        console.dir(this.objects3D);
-    }
-
-    /** 
-     * Create 3D representation of each object:
-     * Boxes for structures, spheres for entites, small boxes for items
-     */ 
-    seedObjects3D() {
-        this.objects.forEach(object => {
-            
-            // Use information from the 'structure' for location
-            var loader = new THREE.GLTFLoader();
-            loader.load( '/models/3d/gltf/' + object.gltf + '.gltf', gltf => {
-            
-                var obj = gltf.scene;
-                switch (object.type) {
-                    case 'building':
-                            obj.position.y = 0;
-                            break;
-                    default:
-                            obj.position.y = 10;
-                            obj.scale.x = .1;
-                            obj.scale.y = .1;
-                            obj.scale.z = .1;
-                            break;
-                }
-
-                obj.name = object.name;
-                obj.position.x = object.location.x * multiplier;
-                obj.position.z = object.location.z * multiplier;
-
-                this.objects3D.push( obj );
-                scene.add( obj );
-            
-            }, undefined, function ( error ) {
-            
-                console.error( error );
-            
-            } );
-        }, this)
-
-        var boxGeometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
-        boxGeometry = boxGeometry.toNonIndexed();
-        // boxGeometry.computeBoundingBox();
-        // var position = boxGeometry.attributes.position;
-        // var colors = [];
-        // for ( var i = 0, l = position.count; i < l; i ++ ) {
-        //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-        //     colors.push( color.r, color.g, color.b );
-        // }
-        // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-        // var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
-        var boxMaterial = new THREE.MeshBasicMaterial();
-        // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-        var box = new THREE.Mesh( boxGeometry, boxMaterial );
-        box.name = 'randomBox';
-
-        this.objects3D.push(box);
-        scene.add(box);
+        console.dir(this.hero);
 
     }
 
     addBackground() {
+
         // BACKGROUND - EQUIRECT thanks to Paul Debevec! 
         if (this.background && this.background.length > 0) {
 
@@ -142,7 +89,7 @@ class Scene {
 
             // textureEquirec = textureLoader.load( "/models/textures/" + this.background );
             // textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
-            // // textureEquirec.encoding = THREE.sRGBEncoding;
+            // textureEquirec.encoding = THREE.sRGBEncoding;
 
             // // Materials
             // var equirectShader = THREE.ShaderLib[ "equirect" ];
@@ -163,12 +110,12 @@ class Scene {
             //     }
             // } );
 
-            // backgroundMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( this.planeWidth, this.planeHeight, this.planeHeight ), equirectMaterial );
+            // backgroundMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( this.planeWidth, 400, this.planeHeight ), equirectMaterial );
             // backgroundMesh.position.y = this.planeHeight/2;
 
             // More simplistic equirectangular mapping to the inverse of a sphere geometry:
             var geometry = new THREE.SphereBufferGeometry(this.planeHeight);
-            geometry.scale (-1,1,1);
+            geometry.scale (-1,.5,1);
 
             var material = new THREE.MeshBasicMaterial( {
                 map: new THREE.TextureLoader().load("/models/textures/" + this.background)
@@ -182,7 +129,7 @@ class Scene {
             scene.background = new THREE.Color( 'white' );
         }
 
-        scene.fog = new THREE.Fog( 'white', 0, 490 );
+        // scene.fog = new THREE.Fog( 'white', 0, 490 );
     }
 
     addLights() {
@@ -199,10 +146,10 @@ class Scene {
 
         scene.add( this.controls.getObject() );
 
-        // Set player location:
-        this.controls.getObject().translateX( this.player.location.x * multiplier );
-        this.controls.getObject().translateZ( this.player.location.z * multiplier );
-        this.controls.getObject().translateY( this.player.height? this.player.height : 15 );
+        // Set hero location:
+        this.controls.getObject().translateX( this.hero.location.x * multiplier );
+        this.controls.getObject().translateZ( this.hero.location.z * multiplier );
+        this.controls.getObject().translateY( this.hero.height? this.hero.height : 15 );
 
         var onKeyDown = function ( event ) {
     
@@ -287,6 +234,7 @@ class Scene {
         0, 10 );
 
         helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(5), new THREE.MeshBasicMaterial({ color: 'red' }));
+        helper.visible = false;
         scene.add( helper );
     
         selectRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
@@ -294,9 +242,34 @@ class Scene {
         0, 20 );
     }
 
-    addFloor() {
-        var floorGeometry = new THREE.PlaneBufferGeometry( this.planeWidth, this.planeHeight, this.widthSegments, this.heightSegments );
-        floorGeometry.rotateX( - Math.PI / 2 );
+    addFloor(callback) {
+
+        var loader = new THREE.GLTFLoader();
+        loader.load( '/models/3d/gltf/' + this.terrain + '.gltf', (gltf) => {
+        
+            var obj = gltf.scene;
+            // obj.position.x = object.location.x * multiplier + getRndInteger(-20,20);
+            // obj.position.z = object.location.z * multiplier + getRndInteger(-20,20);
+            obj.position.y = 0;
+            this.floor = obj.children[0].children[0];
+
+            scene.add( obj );
+            console.dir(this.floor);
+            callback();
+        
+        }, undefined, function ( error ) {
+        
+            console.error( error );
+        
+        } );
+
+
+        // mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
+        // scene.add( mesh );
+
+
+        // var floorGeometry = new THREE.PlaneBufferGeometry( this.planeWidth, this.planeHeight, this.widthSegments, this.heightSegments );
+        // floorGeometry.rotateX( - Math.PI / 2 );
     
         // FLOOR VERTEX COLORS
         // position = floorGeometry.attributes.position;
@@ -307,9 +280,9 @@ class Scene {
         // }
         // floorGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
     
-        var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
-        var floor = new THREE.Mesh( floorGeometry, floorMaterial );
-        scene.add( floor );
+        // var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+        // var floor = new THREE.Mesh( floorGeometry, floorMaterial );
+        // scene.add( floor );
     
         //     var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
         //     boxGeometry = boxGeometry.toNonIndexed();
@@ -317,6 +290,121 @@ class Scene {
         //     var boxMaterial = new THREE.MeshBasicMaterial();
         //     // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
         //     var box = new THREE.Mesh( boxGeometry, boxMaterial );
+    }
+
+    /** 
+     * Create 3D representation of each object:
+     * Boxes for structures, spheres for entites, small boxes for items
+     */ 
+    seedObjects3D = () => {
+        this.objects.forEach(object => {
+
+            // var loader = new THREE.ObjectLoader();
+            var loader = new THREE.GLTFLoader();
+            loader.load( '/models/3d/gltf/' + object.gltf + '.gltf', (gltf) => {
+            
+                var obj = gltf.scene;
+                obj.position.y = object.elevation;
+                obj.scale.x = object.scale;
+                obj.scale.y = object.scale;
+                obj.scale.z = object.scale;
+
+                // Set the name recursively
+                (function setName(o) {
+
+                    if (o.children && o.children.length > 0) {
+                        o.name = object.name;
+                        Array.from(o.children).forEach(child => {
+                            setName(child);
+                        })
+                        return;
+                    } else {
+                        o.name = object.name;
+                        return;
+                    }
+
+                })(obj);
+
+                obj.position.x = object.location.x * multiplier + getRndInteger(-20,20);
+                obj.position.z = object.location.z * multiplier + getRndInteger(-20,20);
+                
+                // ELEVATION based on floor plane
+                // Lift up, then drop down to proper level
+                obj.position.y = 100;
+                let elevationRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
+                    new THREE.Vector3( 0, - 1, 0 ), 
+                    0, 300 );
+
+                elevationRaycaster.ray.origin.copy( obj.position );
+                var elevationIntersection = elevationRaycaster.intersectObject( this.floor, false );
+                
+                obj.position.y -= elevationIntersection[0].distance;
+                this.objects3D.push( obj );
+                scene.add( obj );
+            
+            }, undefined, function ( error ) {
+            
+                console.error( error );
+            
+            } );
+        }, this)
+
+        // var boxGeometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
+        // boxGeometry = boxGeometry.toNonIndexed();
+        // // boxGeometry.computeBoundingBox();
+        // // var position = boxGeometry.attributes.position;
+        // // var colors = [];
+        // // for ( var i = 0, l = position.count; i < l; i ++ ) {
+        // //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+        // //     colors.push( color.r, color.g, color.b );
+        // // }
+        // // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+        // // var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+        // var boxMaterial = new THREE.MeshBasicMaterial();
+        // // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+        // var box = new THREE.Mesh( boxGeometry, boxMaterial );
+        // box.name = 'randomBox';
+
+        // this.objects3D.push(box);
+        // scene.add(box);
+
+    }
+
+    onMouseClick = (e) => {
+    }
+
+    onMouseDown = (e) => {
+
+        switch (e.button) {
+
+            case 0:
+                selectIntersects = selectRaycaster.intersectObjects(this.objects3D,true);
+                if (selectIntersects.length > 0) {
+                    helper.visible = true;
+                    helper.position.copy(selectIntersects[0].point);
+                    console.log(selectIntersects[0].object.name);
+                }
+                break;
+            case 1:
+                break;
+            case 2:
+                moveForward = true;
+                break;
+        }
+    }
+
+    onMouseUp = (e) => {
+        switch (e.button) {
+
+            case 0:
+                helper.visible = false;
+                break;
+            case 1:
+                break;
+            case 2:
+                moveForward = false;
+                break;
+        }
     }
 
     addEventListeners() {
@@ -337,20 +425,25 @@ class Scene {
         instructions.addEventListener( 'click', () => {
 
             this.controls.lock();
-
+        
         }, false );
 
-        this.controls.addEventListener( 'lock', function () {
+        this.controls.addEventListener( 'lock', () => {
 
             instructions.style.display = 'none';
             blocker.style.display = 'none';
-
+            document.addEventListener( 'mousedown', this.onMouseDown, false );
+            document.addEventListener( 'mouseup', this.onMouseUp, false );
+            document.addEventListener( 'click', this.onMouseClick, false );
         } );
 
-        this.controls.addEventListener( 'unlock', function () {
+        this.controls.addEventListener( 'unlock', () => {
 
             blocker.style.display = 'block';
             instructions.style.display = '';
+            document.removeEventListener( 'mousedown', this.onMouseDown, false );
+            document.removeEventListener( 'mouseup', this.onMouseUp, false );
+            document.removeEventListener( 'click', this.onMouseClick, false );
 
         } );
 
@@ -364,12 +457,64 @@ class Scene {
         renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight) );
     }
 
+    castMovementRay() {
+        // MOVEMENT
+        var movementRaycasterRotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
+        movementRaycasterRotation.set( 0, this.controls.getObject().rotation.y, 0 );
+        let worldDirection = new THREE.Vector3().copy(direction).applyEuler( movementRaycasterRotation );
+
+        movementRaycaster.ray.origin.copy( this.controls.getObject().position );
+        movementRaycaster.ray.origin.y -= 5;
+        movementRaycaster.ray.direction.x = - worldDirection.x;
+        movementRaycaster.ray.direction.z = - worldDirection.z;
+    }
+
+    castSelectionRay() {
+        // SELECTION
+        selectRaycaster.ray.origin.copy( this.controls.getObject().position );
+        selectRaycaster.ray.origin.y -= 5;
+        let v = new THREE.Vector3();
+        selectRaycaster.ray.direction.x = this.controls.getDirection(v).x;
+        selectRaycaster.ray.direction.y = this.controls.getDirection(v).y;
+        selectRaycaster.ray.direction.z = this.controls.getDirection(v).z;
+
+    }
+
+    reposition(delta) {
+        // Only perform the translation if I will not invade another.
+        intersects = movementRaycaster.intersectObjects(this.objects3D, true);
+        if (intersects.length == 0) {
+            
+            this.controls.getObject().translateX( velocity.x * delta );
+            this.controls.getObject().translateY( velocity.y * delta );
+            this.controls.getObject().translateZ( velocity.z * delta );
+
+            // Test and bounce back if needed
+            let controlsObj = this.controls.getObject();
+            if (Math.abs(controlsObj.getWorldPosition(controlsObj.position).x) >= this.planeHeight/2 || 
+            Math.abs(controlsObj.getWorldPosition(controlsObj.position).z) >= this.planeWidth/2) {
+                this.controls.getObject().translateX( -velocity.x * delta );
+                this.controls.getObject().translateY( -velocity.y * delta );
+                this.controls.getObject().translateZ( -velocity.z * delta );
+            }
+        } else {
+            // console.dir(intersects);
+        }
+
+        // Grounded means elevation 30
+        if ( this.controls.getObject().position.y < (this.hero.height? this.hero.height : 15) ) {
+            velocity.y = 0;
+            this.controls.getObject().position.y = (this.hero.height? this.hero.height : 15);
+            canJump = true;
+        }
+    }
+
     animate() {
         requestAnimationFrame( this.animate );
         if ( this.controls.isLocked === true ) {
 
             downRaycaster.ray.origin.copy( this.controls.getObject().position );
-            downRaycaster.ray.origin.y -= this.player.height? this.player.height : 15;
+            downRaycaster.ray.origin.y -= (this.hero.height? this.hero.height : 15);
             var intersections = downRaycaster.intersectObjects( this.objects3D, true );
             var onObject = intersections.length > 0;
 
@@ -384,8 +529,8 @@ class Scene {
             direction.x = Number( moveLeft ) - Number( moveRight );
             direction.normalize(); // this ensures consistent movements in all directions
             
-            if ( moveForward || moveBackward ) velocity.z -= direction.z * 600.0 * delta;
-            if ( moveLeft || moveRight ) velocity.x -= direction.x * 600.0 * delta;
+            if ( moveForward || moveBackward ) velocity.z -= direction.z * 800.0 * delta;
+            if ( moveLeft || moveRight ) velocity.x -= direction.x * 800.0 * delta;
             
             if ( onObject === true ) {
                 velocity.y = Math.max( 0, velocity.y );
@@ -393,59 +538,10 @@ class Scene {
             }
             
             // this.controls.getObject().rotation.y returns the yaw rotation of the pointer control (mouse)
+            this.castMovementRay();
+            this.castSelectionRay();
+            this.reposition(delta);            
 
-            // MOVEMENT
-            var movementRaycasterRotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
-            movementRaycasterRotation.set( 0, this.controls.getObject().rotation.y, 0 );
-            let worldDirection = new THREE.Vector3().copy(direction).applyEuler( movementRaycasterRotation );
-
-            movementRaycaster.ray.origin.copy( this.controls.getObject().position );
-            movementRaycaster.ray.origin.y -= 5;
-            movementRaycaster.ray.direction.x = - worldDirection.x;
-            movementRaycaster.ray.direction.z = - worldDirection.z;
-
-            // SELECTION
-            selectRaycaster.ray.origin.copy( this.controls.getObject().position );
-            selectRaycaster.ray.origin.y -= 5;
-            let v = new THREE.Vector3();
-            selectRaycaster.ray.direction.x = this.controls.getDirection(v).x;
-            selectRaycaster.ray.direction.z = this.controls.getDirection(v).z;
-
-            selectIntersects = selectRaycaster.intersectObjects(this.objects3D,true);
-            if (selectIntersects.length > 0) {
-                helper.visible = true;
-                helper.position.copy(selectIntersects[0].point);
-                console.dir(selectIntersects[0].object);
-            } else {
-                helper.visible = false;
-            }
-
-            // Only perform the translation if I will not invade another.
-            intersects = movementRaycaster.intersectObjects(this.objects3D, true);
-            if (intersects.length == 0) {
-                // helper.visible = false;
-                this.controls.getObject().translateX( velocity.x * delta );
-                this.controls.getObject().translateY( velocity.y * delta );
-                this.controls.getObject().translateZ( velocity.z * delta );
-
-                // Test and bounce back if needed
-                let controlsObj = this.controls.getObject();
-                if (Math.abs(controlsObj.getWorldPosition(controlsObj.position).x) >= this.planeHeight/2 || 
-                Math.abs(controlsObj.getWorldPosition(controlsObj.position).z) >= this.planeWidth/2) {
-                    this.controls.getObject().translateX( -velocity.x * delta );
-                    this.controls.getObject().translateY( -velocity.y * delta );
-                    this.controls.getObject().translateZ( -velocity.z * delta );
-                }
-            } else {
-                // console.log("MovementRaycaster:");
-                // console.dir(movementRaycaster.ray);
-            }
-            // Grounded means elevation 30
-            if ( this.controls.getObject().position.y < this.player.height? this.player.height : 15 ) {
-                velocity.y = 0;
-                this.controls.getObject().position.y = 20;
-                canJump = true;
-            }
             prevTime = time;
 
         }

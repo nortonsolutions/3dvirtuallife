@@ -33,48 +33,47 @@ import {LevelManager} from './levelManager.js'
 class LayoutBuilder {
 
     constructor(props) {
+
+        // TODO: props may include saved game details of level layouts
         this.numberOfOthers = props.numberOfOthers;
         this.itemsArray = props.itemsArray;
         this.levelManager = new LevelManager(props.level);
 
-        this.player = {
-            name: props.heroName,
+        this.hero = {
+            ...props.hero, 
             location: props.heroLocation? props.heroLocation : this.randomLocation()
         }
 
-        this.items = this.levelManager.getItems()
-            .map(item => {
-                return {
-                    name: item.name, 
-                    type: item.type, 
-                    location: item.location? item.location : this.randomLocation(),
-                    gltf: item.gltf? item.gltf : 'redball'}});
-                    
+        const itemDetails = (item) => {
+            return {
+                name: item.name, 
+                type: item.type, 
+                location: item.location? item.location : this.randomLocation(),
+                gltf: item.gltf? item.gltf : 'redball',
+                scale: item.attributes.scale,
+                elevation: item.attributes.elevation
+            }
+        }
 
+        this.items = this.levelManager.getItems()
+            .map(item => itemDetails(item));
+                    
         this.structures = this.levelManager.getStructures()
-            .map(structure => {
-                return {
-                    name: structure.name,
-                    type: structure.type, 
-                    location: structure.location? structure.location : this.randomLocation(),
-                    gltf: structure.gltf? structure.gltf : 'redball'}});
+            .map(item => itemDetails(item));
 
         this.entities = this.levelManager.getEntities()
-            .map(entity => {
-                return {
-                    name: entity.name, 
-                    type: entity.type,
-                    location: entity.location? entity.location : this.randomLocation(),
-                    gltf: entity.gltf? entity.gltf : 'redball'}});
+            .map(item => itemDetails(item));
 
         this.width = this.levelManager.getWidth();
         this.height = this.levelManager.getHeight();
         this.background = this.levelManager.getBackground();
+        this.terrain = this.levelManager.getTerrain();
     }
 
     getLayout() {
         var layout = {
-            player: this.player,
+            hero: this.hero,
+            terrain: this.terrain,
             items: this.items,
             structures: this.structures,
             entities: this.entities,
