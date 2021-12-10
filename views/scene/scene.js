@@ -1,5 +1,5 @@
 var camera, scene, renderer, 
-    downRaycaster, movementRaycaster, selectRaycaster, 
+    downRaycaster, movementRaycaster, selectRaycaster, floorheightRaycaster,
     intersects, selectIntersects, helper;
 
 var moveForward = false;
@@ -146,10 +146,6 @@ class Scene {
 
         scene.add( this.controls.getObject() );
 
-        // Set hero location:
-        this.controls.getObject().translateX( this.hero.location.x * multiplier );
-        this.controls.getObject().translateZ( this.hero.location.z * multiplier );
-        this.controls.getObject().translateY( this.hero.height? this.hero.height : 15 );
 
         var onKeyDown = function ( event ) {
     
@@ -240,6 +236,10 @@ class Scene {
         selectRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
         new THREE.Vector3( 0, 0, 0 ),
         0, 20 );
+
+        floorheightRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
+        new THREE.Vector3( 0, -1, 0 ), 
+        0, 300 );
     }
 
     addFloor(callback) {
@@ -297,6 +297,13 @@ class Scene {
      * Boxes for structures, spheres for entites, small boxes for items
      */ 
     seedObjects3D = () => {
+
+        // Set hero location:
+        this.controls.getObject().translateX( this.hero.location.x * multiplier );
+        this.controls.getObject().translateZ( this.hero.location.z * multiplier );
+        this.controls.getObject().translateY( this.hero.height? this.hero.height : 15 ); 
+            // this.determineFloorHeight(this.controls.getObject().position.x, this.controls.getObject().position.z) + this.hero.height );
+
         this.objects.forEach(object => {
 
             // var loader = new THREE.ObjectLoader();
@@ -330,15 +337,8 @@ class Scene {
                 
                 // ELEVATION based on floor plane
                 // Lift up, then drop down to proper level
-                obj.position.y = 100;
-                let elevationRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
-                    new THREE.Vector3( 0, - 1, 0 ), 
-                    0, 300 );
 
-                elevationRaycaster.ray.origin.copy( obj.position );
-                var elevationIntersection = elevationRaycaster.intersectObject( this.floor, false );
-                
-                obj.position.y -= elevationIntersection[0].distance;
+                obj.position.y = this.determineFloorHeight(obj.position.x, obj.position.z);
                 this.objects3D.push( obj );
                 scene.add( obj );
             
@@ -457,6 +457,17 @@ class Scene {
         renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight) );
     }
 
+    determineFloorHeight(x,z) {
+
+        floorheightRaycaster.ray.origin.x = x;
+        floorheightRaycaster.ray.origin.z = z;
+        floorheightRaycaster.ray.origin.y = 110;
+
+        var floorIntersection = floorheightRaycaster.intersectObject( this.floor, false );
+        
+        return 110 - floorIntersection[0].distance;
+    }
+
     castMovementRay() {
         // MOVEMENT
         var movementRaycasterRotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
@@ -502,9 +513,11 @@ class Scene {
         }
 
         // Grounded means elevation 30
-        if ( this.controls.getObject().position.y < (this.hero.height? this.hero.height : 15) ) {
+
+        let floorHeight = this.determineFloorHeight(this.controls.getObject().position.x, this.controls.getObject().position.z);
+        if ( this.controls.getObject().position.y < (floorHeight + this.hero.height)) {
             velocity.y = 0;
-            this.controls.getObject().position.y = (this.hero.height? this.hero.height : 15);
+            this.controls.getObject().position.y = (floorHeight + this.hero.height);
             canJump = true;
         }
     }
@@ -529,8 +542,8 @@ class Scene {
             direction.x = Number( moveLeft ) - Number( moveRight );
             direction.normalize(); // this ensures consistent movements in all directions
             
-            if ( moveForward || moveBackward ) velocity.z -= direction.z * 800.0 * delta;
-            if ( moveLeft || moveRight ) velocity.x -= direction.x * 800.0 * delta;
+            if ( moveForward || moveBackward ) velocity.z -= direction.z * 1000.0 * delta;
+            if ( moveLeft || moveRight ) velocity.x -= direction.x * 1000.0 * delta;
             
             if ( onObject === true ) {
                 velocity.y = Math.max( 0, velocity.y );
