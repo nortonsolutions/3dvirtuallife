@@ -30,7 +30,7 @@ export const levels = [
                 gltf: 'sceneHouse',
                 description: 'Wooden Shed with a locked door',
                 type: 'building',
-                location: { x: -1, y: 0, z: -1},
+                location: { x: 0, y: 0, z: 0},
                 attributes: {
                     key: 'Rusty Old Key',
                     scale: 1,

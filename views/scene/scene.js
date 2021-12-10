@@ -62,6 +62,7 @@ class Scene {
         this.addBackground();
         this.addLights();
         this.addControls();
+        this.addRaycasters();
         this.addFloor(() => {
             this.seedObjects3D()
             console.dir(this.objects3D);
@@ -210,7 +211,9 @@ class Scene {
     
         document.addEventListener( 'keydown', onKeyDown, false );
         document.addEventListener( 'keyup', onKeyUp, false );
-    
+    }
+
+    addRaycasters() {
         /**
          * Raycasters:
          * 
@@ -235,11 +238,11 @@ class Scene {
     
         selectRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
         new THREE.Vector3( 0, 0, 0 ),
-        0, 20 );
+        0, 30 );
 
         floorheightRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
         new THREE.Vector3( 0, -1, 0 ), 
-        0, 300 );
+        0, 140 );
     }
 
     addFloor(callback) {
@@ -248,9 +251,6 @@ class Scene {
         loader.load( '/models/3d/gltf/' + this.terrain + '.gltf', (gltf) => {
         
             var obj = gltf.scene;
-            // obj.position.x = object.location.x * multiplier + getRndInteger(-20,20);
-            // obj.position.z = object.location.z * multiplier + getRndInteger(-20,20);
-            obj.position.y = 0;
             this.floor = obj.children[0].children[0];
 
             scene.add( obj );
@@ -294,7 +294,6 @@ class Scene {
 
     /** 
      * Create 3D representation of each object:
-     * Boxes for structures, spheres for entites, small boxes for items
      */ 
     seedObjects3D = () => {
 
