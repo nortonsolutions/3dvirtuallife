@@ -126,7 +126,7 @@ class Scene {
             scene.background = new THREE.Color( 'white' );
         }
 
-        // scene.fog = new THREE.Fog( 'white', 0, 490 );
+        scene.fog = new THREE.Fog( 'white', 0, 490 );
     }
 
     addLights() {
@@ -375,9 +375,15 @@ class Scene {
             case 0:
                 selectIntersects = selectRaycaster.intersectObjects(this.objects3D,true);
                 if (selectIntersects.length > 0) {
-                    helper.visible = true;
-                    helper.position.copy(selectIntersects[0].point);
-                    document.exitPointerLock();
+                    // helper.visible = true;
+                    // helper.position.copy(selectIntersects[0].point);
+
+                    // TODO: Get the intersected object's properties from the level manager.
+                    // If it is an item, pick it up and add to inventory
+                    // If it is a friendly entity, engage the conversation
+
+                    this.controls.unlock();
+
                     this.controller.eventDepot.fire('modal', { name: selectIntersects[0].object.name });
                     console.log(selectIntersects[0].object.name);
                 }
@@ -562,6 +568,8 @@ class Scene {
 
             prevTime = time;
 
+        } else {
+            prevTime = performance.now();
         }
         renderer.render( scene, camera );
     }

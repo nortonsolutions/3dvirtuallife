@@ -57,7 +57,8 @@
         {
             hero: {
                 name: 'Dave',
-                height: 20
+                height: 20,
+                inventory: []
             },
             level: 0,
             layouts: []
@@ -69,7 +70,7 @@
         and the character may need to backtrack to earlier scenes in his
         unique game. */
         
-        import { Game } from '/game.js';
+        import { Game, GameAPI } from '/game.js';
         import { SceneController } from '/scene/sceneController.js'
 
         /** When the user clicks START, it will instantiate the game and start.
@@ -100,6 +101,13 @@
                             modal.style.display = "none";
                         }
                     }
+                })
+
+                document.querySelector('.inventoryLink').addEventListener('click', e => {
+
+                    // Access the user's inventory and display through the modal.
+                    game.eventDepot.fire('modal', { name: 'Inventory', inventory: []});
+                    e.preventDefault();
                 })
 
                 game.stats(); // currently just dumps objects to console

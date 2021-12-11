@@ -1,7 +1,9 @@
 /**
  * LevelManager will keep track of layouts by level
  */
-import {Size,Color,Entity} from './constants.js'
+import {Entities} from './entities.js';
+import {Items} from './items.js';
+import {Structures} from './structures.js';
 
 export const levels = [
     {
@@ -13,102 +15,37 @@ export const levels = [
         terrain: 'valley',
 
         items: [
-            {
-                name: 'keyToShed',
-                gltf: 'key',
-                description: 'A rusty old key with faint engravings',
-                type: 'key',
-                attributes: {
-                    scale: .1,
-                    elevation: 0
-                }
-            }
+            Items.keyToShed
         ],
         structures: [
-            {
-                name: 'shed',
-                gltf: 'sceneHouse',
-                description: 'Wooden Shed with a locked door',
-                type: 'building',
-                location: { x: 0, y: 0, z: 0},
-                attributes: {
-                    key: 'keyToShed',
-                    scale: 1,
-                    elevation: 0,
-                    routeToLevel: 1
-                }
-            },
-            {
-                name: 'rock1',
-                gltf: 'rock1',
-                description: 'Standard rock',
-                type: 'rock',
-                attributes: {
-                    scale: 1,
-                    elevation: 0
-                }
-            }
+            Structures.shed,
+            Structures.rock1,
+            Structures.rock1
         ],
         entities: [
-            {
-                name: 'john',
-                gltf: 'john',
-                description: 'A strappling middle-aged man with a friendly face',
-                type: 'man',
-                attributes: {
-                    scale: 1,
-                    elevation: 0,
-                    conversation: [],
-                    offers: [],
-                    accepts: []
-                }
-            },
-            Entity.evilOne,
-            Entity.evilOne
-
+            Entities.john,
+            Entities.evilOne,
+            Entities.evilOne
         ]
     },
     {
         level: 1,
-        width: 4,
-        height: 4,
-        name: "Inside the Shed",
-        background: 'chamber.jpg',
+        width: 8,
+        height: 8,
+        name: "Through the Corridor",
+        background: 'clouds.png',
         terrain: 'valley1',
 
         items: [
-            {
-                name: 'bagOfGems',
-                gltf: 'blueball',
-                description: 'A small velvet bag full of gems',
-                type: 'gems',
-                attributes: {
-                    color: Color.multicolored,
-                    size: Size.small
-                }
-            }
+            Items.bagOfGems
         ],
         structures: [
-            {
-                name: 'ancientChest',
-                gltf: 'sceneHouse',
-                description: 'An old but sturdy wooden chest',
-                type: 'chest',
-                attributes: {
-                    color: Color.bronze,
-                    contentItems: [
-                        {
-                            name: 'smallSword',
-                            description: 'A slender metallic blade, strong yet flexible',
-                            type: 'sword',
-                            properties: {
-                                color: Color.silver,
-                                size: Size.small
-                            } 
-                        }
-                    ]
-                }
-            }
+            Structures.ancientChest
+        ],
+        entities: [
+            Entities.john,
+            Entities.evilOne,
+            Entities.evilOne
         ]
     }
 ]
