@@ -69,9 +69,9 @@ main {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
-    left: 0;
+    left: 50%;
     top: 200px;
-    width: 100%; /* Full width */
+    width: 50%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(0,0,0); /* Fallback color */
@@ -79,7 +79,9 @@ main {
     -webkit-animation-name: fadeIn; /* Fade in the background */
     -webkit-animation-duration: 0.4s;
     animation-name: fadeIn;
-    animation-duration: 0.4s
+    animation-duration: 0.4s;
+    transform: translate(-50%);
+    
 }
 
 /* Modal Content */
@@ -111,7 +113,7 @@ main {
 
 .modal-header {
     padding: 2px 16px;
-    background-color: #5cb85c;
+    background-color: #58b1d4;
     color: white;
 }
 
@@ -119,7 +121,7 @@ main {
 
 .modal-footer {
     padding: 2px 16px;
-    background-color: #5cb85c;
+    background-color: #58b1d4;
     color: white;
 }
 

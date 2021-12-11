@@ -118,3 +118,4 @@ handleDelete = (url, data, callback) => {
         callback(response);
     })
 }
+

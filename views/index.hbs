@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <title></title>
-        {{>headerStuff fontAwesome=true jQuery=true bootStrap=true}}
+        {{>headerStuff fontAwesome=true jQuery=true bootStrap=true handlebars=true}}
 
     </head>
     <body>
@@ -37,10 +37,10 @@
             <span class="close">&times;</span>
             <h2 id="modal-title"></h2>
         </div>
-        <div class="modal-body">
+        <div id="modal-body">
         </div>
         <div class="modal-footer">
-            <h3>Modal Footer</h3>
+            <h3></h3>
         </div>
     </div>
 
@@ -60,6 +60,7 @@
         localStorage.getItem('gameProps')? 
         localStorage.getItem('gameProps'): gameAPI.newGame('Dave', 20);
 
+        var game;
         /** When the user clicks START, it will instantiate the game and start.
         An empty layout for the given level will cause the layoutBuilder to
         generate a new layout for the scene. */
@@ -67,7 +68,7 @@
         Array.from(document.querySelectorAll('.startGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
-                var game = new Game(props);
+                game = new Game(props);
 
                 game.eventDepot.addListener('modal', (data) => {
 
@@ -91,7 +92,10 @@
                 })
 
                 document.querySelector('.inventoryLink').addEventListener('click', e => {
-                    game.eventDepot.fire('modal', { name: 'Inventory', detail: game.hero.inventory });
+                    
+                    console.dir(game.hero.inventory);
+                    loadTemplate('modal-body', 'inventory', game.hero.inventory);
+                    game.eventDepot.fire('modal', { name: 'Inventory' });
                     e.preventDefault();
                 })
 
@@ -102,8 +106,17 @@
             })
         })
 
-
-
+        const loadTemplate = (elementId, template, data) => {
+            handleGet(`/views/${template}.hbs`, response => {
+                console.log("Inside fetch:");
+                
+                let template = Handlebars.compile(response);
+                console.log(template);
+                console.dir(data);
+                document.getElementById(elementId).innerHTML = template(data);
+            });
+        }
+        
     </script>
 
 </html>

@@ -377,30 +377,35 @@ class Scene {
             case 0:
                 selectIntersects = selectRaycaster.intersectObjects(this.objects3D,true);
                 if (selectIntersects.length > 0) {
+
                     // helper.visible = true;
                     // helper.position.copy(selectIntersects[0].point);
 
-                    // TODO: Get the intersected object's properties from the level manager.
-                    // If it is an item, pick it up and add to inventory
-                    // If it is a friendly entity, engage the conversation
-
                     let thisObj = selectIntersects[0].object;
+
+                    // If it is an item, pick it up and add to inventory
                     if (thisObj.objectType == "item") {
+                        
                         this.controller.eventDepot.fire('takeItem', thisObj.name);
                         this.objects3D = this.objects3D.filter(el => {
                             return el.name != thisObj.name;
                         }); 
 
-                        // Find the item to be removed from the scene
-                        let itemToRemove = scene.children.find(el => el.name = thisObj.name);
-                        scene.remove(itemToRemove);
+                        scene.remove(scene.children.find(el => el.name == thisObj.name));
 
-                    } else {
+                    // If it is a friendly entity, engage the conversation
+                    } else if (thisObj.objectType == "friendly") {
+                        
+                        // TODO: Get the intersected object's properties from the level manager.
                         this.controls.unlock();
-                    }
+                        this.controller.eventDepot.fire('modal', { name: selectIntersects[0].object.name });
+                   
+                    } else if (thisObj.objectType == "enemy") {
 
-                    // this.controller.eventDepot.fire('modal', { name: selectIntersects[0].object.name });
-                    console.log(selectIntersects[0].object.name);
+                        // TODO: act upon the enemy with the object in hand
+                    
+                    }
+                    console.log(`Object identified: ${selectIntersects[0].object.name}`)
                 }
                 break;
             case 1:

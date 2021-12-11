@@ -57,7 +57,7 @@ class GameAPI {
             hero: {
                 name: name,
                 height: height,
-                inventory: []
+                inventory: {}
             },
             level: 0,
             layouts: []

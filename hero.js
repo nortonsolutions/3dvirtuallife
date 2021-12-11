@@ -30,7 +30,7 @@ export class Hero {
 
     /**
      * 
-     * @param {} item matches the prototype in /layout/blueprints/items.js
+     * @param {} itemName refers to the name of the prototype in /layout/blueprints/items.js
      *
      * Each item may have multiple instances, so inventory keeps track of itemName:quantity
      */
@@ -41,6 +41,8 @@ export class Hero {
         } else {
             this.inventory[itemName] = 1;
         }
+        console.log("Inventory:")
+        console.dir(this.inventory);
     }
 
     removeFromInventory(itemName) {
@@ -49,6 +51,8 @@ export class Hero {
         } else {
             delete this.inventory[itemName];
         }
+        console.log("Inventory:")
+        console.dir(this.inventory);
     }
 
     getInventory() {
