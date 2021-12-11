@@ -3,17 +3,17 @@ export const Items = {
         name: 'keyToShed',
         gltf: 'key',
         description: 'A rusty old key with faint engravings',
-        type: 'key',
+        type: 'item',
         attributes: {
             scale: .1,
-            elevation: 0
+            elevation: 10
         }
     },
     bagOfGems: {
         name: 'bagOfGems',
         gltf: 'blueball',
         description: 'A small velvet bag full of gems',
-        type: 'gems',
+        type: 'item',
         attributes: {
             scale: .1,
             elevation: 0
@@ -22,7 +22,7 @@ export const Items = {
     smallSword: {
         name: 'smallSword',
         description: 'A slender metallic blade, strong yet flexible',
-        type: 'sword',
+        type: 'item',
         attributes: {
             scale: .1,
             elevation: 0

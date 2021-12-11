@@ -18,25 +18,10 @@ class Game {
         this.props = props;
         this.eventDepot = new EventDepot();
 
-        // Hero gets a special class to keep track of settings,
-        // inventory, etc.
         this.hero = new Hero(props.hero, this.eventDepot);
         this.layoutBuilder = new LayoutBuilder(props);
         this.gameLayout = this.layoutBuilder.getLayout();
     }
-
-    // Sample localStorage for gameProps:
-
-    // localStorage.getItem('gameProps'): 
-    //     {
-    //         hero: {
-    //             name: 'Dave',
-    //             height: 20,
-    //             inventory: []
-    //         },
-    //         level: 0,
-    //         layouts: []
-    //     }
 
     setLocalStorage(props) {
         localStorage.setItem('gameProps') = props;
@@ -64,6 +49,21 @@ class GameAPI {
 
     }
     
+    /**
+     * Fresh game props from scratch with only personal details provided.
+     */
+    newGame(name,height) {
+        return {
+            hero: {
+                name: name,
+                height: height,
+                inventory: []
+            },
+            level: 0,
+            layouts: []
+        }
+    }
+
     saveGame() {
         // Post to an API on the server with the game props
         // to save information in the server filesystem.

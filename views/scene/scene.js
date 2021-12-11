@@ -311,17 +311,19 @@ class Scene {
                 obj.scale.y = object.scale;
                 obj.scale.z = object.scale;
 
-                // Set the name recursively
+                // Set the name and type recursively for raycast interactions
                 (function setName(o) {
 
                     if (o.children && o.children.length > 0) {
                         o.name = object.name;
+                        o.objectType = object.type;
                         Array.from(o.children).forEach(child => {
                             setName(child);
                         })
                         return;
                     } else {
                         o.name = object.name;
+                        o.objectType = object.type;
                         return;
                     }
 
@@ -333,7 +335,7 @@ class Scene {
                 // ELEVATION based on floor plane
                 // Lift up, then drop down to proper level
 
-                obj.position.y = this.determineFloorHeight(obj.position.x, obj.position.z);
+                obj.position.y = this.determineFloorHeight(obj.position.x, obj.position.z) + object.elevation;
                 this.objects3D.push( obj );
                 scene.add( obj );
             
@@ -382,9 +384,22 @@ class Scene {
                     // If it is an item, pick it up and add to inventory
                     // If it is a friendly entity, engage the conversation
 
-                    this.controls.unlock();
+                    let thisObj = selectIntersects[0].object;
+                    if (thisObj.objectType == "item") {
+                        this.controller.eventDepot.fire('takeItem', thisObj.name);
+                        this.objects3D = this.objects3D.filter(el => {
+                            return el.name != thisObj.name;
+                        }); 
 
-                    this.controller.eventDepot.fire('modal', { name: selectIntersects[0].object.name });
+                        // Find the item to be removed from the scene
+                        let itemToRemove = scene.children.find(el => el.name = thisObj.name);
+                        scene.remove(itemToRemove);
+
+                    } else {
+                        this.controls.unlock();
+                    }
+
+                    // this.controller.eventDepot.fire('modal', { name: selectIntersects[0].object.name });
                     console.log(selectIntersects[0].object.name);
                 }
                 break;

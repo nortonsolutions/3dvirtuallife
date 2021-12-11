@@ -50,28 +50,15 @@
     </body>
     <script type="module">
 
-        // Some character details will be provided, either new or restored game
-        var props = 
-        localStorage.getItem('gameProps')? 
-        localStorage.getItem('gameProps'): 
-        {
-            hero: {
-                name: 'Dave',
-                height: 20,
-                inventory: []
-            },
-            level: 0,
-            layouts: []
-        }
-
-        /** localStorage:
-        localStorage will keep track of the character and his level layouts,
-        since each time through the game will randomize the level layouts,
-        and the character may need to backtrack to earlier scenes in his
-        unique game. */
-        
         import { Game, GameAPI } from '/game.js';
         import { SceneController } from '/scene/sceneController.js'
+
+        var gameAPI = new GameAPI();
+
+        // Some game details will be provided, either new or restored game
+        var props = 
+        localStorage.getItem('gameProps')? 
+        localStorage.getItem('gameProps'): gameAPI.newGame('Dave', 20);
 
         /** When the user clicks START, it will instantiate the game and start.
         An empty layout for the given level will cause the layoutBuilder to
@@ -104,15 +91,14 @@
                 })
 
                 document.querySelector('.inventoryLink').addEventListener('click', e => {
-
-                    // Access the user's inventory and display through the modal.
-                    game.eventDepot.fire('modal', { name: 'Inventory', inventory: []});
+                    game.eventDepot.fire('modal', { name: 'Inventory', detail: game.hero.inventory });
                     e.preventDefault();
                 })
 
                 game.stats(); // currently just dumps objects to console
                 var sceneController = new SceneController(game.layoutBuilder, game.eventDepot);
                 sceneController.animateScene();
+                
             })
         })
 

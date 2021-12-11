@@ -17,7 +17,7 @@ export const Entities = {
         name: 'john',
         gltf: 'john',
         description: 'A strappling middle-aged man with a friendly face',
-        type: 'man',
+        type: 'friendly',
         attributes: {
             scale: 1,
             elevation: 0,

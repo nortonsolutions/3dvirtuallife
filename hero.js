@@ -19,28 +19,40 @@ export class Hero {
     }
 
     addEventListeners() {
-        this.eventDepot.addListener('takeItem', function(item) {
+        this.eventDepot.addListener('takeItem', (item) => {
             this.addToInventory(item);
         });
 
-        this.eventDepot.addListener('dropItem', function(item) {
+        this.eventDepot.addListener('dropItem', (item) => {
             this.removeFromInventory(item);
         });
     }
 
-    addToInventory(item) {
-        this.inventory.push(item);
+    /**
+     * 
+     * @param {} item matches the prototype in /layout/blueprints/items.js
+     *
+     * Each item may have multiple instances, so inventory keeps track of itemName:quantity
+     */
+    addToInventory(itemName) {
+
+        if (Object.keys(this.inventory).includes(itemName)) {
+            this.inventory[itemName]++;
+        } else {
+            this.inventory[itemName] = 1;
+        }
     }
 
-    removeFromInventory(item) {
-        this.inventory = this.inventory.filter()
+    removeFromInventory(itemName) {
+        if (this.inventor[itemName] > 1) {
+            this.inventory[itemName]--;
+        } else {
+            delete this.inventory[itemName];
+        }
     }
 
     getInventory() {
         return this.inventory;
     }
-
-
-
 
 }
