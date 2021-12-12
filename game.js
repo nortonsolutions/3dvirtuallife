@@ -34,6 +34,18 @@ class Game {
     stats() {
         console.dir(this.gameLayout);
     }
+
+    getObjectDetail(objectType,objectName,detailName) {
+
+        switch (objectType) {
+            case 'item':
+                return this.layoutBuilder.levelManager.getItems().filter(el => el.name == objectName)[0][detailName];
+            case 'entity':
+                return this.layoutBuilder.levelManager.getEntity().filter(el => el.name == objectName)[0][detailName];
+            case 'structure':
+                return this.layoutBuilder.levelManager.getStructure().filter(el => el.name == objectName)[0][detailName];
+        }
+    }
 }
 
 /**

@@ -46,6 +46,7 @@ class Scene {
         this.animate = this.animate.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
         this.seedObjects3D = this.seedObjects3D.bind(this);
+        this.addControls = this.addControls.bind(this);
     }
 
     init() {
@@ -144,7 +145,7 @@ class Scene {
         scene.add( this.controls.getObject() );
 
 
-        var onKeyDown = function ( event ) {
+        var onKeyDown = ( event ) => {
     
             switch ( event.keyCode ) {
     
@@ -168,16 +169,19 @@ class Scene {
                     moveRight = true;
                     break;
     
+
                 case 32: // space
                     if ( canJump === true ) velocity.y += 350;
                     canJump = false;
                     break;
-    
+
+                case 73: // i
+                    this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
             }
     
         };
     
-        var onKeyUp = function ( event ) {
+        var onKeyUp = ( event ) => {
     
             switch ( event.keyCode ) {
     

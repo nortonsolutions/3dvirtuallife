@@ -72,30 +72,49 @@
 
                 game.eventDepot.addListener('modal', (data) => {
 
+                    game.eventDepot.fire('unlockControls', {});
+                    var context;
+
+                    switch (data.type) {
+                        case 'inventory': 
+                            context = [];
+                            Object.keys(game.hero.inventory).forEach(key => {
+                                context.push({
+                                    name: key,
+                                    description: game.getObjectDetail('item',key,'description'),
+                                    quantity: game.hero.inventory[key]
+                                });
+                            })
+                            break;
+                        default:
+                    }
+                    
+                    loadTemplate('modal-body', data.type, context);
+                    
                     var modal = document.getElementById('myModal');
                     var closer = document.getElementsByClassName("close")[0];
-                    var modalTitle = document.getElementById('modal-title').innerHTML = data.name;
+                    var modalTitle = document.getElementById('modal-title').innerHTML = data.title;
 
                     modal.style.display = "block";
-                    
-                    closer.onclick = function() {
+
+                    function escape() {
                         modal.style.display = "none";
                         game.eventDepot.fire('lockControls', {});
+                    }
 
+                    closer.onclick = function() {
+                        escape();
                     }
 
                     window.onclick = function(event) {
                         if (event.target == modal) {
-                            modal.style.display = "none";
+                            escape();
                         }
                     }
                 })
 
                 document.querySelector('.inventoryLink').addEventListener('click', e => {
-                    
-                    console.dir(game.hero.inventory);
-                    loadTemplate('modal-body', 'inventory', game.hero.inventory);
-                    game.eventDepot.fire('modal', { name: 'Inventory' });
+                    game.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
                     e.preventDefault();
                 })
 
@@ -108,11 +127,7 @@
 
         const loadTemplate = (elementId, template, data) => {
             handleGet(`/views/${template}.hbs`, response => {
-                console.log("Inside fetch:");
-                
                 let template = Handlebars.compile(response);
-                console.log(template);
-                console.dir(data);
                 document.getElementById(elementId).innerHTML = template(data);
             });
         }

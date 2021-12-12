@@ -9,9 +9,12 @@
         <tbody>
             {{#each this}}
             <tr>
-                <td scope="row">{{@key}}</td>
+                {{!-- <td scope="row">{{@key}}</td>
                 <td></td>
-                <td>{{this}}</td>
+                <td>{{this}}</td> --}}
+                <td>{{name}}</td>
+                <td>{{description}}</td>
+                <td>{{quantity}}</td>
             </tr>
             {{/each}}
         </tbody>
