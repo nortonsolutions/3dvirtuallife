@@ -1,6 +1,10 @@
 var camera, scene, renderer, 
     downRaycaster, movementRaycaster, selectRaycaster, floorheightRaycaster,
-    intersects, selectIntersects, helper;
+    intersects, selectIntersects, helper, spotLight,
+    hero3D;
+
+var mixers = [];
+var actions = {};
 
 var moveForward = false;
 var moveBackward = false;
@@ -17,6 +21,8 @@ var multiplier = 100;
 
 var navbarHeight;
 
+var WHITE = new THREE.Color('white');
+var BLACK = new THREE.Color('black');
 /**
  * The Scene has graphical display (THREE.js), animates using requestAnimationFrame,
  * and uses controls.  It accepts an initial layout of objects to setup the layout, 
@@ -34,6 +40,9 @@ class Scene {
         this.planeHeight = height? height * multiplier * 1.1 : 2000;
 
         this.hero = hero;
+        this.hero3D = new THREE.Object3D();
+
+        this.emissives = [];
         this.objects = objects;
         this.background = background;
         this.terrain = terrain;
@@ -56,13 +65,14 @@ class Scene {
     
         scene = new THREE.Scene();
 
+
         this.addBackground();
         this.addLights();
         this.addControls();
         this.addRaycasters();
         this.addFloor(() => {
-            this.seedObjects3D()
-            console.dir(this.objects3D);
+            this.seedObjects3D();
+            this.addHero3D();
         });
         
         // this.seedObjects3D();
@@ -73,6 +83,7 @@ class Scene {
         
         this.addEventListeners();
 
+        console.log("Hero:")
         console.dir(this.hero);
 
     }
@@ -137,6 +148,12 @@ class Scene {
 
         // var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
         // scene.add( directionalLight );
+
+        spotLight = new THREE.SpotLight( 0xfffff, 1 );
+        spotLight.angle = Math.PI / 6;
+        scene.add(spotLight);
+
+
     }
 
     addControls() {
@@ -169,7 +186,6 @@ class Scene {
                     moveRight = true;
                     break;
     
-
                 case 32: // space
                     if ( canJump === true ) velocity.y += 350;
                     canJump = false;
@@ -238,7 +254,7 @@ class Scene {
     
         selectRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
         new THREE.Vector3( 0, 0, 0 ),
-        0, 30 );
+        0, 70 );
 
         floorheightRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
         new THREE.Vector3( 0, -1, 0 ), 
@@ -248,7 +264,7 @@ class Scene {
     addFloor(callback) {
 
         var loader = new THREE.GLTFLoader();
-        loader.load( '/models/3d/gltf/' + this.terrain + '.gltf', (gltf) => {
+        loader.load( '/models/3d/gltf/' + this.terrain, (gltf) => {
         
             var obj = gltf.scene;
             this.floor = obj.children[0].children[0];
@@ -292,6 +308,72 @@ class Scene {
         //     var box = new THREE.Mesh( boxGeometry, boxMaterial );
     }
 
+    addHero3D = () => {
+        var loader = new THREE.ObjectLoader();
+        var loader = new THREE.GLTFLoader();
+        loader.load( '/models/3d/gltf/' + this.hero.gltf, (gltf) => {
+        
+            let model = gltf.scene;
+            
+            model.scale.x = this.hero.scale;
+            model.scale.y = this.hero.scale;
+            model.scale.z = this.hero.scale;
+            
+            model.position.z -= 40;
+            model.position.y -= 25;
+            model.rotation.y = Math.PI;
+            this.controls.getObject().add( model );
+
+            this.createGUI( model, gltf.animations, "hero" );
+        
+        }, undefined, function ( error ) {
+        
+            console.error( error );
+        
+        } );
+    }
+
+    /**
+     * Animation mixer based on webgl/THREE demo with robot.
+     * Each entity will have his own mixer;
+     */
+    createGUI = (model, animations, uniqueId) => {
+
+        
+        var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
+        var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
+
+        // After fadeToAction ({emote}, {seconds}), fadeToAction ({state}, {seconds}) again
+        
+        var thisMixer = new THREE.AnimationMixer( model );
+
+        var mixerObj = { 
+        
+            name: uniqueId, 
+            mixer: thisMixer
+        
+        };
+        
+        animations.forEach(animation => {
+
+            var action = thisMixer.clipAction( animation );
+
+            if ( emotes.indexOf( animation.name ) >= 0 || states.indexOf( animation.name ) >= 4 ) {
+                action.clampWhenFinished = true;
+                action.loop = THREE.LoopOnce;
+            }
+            actions[ uniqueId + animation.name ] = action;
+        });
+
+        mixers.push(mixerObj);
+
+        // DEFAULT:
+        actions[ uniqueId + 'Walking'].play();
+
+    }
+
+
+
     /** 
      * Create 3D representation of each object:
      */ 
@@ -307,42 +389,46 @@ class Scene {
 
             // var loader = new THREE.ObjectLoader();
             var loader = new THREE.GLTFLoader();
-            loader.load( '/models/3d/gltf/' + object.gltf + '.gltf', (gltf) => {
+            loader.load( '/models/3d/gltf/' + object.gltf, (gltf) => {
             
-                var obj = gltf.scene;
-                obj.position.y = object.elevation;
-                obj.scale.x = object.scale;
-                obj.scale.y = object.scale;
-                obj.scale.z = object.scale;
-
-                // Set the name and type recursively for raycast interactions
-                (function setName(o) {
-
-                    if (o.children && o.children.length > 0) {
-                        o.name = object.name;
-                        o.objectType = object.type;
-                        Array.from(o.children).forEach(child => {
-                            setName(child);
-                        })
-                        return;
-                    } else {
-                        o.name = object.name;
-                        o.objectType = object.type;
-                        return;
-                    }
-
-                })(obj);
-
-                obj.position.x = object.location.x * multiplier + getRndInteger(-20,20);
-                obj.position.z = object.location.z * multiplier + getRndInteger(-20,20);
+                let model = gltf.scene;
+            
+                model.scale.x = object.scale;
+                model.scale.y = object.scale;
+                model.scale.z = object.scale;
                 
-                // ELEVATION based on floor plane
-                // Lift up, then drop down to proper level
+                model.position.x = object.location.x * multiplier + getRndInteger(-20,20);
+                model.position.z = object.location.z * multiplier + getRndInteger(-20,20);
+                model.position.y = this.determineFloorHeight(model.position.x, model.position.z) + object.elevation;
 
-                obj.position.y = this.determineFloorHeight(obj.position.x, obj.position.z) + object.elevation;
-                this.objects3D.push( obj );
-                scene.add( obj );
-            
+                model.objectName = object.name;
+                model.objectType = object.type;
+
+                // // Set the name and type recursively for raycast interactions
+                // (function setName(o) {
+                //     if (o.children && o.children.length > 0) {
+                //         console.log(`Previous name: ${o.name}, new name: ${object.name}`);
+                //         o.name = object.name;
+                //         o.objectType = object.type;
+                //         Array.from(o.children).forEach(child => {
+                //             setName(child);
+                //         })
+                //         return;
+                //     } else {
+                //         console.log(`Previous name: ${o.name}, new name: ${object.name}`);
+                //         o.name = object.name;
+                //         o.objectType = object.type;
+                //         return;
+                //     }
+                // })(model);
+
+                this.objects3D.push( model );
+                scene.add( model );
+
+                if (object.type == 'beast') {
+                    this.createGUI( model, gltf.animations, "evil" );
+                }
+
             }, undefined, function ( error ) {
             
                 console.error( error );
@@ -372,6 +458,29 @@ class Scene {
     }
 
     onMouseClick = (e) => {
+        // DEBUG
+        console.log(`Controls object:`);
+        console.dir(this.controls.getObject().position);
+    }
+
+    getObjectName = (obj) => {
+        if (obj.objectName) {
+            return obj.objectName;
+        } else if (obj.parent == null) {
+            return null;
+        } else {
+            return this.getObjectName(obj.parent);
+        }
+    }
+
+    getObjectType = (obj) => {
+        if (obj.objectType) {
+            return obj.objectType;
+        } else if (obj.parent == null) {
+            return null;
+        } else {
+            return this.getObjectType(obj.parent);
+        }
     }
 
     onMouseDown = (e) => {
@@ -379,23 +488,34 @@ class Scene {
         switch (e.button) {
 
             case 0:
-                selectIntersects = selectRaycaster.intersectObjects(this.objects3D,true);
-                if (selectIntersects.length > 0) {
+                // selectIntersects = selectRaycaster.intersectObjects(this.objects3D,true);
+                if (selectIntersects && selectIntersects.length > 0) {
 
                     // helper.visible = true;
                     // helper.position.copy(selectIntersects[0].point);
 
                     let thisObj = selectIntersects[0].object;
 
+                    // Get the parent name/type
+                    let objectName = this.getObjectName(thisObj);
+                    let objectType = this.getObjectType(thisObj);
+                    
+                    // console.log("Scene:");
+                    // console.dir(scene);
+                    // console.log("this.objects3D:");
+                    // console.dir(this.objects3D);
+                    // console.log("selectIntersects[0]");
+                    // console.dir(selectIntersects[0]);
+
                     // If it is an item, pick it up and add to inventory
-                    if (thisObj.objectType == "item") {
+                    if (objectType == "item") {
                         
-                        this.controller.eventDepot.fire('takeItem', thisObj.name);
+                        this.controller.eventDepot.fire('takeItem', objectName);
                         this.objects3D = this.objects3D.filter(el => {
-                            return el.name != thisObj.name;
+                            return el.objectName != objectName;
                         }); 
 
-                        scene.remove(scene.children.find(el => el.name == thisObj.name));
+                        scene.remove(scene.children.find(el => el.objectName == objectName));
 
                     // If it is a friendly entity, engage the conversation
                     } else if (thisObj.objectType == "friendly") {
@@ -407,9 +527,10 @@ class Scene {
                     } else if (thisObj.objectType == "enemy") {
 
                         // TODO: act upon the enemy with the object in hand
-                    
+                        
+                        
                     }
-                    console.log(`Object identified: ${selectIntersects[0].object.name}`)
+
                 }
                 break;
             case 1:
@@ -518,12 +639,34 @@ class Scene {
     castSelectionRay() {
         // SELECTION
         selectRaycaster.ray.origin.copy( this.controls.getObject().position );
-        selectRaycaster.ray.origin.y -= 5;
         let v = new THREE.Vector3();
         selectRaycaster.ray.direction.x = this.controls.getDirection(v).x;
         selectRaycaster.ray.direction.y = this.controls.getDirection(v).y;
         selectRaycaster.ray.direction.z = this.controls.getDirection(v).z;
 
+        selectIntersects = selectRaycaster.intersectObjects(this.objects3D,true);
+        if (selectIntersects && selectIntersects.length > 0) {
+            // this.addToEmissives(selectIntersects[0]);
+            
+            spotLight.intensity = 2;
+            spotLight.position.set(
+                this.controls.getObject().position.x,
+                this.controls.getObject().position.y,
+                this.controls.getObject().position.z
+            );
+            spotLight.target = selectIntersects[0].object;
+            
+        } else {
+            spotLight.intensity = 0;
+        }
+
+
+    }
+
+    addToEmissives(obj) {
+        if (!this.emissives.map(el => el.object).includes(obj)) {
+            this.emissives.push({object: obj, timeLeft: 30});
+        }
     }
 
     reposition(delta) {
@@ -557,9 +700,27 @@ class Scene {
         }
     }
 
+    handleEmissives() {
+
+        this.emissives.forEach(obj => {
+            obj.object.object.material.emissive = WHITE;
+
+            if (obj.timeLeft > 0) {
+                console.table(this.emissives);
+                obj.timeLeft --;
+            } else {
+                obj.object.object.material.emissive = BLACK;
+            }
+        });
+
+        this.emissives.filter(el => el.timeLeft > 0);
+    }
+
     animate() {
         requestAnimationFrame( this.animate );
         if ( this.controls.isLocked === true ) {
+
+            this.handleEmissives();
 
             downRaycaster.ray.origin.copy( this.controls.getObject().position );
             downRaycaster.ray.origin.y -= (this.hero.height? this.hero.height : 15);
@@ -585,6 +746,12 @@ class Scene {
                 canJump = true;
             }
             
+            if ( mixers ) {
+                mixers.forEach(mixer => {
+                    mixer.mixer.update( delta );
+                })
+            } 
+
             // this.controls.getObject().rotation.y returns the yaw rotation of the pointer control (mouse)
             this.castMovementRay();
             this.castSelectionRay();

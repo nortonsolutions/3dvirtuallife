@@ -69,6 +69,8 @@ class GameAPI {
             hero: {
                 name: name,
                 height: height,
+                gltf: 'robot.glb',
+                scale: 10,
                 inventory: {}
             },
             level: 0,

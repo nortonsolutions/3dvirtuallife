@@ -1,7 +1,7 @@
 export const Items = {
     keyToShed: {
         name: 'keyToShed',
-        gltf: 'key',
+        gltf: 'key.gltf',
         description: 'A rusty old key with faint engravings',
         type: 'item',
         attributes: {
@@ -11,7 +11,7 @@ export const Items = {
     },
     bagOfGems: {
         name: 'bagOfGems',
-        gltf: 'blueball',
+        gltf: 'blueball.gltf',
         description: 'A small velvet bag full of gems',
         type: 'item',
         attributes: {
@@ -21,6 +21,7 @@ export const Items = {
     },
     smallSword: {
         name: 'smallSword',
+        gltf: 'sword.gltf',
         description: 'A slender metallic blade, strong yet flexible',
         type: 'item',
         attributes: {

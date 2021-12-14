@@ -41,7 +41,7 @@ class LayoutBuilder {
 
         this.hero = {
             ...props.hero, 
-            location: props.heroLocation? props.heroLocation : this.randomLocation()
+            location: props.heroLocation? props.heroLocation : this.randomLocation(),
         }
 
         const itemDetails = (item) => {
@@ -49,7 +49,7 @@ class LayoutBuilder {
                 name: item.name, 
                 type: item.type, 
                 location: item.location? item.location : this.randomLocation(),
-                gltf: item.gltf? item.gltf : 'redball',
+                gltf: item.gltf? item.gltf : 'redball.gltf',
                 scale: item.attributes.scale,
                 elevation: item.attributes.elevation
             }

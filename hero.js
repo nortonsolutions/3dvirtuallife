@@ -9,6 +9,8 @@ export class Hero {
 
     constructor(hero, eventDepot) {
         this.name = hero.name;
+        this.gltf = hero.gltf;
+        this.scale = hero.scale;
         this.height = hero.height;
         this.inventory = hero.inventory;
         this.eventDepot = eventDepot;

@@ -4,7 +4,7 @@ export const Structures = {
     
     shed: {
         name: 'shed',
-        gltf: 'sceneHouse',
+        gltf: 'sceneHouse.gltf',
         description: 'Wooden Shed with a locked door',
         type: 'structure',
         location: { x: 0, y: 0, z: 0},
@@ -19,7 +19,7 @@ export const Structures = {
 
     rock1: {
         name: 'rock1',
-        gltf: 'rock1',
+        gltf: 'rock1.gltf',
         description: 'Standard rock',
         type: 'structure',
         attributes: {
@@ -30,7 +30,7 @@ export const Structures = {
     
     ancientChest: {
         name: 'ancientChest',
-        gltf: 'sceneHouse',
+        gltf: 'sceneHouse.gltf',
         description: 'An old but sturdy wooden chest',
         type: 'structure',
         attributes: {

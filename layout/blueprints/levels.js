@@ -12,7 +12,7 @@ export const levels = [
         height: 8,
         name: "Introduction",
         background: 'clouds.png',
-        terrain: 'valley',
+        terrain: 'valley.gltf',
 
         items: [
             Items.keyToShed
@@ -34,7 +34,7 @@ export const levels = [
         height: 8,
         name: "Through the Corridor",
         background: 'clouds.png',
-        terrain: 'valley1',
+        terrain: 'valley1.gltf',
 
         items: [
             Items.bagOfGems
