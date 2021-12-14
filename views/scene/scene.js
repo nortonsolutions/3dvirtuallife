@@ -3,8 +3,12 @@ var camera, scene, renderer,
     intersects, selectIntersects, helper, spotLight,
     hero3D;
 
-var mixers = [];
+var mixers = {};
 var actions = {};
+var heroMixer = {};
+
+var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
+var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
 var moveForward = false;
 var moveBackward = false;
@@ -339,21 +343,8 @@ class Scene {
      */
     createGUI = (model, animations, uniqueId) => {
 
-        
-        var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
-        var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
-
-        // After fadeToAction ({emote}, {seconds}), fadeToAction ({state}, {seconds}) again
-        
         var thisMixer = new THREE.AnimationMixer( model );
 
-        var mixerObj = { 
-        
-            name: uniqueId, 
-            mixer: thisMixer
-        
-        };
-        
         animations.forEach(animation => {
 
             var action = thisMixer.clipAction( animation );
@@ -365,14 +356,62 @@ class Scene {
             actions[ uniqueId + animation.name ] = action;
         });
 
-        mixers.push(mixerObj);
+        var mixerObj = { 
+        
+            name: uniqueId, 
+            mixer: thisMixer,
+            activeActionName: 'Walking',
+            activeAction: actions[ uniqueId + 'Walking'],
+            previousActionName: '',
+            previousAction: null,
+            absVelocity: 0
+
+        };
+
+        mixers[uniqueId] = mixerObj;
+        if (uniqueId == "hero") {
+            heroMixer = mixerObj;
+        }
 
         // DEFAULT:
-        actions[ uniqueId + 'Walking'].play();
+        this.fadeToAction( uniqueId, 'Walking', 0.2);
 
     }
 
+    fadeToAction = ( uuid, actionName, duration ) => {
+        
+        // Get the mixer for this uuid:
+        let thisMixer = mixers[uuid];
 
+        if ( thisMixer.activeActionName !== actionName ) {
+
+            let newAction = actions[ uuid + actionName ];
+
+            thisMixer.previousActionName = thisMixer.activeActionName;
+            thisMixer.previousAction = thisMixer.activeAction;
+            thisMixer.activeActionName = actionName;
+            thisMixer.activeAction = newAction;
+
+            thisMixer.previousAction.fadeOut( duration );
+
+            thisMixer.activeAction
+                .reset()
+                .setEffectiveTimeScale( 1 )
+                .setEffectiveWeight( 1 )
+                .fadeIn( duration )
+                .play();
+
+            const restoreState = () => {
+                thisMixer.mixer.removeEventListener('finished', restoreState );
+                this.fadeToAction( uuid, thisMixer.previousActionName, 0.1 );
+            }
+    
+            // After fadeToAction ({emote}, {seconds}), fadeToAction ({state}, {seconds}) again
+            if (emotes.includes(actionName)) {
+                thisMixer.mixer.addEventListener( 'finished', restoreState );
+            }
+        }
+    }
 
     /** 
      * Create 3D representation of each object:
@@ -404,29 +443,11 @@ class Scene {
                 model.objectName = object.name;
                 model.objectType = object.type;
 
-                // // Set the name and type recursively for raycast interactions
-                // (function setName(o) {
-                //     if (o.children && o.children.length > 0) {
-                //         console.log(`Previous name: ${o.name}, new name: ${object.name}`);
-                //         o.name = object.name;
-                //         o.objectType = object.type;
-                //         Array.from(o.children).forEach(child => {
-                //             setName(child);
-                //         })
-                //         return;
-                //     } else {
-                //         console.log(`Previous name: ${o.name}, new name: ${object.name}`);
-                //         o.name = object.name;
-                //         o.objectType = object.type;
-                //         return;
-                //     }
-                // })(model);
-
                 this.objects3D.push( model );
                 scene.add( model );
 
                 if (object.type == 'beast') {
-                    this.createGUI( model, gltf.animations, "evil" );
+                    this.createGUI( model, gltf.animations, model.uuid );
                 }
 
             }, undefined, function ( error ) {
@@ -435,25 +456,6 @@ class Scene {
             
             } );
         }, this)
-
-        // var boxGeometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
-        // boxGeometry = boxGeometry.toNonIndexed();
-        // // boxGeometry.computeBoundingBox();
-        // // var position = boxGeometry.attributes.position;
-        // // var colors = [];
-        // // for ( var i = 0, l = position.count; i < l; i ++ ) {
-        // //     color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-        // //     colors.push( color.r, color.g, color.b );
-        // // }
-        // // boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-        // // var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
-        // var boxMaterial = new THREE.MeshBasicMaterial();
-        // // boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-        // var box = new THREE.Mesh( boxGeometry, boxMaterial );
-        // box.name = 'randomBox';
-
-        // this.objects3D.push(box);
-        // scene.add(box);
 
     }
 
@@ -518,16 +520,17 @@ class Scene {
                         scene.remove(scene.children.find(el => el.objectName == objectName));
 
                     // If it is a friendly entity, engage the conversation
-                    } else if (thisObj.objectType == "friendly") {
+                    } else if (objectType == "friendly") {
                         
                         // TODO: Get the intersected object's properties from the level manager.
                         this.controls.unlock();
-                        this.controller.eventDepot.fire('modal', { name: selectIntersects[0].object.name });
+                        this.controller.eventDepot.fire('modal', { name: objectName });
                    
-                    } else if (thisObj.objectType == "enemy") {
+                    } else if (objectType == "beast") {
 
+                        this.fadeToAction("hero", "Punch", 0.2)
                         // TODO: act upon the enemy with the object in hand
-                        
+
                         
                     }
 
@@ -745,10 +748,22 @@ class Scene {
                 velocity.y = Math.max( 0, velocity.y );
                 canJump = true;
             }
-            
+
+            mixers.hero.absVelocity = Math.max(Math.abs(velocity.x), Math.abs(velocity.z));
+
             if ( mixers ) {
-                mixers.forEach(mixer => {
-                    mixer.mixer.update( delta );
+                Object.keys(mixers).forEach(key => {
+
+
+
+
+                    // if (maxVelocity < 1 || mixers.) {
+                    //     this.fadeToAction( "hero", 'Idle', 0.2);
+                    // } else {
+                    //     this.fadeToAction( "hero", 'Walking', 0.2);
+                    // }
+
+                    mixers[key].mixer.update( delta );
                 })
             } 
 
