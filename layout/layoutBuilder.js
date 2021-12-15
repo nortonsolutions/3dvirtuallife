@@ -47,11 +47,10 @@ class LayoutBuilder {
         const itemDetails = (item) => {
             return {
                 name: item.name, 
-                type: item.type, 
+                type: item.type,
+                attributes: item.attributes,
                 location: item.location? item.location : this.randomLocation(),
-                gltf: item.gltf? item.gltf : 'redball.gltf',
-                scale: item.attributes.scale,
-                elevation: item.attributes.elevation
+                gltf: item.gltf? item.gltf : 'redball.gltf'
             }
         }
 
@@ -73,7 +72,7 @@ class LayoutBuilder {
     /**
      * The layout model presented here should only contain information
      * about the layout for the objects in the scene, like location, 
-     * gltf, scale, elevation.
+     * gltf, attributes.
      */
     getLayout() {
         var layout = {

@@ -68,9 +68,16 @@ class GameAPI {
         return {
             hero: {
                 name: name,
-                height: height,
+                attributes: {
+                    height: height,
+                    scale: 10,
+                    elevation: 0,
+                    life: 0,
+                    manna: 0,
+                    strength: 1,
+                    agility: 1
+                },
                 gltf: 'robot.glb',
-                scale: 10,
                 inventory: {}
             },
             level: 0,

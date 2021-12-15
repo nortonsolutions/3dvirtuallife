@@ -5,6 +5,8 @@ export const Entities = {
         description: 'A small but menacing humanoid beast, with fire in its eyes and ready to attack',
         type: 'beast',
         attributes: {
+            height: 20,
+            elevation: 0,
             scale: 10,
             elevation: 0,
             strength: 0,
@@ -19,7 +21,10 @@ export const Entities = {
         description: 'A strappling middle-aged man with a friendly face',
         type: 'friendly',
         attributes: {
+            height: 20,
+            elevation: 0,
             scale: 1,
+            agility: 1,
             elevation: 0,
             conversation: [],
             offers: [],

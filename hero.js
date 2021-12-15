@@ -3,15 +3,16 @@ export class Hero {
     // Sample empty hero:
     // {
     //     name: 'Dave',
-    //     height: 20,
+    //     attributes: {
+    //          height: 20,
+    //     },
     //     inventory: []
     // }
 
     constructor(hero, eventDepot) {
         this.name = hero.name;
         this.gltf = hero.gltf;
-        this.scale = hero.scale;
-        this.height = hero.height;
+        this.attributes = hero.attributes;
         this.inventory = hero.inventory;
         this.eventDepot = eventDepot;
 
@@ -43,8 +44,6 @@ export class Hero {
         } else {
             this.inventory[itemName] = 1;
         }
-        console.log("Inventory:")
-        console.dir(this.inventory);
     }
 
     removeFromInventory(itemName) {
@@ -53,8 +52,6 @@ export class Hero {
         } else {
             delete this.inventory[itemName];
         }
-        console.log("Inventory:")
-        console.dir(this.inventory);
     }
 
     getInventory() {

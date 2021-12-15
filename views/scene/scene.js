@@ -1,11 +1,9 @@
 var camera, scene, renderer, 
     downRaycaster, movementRaycaster, selectRaycaster, floorheightRaycaster,
-    intersects, selectIntersects, helper, spotLight,
-    hero3D;
+    intersects, selectIntersects, helper, spotLight;
 
 var mixers = {};
 var actions = {};
-var heroMixer = {};
 
 var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
 var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
@@ -17,7 +15,7 @@ var moveRight = false;
 var canJump = false;
 
 var prevTime = performance.now();
-var velocity = new THREE.Vector3();
+
 var direction = new THREE.Vector3();
 // var vertex = new THREE.Vector3();
 // var color = new THREE.Color();
@@ -79,17 +77,11 @@ class Scene {
             this.addHero3D();
         });
         
-        // this.seedObjects3D();
-
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
         
         this.addEventListeners();
-
-        console.log("Hero:")
-        console.dir(this.hero);
-
     }
 
     addBackground() {
@@ -142,7 +134,7 @@ class Scene {
             scene.background = new THREE.Color( 'white' );
         }
 
-        scene.fog = new THREE.Fog( 'white', 0, 490 );
+        scene.fog = new THREE.Fog( 'white', 0, 750 );
     }
 
     addLights() {
@@ -154,7 +146,7 @@ class Scene {
         // scene.add( directionalLight );
 
         spotLight = new THREE.SpotLight( 0xfffff, 1 );
-        spotLight.angle = Math.PI / 6;
+        spotLight.angle = Math.PI / 4;
         scene.add(spotLight);
 
 
@@ -191,7 +183,10 @@ class Scene {
                     break;
     
                 case 32: // space
-                    if ( canJump === true ) velocity.y += 350;
+                    if ( canJump === true ) {
+                        mixers.hero.velocity.y += 350;
+                        this.fadeToAction("hero", "Jump", 0.2)
+                    }
                     canJump = false;
                     break;
 
@@ -234,15 +229,6 @@ class Scene {
     }
 
     addRaycasters() {
-        /**
-         * Raycasters:
-         * 
-         * downRaycaster - cast directly beneath the camera for terrain, objects, verticle elevation
-         * 
-         * movementRaycaster - cast at height 10 in the direction of controls movement
-         * 
-         * selectRaycaster - cast immediately in front of the camera for item selection, etc.
-         */
 
         downRaycaster = new THREE.Raycaster( new THREE.Vector3(), 
         new THREE.Vector3( 0, - 1, 0 ), 
@@ -274,7 +260,6 @@ class Scene {
             this.floor = obj.children[0].children[0];
 
             scene.add( obj );
-            console.dir(this.floor);
             callback();
         
         }, undefined, function ( error ) {
@@ -319,11 +304,11 @@ class Scene {
         
             let model = gltf.scene;
             
-            model.scale.x = this.hero.scale;
-            model.scale.y = this.hero.scale;
-            model.scale.z = this.hero.scale;
+            model.scale.x = this.hero.attributes.scale;
+            model.scale.y = this.hero.attributes.scale;
+            model.scale.z = this.hero.attributes.scale;
             
-            model.position.z -= 40;
+            // model.position.z -= 40;
             model.position.y -= 25;
             model.rotation.y = Math.PI;
             this.controls.getObject().add( model );
@@ -364,17 +349,15 @@ class Scene {
             activeAction: actions[ uniqueId + 'Walking'],
             previousActionName: '',
             previousAction: null,
-            absVelocity: 0
+            absVelocity: 0,
+            velocity: new THREE.Vector3()
 
         };
 
         mixers[uniqueId] = mixerObj;
-        if (uniqueId == "hero") {
-            heroMixer = mixerObj;
-        }
 
         // DEFAULT:
-        this.fadeToAction( uniqueId, 'Walking', 0.2);
+        mixerObj.activeAction.play();
 
     }
 
@@ -413,6 +396,44 @@ class Scene {
         }
     }
 
+    /**
+     * This function will move each entity according to his properties,
+     * similar to the reposition function for the hero character.
+     */
+    handleMovement = ( entity, delta ) => {
+
+        if (mixers[entity.uuid]) {
+            
+            // Make a random rotation (yaw)
+            entity.rotateY(getRndInteger(-1,2)/100);
+
+            // Basic movement always in the z-axis direction for this entity
+            mixers[entity.uuid].velocity.z = getRndInteger(.2,entity.attributes.agility) * 100;
+            var mCaster = this.getMovementRay(entity.position,new THREE.Vector3(0,0,1));
+            var mIntersections = mCaster.intersectObjects(this.objects3D, true);
+            mIntersections = mIntersections.filter(el => el != entity);
+            if (mIntersections.length == 0) {
+                entity.translateZ( mixers[entity.uuid].velocity.z * delta );
+                let worldPosition = new THREE.Vector3();
+                if (Math.abs(entity.getWorldPosition(worldPosition).x) >= this.planeHeight/2 || 
+                Math.abs(entity.getWorldPosition(worldPosition).z) >= this.planeWidth/2) {
+                    entity.translateZ( - mixers[entity.uuid].velocity.z * delta );
+                }
+            } else {
+                
+            }
+    
+            // Grounded means elevation 30
+            
+            let floorHeight = this.determineFloorHeight(entity.position.x, entity.position.z);
+            if ( entity.position.y < (floorHeight + entity.attributes.elevation)) {
+                entity.position.y = (floorHeight + entity.attributes.elevation);
+            }
+        }
+
+
+    }
+
     /** 
      * Create 3D representation of each object:
      */ 
@@ -421,8 +442,8 @@ class Scene {
         // Set hero location:
         this.controls.getObject().translateX( this.hero.location.x * multiplier );
         this.controls.getObject().translateZ( this.hero.location.z * multiplier );
-        this.controls.getObject().translateY( this.hero.height? this.hero.height : 15 ); 
-            // this.determineFloorHeight(this.controls.getObject().position.x, this.controls.getObject().position.z) + this.hero.height );
+        this.controls.getObject().translateY( this.hero.attributes.height? this.hero.attributes.height : 15 ); 
+            // this.determineFloorHeight(this.controls.getObject().position.x, this.controls.getObject().position.z) + this.hero.attributes.height );
 
         this.objects.forEach(object => {
 
@@ -432,16 +453,18 @@ class Scene {
             
                 let model = gltf.scene;
             
-                model.scale.x = object.scale;
-                model.scale.y = object.scale;
-                model.scale.z = object.scale;
+                model.scale.x = object.attributes.scale;
+                model.scale.y = object.attributes.scale;
+                model.scale.z = object.attributes.scale;
+
                 
                 model.position.x = object.location.x * multiplier + getRndInteger(-20,20);
                 model.position.z = object.location.z * multiplier + getRndInteger(-20,20);
-                model.position.y = this.determineFloorHeight(model.position.x, model.position.z) + object.elevation;
+                model.position.y = this.determineFloorHeight(model.position.x, model.position.z) + object.attributes.elevation;
 
                 model.objectName = object.name;
                 model.objectType = object.type;
+                model.attributes = object.attributes;
 
                 this.objects3D.push( model );
                 scene.add( model );
@@ -502,13 +525,6 @@ class Scene {
                     let objectName = this.getObjectName(thisObj);
                     let objectType = this.getObjectType(thisObj);
                     
-                    // console.log("Scene:");
-                    // console.dir(scene);
-                    // console.log("this.objects3D:");
-                    // console.dir(this.objects3D);
-                    // console.log("selectIntersects[0]");
-                    // console.dir(selectIntersects[0]);
-
                     // If it is an item, pick it up and add to inventory
                     if (objectType == "item") {
                         
@@ -531,7 +547,7 @@ class Scene {
                         this.fadeToAction("hero", "Punch", 0.2)
                         // TODO: act upon the enemy with the object in hand
 
-                        
+
                     }
 
                 }
@@ -627,6 +643,10 @@ class Scene {
         return 110 - floorIntersection[0].distance;
     }
 
+    getMovementRay(origin, direction) {
+        return new THREE.Raycaster( origin, direction, 0, 10 );
+    }
+
     castMovementRay() {
         // MOVEMENT
         var movementRaycasterRotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
@@ -666,28 +686,22 @@ class Scene {
 
     }
 
-    addToEmissives(obj) {
-        if (!this.emissives.map(el => el.object).includes(obj)) {
-            this.emissives.push({object: obj, timeLeft: 30});
-        }
-    }
-
     reposition(delta) {
         // Only perform the translation if I will not invade another.
         intersects = movementRaycaster.intersectObjects(this.objects3D, true);
         if (intersects.length == 0) {
             
-            this.controls.getObject().translateX( velocity.x * delta );
-            this.controls.getObject().translateY( velocity.y * delta );
-            this.controls.getObject().translateZ( velocity.z * delta );
+            this.controls.getObject().translateX( mixers.hero.velocity.x * delta );
+            this.controls.getObject().translateY( mixers.hero.velocity.y * delta );
+            this.controls.getObject().translateZ( mixers.hero.velocity.z * delta );
 
             // Test and bounce back if needed
             let controlsObj = this.controls.getObject();
             if (Math.abs(controlsObj.getWorldPosition(controlsObj.position).x) >= this.planeHeight/2 || 
             Math.abs(controlsObj.getWorldPosition(controlsObj.position).z) >= this.planeWidth/2) {
-                this.controls.getObject().translateX( -velocity.x * delta );
-                this.controls.getObject().translateY( -velocity.y * delta );
-                this.controls.getObject().translateZ( -velocity.z * delta );
+                this.controls.getObject().translateX( -mixers.hero.velocity.x * delta );
+                this.controls.getObject().translateY( -mixers.hero.velocity.y * delta );
+                this.controls.getObject().translateZ( -mixers.hero.velocity.z * delta );
             }
         } else {
             // console.dir(intersects);
@@ -696,10 +710,16 @@ class Scene {
         // Grounded means elevation 30
 
         let floorHeight = this.determineFloorHeight(this.controls.getObject().position.x, this.controls.getObject().position.z);
-        if ( this.controls.getObject().position.y < (floorHeight + this.hero.height)) {
-            velocity.y = 0;
-            this.controls.getObject().position.y = (floorHeight + this.hero.height);
+        if ( this.controls.getObject().position.y < (floorHeight + this.hero.attributes.height)) {
+            mixers.hero.velocity.y = 0;
+            this.controls.getObject().position.y = (floorHeight + this.hero.attributes.height);
             canJump = true;
+        }
+    }
+
+    addToEmissives(obj) {
+        if (!this.emissives.map(el => el.object).includes(obj)) {
+            this.emissives.push({object: obj, timeLeft: 30});
         }
     }
 
@@ -709,7 +729,6 @@ class Scene {
             obj.object.object.material.emissive = WHITE;
 
             if (obj.timeLeft > 0) {
-                console.table(this.emissives);
                 obj.timeLeft --;
             } else {
                 obj.object.object.material.emissive = BLACK;
@@ -723,54 +742,62 @@ class Scene {
         requestAnimationFrame( this.animate );
         if ( this.controls.isLocked === true ) {
 
-            this.handleEmissives();
+            // this.handleEmissives();
 
             downRaycaster.ray.origin.copy( this.controls.getObject().position );
-            downRaycaster.ray.origin.y -= (this.hero.height? this.hero.height : 15);
+            downRaycaster.ray.origin.y -= (this.hero.attributes.height? this.hero.attributes.height : 15);
             var intersections = downRaycaster.intersectObjects( this.objects3D, true );
             var onObject = intersections.length > 0;
 
             var time = performance.now();
             var delta = ( time - prevTime ) / 1000;
 
-            velocity.x -= velocity.x * 10.0 * delta;
-            velocity.z -= velocity.z * 10.0 * delta;
-            velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+            if (mixers.hero) {
 
-            direction.z = Number( moveForward ) - Number( moveBackward );
-            direction.x = Number( moveLeft ) - Number( moveRight );
-            direction.normalize(); // this ensures consistent movements in all directions
-            
-            if ( moveForward || moveBackward ) velocity.z -= direction.z * 1000.0 * delta;
-            if ( moveLeft || moveRight ) velocity.x -= direction.x * 1000.0 * delta;
-            
-            if ( onObject === true ) {
-                velocity.y = Math.max( 0, velocity.y );
-                canJump = true;
+                mixers.hero.velocity.x -= mixers.hero.velocity.x * 10.0 * delta;
+                mixers.hero.velocity.z -= mixers.hero.velocity.z * 10.0 * delta;
+                mixers.hero.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+    
+                direction.z = Number( moveForward ) - Number( moveBackward );
+                direction.x = Number( moveLeft ) - Number( moveRight );
+                direction.normalize(); // this ensures consistent movements in all directions
+                
+                if ( moveForward || moveBackward ) mixers.hero.velocity.z -= direction.z * 1000.0 * delta;
+                if ( moveLeft || moveRight ) mixers.hero.velocity.x -= direction.x * 1000.0 * delta;
+                
+                if ( onObject === true ) {
+                    mixers.hero.velocity.y = Math.max( 0, mixers.hero.velocity.y );
+                    canJump = true;
+                }
+
+                // this.controls.getObject().rotation.y returns the yaw rotation of the pointer control (mouse)
+                this.castMovementRay();
+                this.castSelectionRay();
+                this.reposition(delta);    
             }
 
-            mixers.hero.absVelocity = Math.max(Math.abs(velocity.x), Math.abs(velocity.z));
 
             if ( mixers ) {
                 Object.keys(mixers).forEach(key => {
-
-
-
-
-                    // if (maxVelocity < 1 || mixers.) {
-                    //     this.fadeToAction( "hero", 'Idle', 0.2);
-                    // } else {
-                    //     this.fadeToAction( "hero", 'Walking', 0.2);
-                    // }
-
                     mixers[key].mixer.update( delta );
+
+                    mixers[key].absVelocity = Math.max(Math.abs(mixers[key].velocity.x), Math.abs(mixers[key].velocity.z));
+
+                    if (mixers[key].absVelocity < .1 && mixers[key].activeActionName == 'Walking') {
+                        this.fadeToAction( key, 'Idle', 0.2);
+                    } else if (mixers[key].absVelocity >= .1 && mixers[key].activeActionName == 'Idle') {
+                        this.fadeToAction( key, 'Walking', 0.2);
+                    }
                 })
+
+                this.objects3D.filter(el => el.objectType == 'friendly' || el.objectType == 'beast').forEach(entity => {
+                    this.handleMovement(entity, delta);
+                });
             } 
 
-            // this.controls.getObject().rotation.y returns the yaw rotation of the pointer control (mouse)
-            this.castMovementRay();
-            this.castSelectionRay();
-            this.reposition(delta);            
+
+
+        
 
             prevTime = time;
 
