@@ -23,7 +23,10 @@ export const levels = [
             Structures.rock1
         ],
         entities: [
-            Entities.evilOne
+            Entities.evilOne,
+            Entities.evilOne,
+            Entities.john
+
         ]
     },
     {

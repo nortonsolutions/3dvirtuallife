@@ -4,7 +4,7 @@ export class Hero {
     // {
     //     name: 'Dave',
     //     attributes: {
-    //          height: 20,
+    //          height: 20
     //     },
     //     inventory: []
     // }
