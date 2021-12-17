@@ -12,7 +12,10 @@ var moveBackward = false;
 var moveLeft = false;
 var moveRight = false;
 
-var downRaycasterTestLength = 250;
+var downRaycasterTestLength = 350;
+var cameraReach = 1000;
+var cameraDistanceDefault = 250;
+var cameraElevationDefault = 50;
 
 var prevTime = performance.now();
 
@@ -32,13 +35,13 @@ var BLACK = new THREE.Color('black');
 
 class Scene {
 
-    constructor(hero, height, width, terrain, objects, background, controller) {
+    constructor(hero, length, width, terrain, objects, background, controller) {
 
         // SceneController has access to layoutBuilder, which has levelManager
         this.controller = controller;
         
         this.planeWidth = width? width * multiplier * 1.1 : 2000;
-        this.planeHeight = height? height * multiplier * 1.1 : 2000;
+        this.planeHeight = length? length * multiplier * 1.1 : 2000;
 
         this.hero = hero;
         this.emissives = [];
@@ -60,15 +63,16 @@ class Scene {
     init() {
 
         navbarHeight = document.querySelector('.navbar').clientHeight;
-        camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, 1400 );
+        camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, cameraReach );
     
-        camera.position.set( 0, 50, 250 );
+        camera.position.set( 0, cameraElevationDefault, cameraDistanceDefault );
+        
+
         scene = new THREE.Scene();
 
-
-        this.addBackground();
         this.addLights();
         this.addControls();
+        this.addBackground();
         this.addFloor(() => {
             this.seedObjects3D();
             this.addHero3D();
@@ -88,58 +92,31 @@ class Scene {
         // BACKGROUND - EQUIRECT thanks to Paul Debevec! 
         if (this.background && this.background.length > 0) {
 
-            // var textureLoader = new THREE.TextureLoader();
-            // var textureEquirec, backgroundMesh;
-
-            // textureEquirec = textureLoader.load( "/models/textures/" + this.background );
-            // textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
-            // textureEquirec.encoding = THREE.sRGBEncoding;
-
-            // // Materials
-            // var equirectShader = THREE.ShaderLib[ "equirect" ];
-            // var equirectMaterial = new THREE.ShaderMaterial( {
-            //     fragmentShader: equirectShader.fragmentShader,
-            //     vertexShader: equirectShader.vertexShader,
-            //     uniforms: equirectShader.uniforms,
-            //     depthWrite: false,
-            //     side: THREE.BackSide
-            // } );
-
-            // equirectMaterial.uniforms[ "tEquirect" ].value = textureEquirec;
-
-            // Object.defineProperty( equirectMaterial, 'map', {
-
-            //     get: function () {
-            //         return this.uniforms.tEquirect.value;
-            //     }
-            // } );
-
-            // backgroundMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( this.planeWidth, 400, this.planeHeight ), equirectMaterial );
-            // backgroundMesh.position.y = this.planeHeight/2;
-
-            // More simplistic equirectangular mapping to the inverse of a sphere geometry:
-            var geometry = new THREE.SphereBufferGeometry(this.planeHeight);
-            geometry.scale (-1,.5,1);
+            // simplistic equirectangular mapping to the inverse of a sphere geometry:
+            var geometry = new THREE.SphereBufferGeometry(cameraReach - 250);
+            geometry.scale (-1,1,1);
 
             var material = new THREE.MeshBasicMaterial( {
                 map: new THREE.TextureLoader().load("/models/textures/" + this.background)
             });
 
             var backgroundMesh = new THREE.Mesh(geometry, material)
-            
-            scene.add( backgroundMesh );
+            this.controls.getObject().add( backgroundMesh );
 
         } else {
-            scene.background = new THREE.Color( 'white' );
+            scene.background = BLACK;
         }
 
-        scene.fog = new THREE.Fog( 'white', 0, 750 );
+        if (this.terrain.fog) scene.fog = new THREE.Fog( 'white', 100, cameraReach );
     }
 
     addLights() {
-        var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
-        light.position.set( 0.5, 1, 0.75 );
-        scene.add( light );
+
+        if (this.terrain.hemisphereLight) {
+            var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
+            light.position.set( 0.5, 1, 0.75 );
+            scene.add( light );
+        }
 
         proximityLight = new THREE.PointLight( 0x00ff00, 2, 50, 2 );
         proximityLight.position.set( 0, 0, 0 );
@@ -149,6 +126,9 @@ class Scene {
 
     addControls() {
         this.controls = new THREE.PointerLockControls( camera );
+
+        this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault);
+        
 
         scene.add( this.controls.getObject() );
 
@@ -239,7 +219,7 @@ class Scene {
         
             this.floor = gltf.scene;
             this.floor.scale.x = this.terrain.scale;
-            this.floor.scale.y = this.terrain.scale * .2;
+            this.floor.scale.y = this.terrain.scale;
             this.floor.scale.z = this.terrain.scale;
             scene.add( this.floor );
             callback();
@@ -280,7 +260,7 @@ class Scene {
     determineElevationGeneric(x,z, uniqueId) {
         this.downRaycasterGeneric.ray.origin.x = x;
         this.downRaycasterGeneric.ray.origin.z = z;
-        this.downRaycasterGeneric.ray.origin.y = downRaycasterTestLength - 1;
+        this.downRaycasterGeneric.ray.origin.y = downRaycasterTestLength - 10;
 
         // DEBUG for 'Cannot read property 'distance'...
         if (! this.downRaycasterGeneric.intersectObject(this.floor, true)[0]) {
@@ -615,7 +595,7 @@ class Scene {
         let thisMixer = mixers[uniqueId];
         let downRaycaster = thisMixer.downRaycaster;
         downRaycaster.ray.origin.copy(entity.position);
-        downRaycaster.ray.origin.y = downRaycasterTestLength - 1;
+        downRaycaster.ray.origin.y = downRaycasterTestLength - 10;
 
 
         var intersections = downRaycaster.intersectObjects( this.objects3D, true ).filter(el => {
@@ -728,6 +708,32 @@ class Scene {
 
     }
 
+    handleAutoZoom = (position, rotation) => {
+        this.cameraBackray.ray.origin.copy(position);
+
+        let rotations = new THREE.Euler( 0, 0, 0, 'YXZ' );
+        rotations.set( rotation.x, rotation.y, 0 );
+        let worldDirection = new THREE.Vector3( 0, 0.4, 1 ).applyEuler( rotations );
+        this.cameraBackray.ray.direction = worldDirection;
+
+        let backrayIntersections = 
+            [...this.cameraBackray.intersectObject(this.floor, true), 
+            ...this.cameraBackray.intersectObjects(this.objects3D.filter(el => el.objectType == 'structure'), true)]
+        
+        if (backrayIntersections[0]) {
+            let distance = backrayIntersections[0].distance;
+            if (distance < cameraDistanceDefault && camera.position.z > -5) {
+                camera.position.z -= cameraDistanceDefault / 30;
+                if (camera.position.y > 0) camera.position.y -= cameraElevationDefault / 30;
+            }
+        } else {
+            if (camera.position.z <= cameraDistanceDefault) {
+                camera.position.z += cameraDistanceDefault / 100;
+                if (camera.position.y < cameraElevationDefault) camera.position.y += cameraElevationDefault / 100;
+            }
+        }
+    }
+
     handleHeroMovement(delta) {
 
         if (mixers.hero) {
@@ -752,6 +758,10 @@ class Scene {
             this.identifySelectedObject(heroObj);
 
             this.handleMovement( "hero", heroObj, delta );
+
+            // HANDLE BACKRAY TO ADJUST CAMERA DISTANCE
+            this.handleAutoZoom(heroObj.position, heroObj.rotation);
+
         }
     }
 

@@ -6,15 +6,18 @@ import {Items} from './items.js';
 import {Structures} from './structures.js';
 
 export const levels = [
+
     {
         level: 0,
-        width: 27,
-        length: 27,
+        width: 26,
+        length: 26,
         name: "In the valley of mist",
         background: 'clouds.png',
         terrain: {
             gltf: 'valley.gltf',
-            scale: 100
+            scale: 100,
+            fog: true,
+            hemisphereLight: true
         },
         items: [
             Items.keyToShed
@@ -40,7 +43,10 @@ export const levels = [
         background: 'clouds.png',
         terrain: {
             gltf: 'dungeon.gltf',
-            scale: 100
+            scale: 100,
+            fog: false,
+            hemisphereLight: false
+
         },
         items: [
             Items.bagOfGems
@@ -53,6 +59,8 @@ export const levels = [
             Entities.evilOne,
             Entities.evilOne
         ]
-    },
+    }
+ 
+
 
 ]
