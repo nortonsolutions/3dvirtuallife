@@ -3,7 +3,7 @@ import {levels} from './blueprints/levels.js'
 class LevelManager {
 
     constructor(level) {
-        this.level = levels[level];
+        this.level = levels.find(el => el.level == level);
     }
 
     getBackground() {
