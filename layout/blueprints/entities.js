@@ -2,9 +2,10 @@ export const Entities = {
     evilOne: {
         name: 'evilOne',
         gltf: 'robot.glb',
-        description: 'A small but menacing humanoid beast, with fire in its eyes and ready to attack',
+        description: 'A menacing beast with fire in its eyes; ready to attack',
         type: 'beast',
         attributes: {
+            animates: true,
             height: 20,
             elevation: 0,
             scale: 10,
@@ -17,13 +18,14 @@ export const Entities = {
     },
     john: {
         name: 'john',
-        gltf: 'john.gltf',
+        gltf: 'robot.glb',
         description: 'A strappling middle-aged man with a friendly face',
         type: 'friendly',
         attributes: {
+            animates: true,
             height: 20,
             elevation: 0,
-            scale: 1,
+            scale: 5,
             agility: 1,
             elevation: 0,
             conversation: [],

@@ -12,6 +12,8 @@ var moveBackward = false;
 var moveLeft = false;
 var moveRight = false;
 
+var downRaycasterTestLength = 250;
+
 var prevTime = performance.now();
 
 // var vertex = new THREE.Vector3();
@@ -60,6 +62,7 @@ class Scene {
         navbarHeight = document.querySelector('.navbar').clientHeight;
         camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, 1400 );
     
+        camera.position.set( 0, 50, 250 );
         scene = new THREE.Scene();
 
 
@@ -75,7 +78,7 @@ class Scene {
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
         
-        this.downRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 150 );
+        this.downRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength);
 
         this.addEventListeners();
     }
@@ -180,6 +183,7 @@ class Scene {
                         this.fadeToAction("hero", "Jump", 0.2)
                     }
                     mixers.hero.canJump = false;
+                    mixers.hero.justJumped = true;
                     break;
 
                 case 73: // i
@@ -231,12 +235,13 @@ class Scene {
     addFloor(callback) {
 
         var loader = new THREE.GLTFLoader();
-        loader.load( '/models/3d/gltf/' + this.terrain, (gltf) => {
+        loader.load( '/models/3d/gltf/' + this.terrain.gltf, (gltf) => {
         
-            var obj = gltf.scene;
-            this.floor = obj.children[0];
-
-            scene.add( obj );
+            this.floor = gltf.scene;
+            this.floor.scale.x = this.terrain.scale;
+            this.floor.scale.y = this.terrain.scale * .2;
+            this.floor.scale.z = this.terrain.scale;
+            scene.add( this.floor );
             callback();
         
         }, undefined, function ( error ) {
@@ -272,10 +277,16 @@ class Scene {
         } );
     }
 
-    determineElevationGeneric(x,z) {
+    determineElevationGeneric(x,z, uniqueId) {
         this.downRaycasterGeneric.ray.origin.x = x;
         this.downRaycasterGeneric.ray.origin.z = z;
-        this.downRaycasterGeneric.ray.origin.y = 150;
+        this.downRaycasterGeneric.ray.origin.y = downRaycasterTestLength - 1;
+
+        // DEBUG for 'Cannot read property 'distance'...
+        if (! this.downRaycasterGeneric.intersectObject(this.floor, true)[0]) {
+            console.dir(this.floor);
+            console.log(`${uniqueId} = ${x},${z}`);
+        }
         return this.downRaycasterGeneric.ray.origin.y - this.downRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
     }
 
@@ -298,22 +309,21 @@ class Scene {
             
                 let model = gltf.scene;
 
-                if (object.type == 'beast') {
-                    this.createGUI( model, gltf.animations, model.uuid );
-                }
-
                 model.scale.x = object.attributes.scale;
                 model.scale.y = object.attributes.scale;
                 model.scale.z = object.attributes.scale;
 
-                
-                model.position.x = object.location.x * multiplier + getRndInteger(-20,20);
-                model.position.z = object.location.z * multiplier + getRndInteger(-20,20);
-                model.position.y = this.determineElevationGeneric(model.position.x, model.position.z) + object.attributes.elevation;
-
                 model.objectName = object.name;
                 model.objectType = object.type;
                 model.attributes = object.attributes;
+                
+                model.position.x = object.location.x * multiplier + getRndInteger(-20,20);
+                model.position.z = object.location.z * multiplier + getRndInteger(-20,20);
+                model.position.y = this.determineElevationGeneric(model.position.x, model.position.z,object.name) + object.attributes.elevation;
+
+                if (object.attributes.animates) {
+                    this.createGUI( model, gltf.animations, model.uuid );
+                }
 
                 this.objects3D.push( model );
                 scene.add( model );
@@ -390,6 +400,10 @@ class Scene {
                         // TODO: act upon the enemy with the object in hand
 
 
+                    } else if (objectType == "structure") {
+
+
+                        mixers[thisObj.uuid].activeAction.reset();
                     }
 
                 }
@@ -520,18 +534,19 @@ class Scene {
 
         var mixerObj = { 
         
-            name: uniqueId, 
+            name: model.objectName, 
             mixer: thisMixer,
-            activeActionName: 'Walking',
-            activeAction: actions[ uniqueId + 'Walking'],
+            activeActionName: 'Idle',
+            activeAction: actions[Object.keys(actions)[0]],
             previousActionName: '',
             previousAction: null,
             absVelocity: 0,
             direction: new THREE.Vector3(),
             velocity: new THREE.Vector3(),
-            downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 150 ),
+            downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength ),
             movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 0, 0 ), 0, 10 ),
             onObject: false,
+            justJumped: false,
             canJump: true,
             selectedObject: null
 
@@ -540,7 +555,7 @@ class Scene {
         mixers[uniqueId] = mixerObj;
 
         // DEFAULT:
-        mixerObj.activeAction.play();
+        if (mixerObj.activeAction) mixerObj.activeAction.play();
 
     }
 
@@ -600,18 +615,21 @@ class Scene {
         let thisMixer = mixers[uniqueId];
         let downRaycaster = thisMixer.downRaycaster;
         downRaycaster.ray.origin.copy(entity.position);
-        downRaycaster.ray.origin.y = 110;
+        downRaycaster.ray.origin.y = downRaycasterTestLength - 1;
+
 
         var intersections = downRaycaster.intersectObjects( this.objects3D, true ).filter(el => {
             return this.getObjectName(el.object) != entity.objectName;
         });
 
-        thisMixer.onObject = intersections.length > 0;
+        if (thisMixer.justJumped || thisMixer.onObject) {
+            thisMixer.onObject = intersections.length > 0;
+        }
+
+        // Accomodate for hero height (special case due to controls object)
         var elevation = (uniqueId == "hero") ? this.hero.attributes.height : 0;
-        
+
         if ( thisMixer.onObject === true ) {
-            thisMixer.velocity.y = Math.max( 0, thisMixer.velocity.y );
-            thisMixer.canJump = true;
             elevation += (downRaycaster.ray.origin.y - intersections[0].distance);
         } else {
             // DEBUG for 'Cannot read property 'distance'...
@@ -622,6 +640,7 @@ class Scene {
             }
             elevation += (downRaycaster.ray.origin.y - downRaycaster.intersectObject(this.floor, true)[0].distance);
         }
+        
 
         return elevation;
     }
@@ -665,8 +684,6 @@ class Scene {
             // console.dir(intersects);
         }
 
-
-
         let elevation = this.determineElevation( uniqueId, entity );
 
         // if (uniqueId == "hero") {
@@ -675,11 +692,13 @@ class Scene {
         //     console.log(`entity.attributes.elevation: ${entity.attributes.elevation}`);
         // }
         
-        if ( entity.position.y <= (elevation + entity.attributes.elevation)) {
-            mixers[uniqueId].velocity.y = 0;
+        // If onObject or onGround:
+        if (thisMixer.onObject || entity.position.y <= (elevation + entity.attributes.elevation)) {
             entity.position.y = (elevation + entity.attributes.elevation);
-            mixers[uniqueId].canJump = true;
-        }
+            thisMixer.velocity.y = Math.max( 0, thisMixer.velocity.y );
+            thisMixer.canJump = true;
+            thisMixer.justJumped = false;
+        } 
     }
 
     identifySelectedObject(heroObj) {

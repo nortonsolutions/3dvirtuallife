@@ -64,7 +64,7 @@ class LayoutBuilder {
             .map(item => itemDetails(item));
 
         this.width = this.levelManager.getWidth();
-        this.height = this.levelManager.getHeight();
+        this.length = this.levelManager.getLength();
         this.background = this.levelManager.getBackground();
         this.terrain = this.levelManager.getTerrain();
     }
@@ -82,7 +82,7 @@ class LayoutBuilder {
             structures: this.structures,
             entities: this.entities,
             width: this.width,
-            height: this.height,   
+            length: this.length,   
             background: this.background
         }
 
@@ -93,7 +93,7 @@ class LayoutBuilder {
         return {
             x: this.levelManager.getWidth()/2 - Math.floor(Math.random() * this.levelManager.getWidth()),
             y: 0,
-            z: this.levelManager.getHeight()/2 - Math.floor(Math.random() * this.levelManager.getHeight())
+            z: this.levelManager.getLength()/2 - Math.floor(Math.random() * this.levelManager.getLength())
         }
     }
 }

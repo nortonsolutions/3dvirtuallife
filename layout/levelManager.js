@@ -14,8 +14,8 @@ class LevelManager {
         return this.level.terrain;
     }
 
-    getHeight() {
-        return this.level.height;
+    getLength() {
+        return this.level.length;
     }
 
     getWidth() {

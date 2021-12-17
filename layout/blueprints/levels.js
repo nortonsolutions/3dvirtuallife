@@ -8,19 +8,22 @@ import {Structures} from './structures.js';
 export const levels = [
     {
         level: 0,
-        width: 8,
-        height: 8,
+        width: 27,
+        length: 27,
         name: "In the valley of mist",
         background: 'clouds.png',
-        terrain: 'valley.gltf',
-
+        terrain: {
+            gltf: 'valley.gltf',
+            scale: 100
+        },
         items: [
             Items.keyToShed
         ],
         structures: [
             Structures.shed,
             Structures.rock1,
-            Structures.rock1
+            Structures.rock1,
+            Structures.grate
         ],
         entities: [
             Entities.evilOne,
@@ -31,12 +34,14 @@ export const levels = [
     },
     {
         level: 1,
-        width: 8,
-        height: 8,
+        width: 29,
+        length: 29,
         name: "In the dungeon",
         background: 'clouds.png',
-        terrain: 'dungeon.gltf',
-
+        terrain: {
+            gltf: 'dungeon.gltf',
+            scale: 100
+        },
         items: [
             Items.bagOfGems
         ],
@@ -48,5 +53,6 @@ export const levels = [
             Entities.evilOne,
             Entities.evilOne
         ]
-    }
+    },
+
 ]

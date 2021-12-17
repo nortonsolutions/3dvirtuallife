@@ -21,7 +21,7 @@ export class SceneController {
     }
 
     animateScene() {
-        var scene = new Scene(this.layout.hero, this.layout.height, this.layout.width, this.terrain, this.objects, this.background, this);
+        var scene = new Scene(this.layout.hero, this.layout.length, this.layout.width, this.terrain, this.objects, this.background, this);
         scene.init();
         scene.animate();
     }

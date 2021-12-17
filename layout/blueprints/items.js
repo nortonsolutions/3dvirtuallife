@@ -5,6 +5,7 @@ export const Items = {
         description: 'A rusty old key with faint engravings',
         type: 'item',
         attributes: {
+            animates: false,
             scale: .1,
             elevation: 10
         }
@@ -15,6 +16,7 @@ export const Items = {
         description: 'A small velvet bag full of gems',
         type: 'item',
         attributes: {
+            animates: true,
             scale: .1,
             elevation: 0
         }
@@ -25,6 +27,7 @@ export const Items = {
         description: 'A slender metallic blade, strong yet flexible',
         type: 'item',
         attributes: {
+            animates: false,
             scale: .1,
             elevation: 0
         } 
