@@ -10,7 +10,7 @@ export const levels = [
         level: 0,
         width: 8,
         height: 8,
-        name: "Introduction",
+        name: "In the valley of mist",
         background: 'clouds.png',
         terrain: 'valley.gltf',
 
@@ -33,9 +33,9 @@ export const levels = [
         level: 1,
         width: 8,
         height: 8,
-        name: "Through the Corridor",
+        name: "In the dungeon",
         background: 'clouds.png',
-        terrain: 'valley1.gltf',
+        terrain: 'dungeon.gltf',
 
         items: [
             Items.bagOfGems

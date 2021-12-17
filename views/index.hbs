@@ -46,6 +46,7 @@
 
     </div>
 
+    <div id="message"></div>
 
     </body>
     <script type="module">
@@ -69,6 +70,15 @@
             el.addEventListener('click', e => {
                 e.preventDefault();
                 game = new Game(props);
+
+                game.eventDepot.addListener('showDescription', (data) => {
+                    let description = game.getObjectDetail(data.objectType,data.objectName,'description');
+                    document.getElementById('message').innerHTML = description;
+                });
+
+                game.eventDepot.addListener('hideDescription', (data) => {
+                    document.getElementById('message').innerHTML = '';
+                });
 
                 game.eventDepot.addListener('modal', (data) => {
 

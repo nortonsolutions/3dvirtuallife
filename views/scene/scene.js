@@ -1,5 +1,5 @@
 var camera, scene, renderer, 
-    selectIntersects, helper, spotLight;
+    helper, proximityLight;
 
 var mixers = {};
 var actions = {};
@@ -138,9 +138,9 @@ class Scene {
         light.position.set( 0.5, 1, 0.75 );
         scene.add( light );
 
-        spotLight = new THREE.SpotLight( 0xfffff, 1 );
-        spotLight.angle = Math.PI / 4;
-        scene.add(spotLight);
+        proximityLight = new THREE.PointLight( 0x00ff00, 2, 50, 2 );
+        proximityLight.position.set( 0, 0, 0 );
+        scene.add( proximityLight );
 
     }
 
@@ -222,9 +222,9 @@ class Scene {
 
     addHelper() {
 
-        // helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(5), new THREE.MeshBasicMaterial({ color: 'red' }));
-        // helper.visible = false;
-        // scene.add( helper );
+        helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(5), new THREE.MeshBasicMaterial({ color: 'red' }));
+        helper.visible = false;
+        scene.add( helper );
 
     }
 
@@ -234,7 +234,7 @@ class Scene {
         loader.load( '/models/3d/gltf/' + this.terrain, (gltf) => {
         
             var obj = gltf.scene;
-            this.floor = obj.children[0].children[0];
+            this.floor = obj.children[0];
 
             scene.add( obj );
             callback();
@@ -275,8 +275,8 @@ class Scene {
     determineElevationGeneric(x,z) {
         this.downRaycasterGeneric.ray.origin.x = x;
         this.downRaycasterGeneric.ray.origin.z = z;
-        this.downRaycasterGeneric.ray.origin.y = 110;
-        return this.downRaycasterGeneric.ray.origin.y - this.downRaycasterGeneric.intersectObject(this.floor)[0].distance;
+        this.downRaycasterGeneric.ray.origin.y = 150;
+        return this.downRaycasterGeneric.ray.origin.y - this.downRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
     }
 
     /** 
@@ -359,13 +359,9 @@ class Scene {
         switch (e.button) {
 
             case 0:
-                // selectIntersects = selectRaycaster.intersectObjects(this.objects3D,true);
-                if (selectIntersects && selectIntersects.length > 0) {
+                if (mixers.hero.selectedObject) {
 
-                    // helper.visible = true;
-                    // helper.position.copy(selectIntersects[0].point);
-
-                    let thisObj = selectIntersects[0].object;
+                    let thisObj = mixers.hero.selectedObject;
 
                     // Get the parent name/type
                     let objectName = this.getObjectName(thisObj);
@@ -536,7 +532,8 @@ class Scene {
             downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 150 ),
             movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 0, 0 ), 0, 10 ),
             onObject: false,
-            canJump: true
+            canJump: true,
+            selectedObject: null
 
         };
 
@@ -603,7 +600,7 @@ class Scene {
         let thisMixer = mixers[uniqueId];
         let downRaycaster = thisMixer.downRaycaster;
         downRaycaster.ray.origin.copy(entity.position);
-        downRaycaster.ray.origin.y = 100;
+        downRaycaster.ray.origin.y = 110;
 
         var intersections = downRaycaster.intersectObjects( this.objects3D, true ).filter(el => {
             return this.getObjectName(el.object) != entity.objectName;
@@ -617,13 +614,17 @@ class Scene {
             thisMixer.canJump = true;
             elevation += (downRaycaster.ray.origin.y - intersections[0].distance);
         } else {
-            elevation += (downRaycaster.ray.origin.y - downRaycaster.intersectObject(this.floor)[0].distance);
+            // DEBUG for 'Cannot read property 'distance'...
+            if (! downRaycaster.intersectObject(this.floor, true)[0]) {
+                console.log(entity.objectName);
+                console.dir(entity.position);
+
+            }
+            elevation += (downRaycaster.ray.origin.y - downRaycaster.intersectObject(this.floor, true)[0].distance);
         }
 
         return elevation;
     }
-
-
 
     /**
      * This function will move an entity from one location to another.
@@ -655,6 +656,10 @@ class Scene {
                 entity.translateX( -thisMixer.velocity.x * delta );
                 entity.translateY( -thisMixer.velocity.y * delta );
                 entity.translateZ( -thisMixer.velocity.z * delta );
+
+                if (uniqueId != "hero") {
+                    entity.rotateY(1);
+                }
             }
         } else {
             // console.dir(intersects);
@@ -677,6 +682,33 @@ class Scene {
         }
     }
 
+    identifySelectedObject(heroObj) {
+
+        proximityLight.rotation.copy(heroObj.rotation);
+        proximityLight.position.copy(heroObj.position);
+        proximityLight.translateZ(-40);
+        proximityLight.translateY(-10);
+
+        let closest = Infinity;
+
+        this.objects3D.forEach(o => {
+            let distance = o.position.distanceTo(proximityLight.position);
+            if (distance <= 50 && distance < closest) {
+                closest = distance;
+                mixers.hero.selectedObject = o;
+                this.controller.eventDepot.fire('showDescription', { objectType: this.getObjectType(o), objectName: this.getObjectName(o) }); 
+            }
+        })
+
+        if (closest > 50) {
+            mixers.hero.selectedObject = null;
+            this.controller.eventDepot.fire('hideDescription', {}); 
+        }
+
+        // console.log(closest);
+
+    }
+
     handleHeroMovement(delta) {
 
         if (mixers.hero) {
@@ -697,6 +729,8 @@ class Scene {
             
             if ( moveForward || moveBackward ) thisMixer.velocity.z -= thisMixer.direction.z * 1000.0 * delta;
             if ( moveLeft || moveRight ) thisMixer.velocity.x -= thisMixer.direction.x * 1000.0 * delta;
+
+            this.identifySelectedObject(heroObj);
 
             this.handleMovement( "hero", heroObj, delta );
         }

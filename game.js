@@ -40,10 +40,11 @@ class Game {
         switch (objectType) {
             case 'item':
                 return this.layoutBuilder.levelManager.getItems().filter(el => el.name == objectName)[0][detailName];
-            case 'entity':
-                return this.layoutBuilder.levelManager.getEntity().filter(el => el.name == objectName)[0][detailName];
+            case 'friendly':
+            case 'beast':
+                return this.layoutBuilder.levelManager.getEntities().filter(el => el.name == objectName)[0][detailName];
             case 'structure':
-                return this.layoutBuilder.levelManager.getStructure().filter(el => el.name == objectName)[0][detailName];
+                return this.layoutBuilder.levelManager.getStructures().filter(el => el.name == objectName)[0][detailName];
         }
     }
 }
