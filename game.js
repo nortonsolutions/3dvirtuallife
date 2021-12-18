@@ -9,14 +9,13 @@
  */
 
 import {LayoutBuilder} from './layout/layoutBuilder.js';
-import {EventDepot} from '/public/eventDepot.js';
 import {Hero} from '/hero.js';
 
 class Game {
 
-    constructor(props) {
+    constructor(props, eventDepot) {
         this.props = props;
-        this.eventDepot = new EventDepot();
+        this.eventDepot = eventDepot;
         this.hero = new Hero(props.hero, this.eventDepot);
     }
 
