@@ -62,6 +62,8 @@
         localStorage.getItem('gameProps'): gameAPI.newGame('Dave', 20);
 
         var game;
+        var sceneController;
+
         /** When the user clicks START, it will instantiate the game and start.
         An empty layout for the given level will cause the layoutBuilder to
         generate a new layout for the scene. */
@@ -70,6 +72,17 @@
             el.addEventListener('click', e => {
                 e.preventDefault();
                 game = new Game(props);
+                
+                game.setGameLayout();
+
+                game.eventDepot.addListener('loadLevel', (data) => {
+                    game.eventDepot.fire('unlockControls', {});
+                    sceneController.deanimateScene();
+                    game.setLevel(data.level);
+                    game.setGameLayout();
+                    sceneController = new SceneController(game.hero, game.layoutBuilder, game.eventDepot);
+                    sceneController.animateScene();
+                });
 
                 game.eventDepot.addListener('showDescription', (data) => {
                     let description = game.getObjectDetail(data.objectType,data.objectName,'description');
@@ -129,7 +142,7 @@
                 })
 
                 game.stats(); // currently just dumps objects to console
-                var sceneController = new SceneController(game.layoutBuilder, game.eventDepot);
+                sceneController = new SceneController(game.hero, game.layoutBuilder, game.eventDepot);
                 sceneController.animateScene();
                 
             })

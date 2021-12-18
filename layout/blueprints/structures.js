@@ -26,7 +26,8 @@ export const Structures = {
             key: 'keyToShed',
             scale: 10,
             elevation: 1,
-            routeToLevel: 1
+            routeToLevel: 1,
+            accessible: false
         }
     
     },
@@ -49,7 +50,7 @@ export const Structures = {
         description: 'An old but sturdy wooden chest',
         type: 'structure',
         attributes: {
-            animates: true,
+            animates: false,
             contentItems: [
                 Items.smallSword
             ]

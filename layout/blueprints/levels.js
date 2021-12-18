@@ -9,18 +9,20 @@ export const levels = [
 
     {
         level: 0,
-        width: 26,
-        length: 26,
+        width: 8, //26
+        length: 8, //26
         name: "In the valley of mist",
         background: 'clouds.png',
         terrain: {
             gltf: 'valley.gltf',
             scale: 100,
             fog: true,
-            hemisphereLight: true
+            hemisphereLight: true,
+            overheadPointLight: true
         },
         items: [
-            Items.keyToShed
+            Items.keyToShed,
+            Items.smallSword
         ],
         structures: [
             Structures.shed,
@@ -40,13 +42,13 @@ export const levels = [
         width: 29,
         length: 29,
         name: "In the dungeon",
-        background: 'clouds.png',
+        background: '',
         terrain: {
             gltf: 'dungeon.gltf',
             scale: 100,
             fog: false,
-            hemisphereLight: false
-
+            hemisphereLight: false,
+            overheadPointLight: true
         },
         items: [
             Items.bagOfGems

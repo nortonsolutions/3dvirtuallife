@@ -17,9 +17,15 @@ class Game {
     constructor(props) {
         this.props = props;
         this.eventDepot = new EventDepot();
-
         this.hero = new Hero(props.hero, this.eventDepot);
-        this.layoutBuilder = new LayoutBuilder(props);
+    }
+
+    setLevel(level) {
+        this.props.level = level;
+    }
+    
+    setGameLayout() {
+        this.layoutBuilder = new LayoutBuilder(this.props);
         this.gameLayout = this.layoutBuilder.getLayout();
     }
 

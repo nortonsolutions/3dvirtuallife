@@ -39,7 +39,8 @@ class Scene {
 
         // SceneController has access to layoutBuilder, which has levelManager
         this.controller = controller;
-        
+        this.running = true;
+
         this.planeWidth = width? width * multiplier * 1.1 : 2000;
         this.planeHeight = length? length * multiplier * 1.1 : 2000;
 
@@ -70,12 +71,12 @@ class Scene {
 
         scene = new THREE.Scene();
 
-        this.addLights();
         this.addControls();
         this.addBackground();
         this.addFloor(() => {
             this.seedObjects3D();
             this.addHero3D();
+            this.addLights();
         });
         
         renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -118,6 +119,12 @@ class Scene {
             scene.add( light );
         }
 
+        if (this.terrain.overheadPointLight) {
+            this.overheadPointLight = new THREE.PointLight( 0xf37509, 2, 250, 2 );
+            this.overheadPointLight.position.set( 0, 0, 0 );
+            scene.add( this.overheadPointLight );
+        }
+        
         proximityLight = new THREE.PointLight( 0x00ff00, 2, 50, 2 );
         proximityLight.position.set( 0, 0, 0 );
         scene.add( proximityLight );
@@ -324,6 +331,16 @@ class Scene {
         console.dir(this.controls.getObject().position);
     }
 
+    getRootObject3D = (obj) => {
+        if (obj.objectName) {
+            return obj;
+        } else if (obj.parent == null) {
+            return null;
+        } else {
+            return this.getRootObject3D(obj.parent);
+        }
+    }
+
     getObjectName = (obj) => {
         if (obj.objectName) {
             return obj.objectName;
@@ -381,11 +398,19 @@ class Scene {
 
 
                     } else if (objectType == "structure") {
-
-
-                        mixers[thisObj.uuid].activeAction.reset();
+                        
+                        // Does this structure require a key?
+                        var accessible = thisObj.attributes.key ? 
+                            Object.keys(this.hero.inventory).includes(thisObj.attributes.key) :
+                            true;
+                        
+                        if (accessible) {
+                            thisObj.attributes.unlocked = true;
+                            if (mixers[thisObj.uuid] && mixers[thisObj.uuid].activeAction) {
+                                this.runActiveAction(thisObj.uuid, 0.2);
+                            }
+                        }
                     }
-
                 }
                 break;
             case 1:
@@ -505,11 +530,21 @@ class Scene {
 
             var action = thisMixer.clipAction( animation );
 
-            if ( emotes.indexOf( animation.name ) >= 0 || states.indexOf( animation.name ) >= 4 ) {
+            if ( emotes.indexOf( animation.name ) >= 0 || states.indexOf( animation.name ) >= 4) {
                 action.clampWhenFinished = true;
                 action.loop = THREE.LoopOnce;
+            } else if (model.objectType=='structure') {
+                action.clampWhenFinished = true;
+                action.loop = THREE.LoopPingPong;
+                action.repetitions = 1;
             }
+
             actions[ uniqueId + animation.name ] = action;
+
+            // DEBUG
+            if (model.objectType=='structure') {
+                console.dir(action);
+            }
         });
 
         var mixerObj = { 
@@ -520,17 +555,24 @@ class Scene {
             activeAction: actions[Object.keys(actions)[0]],
             previousActionName: '',
             previousAction: null,
-            absVelocity: 0,
-            direction: new THREE.Vector3(),
-            velocity: new THREE.Vector3(),
-            downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength ),
-            movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 0, 0 ), 0, 10 ),
-            onObject: false,
-            justJumped: false,
-            canJump: true,
-            selectedObject: null
-
         };
+
+        if (uniqueId == "hero" || model.objectType == "friendly" || model.objectType == "beast") {
+            mixerObj = {
+                ...mixerObj,
+                moves: true,
+                absVelocity: 0,
+                direction: new THREE.Vector3(),
+                velocity: new THREE.Vector3(),
+                downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength ),
+                movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 0, 0 ), 0, 10 ),
+                jumpedOnObject: false,
+                justJumped: false,
+                canJump: true,
+                selectedObject: null,
+                onObject: false
+            }
+        }
 
         mixers[uniqueId] = mixerObj;
 
@@ -573,55 +615,75 @@ class Scene {
             }
         }
     }
+
+    runActiveAction = (uuid, duration) => {
+        // Get the mixer for this uuid:
+        let thisMixer = mixers[uuid];
+        thisMixer.activeAction
+            .reset()
+            .setEffectiveTimeScale( 1 )
+            .setEffectiveWeight( 1 )
+            .fadeIn( duration )
+            .play();
+    }
     
     handleMixers(delta) {
         if ( mixers ) {
             Object.keys(mixers).forEach(key => {
-                mixers[key].mixer.update( delta );
-
-                mixers[key].absVelocity = Math.max(Math.abs(mixers[key].velocity.x), Math.abs(mixers[key].velocity.z));
-
-                if (mixers[key].absVelocity < .1 && mixers[key].activeActionName == 'Walking') {
-                    this.fadeToAction( key, 'Idle', 0.2);
-                } else if (mixers[key].absVelocity >= .1 && mixers[key].activeActionName == 'Idle') {
-                    this.fadeToAction( key, 'Walking', 0.2);
+                
+                
+                if (mixers[key].moves) {
+                    mixers[key].absVelocity = Math.max(Math.abs(mixers[key].velocity.x), Math.abs(mixers[key].velocity.z));
+    
+                    // if (key=="hero") console.log(mixers[key].absVelocity);
+                    if (mixers[key].absVelocity < .1 && (mixers[key].activeActionName == 'Walking' || mixers[key].activeActionName == 'Running')) {
+                        this.fadeToAction( key, 'Idle', 0.2);
+                    } else if (mixers[key].absVelocity >= .1 && mixers[key].activeActionName == 'Idle') {
+                        this.fadeToAction( key, 'Walking', 0.2);
+                    } else if (mixers[key].absVelocity >= 199 && mixers[key].activeActionName == 'Walking') {
+                        this.fadeToAction( key, 'Running', 0.2);
+                    }
                 }
+
+                mixers[key].mixer.update( delta );
             })
         }
     }
 
-    determineElevation(uniqueId, entity) {
+    castDownrayAndDetemineElevation(uniqueId, entity) {
 
         let thisMixer = mixers[uniqueId];
+
         let downRaycaster = thisMixer.downRaycaster;
         downRaycaster.ray.origin.copy(entity.position);
         downRaycaster.ray.origin.y = downRaycasterTestLength - 10;
 
-
-        var intersections = downRaycaster.intersectObjects( this.objects3D, true ).filter(el => {
+        let downwardIntersections = downRaycaster.intersectObjects( this.objects3D, true ).filter(el => {
             return this.getObjectName(el.object) != entity.objectName;
         });
-
-        if (thisMixer.justJumped || thisMixer.onObject) {
-            thisMixer.onObject = intersections.length > 0;
+        // console.dir(downwardIntersections);
+        if (thisMixer.justJumped || thisMixer.jumpedOnObject) {
+            thisMixer.jumpedOnObject = downwardIntersections.length > 0;
         }
+
+
+        if (downwardIntersections[0]) {
+            thisMixer.standingUpon = this.getRootObject3D(downwardIntersections[0].object);
+        } else {
+            thisMixer.standingUpon = null;
+        }
+
+        // if (thisMixer.standingUpon) console.dir(thisMixer.standingUpon);
 
         // Accomodate for hero height (special case due to controls object)
         var elevation = (uniqueId == "hero") ? this.hero.attributes.height : 0;
 
-        if ( thisMixer.onObject === true ) {
-            elevation += (downRaycaster.ray.origin.y - intersections[0].distance);
+        if ( thisMixer.jumpedOnObject === true ) {
+            elevation += (thisMixer.downRaycaster.ray.origin.y - downwardIntersections[0].distance);
         } else {
-            // DEBUG for 'Cannot read property 'distance'...
-            if (! downRaycaster.intersectObject(this.floor, true)[0]) {
-                console.log(entity.objectName);
-                console.dir(entity.position);
-
-            }
             elevation += (downRaycaster.ray.origin.y - downRaycaster.intersectObject(this.floor, true)[0].distance);
         }
         
-
         return elevation;
     }
 
@@ -664,7 +726,7 @@ class Scene {
             // console.dir(intersects);
         }
 
-        let elevation = this.determineElevation( uniqueId, entity );
+        let elevation = this.castDownrayAndDetemineElevation( uniqueId, entity );
 
         // if (uniqueId == "hero") {
         //     console.log(`Elevation: ${elevation}`);
@@ -672,8 +734,8 @@ class Scene {
         //     console.log(`entity.attributes.elevation: ${entity.attributes.elevation}`);
         // }
         
-        // If onObject or onGround:
-        if (thisMixer.onObject || entity.position.y <= (elevation + entity.attributes.elevation)) {
+        // If jumpedOnObject or onGround:
+        if (thisMixer.jumpedOnObject || entity.position.y <= (elevation + entity.attributes.elevation)) {
             entity.position.y = (elevation + entity.attributes.elevation);
             thisMixer.velocity.y = Math.max( 0, thisMixer.velocity.y );
             thisMixer.canJump = true;
@@ -752,16 +814,24 @@ class Scene {
             thisMixer.direction.x = Number( moveLeft ) - Number( moveRight );
             thisMixer.direction.normalize(); // this ensures consistent movements in all directions
             
-            if ( moveForward || moveBackward ) thisMixer.velocity.z -= thisMixer.direction.z * 1000.0 * delta;
-            if ( moveLeft || moveRight ) thisMixer.velocity.x -= thisMixer.direction.x * 1000.0 * delta;
+            if ( moveForward || moveBackward ) thisMixer.velocity.z -= thisMixer.direction.z * 1000.0 * heroObj.attributes.agility * delta;
+            if ( moveLeft || moveRight ) thisMixer.velocity.x -= thisMixer.direction.x * 1000.0 * heroObj.attributes.agility * delta;
 
             this.identifySelectedObject(heroObj);
 
             this.handleMovement( "hero", heroObj, delta );
+            
+            if (thisMixer.standingUpon && thisMixer.standingUpon.attributes.routeToLevel) {
+                if (thisMixer.standingUpon.attributes.unlocked) {
+                    // Use the GAME to start a new level
+                    this.controller.eventDepot.fire('loadLevel', {level: thisMixer.standingUpon.attributes.routeToLevel});
+                }
+            }
 
-            // HANDLE BACKRAY TO ADJUST CAMERA DISTANCE
             this.handleAutoZoom(heroObj.position, heroObj.rotation);
 
+            this.overheadPointLight.position.copy(heroObj.position);
+            this.overheadPointLight.position.y = heroObj.attributes.height + 40;
         }
     }
 
@@ -786,7 +856,7 @@ class Scene {
     animate() {
         
         requestAnimationFrame( this.animate );
-        if ( this.controls.isLocked === true ) {
+        if ( this.controls.isLocked === true && this.running ) {
 
             var time = performance.now();
             var delta = ( time - prevTime ) / 1000;
@@ -802,6 +872,12 @@ class Scene {
         }
         renderer.render( scene, camera );
     }
+
+    deanimate() {
+        this.running = false;
+        cancelAnimationFrame( this.animate );
+    }
+
 }
 
 export {Scene};

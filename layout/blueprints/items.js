@@ -16,20 +16,20 @@ export const Items = {
         description: 'A small velvet bag full of gems',
         type: 'item',
         attributes: {
-            animates: true,
+            animates: false,
             scale: .1,
             elevation: 0
         }
     },
     smallSword: {
         name: 'smallSword',
-        gltf: 'sword.gltf',
+        gltf: 'broadsword.glb',
         description: 'A slender metallic blade, strong yet flexible',
         type: 'item',
         attributes: {
             animates: false,
-            scale: .1,
-            elevation: 0
+            scale: 5,
+            elevation: 5
         } 
     }
 
