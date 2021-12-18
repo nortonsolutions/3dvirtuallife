@@ -28,20 +28,32 @@
  * location changes to the world.
  */
 
-import {LevelManager} from './levelManager.js'
+import {LevelManager} from './levelManager.js';
+import {Items} from './blueprints/items.js';
+import {Entities} from './blueprints/entities.js';
+import {Structures} from './blueprints/structures.js';
+
 
 class LayoutBuilder {
 
     constructor(props) {
+
+        this.usedLocations = [];
 
         // TODO: props may include saved game details of level layouts
         this.numberOfOthers = props.numberOfOthers;
         this.itemsArray = props.itemsArray;
         this.levelManager = new LevelManager(props.level);
 
+        this.allItems = Items;
+        this.allStructures = Structures;
+        this.allEntities = Entities;
+
+        this.allObjects = {...Items, ...Structures, ...Entities};
+
         this.hero = {
             ...props.hero, 
-            location: props.heroLocation? props.heroLocation : this.randomLocation(),
+            location: props.heroLocation? props.heroLocation : this.randomUniqueLocation(),
         }
 
         const itemDetails = (item) => {
@@ -49,7 +61,7 @@ class LayoutBuilder {
                 name: item.name, 
                 type: item.type,
                 attributes: item.attributes,
-                location: item.location? item.location : this.randomLocation(),
+                location: item.location? item.location : this.randomUniqueLocation(),
                 gltf: item.gltf? item.gltf : 'redball.gltf'
             }
         }
@@ -67,6 +79,23 @@ class LayoutBuilder {
         this.length = this.levelManager.getLength();
         this.background = this.levelManager.getBackground();
         this.terrain = this.levelManager.getTerrain();
+    }
+
+
+    getObjectDetail(objectName,detailName) {
+        return this.allObjects[objectName][detailName];
+    }
+
+    getAllItems() {
+        return this.allItems;
+    }
+
+    getAllStructures() {
+        return this.allStructures;
+    }
+
+    getAllEntities() {
+        return this.allEntities;
     }
 
     /**
@@ -90,11 +119,33 @@ class LayoutBuilder {
     }
 
     randomLocation() {
-        return {
+        
+        let location = {
             x: this.levelManager.getWidth()/2 - Math.floor(Math.random() * this.levelManager.getWidth()),
             y: 0,
             z: this.levelManager.getLength()/2 - Math.floor(Math.random() * this.levelManager.getLength())
         }
+
+        this.usedLocations.push(location);
+        return location;
+    }
+
+    randomUniqueLocation() {
+        
+        let location = {
+            x: this.levelManager.getWidth()/2 - Math.floor(Math.random() * this.levelManager.getWidth()),
+            y: 0,
+            z: this.levelManager.getLength()/2 - Math.floor(Math.random() * this.levelManager.getLength())
+        }
+
+        if (!this.usedLocations.includes(location)) {
+            this.usedLocations.push(location);
+            return location;
+        } else {
+            return randomUniqueLocation(); 
+        }
+ 
+
     }
 }
 

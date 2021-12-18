@@ -91,7 +91,7 @@
 
 
             eventDepot.addListener('showDescription', (data) => {
-                let description = game.getObjectDetail(data.objectType,data.objectName,'description');
+                let description = game.getObjectDetail(data.objectName,'description');
                 document.getElementById('message').innerHTML = description;
             });
 
@@ -110,7 +110,7 @@
                         Object.keys(game.hero.inventory).forEach(key => {
                             context.push({
                                 name: key,
-                                description: game.getObjectDetail('item',key,'description'),
+                                description: game.getObjectDetail(key,'description'),
                                 quantity: game.hero.inventory[key]
                             });
                         })

@@ -1,5 +1,6 @@
 import {levels} from './blueprints/levels.js'
 
+
 class LevelManager {
 
     constructor(level) {
@@ -25,7 +26,7 @@ class LevelManager {
     getItems() {
         return this.level.items;
     }
-    
+
     getStructures() {
         return this.level.structures;
     }

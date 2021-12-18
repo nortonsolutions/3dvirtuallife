@@ -708,7 +708,7 @@ class Scene {
             entity.translateY( thisMixer.velocity.y * delta );
             entity.translateZ( thisMixer.velocity.z * delta );
 
-            if (uniqueId=="hero") console.log(`thisMixer.velocity.z: ${thisMixer.velocity.z}`);
+            // if (uniqueId=="hero") console.log(`thisMixer.velocity.z: ${thisMixer.velocity.z}`);
             if (Math.abs(entity.getWorldPosition(entity.position).x) >= this.planeHeight/2 || 
             Math.abs(entity.getWorldPosition(entity.position).z) >= this.planeWidth/2) {
                 entity.translateX( -thisMixer.velocity.x * delta );
@@ -861,7 +861,7 @@ class Scene {
             this.time = performance.now();
             this.delta = ( this.time - this.prevTime ) / 1000;
 
-            console.log(`delta: ${this.delta}`)
+            // console.log(`delta: ${this.delta}`)
             this.handleHeroMovement(this.delta);
             this.handleEntityMovement(this.delta);
             this.handleMixers(this.delta);
