@@ -51,6 +51,11 @@
     </body>
     <script type="module">
 
+       /**
+        * This index module has the primary EventDepot, GameAPI, Game, and SceneController.
+        * It handles events which deal with HTML user interaction like the modal display.
+        */
+        import { EventDepot } from '/public/eventDepot.js';
         import { Game, GameAPI } from '/game.js';
         import { SceneController } from '/scene/sceneController.js'
 
@@ -63,90 +68,103 @@
 
         var game;
         var sceneController;
+        var eventDepot = new EventDepot();
+        
+        const addEventListeners = () => {
+            eventDepot.addListener('loadLevel', (data) => {
+                game.eventDepot.fire('unlockControls', {});
+                sceneController.deanimateScene();
 
-        /** When the user clicks START, it will instantiate the game and start.
-        An empty layout for the given level will cause the layoutBuilder to
-        generate a new layout for the scene. */
+                // TODO: Update props with user and last level layout data
+                props.hero = data.hero;
+                props.level = data.level;
+                startGame();
 
-        Array.from(document.querySelectorAll('.startGame')).forEach(el => {
-            el.addEventListener('click', e => {
-                e.preventDefault();
-                game = new Game(props);
-                
+                {{!-- 
+                game = new Game(props, eventDepot);
+                game.setLevel(data.level);
                 game.setGameLayout();
+                sceneController = new SceneController(game.hero, game.layoutBuilder, game.eventDepot);
+                sceneController.animateScene(); 
+                --}}
+            });
 
-                game.eventDepot.addListener('loadLevel', (data) => {
-                    game.eventDepot.fire('unlockControls', {});
-                    sceneController.deanimateScene();
-                    game.setLevel(data.level);
-                    game.setGameLayout();
-                    sceneController = new SceneController(game.hero, game.layoutBuilder, game.eventDepot);
-                    sceneController.animateScene();
-                });
 
-                game.eventDepot.addListener('showDescription', (data) => {
-                    let description = game.getObjectDetail(data.objectType,data.objectName,'description');
-                    document.getElementById('message').innerHTML = description;
-                });
+            eventDepot.addListener('showDescription', (data) => {
+                let description = game.getObjectDetail(data.objectType,data.objectName,'description');
+                document.getElementById('message').innerHTML = description;
+            });
 
-                game.eventDepot.addListener('hideDescription', (data) => {
-                    document.getElementById('message').innerHTML = '';
-                });
+            eventDepot.addListener('hideDescription', (data) => {
+                document.getElementById('message').innerHTML = '';
+            });
 
-                game.eventDepot.addListener('modal', (data) => {
+            eventDepot.addListener('modal', (data) => {
 
-                    game.eventDepot.fire('unlockControls', {});
-                    var context;
+                eventDepot.fire('unlockControls', {});
+                var context;
 
-                    switch (data.type) {
-                        case 'inventory': 
-                            context = [];
-                            Object.keys(game.hero.inventory).forEach(key => {
-                                context.push({
-                                    name: key,
-                                    description: game.getObjectDetail('item',key,'description'),
-                                    quantity: game.hero.inventory[key]
-                                });
-                            })
-                            break;
-                        default:
-                    }
-                    
-                    loadTemplate('modal-body', data.type, context);
-                    
-                    var modal = document.getElementById('myModal');
-                    var closer = document.getElementsByClassName("close")[0];
-                    var modalTitle = document.getElementById('modal-title').innerHTML = data.title;
+                switch (data.type) {
+                    case 'inventory': 
+                        context = [];
+                        Object.keys(game.hero.inventory).forEach(key => {
+                            context.push({
+                                name: key,
+                                description: game.getObjectDetail('item',key,'description'),
+                                quantity: game.hero.inventory[key]
+                            });
+                        })
+                        break;
+                    default:
+                }
+                
+                loadTemplate('modal-body', data.type, context);
+                
+                var modal = document.getElementById('myModal');
+                var closer = document.getElementsByClassName("close")[0];
+                var modalTitle = document.getElementById('modal-title').innerHTML = data.title;
 
-                    modal.style.display = "block";
+                modal.style.display = "block";
 
-                    function escape() {
-                        modal.style.display = "none";
-                        game.eventDepot.fire('lockControls', {});
-                    }
+                function escape() {
+                    modal.style.display = "none";
+                    eventDepot.fire('lockControls', {});
+                }
 
-                    closer.onclick = function() {
+                closer.onclick = function() {
+                    escape();
+                }
+
+                window.onclick = function(event) {
+                    if (event.target == modal) {
                         escape();
                     }
-
-                    window.onclick = function(event) {
-                        if (event.target == modal) {
-                            escape();
-                        }
-                    }
-                })
-
-                document.querySelector('.inventoryLink').addEventListener('click', e => {
-                    game.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
-                    e.preventDefault();
-                })
-
-                game.stats(); // currently just dumps objects to console
-                sceneController = new SceneController(game.hero, game.layoutBuilder, game.eventDepot);
-                sceneController.animateScene();
-                
+                }
             })
-        })
+
+            document.querySelector('.inventoryLink').addEventListener('click', e => {
+                eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
+                e.preventDefault();
+            })
+
+            Array.from(document.querySelectorAll('.startGame')).forEach(el => {
+                el.addEventListener('click', e => {
+                    e.preventDefault();
+                    startGame();
+                    
+                })
+            })
+        }
+        addEventListeners();
+
+        const startGame = () => {
+            game = new Game(props, eventDepot);
+            game.setGameLayout();
+
+            game.stats(); // currently just dumps objects to console
+            sceneController = new SceneController(game.hero, game.layoutBuilder, game.eventDepot);
+            sceneController.animateScene();
+        }
 
         const loadTemplate = (elementId, template, data) => {
             handleGet(`/views/${template}.hbs`, response => {

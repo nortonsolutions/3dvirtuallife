@@ -14,15 +14,12 @@ var moveRight = false;
 
 var downRaycasterTestLength = 350;
 var cameraReach = 1000;
-var cameraDistanceDefault = 250;
-var cameraElevationDefault = 50;
-
-var prevTime = performance.now();
+var cameraDistanceDefault = 200;
+var cameraElevationDefault = 40;
 
 // var vertex = new THREE.Vector3();
 // var color = new THREE.Color();
 var multiplier = 100;
-
 var navbarHeight;
 
 var WHITE = new THREE.Color('white');
@@ -37,6 +34,7 @@ class Scene {
 
     constructor(hero, length, width, terrain, objects, background, controller) {
 
+        this.prevTime = performance.now();
         // SceneController has access to layoutBuilder, which has levelManager
         this.controller = controller;
         this.running = true;
@@ -52,7 +50,6 @@ class Scene {
 
         // objects3D is used for raycast intersections
         this.objects3D = [];
-
         this.controls = null;
 
         this.animate = this.animate.bind(this);
@@ -131,6 +128,73 @@ class Scene {
 
     }
 
+    onKeyDown = ( event ) => {
+    
+        switch ( event.keyCode ) {
+
+            case 38: // up
+            case 87: // w
+                moveForward = true;
+                break;
+
+            case 37: // left
+            case 65: // a
+                moveLeft = true;
+                break;
+
+            case 40: // down
+            case 83: // s
+                moveBackward = true;
+                break;
+
+            case 39: // right
+            case 68: // d
+                moveRight = true;
+                break;
+
+            case 32: // space
+                if ( mixers.hero.canJump === true ) {
+                    mixers.hero.velocity.y += 350;
+                    this.fadeToAction("hero", "Jump", 0.2)
+                }
+                mixers.hero.canJump = false;
+                mixers.hero.justJumped = true;
+                break;
+
+            case 73: // i
+                this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
+        }
+
+    };
+
+    onKeyUp = ( event ) => {
+
+        switch ( event.keyCode ) {
+
+            case 38: // up
+            case 87: // w
+                moveForward = false;
+                break;
+
+            case 37: // left
+            case 65: // a
+                moveLeft = false;
+                break;
+
+            case 40: // down
+            case 83: // s
+                moveBackward = false;
+                break;
+
+            case 39: // right
+            case 68: // d
+                moveRight = false;
+                break;
+
+        }
+
+    };
+
     addControls() {
         this.controls = new THREE.PointerLockControls( camera );
 
@@ -138,77 +202,9 @@ class Scene {
         
 
         scene.add( this.controls.getObject() );
-
-
-        var onKeyDown = ( event ) => {
     
-            switch ( event.keyCode ) {
-    
-                case 38: // up
-                case 87: // w
-                    moveForward = true;
-                    break;
-    
-                case 37: // left
-                case 65: // a
-                    moveLeft = true;
-                    break;
-    
-                case 40: // down
-                case 83: // s
-                    moveBackward = true;
-                    break;
-    
-                case 39: // right
-                case 68: // d
-                    moveRight = true;
-                    break;
-    
-                case 32: // space
-                    if ( mixers.hero.canJump === true ) {
-                        mixers.hero.velocity.y += 350;
-                        this.fadeToAction("hero", "Jump", 0.2)
-                    }
-                    mixers.hero.canJump = false;
-                    mixers.hero.justJumped = true;
-                    break;
-
-                case 73: // i
-                    this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
-            }
-    
-        };
-    
-        var onKeyUp = ( event ) => {
-    
-            switch ( event.keyCode ) {
-    
-                case 38: // up
-                case 87: // w
-                    moveForward = false;
-                    break;
-    
-                case 37: // left
-                case 65: // a
-                    moveLeft = false;
-                    break;
-    
-                case 40: // down
-                case 83: // s
-                    moveBackward = false;
-                    break;
-    
-                case 39: // right
-                case 68: // d
-                    moveRight = false;
-                    break;
-    
-            }
-    
-        };
-    
-        document.addEventListener( 'keydown', onKeyDown, false );
-        document.addEventListener( 'keyup', onKeyUp, false );
+        document.addEventListener( 'keydown', this.onKeyDown, false );
+        document.addEventListener( 'keyup', this.onKeyUp, false );
     }
 
     addHelper() {
@@ -447,8 +443,8 @@ class Scene {
 
         </div>`;
 
-        var blocker = document.getElementById( 'blocker' );
-        var instructions = document.getElementById( 'instructions' );
+        this.blocker = document.getElementById( 'blocker' );
+        this.instructions = document.getElementById( 'instructions' );
 
         this.controller.eventDepot.addListener('lockControls', () => {
             this.controls.lock();
@@ -458,16 +454,16 @@ class Scene {
             this.controls.unlock();
         })
 
-        instructions.addEventListener( 'click', () => {
+        this.instructions.addEventListener( 'click', () => {
 
             this.controls.lock();
         
         }, false );
-
+        
         this.controls.addEventListener( 'lock', () => {
 
-            instructions.style.display = 'none';
-            blocker.style.display = 'none';
+            this.instructions.style.display = 'none';
+            this.blocker.style.display = 'none';
             document.addEventListener( 'mousedown', this.onMouseDown, false );
             document.addEventListener( 'mouseup', this.onMouseUp, false );
             document.addEventListener( 'click', this.onMouseClick, false );
@@ -475,8 +471,8 @@ class Scene {
 
         this.controls.addEventListener( 'unlock', () => {
 
-            blocker.style.display = 'block';
-            instructions.style.display = '';
+            this.blocker.style.display = 'block';
+            this.instructions.style.display = '';
             document.removeEventListener( 'mousedown', this.onMouseDown, false );
             document.removeEventListener( 'mouseup', this.onMouseUp, false );
             document.removeEventListener( 'click', this.onMouseClick, false );
@@ -712,6 +708,7 @@ class Scene {
             entity.translateY( thisMixer.velocity.y * delta );
             entity.translateZ( thisMixer.velocity.z * delta );
 
+            if (uniqueId=="hero") console.log(`thisMixer.velocity.z: ${thisMixer.velocity.z}`);
             if (Math.abs(entity.getWorldPosition(entity.position).x) >= this.planeHeight/2 || 
             Math.abs(entity.getWorldPosition(entity.position).z) >= this.planeWidth/2) {
                 entity.translateX( -thisMixer.velocity.x * delta );
@@ -824,7 +821,10 @@ class Scene {
             if (thisMixer.standingUpon && thisMixer.standingUpon.attributes.routeToLevel) {
                 if (thisMixer.standingUpon.attributes.unlocked) {
                     // Use the GAME to start a new level
-                    this.controller.eventDepot.fire('loadLevel', {level: thisMixer.standingUpon.attributes.routeToLevel});
+                    this.controller.eventDepot.fire('loadLevel', {
+                        level: thisMixer.standingUpon.attributes.routeToLevel,
+                        hero: this.hero
+                    });
                 }
             }
 
@@ -858,17 +858,18 @@ class Scene {
         requestAnimationFrame( this.animate );
         if ( this.controls.isLocked === true && this.running ) {
 
-            var time = performance.now();
-            var delta = ( time - prevTime ) / 1000;
+            this.time = performance.now();
+            this.delta = ( this.time - this.prevTime ) / 1000;
 
-            this.handleHeroMovement(delta);
-            this.handleEntityMovement(delta);
-            this.handleMixers(delta);
+            console.log(`delta: ${this.delta}`)
+            this.handleHeroMovement(this.delta);
+            this.handleEntityMovement(this.delta);
+            this.handleMixers(this.delta);
 
-            prevTime = time;
+            this.prevTime = this.time;
 
         } else {
-            prevTime = performance.now();
+            this.prevTime = performance.now();
         }
         renderer.render( scene, camera );
     }
@@ -876,6 +877,14 @@ class Scene {
     deanimate() {
         this.running = false;
         cancelAnimationFrame( this.animate );
+        return;
+    }
+
+    unregisterEventListeners = () => {
+        this.instructions.removeEventListener( 'click', this.controls.lock, false );
+        document.removeEventListener( 'keydown', this.onKeyDown, false );
+        document.removeEventListener( 'keyup', this.onKeyUp, false );
+        window.removeEventListener( 'resize', this.onWindowResize, false );
     }
 
 }

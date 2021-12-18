@@ -29,8 +29,12 @@ export class SceneController {
         this.scene.animate();
     }
 
+
+
     deanimateScene() {
         this.scene.deanimate();
+        this.scene.unregisterEventListeners();
+        this.scene = null;
     }
 
 }
