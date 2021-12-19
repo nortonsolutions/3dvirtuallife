@@ -72,7 +72,7 @@ class GameAPI {
                     life: 0,
                     manna: 0,
                     strength: 1,
-                    agility: 1
+                    agility: 3
                 },
                 gltf: 'robot.glb',
                 inventory: {}

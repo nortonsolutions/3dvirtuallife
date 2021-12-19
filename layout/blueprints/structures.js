@@ -26,8 +26,23 @@ export const Structures = {
             key: 'keyToShed',
             scale: 10,
             elevation: 1,
-            routeToLevel: 1,
-            accessible: false
+            routeToLevel: 1 
+        }
+    
+    },
+
+    archway: {
+        name: 'archway',
+        gltf: 'archway.gltf',
+        description: 'Dark gothic archway leading upstairs',
+        type: 'structure',
+        location: { x: 16, y: 0, z: 4 },
+        attributes: {
+            animates: false,
+            scale: 100,
+            elevation: 1,
+            routeToLevel: 0,
+            unlocked: true
         }
     
     },

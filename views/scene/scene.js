@@ -39,8 +39,8 @@ class Scene {
         this.controller = controller;
         this.running = true;
 
-        this.planeWidth = width? width * multiplier * 1.1 : 2000;
-        this.planeHeight = length? length * multiplier * 1.1 : 2000;
+        this.planeWidth = width? width * multiplier : 2000;
+        this.planeHeight = length? length * multiplier : 2000;
 
         this.hero = hero;
         this.emissives = [];
@@ -58,7 +58,7 @@ class Scene {
         this.addControls = this.addControls.bind(this);
     }
 
-    init() {
+    init(callback) {
 
         navbarHeight = document.querySelector('.navbar').clientHeight;
         camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, cameraReach );
@@ -83,6 +83,7 @@ class Scene {
         this.downRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength);
 
         this.addEventListeners();
+        if (callback) callback();
     }
 
     addBackground() {
@@ -224,8 +225,11 @@ class Scene {
             this.floor.scale.x = this.terrain.scale;
             this.floor.scale.y = this.terrain.scale;
             this.floor.scale.z = this.terrain.scale;
+            // this.floor.onAfterRender = callback;
             scene.add( this.floor );
-            callback();
+            setTimeout(() => {
+                callback();
+            }, 200);
         
         }, undefined, function ( error ) {
         
@@ -265,10 +269,10 @@ class Scene {
         this.downRaycasterGeneric.ray.origin.z = z;
         this.downRaycasterGeneric.ray.origin.y = downRaycasterTestLength - 10;
 
-        // DEBUG for 'Cannot read property 'distance'...
         if (! this.downRaycasterGeneric.intersectObject(this.floor, true)[0]) {
-            console.dir(this.floor);
-            console.log(`${uniqueId} = ${x},${z}`);
+            console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
+            console.error(this.floor);
+            console.error(`${uniqueId} = ${x},${z}`);
         }
         return this.downRaycasterGeneric.ray.origin.y - this.downRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
     }
@@ -300,8 +304,8 @@ class Scene {
                 model.objectType = object.type;
                 model.attributes = object.attributes;
                 
-                model.position.x = object.location.x * multiplier + getRndInteger(-20,20);
-                model.position.z = object.location.z * multiplier + getRndInteger(-20,20);
+                model.position.x = object.location.x * multiplier;
+                model.position.z = object.location.z * multiplier;
                 model.position.y = this.determineElevationGeneric(model.position.x, model.position.z,object.name) + object.attributes.elevation;
 
                 if (object.attributes.animates) {
@@ -699,6 +703,18 @@ class Scene {
         mRaycaster.ray.direction.x = - worldDirection.x;
         mRaycaster.ray.direction.z = - worldDirection.z;
 
+        if (uniqueId != "hero") {
+            mRaycaster.ray.origin.y += 20;
+        }
+
+        // mRaycaster.ray.direction.copy(new THREE.Vector3().copy(thisMixer.direction).applyEuler( yAxisRotation ));
+        // mRaycaster.ray.direction.x = - mRaycaster.ray.direction.x;
+        // mRaycaster.ray.direction.z = - mRaycaster.ray.direction.z;
+
+        console.log(`${uniqueId}: origin: ${mRaycaster.ray.origin.x},${mRaycaster.ray.origin.y},${mRaycaster.ray.origin.z}`);
+        console.log(`${uniqueId}: direction: ${mRaycaster.ray.direction.x},${mRaycaster.ray.direction.y},${mRaycaster.ray.direction.z}`);
+
+
         // Only perform the translation if I will not invade another.
         let movementIntersects = mRaycaster.intersectObjects(this.objects3D, true).filter(el => el != entity);
         
@@ -720,7 +736,16 @@ class Scene {
                 }
             }
         } else {
-            // console.dir(intersects);
+            console.log(`${uniqueId} intersects:`);
+            console.dir(movementIntersects);
+
+            thisMixer.velocity.x = 0;
+            thisMixer.velocity.y = 0;
+            thisMixer.velocity.z = 0;
+
+            if (uniqueId != "hero") {
+                entity.rotateY(1);
+            } 
         }
 
         let elevation = this.castDownrayAndDetemineElevation( uniqueId, entity );
@@ -767,13 +792,30 @@ class Scene {
 
     }
 
-    handleAutoZoom = (position, rotation) => {
-        this.cameraBackray.ray.origin.copy(position);
+    handleAutoZoom = () => {
+        this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
 
-        let rotations = new THREE.Euler( 0, 0, 0, 'YXZ' );
-        rotations.set( rotation.x, rotation.y, 0 );
-        let worldDirection = new THREE.Vector3( 0, 0.4, 1 ).applyEuler( rotations );
-        this.cameraBackray.ray.direction = worldDirection;
+
+        // console.table(this.controls.getObject().position);
+        // // ORIGINAL
+        // let rotations = new THREE.Euler( 0, 0, 0, 'YXZ' );
+        // rotations.set( rotation.x, rotation.y, 0 );
+        // let worldDirection = new THREE.Vector3( 0, 0.4, 1 ).applyEuler( rotations );
+        
+        // //DEBUG
+        // console.log("worldDirection:")
+        // console.table(worldDirection);
+        
+        // NEEDS PITCH as well
+        let cameraDirection = this.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
+
+        this.cameraBackray.ray.direction.x = -cameraDirection.x
+        this.cameraBackray.ray.direction.y = -cameraDirection.y + 0.4
+        this.cameraBackray.ray.direction.z = -cameraDirection.z
+
+        // //DEBUG
+        // console.log("this.cameraBackray.ray.direction:")
+        // console.table(this.cameraBackray.ray.direction);
 
         let backrayIntersections = 
             [...this.cameraBackray.intersectObject(this.floor, true), 
@@ -818,9 +860,14 @@ class Scene {
 
             this.handleMovement( "hero", heroObj, delta );
             
-            if (thisMixer.standingUpon && thisMixer.standingUpon.attributes.routeToLevel) {
+            if (thisMixer.standingUpon && typeof thisMixer.standingUpon.attributes.routeToLevel == "number") {
                 if (thisMixer.standingUpon.attributes.unlocked) {
                     // Use the GAME to start a new level
+
+                    this.controller.eventDepot.fire('saveLevel', {
+                        // TODO: implement save level, item locations, etc.
+                    });
+
                     this.controller.eventDepot.fire('loadLevel', {
                         level: thisMixer.standingUpon.attributes.routeToLevel,
                         hero: this.hero
@@ -828,7 +875,7 @@ class Scene {
                 }
             }
 
-            this.handleAutoZoom(heroObj.position, heroObj.rotation);
+            this.handleAutoZoom();
 
             this.overheadPointLight.position.copy(heroObj.position);
             this.overheadPointLight.position.y = heroObj.attributes.height + 40;
@@ -847,7 +894,12 @@ class Scene {
                 mixers[entity.uuid].velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
                 // Basic movement always in the z-axis direction for this entity
-                mixers[entity.uuid].velocity.z = getRndInteger(.2,entity.attributes.agility) * 100;
+                mixers[entity.uuid].velocity.z = getRnd(.2,entity.attributes.agility) * 100;
+                mixers[entity.uuid].velocity.x = 0; // getRndInteger(.2,entity.attributes.agility) * 100;
+                
+                mixers[entity.uuid].direction.z = getRnd(-.2,.2);
+                mixers[entity.uuid].direction.x = getRnd(-.2,.2);
+
                 this.handleMovement(entity.uuid, entity, delta);
             }
         });

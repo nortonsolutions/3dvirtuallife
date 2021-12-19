@@ -121,9 +121,12 @@ class LayoutBuilder {
     randomLocation() {
         
         let location = {
-            x: this.levelManager.getWidth()/2 - Math.floor(Math.random() * this.levelManager.getWidth()),
+            x: getRndInteger(-this.levelManager.getWidth()/2,this.levelManager.getWidth()/2),
             y: 0,
-            z: this.levelManager.getLength()/2 - Math.floor(Math.random() * this.levelManager.getLength())
+            z: getRndInteger(-this.levelManager.getWidth()/2,this.levelManager.getWidth()/2)
+            // x: this.levelManager.getWidth()/2 - Math.floor(Math.random() * this.levelManager.getWidth()),
+            // y: 0,
+            // z: this.levelManager.getLength()/2 - Math.floor(Math.random() * this.levelManager.getLength())
         }
 
         this.usedLocations.push(location);
@@ -133,9 +136,9 @@ class LayoutBuilder {
     randomUniqueLocation() {
         
         let location = {
-            x: this.levelManager.getWidth()/2 - Math.floor(Math.random() * this.levelManager.getWidth()),
+            x: getRndInteger(-this.levelManager.getWidth()/2,this.levelManager.getWidth()/2),
             y: 0,
-            z: this.levelManager.getLength()/2 - Math.floor(Math.random() * this.levelManager.getLength())
+            z: getRndInteger(-this.levelManager.getWidth()/2,this.levelManager.getWidth()/2)
         }
 
         if (!this.usedLocations.includes(location)) {

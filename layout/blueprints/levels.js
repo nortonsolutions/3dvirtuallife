@@ -39,8 +39,8 @@ export const levels = [
     },
     {
         level: 1,
-        width: 29,
-        length: 29,
+        width: 32, //32
+        length: 32,  //32
         name: "In the dungeon",
         background: '',
         terrain: {
@@ -54,7 +54,8 @@ export const levels = [
             Items.bagOfGems
         ],
         structures: [
-            Structures.ancientChest
+            Structures.ancientChest,
+            Structures.archway
         ],
         entities: [
             Entities.john,
