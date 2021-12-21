@@ -32,10 +32,23 @@ export const Items = {
         description: 'A metallic blade, strong yet flexible',
         type: 'item',
         attributes: {
-            equippable: ['rHand', 'lHand'],
+            equippable: ['handR', 'handL'],
             animates: false,
             scale: 100,
             elevation: 5
+        } 
+    },
+    mace: {
+        name: 'mace',
+        gltf: 'mace.glb',
+        image: 'mace.png',
+        description: 'A metallic mace',
+        type: 'item',
+        attributes: {
+            equippable: ['handR', 'handL'],
+            animates: false,
+            scale: 100,
+            elevation: 30
         } 
     },
     crystalBall: {

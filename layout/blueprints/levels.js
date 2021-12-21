@@ -51,7 +51,8 @@ export const levels = [
         },
         items: [
             Items.bagOfGems,
-            Items.crystalBall
+            Items.crystalBall,
+            Items.mace
         ],
         structures: [
             Structures.ancientChest,

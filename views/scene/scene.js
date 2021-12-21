@@ -65,7 +65,7 @@ class Scene {
     
         camera.position.set( 0, cameraElevationDefault, cameraDistanceDefault );
         
-
+        
         scene = new THREE.Scene();
 
         this.addControls();
@@ -200,8 +200,8 @@ class Scene {
         this.controls = new THREE.PointerLockControls( camera );
 
         this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault);
-        
 
+        
         scene.add( this.controls.getObject() );
     
         document.addEventListener( 'keydown', this.onKeyDown, false );
@@ -255,10 +255,18 @@ class Scene {
             model.position.y -= this.hero.attributes.height;
             model.rotation.y = Math.PI;
 
-            this.controls.getObject().attributes = this.hero.attributes;
-            this.controls.getObject().add( model );
+            let controlsObj = this.controls.getObject();
+            controlsObj.attributes = this.hero.attributes;
+            controlsObj.add( model );
+
+            // Set hero location:
+            controlsObj.translateX( this.hero.location.x * multiplier );
+            controlsObj.translateZ( this.hero.location.z * multiplier );
+            controlsObj.translateY( this.hero.attributes.height? this.hero.attributes.height : 20 ); 
 
             this.createGUI( model, gltf.animations, "hero" );
+
+
         
         }, undefined, function ( error ) {
         
@@ -285,10 +293,6 @@ class Scene {
      */ 
     seedObjects3D = () => {
 
-        // Set hero location:
-        this.controls.getObject().translateX( this.hero.location.x * multiplier );
-        this.controls.getObject().translateZ( this.hero.location.z * multiplier );
-        this.controls.getObject().translateY( this.hero.attributes.height? this.hero.attributes.height : 20 ); 
             
 
         this.objects.forEach(object => {
@@ -334,35 +338,7 @@ class Scene {
         console.dir(this.controls.getObject().position);
     }
 
-    getRootObject3D = (obj) => {
-        if (obj.objectName) {
-            return obj;
-        } else if (obj.parent == null) {
-            return null;
-        } else {
-            return this.getRootObject3D(obj.parent);
-        }
-    }
 
-    getObjectName = (obj) => {
-        if (obj.objectName) {
-            return obj.objectName;
-        } else if (obj.parent == null) {
-            return null;
-        } else {
-            return this.getObjectName(obj.parent);
-        }
-    }
-
-    getObjectType = (obj) => {
-        if (obj.objectType) {
-            return obj.objectType;
-        } else if (obj.parent == null) {
-            return null;
-        } else {
-            return this.getObjectType(obj.parent);
-        }
-    }
 
     onMouseDown = (e) => {
 
@@ -374,8 +350,8 @@ class Scene {
                     let thisObj = mixers.hero.selectedObject;
 
                     // Get the parent name/type
-                    let objectName = this.getObjectName(thisObj);
-                    let objectType = this.getObjectType(thisObj);
+                    let objectName = this.controller.getObjectName(thisObj);
+                    let objectType = this.controller.getObjectType(thisObj);
                     
                     // If it is an item, pick it up and add to inventory
                     if (objectType == "item") {
@@ -498,27 +474,6 @@ class Scene {
 
     getMovementRay(origin, direction) {
         return new THREE.Raycaster( origin, direction, 0, 10 );
-    }
-
-    addToEmissives(obj) {
-        if (!this.emissives.map(el => el.object).includes(obj)) {
-            this.emissives.push({object: obj, timeLeft: 30});
-        }
-    }
-
-    handleEmissives() {
-
-        this.emissives.forEach(obj => {
-            obj.object.object.material.emissive = WHITE;
-
-            if (obj.timeLeft > 0) {
-                obj.timeLeft --;
-            } else {
-                obj.object.object.material.emissive = BLACK;
-            }
-        });
-
-        this.emissives.filter(el => el.timeLeft > 0);
     }
 
     /**
@@ -662,7 +617,7 @@ class Scene {
         downRaycaster.ray.origin.y = downRaycasterTestLength - 10;
 
         let downwardIntersections = downRaycaster.intersectObjects( this.objects3D, true ).filter(el => {
-            return this.getObjectName(el.object) != entity.objectName;
+            return this.controller.getObjectName(el.object) != entity.objectName;
         });
         // console.dir(downwardIntersections);
         if (thisMixer.justJumped || thisMixer.jumpedOnObject) {
@@ -671,7 +626,7 @@ class Scene {
 
 
         if (downwardIntersections[0]) {
-            thisMixer.standingUpon = this.getRootObject3D(downwardIntersections[0].object);
+            thisMixer.standingUpon = this.controller.getRootObject3D(downwardIntersections[0].object);
         } else {
             thisMixer.standingUpon = null;
         }
@@ -722,7 +677,7 @@ class Scene {
 
 
         // Only perform the translation if I will not invade another.
-        let movementIntersects = mRaycaster.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
+        let movementIntersects = mRaycaster.intersectObjects(this.objects3D, true).filter(el => this.controller.getRootObject3D(el.object) != entity);
         
         if (movementIntersects.length == 0) {
             
@@ -789,7 +744,7 @@ class Scene {
             if (distance <= 50 && distance < closest) {
                 closest = distance;
                 mixers.hero.selectedObject = o;
-                this.controller.eventDepot.fire('showDescription', { objectType: this.getObjectType(o), objectName: this.getObjectName(o) }); 
+                this.controller.eventDepot.fire('showDescription', { objectType: this.controller.getObjectType(o), objectName: this.controller.getObjectName(o) }); 
             }
         })
 

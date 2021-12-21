@@ -197,7 +197,7 @@
                 ev.target.appendChild(document.getElementById(altId));
 
                 if (Array.from(ev.target.classList).includes('body')) {
-                    sceneController.loadObject3D(id, (gltf) => {
+                    sceneController.loadObject3DbyName(id, (gltf) => {
                         game.hero.equip(ev.target.id, gltf.scene);
                     });
                 };
