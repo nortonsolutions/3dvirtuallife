@@ -98,6 +98,10 @@ class LayoutBuilder {
         return this.allEntities;
     }
 
+    getObject(name) {
+        return this.allObjects[name];
+    }
+
     /**
      * The layout model presented here should only contain information
      * about the layout for the objects in the scene, like location, 

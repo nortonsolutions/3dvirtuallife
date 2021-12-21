@@ -79,14 +79,6 @@
                 props.hero = data.hero;
                 props.level = data.level;
                 startGame();
-
-                {{!-- 
-                game = new Game(props, eventDepot);
-                game.setLevel(data.level);
-                game.setGameLayout();
-                sceneController = new SceneController(game.hero, game.layoutBuilder, game.eventDepot);
-                sceneController.animateScene(); 
-                --}}
             });
 
 
@@ -115,17 +107,23 @@
                                 quantity: game.hero.inventory[key]
                             });
                         })
+
+                        
                         break;
                     default:
                 }
                 
-                loadTemplate('modal-body', data.type, context);
+                loadTemplate('modal-body', data.type, context, () => {
+                    if (data.type == "inventory") addInventoryEvents();
+                });
                 
                 var modal = document.getElementById('myModal');
                 var closer = document.getElementsByClassName("close")[0];
                 var modalTitle = document.getElementById('modal-title').innerHTML = data.title;
 
                 modal.style.display = "block";
+
+
 
                 function escape() {
                     modal.style.display = "none";
@@ -155,10 +153,8 @@
                     
                 })
             })
-
-
-
         }
+
         addEventListeners();
 
         const startGame = () => {
@@ -170,27 +166,55 @@
             sceneController.animateScene();
         }
 
-        const loadTemplate = (elementId, template, data) => {
+        const loadTemplate = (elementId, template, data, callback) => {
             handleGet(`/views/${template}.hbs`, response => {
                 let template = Handlebars.compile(response);
                 document.getElementById(elementId).innerHTML = template(data);
+                if (callback) callback();
             });
         }
+
+        const addInventoryEvents = () => {
+            const allowDrop = (ev) => {
+                ev.preventDefault();
+                ev.dataTransfer.dropEffect = "move";
+            }
+
+            const drag = (ev) => {
+                ev.dataTransfer.setData("text", ev.target.id + ':' + ev.target.alt);
+                var img = new Image(ev.target.src);
+                ev.dataTransfer.setDragImage(img,10,10);
+            }
+
+            const drop = (ev) => {
+                ev.preventDefault();
+                let data = ev.dataTransfer.getData("text").split(':');
+
+                var id = data[0];
+                var altId = data[1];
+                
+                ev.target.appendChild(document.getElementById(id));
+                ev.target.appendChild(document.getElementById(altId));
+
+                if (Array.from(ev.target.classList).includes('body')) {
+                    sceneController.loadObject3D(id, (gltf) => {
+                        game.hero.equip(ev.target.id, gltf.scene);
+                    });
+                };
+            }
+
+            document.querySelectorAll('.draggable').forEach(draggableElement => {
+                draggableElement.addEventListener('dragstart', drag);
+            });
+
+            document.querySelectorAll('.dragSpot').forEach(dragSpot => {
+                dragSpot.addEventListener('drop', drop);
+                dragSpot.addEventListener('dragover', allowDrop);
+            });
+
+        }
+
         
-        function allowDrop(ev) {
-            ev.preventDefault();
-        }
-
-        function drag(ev) {
-            ev.dataTransfer.setData("text", ev.target.id);
-        }
-
-        function drop(ev) {
-            ev.preventDefault();
-            var data = ev.dataTransfer.getData("text");
-            ev.target.appendChild(document.getElementById(data));
-        }
-
     </script>
 
 </html>

@@ -1,19 +1,13 @@
-<script>
+<div class="row mx-0">
 
-
-
-</script>
-
-<div class="row">
-
-    <div class="col-8">
+    <div class="col-8 px-0">
         <div class="row ml-0">
             {{#each this}}
             <div class="col-xs-1-12">
                 <div class="card">
-                <div class="card-body tooltipper">
-                        <img draggable="true" ondragstart="drag(event)" src="/models/png/{{image}}" alt="{{description}}">
-                        <span class="tooltippertext">{{description}}</span>
+                <div class="card-body tooltipper dragSpot">
+                        <img id="{{name}}" class="draggable" draggable="true" src="/models/png/{{image}}" alt="{{name}}alt">
+                        <span id="{{name}}alt" class="tooltippertext">{{description}}</span>
                 </div>
                 </div>
             </div>
@@ -24,12 +18,12 @@
     </div>
 
     <div class="col-4 charGrid">
-        <div class="one" ondrop="drop(event)" ondragover="allowDrop(event)">One</div>
-        <div class="two" ondrop="drop(event)" ondragover="allowDrop(event)">Two</div>
-        <div class="three" ondrop="drop(event)" ondragover="allowDrop(event)">Three</div>
-        <div class="four" ondrop="drop(event)" ondragover="allowDrop(event)">Four</div>
-        <div class="five" ondrop="drop(event)" ondragover="allowDrop(event)">Five</div>
-        <div class="six" ondrop="drop(event)" ondragover="allowDrop(event)">Six</div>
+        <div id="head" class="body one tooltipper dragSpot"></div>
+        <div id="body" class="body two tooltipper dragSpot"></div>
+        <div id="Middle2R_end" class="body three tooltipper dragSpot"></div>
+        <div id="handL" class="body four tooltipper dragSpot"></div>
+        <div id="special" class="body five tooltipper dragSpot"></div>
+        <div id="feet" class="body six tooltipper dragSpot"></div>
     </div>
 
 

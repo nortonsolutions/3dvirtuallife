@@ -21,6 +21,7 @@ export const Structures = {
         gltf: 'grate.gltf',
         description: 'Locked rusty iron grate',
         type: 'structure',
+        location: { x: 5, y: 0, z: 5},
         attributes: {
             animates: true,
             key: 'keyToShed',

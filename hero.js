@@ -9,13 +9,14 @@ export class Hero {
     //     inventory: []
     // }
 
-    constructor(hero, eventDepot) {
+    constructor(hero, eventDepot, sceneController) {
         this.name = hero.name;
         this.gltf = hero.gltf;
         this.model = hero.model;
         this.attributes = hero.attributes;
         this.inventory = hero.inventory;
         this.eventDepot = eventDepot;
+        this.controller = sceneController;
 
         this.addEventListeners = this.addEventListeners.bind(this);
         this.addEventListeners();
@@ -32,12 +33,6 @@ export class Hero {
         });
     }
 
-    /**
-     * 
-     * @param {} itemName refers to the name of the prototype in /layout/blueprints/items.js
-     *
-     * Each item may have multiple instances, so inventory keeps track of itemName:quantity
-     */
     addToInventory(itemName) {
 
         if (Object.keys(this.inventory).includes(itemName)) {
@@ -61,22 +56,8 @@ export class Hero {
 
     equip(area, item) {
 
-
-        // mixers.hero.selectedObject.position.copy(new THREE.Vector3( 0,0,0 ));
-        //                 this.controls.getObject().add( mixers.hero.selectedObject );
-
-        /** For robot model, children[0] = 'Root Scene'; children[1] = 'handR' */
-
-        // item.scale.copy(new THREE.Vector3( 1,1,1 ));
-        // item.rotation.copy(new THREE.Vector3(0,1,1))
-        // this.model.add(item);
-        // item.position.copy(this.model.children[0].children[0].position);
-
-        this.addToBodyPart(this.model, area, item)
+        this.addToBodyPart(this.model, area, item);
         
-        console.dir(this.model);
-        console.log("test");
-
     }
 
     findBodyPartByName(current, name) {

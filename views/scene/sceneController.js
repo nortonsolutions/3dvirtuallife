@@ -38,4 +38,28 @@ export class SceneController {
         this.scene = null;
     }
 
+    /** This method will not set the position of the object3D, nor create a GUI.
+     * The return object 'gltf' will have a model and animations if applicable.
+      */
+    loadObject3D(objectName, callback) {
+
+        let object = this.layoutBuilder.getObject(objectName);
+        var loader = new THREE.GLTFLoader();
+        loader.load( '/models/3d/gltf/' + object.gltf, (gltf) => {
+            let model = gltf.scene;
+            model.scale.x = object.attributes.scale;
+            model.scale.y = object.attributes.scale;
+            model.scale.z = object.attributes.scale;
+            model.objectName = object.name;
+            model.objectType = object.type;
+            model.attributes = object.attributes;
+            callback(gltf);
+        });
+    }
+
+    /** Position of the model should be set before animating */
+    createGUI(gltf) {
+        this.scene.createGUI( model, gltf.animations, model.uuid );
+    }
+
 }

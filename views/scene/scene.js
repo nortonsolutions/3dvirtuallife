@@ -380,8 +380,6 @@ class Scene {
                     // If it is an item, pick it up and add to inventory
                     if (objectType == "item") {
                         
-                        // TESTING ONLY, eventually this will be done from inventory screen:
-                        
                         this.controller.eventDepot.fire('takeItem', objectName);
                         this.objects3D = this.objects3D.filter(el => {
                             return el.objectName != objectName;

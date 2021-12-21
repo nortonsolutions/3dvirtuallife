@@ -8,9 +8,14 @@ img {
     max-width: 100% !important;
 }
 
+.card {
+    height: 80px;
+    width: 100px;
+}
+
 .charGrid {
     background-image: url('/models/png/hero.png');
-    background-size: 100%;
+    background-size: 100% 100%;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 5px;
@@ -57,10 +62,10 @@ img {
 /* Tooltip container */
 .tooltipper {
     /* position: relative; */
-    width: 100px !important;
+    /* width: 100px !important; */
     max-width: 100px !important ;
     /* display: inline-block; */
-    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+    /* border-bottom: 1px dotted black; If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
