@@ -65,6 +65,7 @@ class GameAPI {
         return {
             hero: {
                 name: name,
+                type: "hero",
                 attributes: {
                     height: height,
                     scale: 10,

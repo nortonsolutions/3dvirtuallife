@@ -15,10 +15,13 @@ export const levels = [
         background: 'clouds.png',
         terrain: {
             gltf: 'valley.gltf',
-            scale: 100,
             fog: true,
             hemisphereLight: true,
-            overheadPointLight: true
+            overheadPointLight: true,
+            attributes: {
+                scale: 100
+            }
+
         },
         items: [
             Items.keyToShed,
@@ -44,10 +47,12 @@ export const levels = [
         background: '',
         terrain: {
             gltf: 'dungeon.gltf',
-            scale: 100,
             fog: false,
             hemisphereLight: false,
-            overheadPointLight: true
+            overheadPointLight: true,
+            attributes: {
+                scale: 100
+            }
         },
         items: [
             Items.bagOfGems,
