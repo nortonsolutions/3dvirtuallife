@@ -1,22 +1,37 @@
-<table class="table table-striped table-inverse table-responsive">
-    <thead class="thead-inverse">
-        <tr>
-            <th>Item</th>
-            <th>Description</th>
-            <th>Quantity</th>
-        </tr>
-        </thead>
-        <tbody>
+<script>
+
+
+
+</script>
+
+<div class="row">
+
+    <div class="col-8">
+        <div class="row ml-0">
             {{#each this}}
-            <tr>
-                {{!-- <td scope="row">{{@key}}</td>
-                <td></td>
-                <td>{{this}}</td> --}}
-                <td>{{name}}</td>
-                <td>{{description}}</td>
-                <td>{{quantity}}</td>
-            </tr>
+            <div class="col-xs-1-12">
+                <div class="card">
+                <div class="card-body tooltipper">
+                        <img draggable="true" ondragstart="drag(event)" src="/models/png/{{image}}" alt="{{description}}">
+                        <span class="tooltippertext">{{description}}</span>
+                </div>
+                </div>
+            </div>
             {{/each}}
-        </tbody>
-</table>
+
+            
+        </div>
+    </div>
+
+    <div class="col-4 charGrid">
+        <div class="one" ondrop="drop(event)" ondragover="allowDrop(event)">One</div>
+        <div class="two" ondrop="drop(event)" ondragover="allowDrop(event)">Two</div>
+        <div class="three" ondrop="drop(event)" ondragover="allowDrop(event)">Three</div>
+        <div class="four" ondrop="drop(event)" ondragover="allowDrop(event)">Four</div>
+        <div class="five" ondrop="drop(event)" ondragover="allowDrop(event)">Five</div>
+        <div class="six" ondrop="drop(event)" ondragover="allowDrop(event)">Six</div>
+    </div>
+
+
+</div>
 

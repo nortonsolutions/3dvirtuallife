@@ -25,7 +25,7 @@ export const Entities = {
             animates: true,
             height: 20,
             elevation: 0,
-            scale: 5,
+            scale: 10,
             agility: 1,
             elevation: 0,
             conversation: [],

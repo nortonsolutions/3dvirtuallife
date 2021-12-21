@@ -244,6 +244,9 @@ class Scene {
         
             let model = gltf.scene;
             
+            // this.hero.model will be used to handle primary gltf + equipped items
+            this.hero.model = model;
+
             model.scale.x = this.hero.attributes.scale;
             model.scale.y = this.hero.attributes.scale;
             model.scale.z = this.hero.attributes.scale;
@@ -286,7 +289,7 @@ class Scene {
         this.controls.getObject().translateX( this.hero.location.x * multiplier );
         this.controls.getObject().translateZ( this.hero.location.z * multiplier );
         this.controls.getObject().translateY( this.hero.attributes.height? this.hero.attributes.height : 20 ); 
-            // this.determineElevation(this.controls.getObject().position.x, this.controls.getObject().position.z) + this.hero.attributes.height );
+            
 
         this.objects.forEach(object => {
 
@@ -376,6 +379,8 @@ class Scene {
                     
                     // If it is an item, pick it up and add to inventory
                     if (objectType == "item") {
+                        
+                        // TESTING ONLY, eventually this will be done from inventory screen:
                         
                         this.controller.eventDepot.fire('takeItem', objectName);
                         this.objects3D = this.objects3D.filter(el => {
@@ -565,7 +570,7 @@ class Scene {
                 direction: new THREE.Vector3(),
                 velocity: new THREE.Vector3(),
                 downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength ),
-                movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 0, 0 ), 0, 10 ),
+                movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 0, 0 ), 0, 40 ),
                 jumpedOnObject: false,
                 justJumped: false,
                 canJump: true,
@@ -695,6 +700,7 @@ class Scene {
 
         let thisMixer = mixers[uniqueId];
 
+
         var yAxisRotation = new THREE.Euler( 0, entity.rotation.y, 0, 'YXZ' );
         let worldDirection = new THREE.Vector3().copy(thisMixer.direction).applyEuler( yAxisRotation );
         
@@ -704,6 +710,8 @@ class Scene {
         mRaycaster.ray.direction.z = - worldDirection.z;
 
         if (uniqueId != "hero") {
+            mRaycaster.ray.direction.x = - mRaycaster.ray.direction.x;
+            mRaycaster.ray.direction.z = - mRaycaster.ray.direction.z;
             mRaycaster.ray.origin.y += 20;
         }
 
@@ -711,12 +719,12 @@ class Scene {
         // mRaycaster.ray.direction.x = - mRaycaster.ray.direction.x;
         // mRaycaster.ray.direction.z = - mRaycaster.ray.direction.z;
 
-        console.log(`${uniqueId}: origin: ${mRaycaster.ray.origin.x},${mRaycaster.ray.origin.y},${mRaycaster.ray.origin.z}`);
-        console.log(`${uniqueId}: direction: ${mRaycaster.ray.direction.x},${mRaycaster.ray.direction.y},${mRaycaster.ray.direction.z}`);
+        // console.log(`${uniqueId}: origin: ${mRaycaster.ray.origin.x},${mRaycaster.ray.origin.y},${mRaycaster.ray.origin.z}`);
+        // console.log(`${uniqueId}: direction: ${mRaycaster.ray.direction.x},${mRaycaster.ray.direction.y},${mRaycaster.ray.direction.z}`);
 
 
         // Only perform the translation if I will not invade another.
-        let movementIntersects = mRaycaster.intersectObjects(this.objects3D, true).filter(el => el != entity);
+        let movementIntersects = mRaycaster.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
         
         if (movementIntersects.length == 0) {
             
@@ -724,7 +732,7 @@ class Scene {
             entity.translateY( thisMixer.velocity.y * delta );
             entity.translateZ( thisMixer.velocity.z * delta );
 
-            // if (uniqueId=="hero") console.log(`thisMixer.velocity.z: ${thisMixer.velocity.z}`);
+            // if (uniqueId!="hero") console.log(`thisMixer.velocity.z: ${thisMixer.velocity.z}`);
             if (Math.abs(entity.getWorldPosition(entity.position).x) >= this.planeHeight/2 || 
             Math.abs(entity.getWorldPosition(entity.position).z) >= this.planeWidth/2) {
                 entity.translateX( -thisMixer.velocity.x * delta );
@@ -732,19 +740,23 @@ class Scene {
                 entity.translateZ( -thisMixer.velocity.z * delta );
 
                 if (uniqueId != "hero") {
-                    entity.rotateY(1);
+                    entity.rotateY(Math.PI);
                 }
             }
         } else {
-            console.log(`${uniqueId} intersects:`);
-            console.dir(movementIntersects);
+            
+            // movementIntersects[ 0 ].object.material.transparent = true;
+            // movementIntersects[ 0 ].object.material.opacity = 0.1;
+
+            if (uniqueId!="hero") console.log(`${uniqueId} intersects:`);
+            if (uniqueId!="hero") console.dir(movementIntersects[0].object);
 
             thisMixer.velocity.x = 0;
             thisMixer.velocity.y = 0;
             thisMixer.velocity.z = 0;
 
             if (uniqueId != "hero") {
-                entity.rotateY(1);
+                entity.rotateY(2);
             } 
         }
 
@@ -825,7 +837,7 @@ class Scene {
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && camera.position.z > -5) {
                 camera.position.z -= cameraDistanceDefault / 30;
-                if (camera.position.y > 0) camera.position.y -= cameraElevationDefault / 30;
+                if (camera.position.y > this.controls.getObject().position.y) camera.position.y -= cameraElevationDefault / 30;
             }
         } else {
             if (camera.position.z <= cameraDistanceDefault) {

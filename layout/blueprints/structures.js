@@ -10,7 +10,7 @@ export const Structures = {
         location: { x: 0, y: 0, z: 0},
         attributes: {
             animates: false,
-            scale: 1,
+            scale: 100,
             elevation: 0,
         }
     
@@ -24,7 +24,7 @@ export const Structures = {
         attributes: {
             animates: true,
             key: 'keyToShed',
-            scale: 10,
+            scale: 100,
             elevation: 1,
             routeToLevel: 1 
         }
@@ -61,11 +61,14 @@ export const Structures = {
     
     ancientChest: {
         name: 'ancientChest',
-        gltf: 'sceneHouse.gltf',
+        gltf: 'chest.gltf',
         description: 'An old but sturdy wooden chest',
         type: 'structure',
+
         attributes: {
-            animates: false,
+            scale: 100,
+            elevation: 30,
+            animates: true,
             contentItems: [
                 Items.smallSword
             ]

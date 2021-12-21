@@ -75,6 +75,7 @@ class GameAPI {
                     agility: 3
                 },
                 gltf: 'robot.glb',
+                model: null,
                 inventory: {}
             },
             level: 0,

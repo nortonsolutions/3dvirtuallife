@@ -4,6 +4,105 @@ body {
     overflow: hidden;
 }
 
+img {
+    max-width: 100% !important;
+}
+
+.charGrid {
+    background-image: url('/models/png/hero.png');
+    background-size: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 5px;
+    grid-auto-rows: minmax(50px, auto);
+
+}
+
+/* head */
+.one {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+/* body  */
+.two { 
+    grid-column: 2;
+    grid-row: 2 / 4;
+}
+
+/* left hand */
+.three {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+/* right hand */
+.four {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+/* special */
+.five {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+/* feet */
+.six {
+    grid-column: 2;
+    grid-row: 4;
+}
+
+/* Tooltip container */
+.tooltipper {
+    /* position: relative; */
+    width: 100px !important;
+    max-width: 100px !important ;
+    /* display: inline-block; */
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltipper .tooltippertext {
+    visibility: hidden;
+    width: 100px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    bottom: 80%;
+    left: 70%;
+    margin-left: -40px;
+
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltipper .tooltippertext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltipper:hover .tooltippertext {
+    visibility: visible;
+    opacity: 1;
+}
+
 #message {
     position: absolute;
     display:block;
