@@ -17,8 +17,6 @@ var cameraReach = 1000;
 var cameraDistanceDefault = 200;
 var cameraElevationDefault = 40;
 
-// var vertex = new THREE.Vector3();
-// var color = new THREE.Color();
 var multiplier = 100;
 var navbarHeight;
 
@@ -43,7 +41,6 @@ class Scene {
         this.planeHeight = length? length * multiplier : 2000;
 
         this.hero = hero;
-        this.emissives = [];
         this.objects = objects;
         this.background = background;
         this.terrain = terrain;
@@ -201,7 +198,7 @@ class Scene {
 
         this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault);
 
-        
+
         scene.add( this.controls.getObject() );
     
         document.addEventListener( 'keydown', this.onKeyDown, false );
@@ -266,7 +263,11 @@ class Scene {
 
             this.createGUI( model, gltf.animations, "hero" );
 
-
+            Object.keys(this.hero.equipped).forEach(bodyPart => {
+                this.controller.loadObject3DbyName(this.hero.equipped[bodyPart], (gltf) => {
+                    this.hero.equip(bodyPart, gltf.scene);
+                })
+            })
         
         }, undefined, function ( error ) {
         

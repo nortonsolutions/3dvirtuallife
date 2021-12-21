@@ -15,6 +15,7 @@ export class Hero {
         this.model = hero.model;
         this.attributes = hero.attributes;
         this.inventory = hero.inventory;
+        this.equipped = hero.equipped;
         this.eventDepot = eventDepot;
         this.controller = sceneController;
 
@@ -43,7 +44,7 @@ export class Hero {
     }
 
     removeFromInventory(itemName) {
-        if (this.inventor[itemName] > 1) {
+        if (this.inventory[itemName] > 1) {
             this.inventory[itemName]--;
         } else {
             delete this.inventory[itemName];
@@ -74,8 +75,6 @@ export class Hero {
     addToBodyPart(current, name, componentToAdd) {
 
         if (current.name == name ) {
-            console.log(`Adding ${componentToAdd.name} to ${name}`)
-            console.dir(current);
             componentToAdd.position.set(0,0,0);
             componentToAdd.rotation.y = Math.PI;
             componentToAdd.scale.copy(new THREE.Vector3( .1,.1,.1 ));

@@ -76,7 +76,8 @@ class GameAPI {
                 },
                 gltf: 'robot.glb',
                 model: null,
-                inventory: {}
+                inventory: {},
+                equipped: {}
             },
             level: 0,
             layouts: []
