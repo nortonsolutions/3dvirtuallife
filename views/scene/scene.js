@@ -241,7 +241,7 @@ class Scene {
         })
     }
 
-        /** 
+    /** 
      * Create 3D representation of each object:
      */ 
     seedObjects3D = () => {
@@ -268,8 +268,6 @@ class Scene {
 
         });
     }
-
-
 
     onMouseClick = (e) => {
         console.log(`Controls object:`);
@@ -536,7 +534,6 @@ class Scene {
     handleAutoZoom = () => {
         this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
 
-
         // console.table(this.controls.getObject().position);
         // // ORIGINAL
         // let rotations = new THREE.Euler( 0, 0, 0, 'YXZ' );
@@ -607,6 +604,8 @@ class Scene {
 
                     this.controller.eventDepot.fire('saveLevel', {
                         // TODO: implement save level, item locations, etc.
+
+                        
                     });
 
                     this.controller.eventDepot.fire('loadLevel', {

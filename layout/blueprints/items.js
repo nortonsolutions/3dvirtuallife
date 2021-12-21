@@ -14,14 +14,14 @@ export const Items = {
     },
     bagOfGems: {
         name: 'bagOfGems',
-        gltf: 'blueball.gltf',
-        image: 'blueball.png',
+        gltf: 'bagOfGems.glb',
+        image: 'crystalBall.png',
         description: 'A small velvet bag full of gems',
         type: 'item',
         attributes: {
 
             animates: false,
-            scale: .1,
+            scale: 100,
             elevation: 0
         }
     },
@@ -41,13 +41,13 @@ export const Items = {
     mace: {
         name: 'mace',
         gltf: 'mace.glb',
-        image: 'mace.png',
+        image: 'broadsword.png',
         description: 'A metallic mace',
         type: 'item',
         attributes: {
             equippable: ['handR', 'handL'],
             animates: false,
-            scale: 100,
+            scale: 50,
             elevation: 30
         } 
     },
@@ -60,7 +60,7 @@ export const Items = {
         attributes: {
 
             animates: false,
-            scale: 100,
+            scale: 50,
             elevation: 30
         }
     },
