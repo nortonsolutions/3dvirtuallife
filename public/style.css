@@ -59,6 +59,13 @@ img {
     grid-row: 4;
 }
 
+/* drop  */
+.seven {
+    grid-column: 1;
+    grid-row: 4;
+    background-color: darkred;
+}
+
 /* Tooltip container */
 .tooltipper {
     /* position: relative; */

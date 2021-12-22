@@ -1,4 +1,4 @@
-var camera, scene, renderer, 
+var camera, renderer, 
     helper, proximityLight;
 
 var moveForward = false;
@@ -43,6 +43,7 @@ class Scene {
         this.onWindowResize = this.onWindowResize.bind(this);
         this.seedObjects3D = this.seedObjects3D.bind(this);
         this.addControls = this.addControls.bind(this);
+        this.scene = null;
     }
 
     init(callback) {
@@ -52,7 +53,7 @@ class Scene {
         camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, cameraReach );
         camera.position.set( 0, cameraElevationDefault, cameraDistanceDefault );
         
-        scene = new THREE.Scene();
+        this.scene = new THREE.Scene();
 
         this.addControls();
         this.addBackground();
@@ -73,7 +74,7 @@ class Scene {
     addControls() {
         this.controls = new THREE.PointerLockControls( camera );
         this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault);
-        scene.add( this.controls.getObject() );
+        this.scene.add( this.controls.getObject() );
     
         document.addEventListener( 'keydown', this.onKeyDown, false );
         document.addEventListener( 'keyup', this.onKeyUp, false );
@@ -95,10 +96,10 @@ class Scene {
             this.controls.getObject().add( backgroundMesh );
 
         } else {
-            scene.background = BLACK;
+            this.scene.background = BLACK;
         }
 
-        if (this.terrain.fog) scene.fog = new THREE.Fog( 'white', 100, cameraReach );
+        if (this.terrain.fog) this.scene.fog = new THREE.Fog( 'white', 100, cameraReach );
     }
 
     addLights() {
@@ -106,18 +107,18 @@ class Scene {
         if (this.terrain.hemisphereLight) {
             var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
             light.position.set( 0.5, 1, 0.75 );
-            scene.add( light );
+            this.scene.add( light );
         }
 
         if (this.terrain.overheadPointLight) {
             this.overheadPointLight = new THREE.PointLight( 0xf37509, 2, 250, 2 );
             this.overheadPointLight.position.set( 0, 0, 0 );
-            scene.add( this.overheadPointLight );
+            this.scene.add( this.overheadPointLight );
         }
         
         proximityLight = new THREE.PointLight( 0x00ff00, 2, 50, 2 );
         proximityLight.position.set( 0, 0, 0 );
-        scene.add( proximityLight );
+        this.scene.add( proximityLight );
 
     }
 
@@ -194,7 +195,7 @@ class Scene {
 
         helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(5), new THREE.MeshBasicMaterial({ color: 'red' }));
         helper.visible = false;
-        scene.add( helper );
+        this.scene.add( helper );
 
     }
 
@@ -202,7 +203,7 @@ class Scene {
 
         this.controller.load(this.terrain, (gltf) => {
             this.controller.floor = gltf.scene;
-            scene.add( this.controller.floor );
+            this.scene.add( this.controller.floor );
             setTimeout(() => {
                 callback();
             }, 200);
@@ -263,7 +264,7 @@ class Scene {
                 }
 
                 this.controller.objects3D.push( model );
-                scene.add( model );
+                this.scene.add( model );
 
             }, undefined, function ( error ) {
                 console.error( error );
@@ -293,11 +294,7 @@ class Scene {
                     
                     // If it is an item, pick it up and add to inventory
                     if (objectType == "item") {
-                        
                         this.controller.eventDepot.fire('takeItem', objectName);
-                        this.controller.removeFromObjects3DbyName(objectName);
-                        scene.remove(scene.children.find(el => el.objectName == objectName));
-
                     // If it is a friendly entity, engage the conversation
                     } else if (objectType == "friendly") {
                         
@@ -680,7 +677,7 @@ class Scene {
         } else {
             this.prevTime = performance.now();
         }
-        renderer.render( scene, camera );
+        renderer.render( this.scene, camera );
     }
 
     deanimate() {

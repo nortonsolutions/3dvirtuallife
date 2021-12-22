@@ -28,6 +28,7 @@ export class SceneController {
         this.moveRight = false;
 
         this.hero = hero;
+        this.scene = null;
         this.floor = null;
 
         this.downRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength);
@@ -47,6 +48,29 @@ export class SceneController {
         this.mixers = {};
         this.actions = {};
 
+        this.addEventListeners = this.addEventListeners.bind(this);
+        this.addEventListeners();
+    }
+
+    addEventListeners() {
+        this.eventDepot.addListener('takeItem', (itemName) => {
+            this.removeFromScenebyName(itemName);
+        });
+
+        this.eventDepot.addListener('dropItem', (itemName) => {
+            let object = this.layoutManager.getObject(itemName);
+            this.loadObject3DbyName(itemName, (gltf) => {
+                let model = gltf.scene;
+                model.position.copy(this.scene.controls.getObject().position);
+                model.position.y = this.determineElevationGeneric(model.position.x, model.position.y) + object.attributes.elevation;
+                
+                // Add to layoutManager's levelObjects as well with grid coordinates, for future loads
+                
+                this.addToObjects3D(model);
+                this.scene.scene.add(model);
+                
+            })
+        });
     }
 
     determineElevationGeneric(x,z, uniqueId) {
@@ -103,7 +127,12 @@ export class SceneController {
         this.objects3D.push(object);
     }
 
-    removeFromObjects3DbyName(objectName) {
+    removeFromScenebyName(objectName) {
+
+        this.scene.scene.remove(this.scene.scene.children.find(el => {
+            return el.objectName == objectName;
+        }));
+
         this.objects3D = this.objects3D.filter(el => {
             return el.objectName != objectName;
         });
@@ -120,7 +149,7 @@ export class SceneController {
     deanimateScene() {
         this.scene.deanimate();
         this.scene.unregisterEventListeners();
-        this.scene = null;
+
     }
 
     /** This method will not set the position of the object3D, nor create a GUI.
@@ -129,10 +158,11 @@ export class SceneController {
     loadObject3DbyName(objectName, callback) {
 
         let object = this.layoutManager.getObject(objectName);
-        var loader = new THREE.GLTFLoader();
-        loader.load( '/models/3d/gltf/' + object.gltf, (gltf) => {
+        this.loader.load( '/models/3d/gltf/' + object.gltf, (gltf) => {
             let model = gltf.scene;
-            model.scale.copy(object.attributes.scale);
+            model.scale.x = object.attributes.scale;
+            model.scale.y = object.attributes.scale;
+            model.scale.z = object.attributes.scale;
             model.objectName = object.name;
             model.objectType = object.type;
             model.attributes = object.attributes;

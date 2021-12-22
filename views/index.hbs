@@ -213,6 +213,14 @@
                 };
             }
 
+            const dropOnly = (ev) => {
+                ev.preventDefault();
+                let data = ev.dataTransfer.getData("text").split(':');
+
+                var itemName = data[0];
+                eventDepot.fire('dropItem', itemName);
+            }
+
             document.querySelectorAll('.draggable').forEach(draggableElement => {
                 draggableElement.addEventListener('dragstart', drag);
             });
@@ -222,8 +230,11 @@
                 dragSpot.addEventListener('dragover', allowDrop);
             });
 
+            document.querySelectorAll('.dropOnly').forEach(d => {
+                d.addEventListener('drop', dropOnly);
+                d.addEventListener('dragover', allowDrop);
+            });
         }
-
         
     </script>
 

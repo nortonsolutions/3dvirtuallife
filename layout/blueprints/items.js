@@ -48,7 +48,7 @@ export const Items = {
             equippable: ['handR', 'handL'],
             animates: false,
             scale: 50,
-            elevation: 30
+            elevation: 3
         } 
     },
     crystalBall: {

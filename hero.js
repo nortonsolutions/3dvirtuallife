@@ -26,12 +26,12 @@ export class Hero {
     }
 
     addEventListeners() {
-        this.eventDepot.addListener('takeItem', (item) => {
-            this.addToInventory(item);
+        this.eventDepot.addListener('takeItem', (itemName) => {
+            this.addToInventory(itemName);
         });
 
-        this.eventDepot.addListener('dropItem', (item) => {
-            this.removeFromInventory(item);
+        this.eventDepot.addListener('dropItem', (itemName) => {
+            this.removeFromInventory(itemName);
         });
     }
 
