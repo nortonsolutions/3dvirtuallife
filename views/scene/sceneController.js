@@ -1,11 +1,12 @@
 import { Scene } from '/scene/scene.js';
+import { Hero } from '/hero.js'
 
 /**
  * SceneController has a Scene object for graphical display, and keeps track
  * of movements and placement within the scene for object interactions, etc.
  * 
  * SceneController receives the summarized version of the layout as defined
- * by the LayoutBuilder, containing only the information needed for the UI.
+ * by the LayoutManager, containing only the information needed for the UI.
  * 
  * Also has utilities for handling 3D objects, interfacing with the Scene.
  * 
@@ -19,7 +20,7 @@ var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
 export class SceneController {
 
-    constructor(hero, layoutBuilder, eventDepot) {
+    constructor(hero, layoutManager, eventDepot) {
 
         this.moveForward = false;
         this.moveBackward = false;
@@ -28,16 +29,16 @@ export class SceneController {
 
         this.hero = hero;
         this.floor = null;
-        
+
         this.downRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength);
 
         this.eventDepot = eventDepot;
-        this.layoutBuilder = layoutBuilder;
-        this.layout = layoutBuilder.getLayout();
+        this.layoutManager = layoutManager;
+        this.level = layoutManager.getLevel();
+        this.layout = layoutManager.getLayout();
         this.background = this.layout.background;
         this.terrain = this.layout.terrain;
-        this.objects = [...this.layout.entities, ...this.layout.structures, ...this.layout.items];
-        this.hero.location = this.layout.hero.location;
+        this.objects = layoutManager.getLevelObjects();  
 
         this.loader = new THREE.GLTFLoader();
                 
@@ -127,7 +128,7 @@ export class SceneController {
       */
     loadObject3DbyName(objectName, callback) {
 
-        let object = this.layoutBuilder.getObject(objectName);
+        let object = this.layoutManager.getObject(objectName);
         var loader = new THREE.GLTFLoader();
         loader.load( '/models/3d/gltf/' + object.gltf, (gltf) => {
             let model = gltf.scene;

@@ -27,7 +27,7 @@ export const Structures = {
             key: 'keyToShed',
             scale: 100,
             elevation: 1,
-            routeToLevel: 1 
+            routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } },
         }
     
     },
@@ -42,7 +42,7 @@ export const Structures = {
             animates: false,
             scale: 100,
             elevation: 1,
-            routeToLevel: 0,
+            routeTo: { level: 0, location: { x: 5, y: 0, z: 5} },
             unlocked: true
         }
     

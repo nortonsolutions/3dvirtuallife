@@ -9,7 +9,7 @@ export class Hero {
     //     inventory: []
     // }
 
-    constructor(hero, eventDepot, sceneController) {
+    constructor(hero, eventDepot) {
         this.name = hero.name;
         this.gltf = hero.gltf;
         this.model = hero.model;
@@ -17,11 +17,12 @@ export class Hero {
         this.inventory = hero.inventory;
         this.equipped = hero.equipped;
         this.eventDepot = eventDepot;
-        this.controller = sceneController;
-
+        
         this.addEventListeners = this.addEventListeners.bind(this);
         this.addEventListeners();
 
+        // Actually just a starting/saved location
+        if (hero.location) this.location = hero.location;
     }
 
     addEventListeners() {

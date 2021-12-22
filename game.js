@@ -3,12 +3,12 @@
  * 
  * The 'Game' is the main interface for the game.
  * 
- * It utilizes the LayoutBuilder to provide layout details
+ * It utilizes the LayoutManager to provide layout details
  * given the props (hero, level, and layouts).
  * 
  */
 
-import {LayoutBuilder} from './layout/layoutBuilder.js';
+import {LayoutManager} from './layout/layoutManager.js';
 import {Hero} from '/hero.js';
 
 class Game {
@@ -24,8 +24,9 @@ class Game {
     }
     
     setGameLayout() {
-        this.layoutBuilder = new LayoutBuilder(this.props);
-        this.gameLayout = this.layoutBuilder.getLayout();
+        this.layoutManager = new LayoutManager(this.props);
+        this.gameLayout = this.layoutManager.getLayout();
+        this.hero.location = this.props.hero.location;
     }
 
     setLocalStorage(props) {
@@ -41,7 +42,7 @@ class Game {
     }
 
     getObjectDetail(objectName,detailName) {
-        return this.layoutBuilder.getObjectDetail(objectName,detailName);
+        return this.layoutManager.getObjectDetail(objectName,detailName);
     }
 }
 
@@ -66,6 +67,7 @@ class GameAPI {
             hero: {
                 name: name,
                 type: "hero",
+                location: { x: 0, y: 0, z: 0 },
                 attributes: {
                     height: height,
                     scale: 10,

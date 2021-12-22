@@ -1,5 +1,5 @@
 /**
- * LevelManager will keep track of layouts by level
+ * LevelBuilder will keep track of layouts by level
  */
 import {Entities} from './entities.js';
 import {Items} from './items.js';

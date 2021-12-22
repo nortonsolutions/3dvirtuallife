@@ -26,7 +26,7 @@ class Scene {
     constructor(hero, length, width, terrain, background, controller) {
 
         this.prevTime = performance.now();
-        // SceneController has access to layoutBuilder, which has levelManager
+        // SceneController has access to layoutManager, which has levelBuilder
         this.controller = controller;
         this.running = true;
 
@@ -225,6 +225,9 @@ class Scene {
             model.position.y -= this.hero.attributes.height;
             model.rotation.y = Math.PI;
 
+
+            console.log("this.hero.location in addHero3D");
+            console.table(this.hero.location);
             // Set hero location:
             controlsObj.translateX( this.hero.location.x * multiplier );
             controlsObj.translateZ( this.hero.location.z * multiplier );
@@ -572,6 +575,13 @@ class Scene {
             }
         }
     }
+    
+    // Calculate hero location using grid coordinates
+    updateHeroLocation = () => {
+        let { x, y, z } = this.controls.getObject().position;
+        this.hero.location.x = x / multiplier;
+        this.hero.location.z = z / multiplier;
+    }
 
     handleHeroMovement(delta) {
 
@@ -598,18 +608,19 @@ class Scene {
 
             this.handleMovement( "hero", heroObj, delta );
             
-            if (thisMixer.standingUpon && typeof thisMixer.standingUpon.attributes.routeToLevel == "number") {
+            if (thisMixer.standingUpon && thisMixer.standingUpon.attributes.routeTo && typeof thisMixer.standingUpon.attributes.routeTo.level == "number") {
                 if (thisMixer.standingUpon.attributes.unlocked) {
-                    // Use the GAME to start a new level
+                    
+                    this.updateHeroLocation();
 
                     this.controller.eventDepot.fire('saveLevel', {
-                        // TODO: implement save level, item locations, etc.
-
-                        
+                        hero: this.hero,
+                        level: this.controller.level
                     });
 
                     this.controller.eventDepot.fire('loadLevel', {
-                        level: thisMixer.standingUpon.attributes.routeToLevel,
+                        level: thisMixer.standingUpon.attributes.routeTo.level,
+                        location: thisMixer.standingUpon.attributes.routeTo.location,
                         hero: this.hero
                     });
                 }

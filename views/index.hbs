@@ -75,10 +75,18 @@
                 game.eventDepot.fire('unlockControls', {});
                 sceneController.deanimateScene();
 
-                // TODO: Update props with user and last level layout data
                 props.hero = data.hero;
                 props.level = data.level;
+                props.hero.location = data.location;
+                props.hero.location.x -= 1;
                 startGame();
+            });
+
+            eventDepot.addListener('saveLevel', (data) => {
+                
+                props = {...props, ...data};
+                localStorage.setItem('gameProps', JSON.stringify(props)); 
+
             });
 
 
@@ -162,7 +170,7 @@
             game.setGameLayout();
 
             game.stats(); // currently just dumps objects to console
-            sceneController = new SceneController(game.hero, game.layoutBuilder, game.eventDepot);
+            sceneController = new SceneController(game.hero, game.layoutManager, game.eventDepot);
             sceneController.animateScene();
         }
 
@@ -199,7 +207,7 @@
                 if (Array.from(ev.target.classList).includes('body')) {
                     game.hero.equipped[ev.target.id] = id;
                     sceneController.loadObject3DbyName(id, (gltf) => {
-                        game.hero.equip(ev.target.id, gltf.scene);
+                       game.hero.equip(ev.target.id, gltf.scene);
                     });
                 };
             }
