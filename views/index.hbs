@@ -107,21 +107,35 @@
 
                 switch (data.type) {
                     case 'inventory': 
-                        context = [];
+
+                        context = { equipped: {}, inventory: [] };
+                        Object.keys(game.hero.equipped).forEach(key => {
+                            context.equipped[key] = {
+                                name: game.hero.equipped[key],
+                                description: game.getObjectDetail(game.hero.equipped[key],'description'),
+                                image: game.getObjectDetail(game.hero.equipped[key],'image'),
+                            };
+                        });
+
+                        
                         Object.keys(game.hero.inventory).forEach(key => {
-                            context.push({
+                            context.inventory.push({
                                 name: key,
                                 description: game.getObjectDetail(key,'description'),
                                 image: game.getObjectDetail(key,'image'),
                                 quantity: game.hero.inventory[key]
                             });
-                        })
+                        });
 
                         
                         break;
                     default:
+                
                 }
                 
+                console.log("context for inventory:")
+                console.dir(context);
+
                 loadTemplate('modal-body', data.type, context, () => {
                     if (data.type == "inventory") addInventoryEvents();
                 });

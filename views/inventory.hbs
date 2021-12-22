@@ -2,7 +2,7 @@
 
     <div class="col-8 px-0">
         <div class="row ml-0">
-            {{#each this}}
+            {{#each inventory}}
             <div class="col-xs-1-12">
                 <div class="card">
                 <div class="card-body tooltipper dragSpot">
@@ -21,7 +21,12 @@
     <div class="col-4 charGrid">
         <div id="head" class="body one tooltipper dragSpot"></div>
         <div id="body" class="body two tooltipper dragSpot"></div>
-        <div id="Middle2R_end" class="body three tooltipper dragSpot"></div>
+        <div id="Middle2R_end" class="body three tooltipper dragSpot">
+            {{#if equipped.Middle2R_end}}
+                <img id="{{equipped.Middle2R_end.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.Middle2R_end.image}}" alt="{{equipped.Middle2R_end.name}}alt">
+                <span id="{{equipped.Middle2R_end.name}}alt" class="tooltippertext">{{equipped.Middle2R_end.description}}</span>
+            {{/if}}
+        </div>
         <div id="handL" class="body four tooltipper dragSpot"></div>
         <div id="special" class="body five tooltipper dragSpot"></div>
         <div id="feet" class="body six tooltipper dragSpot"></div>
