@@ -579,8 +579,12 @@ class Scene {
     // Calculate hero location using grid coordinates
     updateHeroLocation = () => {
         let { x, y, z } = this.controls.getObject().position;
+        
+        let zOffset = (z < 0) ? 20 : -20;
+        
         this.hero.location.x = x / multiplier;
-        this.hero.location.z = z / multiplier;
+        this.hero.location.z = (z+zOffset) / multiplier;
+
     }
 
     handleHeroMovement(delta) {
@@ -614,7 +618,7 @@ class Scene {
                     this.updateHeroLocation();
 
                     this.controller.eventDepot.fire('saveLevel', {
-                        hero: this.hero,
+                        hero: this.hero.basic(),
                         level: this.controller.level
                     });
 

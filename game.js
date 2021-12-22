@@ -34,7 +34,7 @@ class Game {
     }
 
     getLocalStorage() {
-        return localStorage.getItem('gameProps');
+        return JSON.parse(localStorage.getItem('gameProps'));
     }
 
     stats() {

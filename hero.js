@@ -88,5 +88,18 @@ export class Hero {
         }
     }
 
+    basic() {
+
+        return {
+            name: this.name,
+            type: "hero",
+            location: this.location,
+            attributes: this.attributes,
+            gltf: this.gltf,
+            model: null,
+            inventory: this.inventory,
+            equipped: this.equipped
+        }
+    }
 
 }

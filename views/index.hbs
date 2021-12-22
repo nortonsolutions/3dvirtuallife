@@ -64,13 +64,14 @@
         // Some game details will be provided, either new or restored game
         var props = 
         localStorage.getItem('gameProps')? 
-        localStorage.getItem('gameProps'): gameAPI.newGame('Dave', 20);
+        JSON.parse(localStorage.getItem('gameProps')): gameAPI.newGame('Dave', 20);
 
         var game;
         var sceneController;
         var eventDepot = new EventDepot();
         
         const addEventListeners = () => {
+            
             eventDepot.addListener('loadLevel', (data) => {
                 game.eventDepot.fire('unlockControls', {});
                 sceneController.deanimateScene();
