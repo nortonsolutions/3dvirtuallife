@@ -54,6 +54,7 @@ export class SceneController {
 
     addEventListeners() {
         this.eventDepot.addListener('takeItem', (itemName) => {
+            
             this.removeFromScenebyName(itemName);
         });
 
@@ -66,8 +67,8 @@ export class SceneController {
                 
                 // Add to layoutManager's levelObjects as well with grid coordinates, for future loads
                 
-                this.addToObjects3D(model);
                 this.scene.scene.add(model);
+                this.addToObjects3D(model);
                 
             })
         });
