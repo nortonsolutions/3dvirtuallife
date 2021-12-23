@@ -1,4 +1,5 @@
 var camera, renderer, 
+    cameraMinimap, rendererMinimap, 
     helper, proximityLight;
 
 var moveForward = false;
@@ -6,7 +7,7 @@ var moveBackward = false;
 var moveLeft = false;
 var moveRight = false;
 
-var cameraReach = 1000;
+var cameraReach = 1200;
 var cameraDistanceDefault = 200;
 var cameraElevationDefault = 40;
 
@@ -15,6 +16,12 @@ var navbarHeight;
 
 var WHITE = new THREE.Color('white');
 var BLACK = new THREE.Color('black');
+
+var SCREEN_WIDTH = window.innerWidth;
+var SCREEN_HEIGHT = window.innerHeight;
+
+var minimap = false;
+
 /**
  * The Scene has graphical display (THREE.js), animates using requestAnimationFrame,
  * and uses controls.  It accepts an initial layout of objects to setup the layout, 
@@ -50,7 +57,7 @@ class Scene {
 
         navbarHeight = document.querySelector('.navbar').clientHeight;
     
-        camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, cameraReach );
+        camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / (SCREEN_HEIGHT - navbarHeight), 1, cameraReach );
         camera.position.set( 0, cameraElevationDefault, cameraDistanceDefault );
         
         this.scene = new THREE.Scene();
@@ -64,6 +71,11 @@ class Scene {
         });
         
         renderer = new THREE.WebGLRenderer( { antialias: true } );
+
+        // MINIMAP      
+        rendererMinimap = new THREE.WebGLRenderer( { antialias: true } );
+        document.getElementById('minimap').appendChild( rendererMinimap.domElement );
+
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
         
@@ -73,6 +85,13 @@ class Scene {
 
     addControls() {
         this.controls = new THREE.PointerLockControls( camera );
+        
+        // MINIMAP        
+        cameraMinimap = new THREE.PerspectiveCamera( 45, 1, 1, 1000 );
+        this.controls.getObject().add(cameraMinimap);
+        cameraMinimap.position.set( 0, 960, 0);
+        cameraMinimap.rotation.set( -Math.PI / 2, 0, 0 );
+        
         this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault);
         this.scene.add( this.controls.getObject() );
     
@@ -99,7 +118,7 @@ class Scene {
             this.scene.background = BLACK;
         }
 
-        if (this.terrain.fog) this.scene.fog = new THREE.Fog( 'white', 100, cameraReach );
+        if (this.terrain.fog) this.scene.fog = new THREE.Fog( 'white', 900, cameraReach );
     }
 
     addLights() {
@@ -159,6 +178,10 @@ class Scene {
 
             case 73: // i
                 this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
+
+            case 77: // m
+                minimap = !minimap;
+                this.controller.eventDepot.fire('minimap', {});
         }
 
     };
@@ -276,6 +299,10 @@ class Scene {
     onMouseClick = (e) => {
         console.log(`Controls object:`);
         console.dir(this.controls.getObject().position);
+
+        console.log(`Objects3D object:`);
+        console.dir(this.controller.objects3D);
+
     }
 
     onMouseDown = (e) => {
@@ -678,6 +705,21 @@ class Scene {
             this.prevTime = performance.now();
         }
         renderer.render( this.scene, camera );
+
+
+
+        if (minimap) {
+            // renderer.setViewport( 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
+            // renderer.render( scene, activeCamera );
+            // cameraMinimap.lookAt(this.controls.getObject().position);
+            rendererMinimap.render(this.scene, cameraMinimap);
+            // renderer.setViewport( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
+            // renderer.render( scene, camera );
+        }
+
+
+
+
     }
 
     deanimate() {

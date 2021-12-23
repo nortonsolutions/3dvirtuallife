@@ -47,7 +47,7 @@
     </div>
 
     <div id="message"></div>
-
+    <div id="minimap"></div>
     </body>
     <script type="module">
 
@@ -69,6 +69,7 @@
         var game;
         var sceneController;
         var eventDepot = new EventDepot();
+        var minimap = false;
         
         const addEventListeners = () => {
             
@@ -98,6 +99,11 @@
 
             eventDepot.addListener('hideDescription', (data) => {
                 document.getElementById('message').innerHTML = '';
+            });
+
+            eventDepot.addListener('minimap', () => {
+                minimap = !minimap;
+                document.getElementById('minimap').style.display = minimap? 'block' : 'none';
             });
 
             eventDepot.addListener('modal', (data) => {

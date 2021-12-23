@@ -22,7 +22,7 @@ export const Items = {
 
             animates: false,
             scale: 100,
-            elevation: 0
+            elevation: 10
         }
     },
     smallSword: {
@@ -48,7 +48,7 @@ export const Items = {
             equippable: ['handR', 'handL'],
             animates: false,
             scale: 50,
-            elevation: 3
+            elevation: -10
         } 
     },
     crystalBall: {
@@ -58,10 +58,9 @@ export const Items = {
         description: 'A gleaming ball of crystal',
         type: 'item',
         attributes: {
-
             animates: false,
             scale: 50,
-            elevation: 30
+            elevation: 0
         }
     },
 

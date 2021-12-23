@@ -115,6 +115,16 @@ img {
     opacity: 1;
 }
 
+#minimap {
+    display: none;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 200px;
+    height: 200px;
+    z-index: 200;
+}
+
 #message {
     position: absolute;
     display:block;
