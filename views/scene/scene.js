@@ -1,7 +1,3 @@
-var camera, renderer, 
-    cameraMinimap, rendererMinimap, 
-    helper, proximityLight;
-
 var moveForward = false;
 var moveBackward = false;
 var moveLeft = false;
@@ -10,6 +6,11 @@ var moveRight = false;
 var cameraReach = 1200;
 var cameraDistanceDefault = 200;
 var cameraElevationDefault = 40;
+
+var cameraMinimapReach = 1200;
+var cameraMinimapElevationDefault = 1000;
+
+var DUENORTH = new THREE.Vector3( 0, 0, 2000 );
 
 var multiplier = 100;
 var navbarHeight;
@@ -33,6 +34,7 @@ class Scene {
     constructor(hero, length, width, terrain, background, controller) {
 
         this.prevTime = performance.now();
+
         // SceneController has access to layoutManager, which has levelBuilder
         this.controller = controller;
         this.running = true;
@@ -44,12 +46,12 @@ class Scene {
         this.background = background;
         this.terrain = terrain;
 
-        this.controls = null;
-
         this.animate = this.animate.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
         this.seedObjects3D = this.seedObjects3D.bind(this);
         this.addControls = this.addControls.bind(this);
+        
+        this.controls = null;
         this.scene = null;
     }
 
@@ -57,8 +59,8 @@ class Scene {
 
         navbarHeight = document.querySelector('.navbar').clientHeight;
     
-        camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / (SCREEN_HEIGHT - navbarHeight), 1, cameraReach );
-        camera.position.set( 0, cameraElevationDefault, cameraDistanceDefault );
+        this.camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / (SCREEN_HEIGHT - navbarHeight), 1, cameraReach );
+        this.camera.position.set( 0, cameraElevationDefault, cameraDistanceDefault );
         
         this.scene = new THREE.Scene();
 
@@ -70,28 +72,38 @@ class Scene {
             this.addLights();
         });
         
-        renderer = new THREE.WebGLRenderer( { antialias: true } );
+        this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+        this.renderer.setPixelRatio( window.devicePixelRatio );
+        this.renderer.setSize( SCREEN_WIDTH, (SCREEN_HEIGHT - navbarHeight));
 
-        // MINIMAP      
-        rendererMinimap = new THREE.WebGLRenderer( { antialias: true } );
-        document.getElementById('minimap').appendChild( rendererMinimap.domElement );
 
-        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
-        
+        this.stats = new Stats();
+        document.body.appendChild( this.stats.dom );
+
         this.addEventListeners();
         if (callback) callback();
     }
 
     addControls() {
-        this.controls = new THREE.PointerLockControls( camera );
+        this.controls = new THREE.PointerLockControls( this.camera );
+
+        // MINIMAP      
+        this.rendererMinimap = new THREE.WebGLRenderer( { antialias: true } );
+        document.getElementById('minimap').appendChild( this.rendererMinimap.domElement );
+        this.cameraMinimap = new THREE.PerspectiveCamera( 45, 1, 1, cameraMinimapReach );
+        this.cameraMinimap.position.set( 0, cameraMinimapElevationDefault, 0);
+        this.cameraMinimap.rotation.set( -Math.PI / 2, 0, 0 );
+        this.controls.getObject().add(this.cameraMinimap);
         
-        // MINIMAP        
-        cameraMinimap = new THREE.PerspectiveCamera( 45, 1, 1, 1000 );
-        this.controls.getObject().add(cameraMinimap);
-        cameraMinimap.position.set( 0, 960, 0);
-        cameraMinimap.rotation.set( -Math.PI / 2, 0, 0 );
-        
+        // COMPASS
+        var compassGeometry = new THREE.CylinderBufferGeometry( 0, 10, 100, 12 );
+        compassGeometry.rotateX( Math.PI / 2 );
+        var compassMaterial = new THREE.MeshNormalMaterial();
+        this.compass = new THREE.Mesh( compassGeometry, compassMaterial );
+        this.compass.position.set( 0, cameraMinimapElevationDefault/2, -cameraMinimapElevationDefault/10);
+        this.controls.getObject().add(this.compass);
+
+
         this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault);
         this.scene.add( this.controls.getObject() );
     
@@ -135,9 +147,9 @@ class Scene {
             this.scene.add( this.overheadPointLight );
         }
         
-        proximityLight = new THREE.PointLight( 0x00ff00, 2, 50, 2 );
-        proximityLight.position.set( 0, 0, 0 );
-        this.scene.add( proximityLight );
+        this.proximityLight = new THREE.PointLight( 0x00ff00, 2, 50, 2 );
+        this.proximityLight.position.set( 0, 0, 0 );
+        this.scene.add( this.proximityLight );
 
     }
 
@@ -216,9 +228,9 @@ class Scene {
 
     addHelper() {
 
-        helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(5), new THREE.MeshBasicMaterial({ color: 'red' }));
-        helper.visible = false;
-        this.scene.add( helper );
+        this.helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(5), new THREE.MeshBasicMaterial({ color: 'red' }));
+        this.helper.visible = false;
+        this.scene.add( this.helper );
 
     }
 
@@ -363,7 +375,7 @@ class Scene {
         switch (e.button) {
 
             case 0:
-                // helper.visible = false;
+                // this.helper.visible = false;
                 break;
             case 1:
                 break;
@@ -421,14 +433,17 @@ class Scene {
 
         } );
 
-        main.appendChild(renderer.domElement);
+        main.appendChild(this.renderer.domElement);
         window.addEventListener( 'resize', this.onWindowResize, false );
     }
 
     onWindowResize() {
-        camera.aspect = window.innerWidth / (window.innerHeight - navbarHeight);
-        camera.updateProjectionMatrix();
-        renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight) );
+        SCREEN_WIDTH = window.innerWidth;
+        SCREEN_HEIGHT = window.innerHeight;
+
+        this.camera.aspect = SCREEN_WIDTH / (SCREEN_HEIGHT - navbarHeight);
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize( SCREEN_WIDTH, (SCREEN_HEIGHT - navbarHeight) );
     }
 
     getMovementRay(origin, direction) {
@@ -533,15 +548,15 @@ class Scene {
 
     identifySelectedObject(heroObj) {
 
-        proximityLight.rotation.copy(heroObj.rotation);
-        proximityLight.position.copy(heroObj.position);
-        proximityLight.translateZ(-40);
-        proximityLight.translateY(-10);
+        this.proximityLight.rotation.copy(heroObj.rotation);
+        this.proximityLight.position.copy(heroObj.position);
+        this.proximityLight.translateZ(-40);
+        this.proximityLight.translateY(-10);
 
         let closest = Infinity;
 
         this.controller.objects3D.forEach(o => {
-            let distance = o.position.distanceTo(proximityLight.position);
+            let distance = o.position.distanceTo(this.proximityLight.position);
             if (distance <= 50 && distance < closest) {
                 closest = distance;
                 this.controller.mixers.hero.selectedObject = o;
@@ -588,14 +603,14 @@ class Scene {
         
         if (backrayIntersections[0]) {
             let distance = backrayIntersections[0].distance;
-            if (distance < cameraDistanceDefault && camera.position.z > -5) {
-                camera.position.z -= cameraDistanceDefault / 30;
-                if (camera.position.y > this.controls.getObject().position.y) camera.position.y -= cameraElevationDefault / 30;
+            if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
+                this.camera.position.z -= cameraDistanceDefault / 30;
+                if (this.camera.position.y > this.controls.getObject().position.y) this.camera.position.y -= cameraElevationDefault / 30;
             }
         } else {
-            if (camera.position.z <= cameraDistanceDefault) {
-                camera.position.z += cameraDistanceDefault / 100;
-                if (camera.position.y < cameraElevationDefault) camera.position.y += cameraElevationDefault / 100;
+            if (this.camera.position.z <= cameraDistanceDefault) {
+                this.camera.position.z += cameraDistanceDefault / 100;
+                if (this.camera.position.y < cameraElevationDefault) this.camera.position.y += cameraElevationDefault / 100;
             }
         }
     }
@@ -704,7 +719,7 @@ class Scene {
         } else {
             this.prevTime = performance.now();
         }
-        renderer.render( this.scene, camera );
+        this.renderer.render( this.scene, this.camera );
 
 
 
@@ -712,18 +727,20 @@ class Scene {
             // renderer.setViewport( 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
             // renderer.render( scene, activeCamera );
             // cameraMinimap.lookAt(this.controls.getObject().position);
-            rendererMinimap.render(this.scene, cameraMinimap);
+            this.rendererMinimap.render(this.scene, this.cameraMinimap);
             // renderer.setViewport( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
             // renderer.render( scene, camera );
+
+            this.compass.lookAt( DUENORTH );
         }
 
 
-
-
+        this.stats.update();
     }
 
     deanimate() {
         this.running = false;
+        document.getElementById('minimap').firstElementChild.remove();
         cancelAnimationFrame( this.animate );
         return;
     }
