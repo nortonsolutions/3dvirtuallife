@@ -58,7 +58,7 @@ export const Items = {
         attributes: {
             equippable: ['handR', 'handL'],
             animates: false,
-            scale: 50,
+            scale: 100,
             elevation: 0
         } 
     },

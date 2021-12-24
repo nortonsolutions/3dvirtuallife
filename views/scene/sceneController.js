@@ -49,6 +49,7 @@ export class SceneController {
         this.actions = {};
 
         this.addEventListeners = this.addEventListeners.bind(this);
+        this.deanimateScene = this.deanimateScene.bind(this);
         this.addEventListeners();
     }
 
@@ -147,9 +148,17 @@ export class SceneController {
         });
     }
 
-    deanimateScene() {
-        this.scene.deanimate();
+
+    deanimateScene(callback) {
         this.scene.unregisterEventListeners();
+        this.scene.deanimate(() => {
+
+            this.scene = null;
+            this.objects3D.forEach(obj3D => {
+                obj3D.dispose();
+            })
+            callback();
+        });
 
     }
 

@@ -19,7 +19,7 @@ export const levels = [
             fog: true,
             fogColor: 'white',
             hemisphereLight: true,
-            overheadPointLight: true,
+            overheadPointLight: false,
             attributes: {
                 scale: 100
             }

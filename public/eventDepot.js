@@ -25,7 +25,11 @@ class EventDepot {
                 handler(eventData);                
             }
         }
-    } 
+    }
+    
+    removeListeners(eventName) {
+        delete this.eventRegistry[eventName];
+    }
 }
 
 export { EventDepot };

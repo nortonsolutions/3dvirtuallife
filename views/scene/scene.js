@@ -150,12 +150,12 @@ class Scene {
         }
 
         if (this.terrain.overheadPointLight) {
-            this.overheadPointLight = new THREE.PointLight( 0xf37509, 2, 250, 2 );
+            this.overheadPointLight = new THREE.PointLight( 0xf37509, 10, 350, 1 );
             this.overheadPointLight.position.set( 0, 0, 0 );
             this.scene.add( this.overheadPointLight );
         }
         
-        this.proximityLight = new THREE.PointLight( 0x00ff00, 2, 50, 2 );
+        this.proximityLight = new THREE.PointLight( 0x00ff00, 2, 150, 30 );
         this.proximityLight.position.set( 0, 0, 0 );
         this.scene.add( this.proximityLight );
 
@@ -581,9 +581,12 @@ class Scene {
         this.controller.objects3D.forEach(o => {
             let distance = o.position.distanceTo(this.proximityLight.position);
             if (distance <= 50 && distance < closest) {
-                closest = distance;
-                this.controller.mixers.hero.selectedObject = o;
-                this.controller.eventDepot.fire('showDescription', { objectType: this.controller.getObjectType(o), objectName: this.controller.getObjectName(o) }); 
+                // If the object is unlocked, exclude to allow selecting the contents
+                if (!o.attributes.contentItems || (o.attributes.contentItems && !o.attributes.unlocked))  {
+                    closest = distance;
+                    this.controller.mixers.hero.selectedObject = o;
+                    this.controller.eventDepot.fire('showDescription', { objectType: this.controller.getObjectType(o), objectName: this.controller.getObjectName(o) }); 
+                }
             }
         })
 
@@ -599,26 +602,12 @@ class Scene {
     handleAutoZoom = () => {
         this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
 
-        // console.table(this.controls.getObject().position);
-        // // ORIGINAL
-        // let rotations = new THREE.Euler( 0, 0, 0, 'YXZ' );
-        // rotations.set( rotation.x, rotation.y, 0 );
-        // let worldDirection = new THREE.Vector3( 0, 0.4, 1 ).applyEuler( rotations );
-        
-        // //DEBUG
-        // console.log("worldDirection:")
-        // console.table(worldDirection);
-        
         // NEEDS PITCH as well
         let cameraDirection = this.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
 
         this.cameraBackray.ray.direction.x = -cameraDirection.x
         this.cameraBackray.ray.direction.y = -cameraDirection.y + 0.4
         this.cameraBackray.ray.direction.z = -cameraDirection.z
-
-        // //DEBUG
-        // console.log("this.cameraBackray.ray.direction:")
-        // console.table(this.cameraBackray.ray.direction);
 
         let backrayIntersections = 
             [...this.cameraBackray.intersectObject(this.controller.floor, true), 
@@ -628,7 +617,7 @@ class Scene {
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
                 this.camera.position.z -= cameraDistanceDefault / 30;
-                if (this.camera.position.y > this.controls.getObject().position.y) this.camera.position.y -= cameraElevationDefault / 30;
+                if (this.camera.position.y > (this.controls.getObject().position.y + 10)) this.camera.position.y -= cameraElevationDefault / 30;
             }
         } else {
             if (this.camera.position.z <= cameraDistanceDefault) {
@@ -694,8 +683,10 @@ class Scene {
 
             this.handleAutoZoom();
 
-            this.overheadPointLight.position.copy(heroObj.position);
-            this.overheadPointLight.position.y = this.hero.attributes.height + 40;
+            if (this.terrain.overheadPointLight) {
+                this.overheadPointLight.position.copy(heroObj.position);
+                this.overheadPointLight.position.y = this.hero.attributes.height + 40;
+           }
         }
     }
 
@@ -737,7 +728,7 @@ class Scene {
             this.handleEntityMovement(this.delta);
             this.handleMixers(this.delta);
 
-            this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
+            if (this.backgroundMesh) this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
 
             this.prevTime = this.time;
 
@@ -746,16 +737,14 @@ class Scene {
         }
         this.renderer.render( this.scene, this.camera );
 
-
-
         if (minimap) {
+
             // renderer.setViewport( 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
             // renderer.render( scene, activeCamera );
             // cameraMinimap.lookAt(this.controls.getObject().position);
-            this.rendererMinimap.render(this.scene, this.cameraMinimap);
             // renderer.setViewport( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
             // renderer.render( scene, camera );
-
+            this.rendererMinimap.render(this.scene, this.cameraMinimap);
             this.compass.lookAt( DUENORTH );
         }
 
@@ -763,11 +752,26 @@ class Scene {
         this.stats.update();
     }
 
-    deanimate() {
+    dispose(item) {
+        if (item.children.length == 0) {
+            if (item.dispose) item.dispose();
+            return;
+        } else {
+            item.children.forEach(child => {
+                this.dispose(child);
+            })
+        }
+        if (item.dispose) item.dispose();
+    }
+
+    deanimate(callback) {
         this.running = false;
-        document.getElementById('minimap').firstElementChild.remove();
+        
         cancelAnimationFrame( this.animate );
-        return;
+        document.getElementById('minimap').firstElementChild.remove();
+
+        this.dispose(this.scene);
+        callback();
     }
 
     unregisterEventListeners = () => {
@@ -775,6 +779,10 @@ class Scene {
         document.removeEventListener( 'keydown', this.onKeyDown, false );
         document.removeEventListener( 'keyup', this.onKeyUp, false );
         window.removeEventListener( 'resize', this.onWindowResize, false );
+        this.controller.eventDepot.removeListeners('takeItem');
+        this.controller.eventDepot.removeListeners('dropItem');
+        this.controller.eventDepot.removeListeners('lockControls');
+        this.controller.eventDepot.removeListeners('unlockControls');
     }
 
 }

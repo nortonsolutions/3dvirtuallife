@@ -76,7 +76,9 @@
             
             eventDepot.addListener('loadLevel', (data) => {
                 game.eventDepot.fire('unlockControls', {});
-                sceneController.deanimateScene();
+                sceneController.deanimateScene(() => {
+                    sceneController = null;
+                });
 
                 props.hero = data.hero;
                 props.level = data.level;
