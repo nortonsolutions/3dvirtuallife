@@ -62,16 +62,17 @@ export const Structures = {
     
     ancientChest: {
         name: 'ancientChest',
-        gltf: 'chest.gltf',
+        gltf: 'chest.glb',
         description: 'An old but sturdy wooden chest',
         type: 'structure',
 
         attributes: {
-            scale: 100,
-            elevation: 30,
+            scale: 60,
+            elevation: 0,
             animates: true,
+            key: 'keyToChest',
             contentItems: [
-                Items.smallSword
+                Items.crystalBall
             ]
         }
     }

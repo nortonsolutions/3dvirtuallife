@@ -70,18 +70,19 @@ class Scene {
             this.seedObjects3D();
             this.addHero3D();
             this.addLights();
+
+            this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+            this.renderer.setPixelRatio( window.devicePixelRatio );
+            this.renderer.setSize( SCREEN_WIDTH, (SCREEN_HEIGHT - navbarHeight));
+    
+    
+            this.stats = new Stats();
+            document.body.appendChild( this.stats.dom );
+    
+            this.addEventListeners();
+            if (callback) callback();
         });
-        
-        this.renderer = new THREE.WebGLRenderer( { antialias: true } );
-        this.renderer.setPixelRatio( window.devicePixelRatio );
-        this.renderer.setSize( SCREEN_WIDTH, (SCREEN_HEIGHT - navbarHeight));
 
-
-        this.stats = new Stats();
-        document.body.appendChild( this.stats.dom );
-
-        this.addEventListeners();
-        if (callback) callback();
     }
 
     addControls() {
@@ -96,13 +97,20 @@ class Scene {
         this.controls.getObject().add(this.cameraMinimap);
         
         // COMPASS
-        var compassGeometry = new THREE.CylinderBufferGeometry( 0, 10, 100, 12 );
-        compassGeometry.rotateX( Math.PI / 2 );
-        var compassMaterial = new THREE.MeshNormalMaterial();
-        this.compass = new THREE.Mesh( compassGeometry, compassMaterial );
-        this.compass.position.set( 0, cameraMinimapElevationDefault/2, -cameraMinimapElevationDefault/10);
-        this.controls.getObject().add(this.compass);
+        // var compassGeometry = new THREE.CylinderBufferGeometry( 0, 10, 100, 12 );
+        // compassGeometry.rotateX( Math.PI / 2 );
+        // var compassMaterial = new THREE.MeshNormalMaterial();
+        // this.compass = new THREE.Mesh( compassGeometry, compassMaterial );
 
+        this.controller.loader.load( '/models/3d/gltf/arrow.gltf', (gltf) => {
+            this.compass = gltf.scene;
+            this.compass.scale.set( 100, 100, 100 );
+            this.compass.children[0].material.side = THREE.FrontSide;
+            this.compass.position.set( 0, cameraMinimapElevationDefault/2, -cameraMinimapElevationDefault/10);
+            this.controls.getObject().add(this.compass);
+        });
+
+        
 
         this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault);
         this.scene.add( this.controls.getObject() );
@@ -123,14 +131,14 @@ class Scene {
                 map: new THREE.TextureLoader().load("/models/textures/" + this.background)
             });
 
-            var backgroundMesh = new THREE.Mesh(geometry, material)
-            this.controls.getObject().add( backgroundMesh );
+            this.backgroundMesh = new THREE.Mesh(geometry, material)
+            this.controls.getObject().add( this.backgroundMesh );
 
         } else {
             this.scene.background = BLACK;
         }
 
-        if (this.terrain.fog) this.scene.fog = new THREE.Fog( 'white', 900, cameraReach );
+        if (this.terrain.fog) this.scene.fog = new THREE.Fog( this.terrain.fogColor, 900, cameraReach );
     }
 
     addLights() {
@@ -238,7 +246,10 @@ class Scene {
 
         this.controller.load(this.terrain, (gltf) => {
             this.controller.floor = gltf.scene;
+            this.controller.floor.objectName = "floor";
+            this.controller.floor.objectType = "floor"; 
             this.scene.add( this.controller.floor );
+            this.controller.objects3D.push(this.controller.floor);
             setTimeout(() => {
                 callback();
             }, 200);
@@ -262,8 +273,6 @@ class Scene {
             model.rotation.y = Math.PI;
 
 
-            console.log("this.hero.location in addHero3D");
-            console.table(this.hero.location);
             // Set hero location:
             controlsObj.translateX( this.hero.location.x * multiplier );
             controlsObj.translateZ( this.hero.location.z * multiplier );
@@ -296,6 +305,19 @@ class Scene {
 
                 if (object.attributes.animates) {
                     this.controller.createMixer( model, gltf.animations, model.uuid );
+                }
+
+                if (object.attributes.contentItems) {
+                    object.attributes.contentItems.forEach(contentItem => {
+                        this.controller.load(contentItem, (iGltf) => {
+                            let iModel = iGltf.scene;
+                            iModel.position.x = object.location.x * multiplier;
+                            iModel.position.z = object.location.z * multiplier;
+                            iModel.position.y = this.controller.determineElevationGeneric(model.position.x, model.position.z,object.name) + object.attributes.elevation + contentItem.attributes.elevation;
+                            this.controller.objects3D.push( iModel );
+                            this.scene.add( iModel );
+                        })
+                    });
                 }
 
                 this.controller.objects3D.push( model );
@@ -333,7 +355,7 @@ class Scene {
                     
                     // If it is an item, pick it up and add to inventory
                     if (objectType == "item") {
-                        this.controller.eventDepot.fire('takeItem', objectName);
+                        this.controller.eventDepot.fire('takeItem', {name: objectName, uuid: thisObj.uuid});
                     // If it is a friendly entity, engage the conversation
                     } else if (objectType == "friendly") {
                         
@@ -492,6 +514,7 @@ class Scene {
         mRaycaster.ray.direction.z = - worldDirection.z;
 
         if (uniqueId != "hero") {
+            
             mRaycaster.ray.direction.x = - mRaycaster.ray.direction.x;
             mRaycaster.ray.direction.z = - mRaycaster.ray.direction.z;
             mRaycaster.ray.origin.y += 20;
@@ -524,8 +547,8 @@ class Scene {
             // movementIntersects[ 0 ].object.material.transparent = true;
             // movementIntersects[ 0 ].object.material.opacity = 0.1;
 
-            if (uniqueId!="hero") console.log(`${uniqueId} intersects:`);
-            if (uniqueId!="hero") console.dir(movementIntersects[0].object);
+            // if (uniqueId!="hero") console.log(`${uniqueId} intersects:`);
+            // if (uniqueId!="hero") console.dir(movementIntersects[0].object);
 
             thisMixer.velocity.x = 0;
             thisMixer.velocity.y = 0;
@@ -713,6 +736,8 @@ class Scene {
             this.handleHeroMovement(this.delta);
             this.handleEntityMovement(this.delta);
             this.handleMixers(this.delta);
+
+            this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
 
             this.prevTime = this.time;
 

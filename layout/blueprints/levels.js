@@ -14,8 +14,10 @@ export const levels = [
         name: "In the valley of mist",
         background: 'clouds.png',
         terrain: {
+            description: 'valley',
             gltf: 'valley.gltf',
             fog: true,
+            fogColor: 'white',
             hemisphereLight: true,
             overheadPointLight: true,
             attributes: {
@@ -46,8 +48,10 @@ export const levels = [
         name: "In the dungeon",
         background: '',
         terrain: {
+            description: 'dungeon',
             gltf: 'dungeon.gltf',
-            fog: false,
+            fog: true,
+            fogColor: 'black',
             hemisphereLight: false,
             overheadPointLight: true,
             attributes: {
@@ -56,8 +60,8 @@ export const levels = [
         },
         items: [
             Items.bagOfGems,
-            Items.crystalBall,
-            Items.mace
+            Items.mace,
+            Items.keyToChest
         ],
         structures: [
             Structures.ancientChest,

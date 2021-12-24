@@ -140,9 +140,6 @@
                 
                 }
                 
-                console.log("context for inventory:")
-                console.dir(context);
-
                 loadTemplate('modal-body', data.type, context, () => {
                     if (data.type == "inventory") addInventoryEvents();
                 });

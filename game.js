@@ -69,6 +69,7 @@ class GameAPI {
                 type: "hero",
                 location: { x: 0, y: 0, z: 0 },
                 attributes: {
+                    moves: true,
                     height: height,
                     scale: 10,
                     elevation: 0,

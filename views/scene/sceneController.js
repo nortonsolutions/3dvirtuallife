@@ -53,9 +53,9 @@ export class SceneController {
     }
 
     addEventListeners() {
-        this.eventDepot.addListener('takeItem', (itemName) => {
+        this.eventDepot.addListener('takeItem', (data) => {
             
-            this.removeFromScenebyName(itemName);
+            this.removeFromScenebyUUID(data.uuid);
         });
 
         this.eventDepot.addListener('dropItem', (itemName) => {
@@ -63,7 +63,7 @@ export class SceneController {
             this.loadObject3DbyName(itemName, (gltf) => {
                 let model = gltf.scene;
                 model.position.copy(this.scene.controls.getObject().position);
-                model.position.y = this.determineElevationGeneric(model.position.x, model.position.y) + object.attributes.elevation;
+                model.position.y = this.determineElevationGeneric(model.position.x, model.position.y, itemName) + object.attributes.elevation;
                 
                 // Add to layoutManager's levelObjects as well with grid coordinates, for future loads
                 
@@ -74,7 +74,7 @@ export class SceneController {
         });
     }
 
-    determineElevationGeneric(x,z, uniqueId) {
+    determineElevationGeneric(x,z, name) {
         this.downRaycasterGeneric.ray.origin.x = x;
         this.downRaycasterGeneric.ray.origin.z = z;
         this.downRaycasterGeneric.ray.origin.y = downRaycasterTestLength - 10;
@@ -82,7 +82,7 @@ export class SceneController {
         if (! this.downRaycasterGeneric.intersectObject(this.floor, true)[0]) {
             console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
             console.error(this.floor);
-            console.error(`${uniqueId} = ${x},${z}`);
+            console.error(`${name} = ${x},${z}`);
         }
         return this.downRaycasterGeneric.ray.origin.y - this.downRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
     }
@@ -128,14 +128,14 @@ export class SceneController {
         this.objects3D.push(object);
     }
 
-    removeFromScenebyName(objectName) {
+    removeFromScenebyUUID(uuid) {
 
         this.scene.scene.remove(this.scene.scene.children.find(el => {
-            return el.objectName == objectName;
+            return el.uuid == uuid;
         }));
 
         this.objects3D = this.objects3D.filter(el => {
-            return el.objectName != objectName;
+            return el.uuid != uuid;
         });
     }
 
@@ -238,9 +238,11 @@ export class SceneController {
 
         var thisMixer = new THREE.AnimationMixer( model );
 
-        animations.forEach(animation => {
+        let firstAnimationName = '';
+        animations.forEach((animation,index) => {
 
             var action = thisMixer.clipAction( animation );
+            if (index == 0) { firstAnimationName = animation.name };
 
             if ( emotes.indexOf( animation.name ) >= 0 || states.indexOf( animation.name ) >= 4) {
                 action.clampWhenFinished = true;
@@ -259,13 +261,15 @@ export class SceneController {
         
             name: model.objectName, 
             mixer: thisMixer,
-            activeActionName: 'Idle',
-            activeAction: this.actions[Object.keys(this.actions)[0]],
+            activeActionName: 'Idle', // 'Idle',
+            activeAction: this.actions[uniqueId + firstAnimationName],
             previousActionName: '',
             previousAction: null,
         };
 
-        if (uniqueId == "hero" || model.objectType == "friendly" || model.objectType == "beast") {
+
+        if (model.attributes.moves) {
+        // if (uniqueId == "hero" || model.objectType == "friendly" || model.objectType == "beast") {
             mixerObj = {
                 ...mixerObj,
                 moves: true,
@@ -280,12 +284,13 @@ export class SceneController {
                 selectedObject: null,
                 onObject: false
             }
+
+            // DEFAULT:
+            mixerObj.activeAction.play();
+            
         }
 
         this.mixers[uniqueId] = mixerObj;
-
-        // DEFAULT:
-        if (mixerObj.activeAction) mixerObj.activeAction.play();
     }
 
     fadeToAction = ( uuid, actionName, duration ) => {

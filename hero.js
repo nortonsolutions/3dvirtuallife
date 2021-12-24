@@ -26,8 +26,8 @@ export class Hero {
     }
 
     addEventListeners() {
-        this.eventDepot.addListener('takeItem', (itemName) => {
-            this.addToInventory(itemName);
+        this.eventDepot.addListener('takeItem', (data) => {
+            this.addToInventory(data.name);
         });
 
         this.eventDepot.addListener('dropItem', (itemName) => {

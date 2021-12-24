@@ -43,7 +43,7 @@ class LayoutManager {
         this.allItems = Items;
         this.allStructures = Structures;
         this.allEntities = Entities;
-        this.allObjects = {...Items, ...Structures, ...Entities};
+        this.allObjects = {...Items, ...Structures, ...Entities, ...{ floor: { description: "floor"}}};
 
         this.layout = {};
         
@@ -55,7 +55,7 @@ class LayoutManager {
         }
 
         this.props.hero.location = this.props.hero.location? this.props.hero.location : this.levelBuilder.randomUniqueLocation();
-
+        
     }
 
     getObject(name) {

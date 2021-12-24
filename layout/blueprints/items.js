@@ -6,16 +6,27 @@ export const Items = {
         description: 'A rusty old key with faint engravings',
         type: 'item',
         attributes: {
-
             animates: false,
             scale: 100,
+            elevation: 10
+        }
+    },
+    keyToChest: {
+        name: 'keyToChest',
+        gltf: 'key.gltf',
+        image: 'key.png',
+        description: 'A small golden key',
+        type: 'item',
+        attributes: {
+            animates: false,
+            scale: 50,
             elevation: 10
         }
     },
     bagOfGems: {
         name: 'bagOfGems',
         gltf: 'bagOfGems.glb',
-        image: 'crystalBall.png',
+        image: 'bagOfGems.png',
         description: 'A small velvet bag full of gems',
         type: 'item',
         attributes: {
@@ -41,14 +52,14 @@ export const Items = {
     mace: {
         name: 'mace',
         gltf: 'mace.glb',
-        image: 'broadsword.png',
+        image: 'mace.png',
         description: 'A metallic mace',
         type: 'item',
         attributes: {
             equippable: ['handR', 'handL'],
             animates: false,
             scale: 50,
-            elevation: -10
+            elevation: 0
         } 
     },
     crystalBall: {
@@ -59,8 +70,8 @@ export const Items = {
         type: 'item',
         attributes: {
             animates: false,
-            scale: 50,
-            elevation: 0
+            scale: 40,
+            elevation: 30
         }
     },
 
