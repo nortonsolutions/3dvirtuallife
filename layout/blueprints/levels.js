@@ -15,7 +15,7 @@ export const levels = [
         background: 'clouds.png',
         terrain: {
             description: 'valley',
-            gltf: 'valley.gltf',
+            gltf: 'valley.glb',
             fog: true,
             fogColor: 'white',
             hemisphereLight: true,
@@ -36,7 +36,7 @@ export const levels = [
             Structures.grate
         ],
         entities: [
-            Entities.evilOne,
+            // Entities.evilOne,
 
 
         ]
@@ -49,7 +49,7 @@ export const levels = [
         background: '',
         terrain: {
             description: 'dungeon',
-            gltf: 'dungeon.gltf',
+            gltf: 'dungeon.glb',
             fog: true,
             fogColor: 'black',
             hemisphereLight: false,
@@ -65,12 +65,38 @@ export const levels = [
         ],
         structures: [
             Structures.ancientChest,
-            Structures.archway
+            Structures.archway0,
+            Structures.archway2,
         ],
         entities: [
             Entities.john,
             Entities.evilOne,
             Entities.evilOne
+        ]
+    },
+    {
+        level: 2,
+        width: 40, //32
+        length: 27,  //32
+        name: "Catacomb",
+        background: '',
+        terrain: {
+            description: 'catacomb',
+            gltf: 'catacomb.glb',
+            fog: true,
+            fogColor: 'black',
+            hemisphereLight: false,
+            overheadPointLight: true,
+            attributes: {
+                scale: 100
+            }
+        },
+        items: [
+        ],
+        structures: [
+            Structures.archway1
+        ],
+        entities: [
         ]
     }
  

@@ -32,10 +32,10 @@ export const Structures = {
     
     },
 
-    archway: {
-        name: 'archway',
+    archway0: {
+        name: 'archway0',
         gltf: 'archway.gltf',
-        description: 'Dark gothic archway leading upstairs',
+        description: 'Dark gothic archway leading outside',
         type: 'structure',
         location: { x: 16, y: 0, z: 4 },
         attributes: {
@@ -43,6 +43,38 @@ export const Structures = {
             scale: 100,
             elevation: 1,
             routeTo: { level: 0, location: { x: 5, y: 0, z: 5} },
+            unlocked: true
+        }
+    
+    },
+
+    archway1: {
+        name: 'archway1',
+        gltf: 'archway.gltf',
+        description: 'Dark gothic archway leading upstairs',
+        type: 'structure',
+        location: { x: 1, y: 0, z: 0},
+        attributes: {
+            animates: false,
+            scale: 100,
+            elevation: 1,
+            routeTo: { level: 1, location: { x: 16, y: 0, z: -4 } },
+            unlocked: true
+        }
+    
+    },
+
+    archway2: {
+        name: 'archway2',
+        gltf: 'archway.gltf',
+        description: 'Archway leading to dark catacomb',
+        type: 'structure',
+        location: { x: 16, y: 0, z: -4 },
+        attributes: {
+            animates: false,
+            scale: 100,
+            elevation: 1,
+            routeTo: { level: 2, location: { x: 0, y: 0, z: 0} },
             unlocked: true
         }
     

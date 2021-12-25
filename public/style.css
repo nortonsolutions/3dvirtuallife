@@ -2,6 +2,7 @@ body {
     margin: 0;
     height: 100vh;
     overflow: hidden;
+    min-width: 655px;
 }
 
 img {
@@ -10,7 +11,11 @@ img {
 
 .card {
     height: 80px;
-    width: 100px;
+    width: 80px;
+}
+
+.card-body {
+    padding: 0 !important;
 }
 
 .charGrid {
@@ -154,6 +159,7 @@ main {
     margin: 0;
     overflow: hidden;
     font-family: arial;
+    min-width: 655px;
 }
 
 #blocker {
@@ -198,10 +204,10 @@ main {
 .myModal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    z-index: 1000; /* Sit on top */
     left: 50%;
-    top: 200px;
-    width: 50%; /* Full width */
+    top: 100px;
+    width: 500px; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(0,0,0); /* Fallback color */
@@ -274,4 +280,8 @@ main {
 @keyframes fadeIn {
     from {opacity: 0} 
     to {opacity: 1}
+}
+
+.noClick {
+    pointer-events: none !important;
 }

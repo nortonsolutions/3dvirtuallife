@@ -35,20 +35,35 @@ export class Hero {
         });
     }
 
+    firstInventorySlot() {
+        let max = this.inventory.length;
+        for (let i = 0; i < this.inventory.length; i++ ) {
+            if (!this.inventory[i] || !this.inventory[i].itemName) return i;
+        }
+        return max;
+    }
+
     addToInventory(itemName) {
 
-        if (Object.keys(this.inventory).includes(itemName)) {
-            this.inventory[itemName]++;
+        let itemIndex = this.inventory.map(el => el.itemName).indexOf(itemName);
+        if (itemIndex != -1) {
+            this.inventory[itemIndex].quantity++;
         } else {
-            this.inventory[itemName] = 1;
+            this.inventory[this.firstInventorySlot()] = {
+                itemName: itemName,
+                quantity: 1
+            }
         }
     }
 
     removeFromInventory(itemName) {
-        if (this.inventory[itemName] > 1) {
-            this.inventory[itemName]--;
+
+        let index = this.inventory.findIndex(el => el.itemName);
+        
+        if (this.inventory[index].quantity > 1) {
+            this.inventory[index].quantity--;
         } else {
-            delete this.inventory[itemName];
+            this.inventory[index] = {};
         }
     }
 
