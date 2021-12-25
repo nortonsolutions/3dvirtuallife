@@ -13,7 +13,8 @@ import { Hero } from '/hero.js'
  * Provides utilities to manage the scene state, for saving and loading.
  *  
  */
-
+// var floorBuffer = 0;
+var upRaycasterTestLength = 200; 
 var downRaycasterTestLength = 350;
 var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
 var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
@@ -30,7 +31,7 @@ export class SceneController {
         this.hero = hero;
         this.scene = null;
         this.floor = null;
-
+        this.upRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ), 0, upRaycasterTestLength);
         this.downRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength);
 
         this.eventDepot = eventDepot;
@@ -76,53 +77,77 @@ export class SceneController {
     }
 
     determineElevationGeneric(x,z, name) {
-        this.downRaycasterGeneric.ray.origin.x = x;
-        this.downRaycasterGeneric.ray.origin.z = z;
-        this.downRaycasterGeneric.ray.origin.y = downRaycasterTestLength - 10;
 
-        if (! this.downRaycasterGeneric.intersectObject(this.floor, true)[0]) {
+        this.upRaycasterGeneric.ray.origin.x = x;
+        this.upRaycasterGeneric.ray.origin.z = z;
+        this.upRaycasterGeneric.ray.origin.y = 0;
+
+        if (! this.upRaycasterGeneric.intersectObject(this.floor, true)[0]) {
             console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
             console.error(this.floor);
             console.error(`${name} = ${x},${z}`);
         }
-        return this.downRaycasterGeneric.ray.origin.y - this.downRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
+        return this.upRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
     }
 
-    castDownrayAndDetemineElevation(uniqueId, entity) {
+    setElevation(uniqueId, entity) {
 
-        let thisMixer = this.mixers[uniqueId];
-
-        let downRaycaster = thisMixer.downRaycaster;
-        downRaycaster.ray.origin.copy(entity.position);
-        downRaycaster.ray.origin.y = downRaycasterTestLength - 10;
-
-        let downwardIntersections = downRaycaster.intersectObjects( this.objects3D, true ).filter(el => {
-            return this.getObjectName(el.object) != entity.objectName;
-        });
-        // console.dir(downwardIntersections);
-        if (thisMixer.justJumped || thisMixer.jumpedOnObject) {
-            thisMixer.jumpedOnObject = downwardIntersections.length > 0;
-        }
-
-
-        if (downwardIntersections[0]) {
-            thisMixer.standingUpon = this.getRootObject3D(downwardIntersections[0].object);
-        } else {
-            thisMixer.standingUpon = null;
-        }
-
-        // if (thisMixer.standingUpon) console.dir(thisMixer.standingUpon);
-
-        // Accomodate for hero height (special case due to controls object)
-        var elevation = (uniqueId == "hero") ? this.hero.attributes.height : 0;
-
-        if ( thisMixer.jumpedOnObject === true ) {
-            elevation += (thisMixer.downRaycaster.ray.origin.y - downwardIntersections[0].distance);
-        } else {
-            elevation += (downRaycaster.ray.origin.y - downRaycaster.intersectObject(this.floor, true)[0].distance);
-        }
+        let feetPosition = entity.position.y - entity.attributes.height;
         
-        return elevation;
+        this.mixers[uniqueId].upRaycaster.ray.origin.copy(entity.position);
+        this.mixers[uniqueId].upRaycaster.ray.origin.y = 0;
+        let floorElevation = this.mixers[uniqueId].upRaycaster.intersectObject(this.floor, true)[0].distance;
+        
+        let thisElevation = floorElevation;
+
+        if (this.mixers[uniqueId].justJumped || this.mixers[uniqueId].standingUpon) {
+
+            this.mixers[uniqueId].downRaycaster.ray.origin.copy(entity.position);
+            this.mixers[uniqueId].downRaycaster.ray.origin.y = downRaycasterTestLength - 10;
+
+            var otherObjects = this.objects3D.filter(el => {
+                return this.getObjectName(el) != entity.objectName &&
+                       this.getObjectName(el) != "floor";
+            });
+
+            let downwardIntersections = this.mixers[uniqueId].downRaycaster.intersectObjects( otherObjects, true );
+            
+            console.dir(downwardIntersections);
+            if (downwardIntersections[0]) {
+
+                this.mixers[uniqueId].standingUpon = this.getRootObject3D(downwardIntersections[0].object);
+                var topOfObject = this.mixers[uniqueId].downRaycaster.ray.origin.y - downwardIntersections[0].distance;
+                
+                if (feetPosition <= topOfObject) {
+                    thisElevation = topOfObject;
+                    this.mixers[uniqueId].velocity.y = Math.max( 0, this.mixers[uniqueId].velocity.y );
+                    this.mixers[uniqueId].canJump = true;
+                    this.mixers[uniqueId].justJumped = false;
+                }
+
+
+            } else {
+                this.mixers[uniqueId].standingUpon = null;
+                if (feetPosition <= floorElevation) {
+                    thisElevation = floorElevation;
+                    this.mixers[uniqueId].velocity.y = Math.max( 0, this.mixers[uniqueId].velocity.y );
+                    this.mixers[uniqueId].canJump = true;
+                    this.mixers[uniqueId].justJumped = false;
+                } 
+            }
+
+        } else {
+
+            if (feetPosition <= floorElevation) {
+                thisElevation = floorElevation;
+                this.mixers[uniqueId].velocity.y = Math.max( 0, this.mixers[uniqueId].velocity.y );
+                this.mixers[uniqueId].canJump = true;
+                this.mixers[uniqueId].justJumped = false;
+            } 
+        }
+
+        entity.position.y = thisElevation + entity.attributes.height;
+
     }
 
     addToObjects3D(object) {
@@ -285,10 +310,11 @@ export class SceneController {
                 absVelocity: 0,
                 direction: new THREE.Vector3(),
                 velocity: new THREE.Vector3(),
+                upRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ), 0, upRaycasterTestLength ),
                 downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength ),
                 movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 0, 0 ), 0, 40 ),
-                jumpedOnObject: false,
                 justJumped: false,
+                standingUpon: null,
                 canJump: true,
                 selectedObject: null,
                 onObject: false
@@ -305,20 +331,19 @@ export class SceneController {
     fadeToAction = ( uuid, actionName, duration ) => {
         
         // Get the mixer for this uuid:
-        let thisMixer = this.mixers[uuid];
 
-        if ( thisMixer.activeActionName !== actionName ) {
+        if ( this.mixers[uuid].activeActionName !== actionName ) {
 
             let newAction = this.actions[ uuid + actionName ];
 
-            thisMixer.previousActionName = thisMixer.activeActionName;
-            thisMixer.previousAction = thisMixer.activeAction;
-            thisMixer.activeActionName = actionName;
-            thisMixer.activeAction = newAction;
+            this.mixers[uuid].previousActionName = this.mixers[uuid].activeActionName;
+            this.mixers[uuid].previousAction = this.mixers[uuid].activeAction;
+            this.mixers[uuid].activeActionName = actionName;
+            this.mixers[uuid].activeAction = newAction;
 
-            thisMixer.previousAction.fadeOut( duration );
+            this.mixers[uuid].previousAction.fadeOut( duration );
 
-            thisMixer.activeAction
+            this.mixers[uuid].activeAction
                 .reset()
                 .setEffectiveTimeScale( 1 )
                 .setEffectiveWeight( 1 )
@@ -326,21 +351,20 @@ export class SceneController {
                 .play();
 
             const restoreState = () => {
-                thisMixer.mixer.removeEventListener('finished', restoreState );
-                this.fadeToAction( uuid, thisMixer.previousActionName, 0.1 );
+                this.mixers[uuid].mixer.removeEventListener('finished', restoreState );
+                this.fadeToAction( uuid, this.mixers[uuid].previousActionName, 0.1 );
             }
     
             // After fadeToAction ({emote}, {seconds}), fadeToAction ({state}, {seconds}) again
             if (emotes.includes(actionName)) {
-                thisMixer.mixer.addEventListener( 'finished', restoreState );
+                this.mixers[uuid].mixer.addEventListener( 'finished', restoreState );
             }
         }
     }
 
     runActiveAction = (uuid, duration) => {
         // Get the mixer for this uuid:
-        let thisMixer = this.mixers[uuid];
-        thisMixer.activeAction
+        this.mixers[uuid].activeAction
             .reset()
             .setEffectiveTimeScale( 1 )
             .setEffectiveWeight( 1 )

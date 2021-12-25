@@ -150,7 +150,7 @@ class Scene {
         }
 
         if (this.terrain.overheadPointLight) {
-            this.overheadPointLight = new THREE.PointLight( 0xf37509, 10, 350, 1 );
+            this.overheadPointLight = new THREE.PointLight( 0xf37509, 20, 450, 1 );
             this.overheadPointLight.position.set( 0, 0, 0 );
             this.scene.add( this.overheadPointLight );
         }
@@ -186,10 +186,10 @@ class Scene {
                 break;
 
             case 32: // space
-
                 let heroMixer = this.controller.mixers.hero;
+                
                 if ( heroMixer.canJump === true ) {
-                    heroMixer.velocity.y += 350;
+                    heroMixer.velocity.y += 850;
                     this.controller.fadeToAction("hero", "Jump", 0.2)
                 }
                 heroMixer.canJump = false;
@@ -242,12 +242,22 @@ class Scene {
 
     }
 
+    setToRenderDoubleSided(object) {
+
+        if (object.material) {
+            object.material.side = THREE.DoubleSide;
+        } else {
+            object.children.forEach(e => this.setToRenderDoubleSided(e)); 
+        }
+    }
+
     addFloor(callback) {
 
         this.controller.load(this.terrain, (gltf) => {
             this.controller.floor = gltf.scene;
             this.controller.floor.objectName = "floor";
             this.controller.floor.objectType = "floor"; 
+            this.setToRenderDoubleSided(this.controller.floor);
             this.scene.add( this.controller.floor );
             this.controller.objects3D.push(this.controller.floor);
             setTimeout(() => {
@@ -373,7 +383,7 @@ class Scene {
                         
                         // Does this structure require a key?
                         var accessible = thisObj.attributes.key ? 
-                            Object.keys(this.hero.inventory).includes(thisObj.attributes.key) :
+                            this.hero.inventory.map(el => el.itemName).includes(thisObj.attributes.key) :
                             true;
                         
                         if (accessible) {
@@ -503,12 +513,10 @@ class Scene {
      */
     handleMovement = ( uniqueId, entity, delta ) => {
 
-        let thisMixer = this.controller.mixers[uniqueId];
-
         var yAxisRotation = new THREE.Euler( 0, entity.rotation.y, 0, 'YXZ' );
-        let worldDirection = new THREE.Vector3().copy(thisMixer.direction).applyEuler( yAxisRotation );
+        let worldDirection = new THREE.Vector3().copy(this.controller.mixers[uniqueId].direction).applyEuler( yAxisRotation );
         
-        let mRaycaster = thisMixer.movementRaycaster;
+        let mRaycaster = this.controller.mixers[uniqueId].movementRaycaster;
         mRaycaster.ray.origin.copy( entity.position );
         mRaycaster.ray.direction.x = - worldDirection.x;
         mRaycaster.ray.direction.z = - worldDirection.z;
@@ -527,16 +535,16 @@ class Scene {
         
         if (movementIntersects.length == 0) {
             
-            entity.translateX( thisMixer.velocity.x * delta );
-            entity.translateY( thisMixer.velocity.y * delta );
-            entity.translateZ( thisMixer.velocity.z * delta );
+            entity.translateX( this.controller.mixers[uniqueId].velocity.x * delta );
+            entity.translateY( this.controller.mixers[uniqueId].velocity.y * delta );
+            entity.translateZ( this.controller.mixers[uniqueId].velocity.z * delta );
 
-            // if (uniqueId!="hero") console.log(`thisMixer.velocity.z: ${thisMixer.velocity.z}`);
+            // if (uniqueId!="hero") console.log(`this.controller.mixers[uniqueId].velocity.z: ${this.controller.mixers[uniqueId].velocity.z}`);
             if (Math.abs(entity.getWorldPosition(entity.position).x) >= this.planeHeight/2 || 
             Math.abs(entity.getWorldPosition(entity.position).z) >= this.planeWidth/2) {
-                entity.translateX( -thisMixer.velocity.x * delta );
-                entity.translateY( -thisMixer.velocity.y * delta );
-                entity.translateZ( -thisMixer.velocity.z * delta );
+                entity.translateX( -this.controller.mixers[uniqueId].velocity.x * delta );
+                entity.translateY( -this.controller.mixers[uniqueId].velocity.y * delta );
+                entity.translateZ( -this.controller.mixers[uniqueId].velocity.z * delta );
 
                 if (uniqueId != "hero") {
                     entity.rotateY(Math.PI);
@@ -544,29 +552,17 @@ class Scene {
             }
         } else {
             
-            // movementIntersects[ 0 ].object.material.transparent = true;
-            // movementIntersects[ 0 ].object.material.opacity = 0.1;
-
-            // if (uniqueId!="hero") console.log(`${uniqueId} intersects:`);
-            // if (uniqueId!="hero") console.dir(movementIntersects[0].object);
-
-            thisMixer.velocity.x = 0;
-            thisMixer.velocity.y = 0;
-            thisMixer.velocity.z = 0;
+            this.controller.mixers[uniqueId].velocity.x = 0;
+            this.controller.mixers[uniqueId].velocity.y = 0;
+            this.controller.mixers[uniqueId].velocity.z = 0;
 
             if (uniqueId != "hero") {
                 entity.rotateY(2);
             } 
         }
 
-        let elevation = this.controller.castDownrayAndDetemineElevation( uniqueId, entity );
+        this.controller.setElevation( uniqueId, entity );
 
-        if (thisMixer.jumpedOnObject || entity.position.y <= (elevation + entity.attributes.elevation)) {
-            entity.position.y = (elevation + entity.attributes.elevation);
-            thisMixer.velocity.y = Math.max( 0, thisMixer.velocity.y );
-            thisMixer.canJump = true;
-            thisMixer.justJumped = false;
-        } 
     }
 
     identifySelectedObject(heroObj) {
@@ -642,29 +638,26 @@ class Scene {
 
         if (this.controller.mixers.hero) {
 
-            let thisMixer = this.controller.mixers.hero;
-
             let heroObj = this.controls.getObject();
-            thisMixer.downRaycaster.ray.origin.copy( heroObj.position );
 
             // INERTIA
-            thisMixer.velocity.x -= thisMixer.velocity.x * 10.0 * delta;
-            thisMixer.velocity.z -= thisMixer.velocity.z * 10.0 * delta;
-            thisMixer.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+            this.controller.mixers.hero.velocity.x -= this.controller.mixers.hero.velocity.x * 10.0 * delta;
+            this.controller.mixers.hero.velocity.z -= this.controller.mixers.hero.velocity.z * 10.0 * delta;
+            this.controller.mixers.hero.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
-            thisMixer.direction.z = Number( moveForward ) - Number( moveBackward );
-            thisMixer.direction.x = Number( moveLeft ) - Number( moveRight );
-            thisMixer.direction.normalize(); // this ensures consistent movements in all directions
+            this.controller.mixers.hero.direction.z = Number( moveForward ) - Number( moveBackward );
+            this.controller.mixers.hero.direction.x = Number( moveLeft ) - Number( moveRight );
+            this.controller.mixers.hero.direction.normalize(); // this ensures consistent movements in all directions
             
-            if ( moveForward || moveBackward ) thisMixer.velocity.z -= thisMixer.direction.z * 1000.0 * this.hero.attributes.agility * delta;
-            if ( moveLeft || moveRight ) thisMixer.velocity.x -= thisMixer.direction.x * 1000.0 * this.hero.attributes.agility * delta;
+            if ( moveForward || moveBackward ) this.controller.mixers.hero.velocity.z -= this.controller.mixers.hero.direction.z * 1000.0 * this.hero.attributes.agility * delta;
+            if ( moveLeft || moveRight ) this.controller.mixers.hero.velocity.x -= this.controller.mixers.hero.direction.x * 1000.0 * this.hero.attributes.agility * delta;
 
             this.identifySelectedObject(heroObj);
 
             this.handleMovement( "hero", heroObj, delta );
             
-            if (thisMixer.standingUpon && thisMixer.standingUpon.attributes.routeTo && typeof thisMixer.standingUpon.attributes.routeTo.level == "number") {
-                if (thisMixer.standingUpon.attributes.unlocked) {
+            if (this.controller.mixers.hero.standingUpon && this.controller.mixers.hero.standingUpon.attributes.routeTo && typeof this.controller.mixers.hero.standingUpon.attributes.routeTo.level == "number") {
+                if (this.controller.mixers.hero.standingUpon.attributes.unlocked) {
                     
                     this.updateHeroLocation();
 
@@ -674,8 +667,8 @@ class Scene {
                     });
 
                     this.controller.eventDepot.fire('loadLevel', {
-                        level: thisMixer.standingUpon.attributes.routeTo.level,
-                        location: thisMixer.standingUpon.attributes.routeTo.location,
+                        level: this.controller.mixers.hero.standingUpon.attributes.routeTo.level,
+                        location: this.controller.mixers.hero.standingUpon.attributes.routeTo.location,
                         hero: this.hero
                     });
                 }
@@ -695,20 +688,18 @@ class Scene {
             
             if (this.controller.mixers[entity.uuid]) {
             
-                let thisMixer = this.controller.mixers[entity.uuid];
-
                 // Make a random rotation (yaw)
                 entity.rotateY(getRndInteger(-1,2)/100);
                 
                 // GRAVITY
-                thisMixer.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+                this.controller.mixers[entity.uuid].velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
                 // Basic movement always in the z-axis direction for this entity
-                thisMixer.velocity.z = getRnd(.2,entity.attributes.agility) * 100;
-                thisMixer.velocity.x = 0; // getRndInteger(.2,entity.attributes.agility) * 100;
+                this.controller.mixers[entity.uuid].velocity.z = getRnd(.2,entity.attributes.agility) * 100;
+                this.controller.mixers[entity.uuid].velocity.x = 0; // getRndInteger(.2,entity.attributes.agility) * 100;
                 
-                thisMixer.direction.z = getRnd(-.2,.2);
-                thisMixer.direction.x = getRnd(-.2,.2);
+                this.controller.mixers[entity.uuid].direction.z = getRnd(-.2,.2);
+                this.controller.mixers[entity.uuid].direction.x = getRnd(-.2,.2);
 
                 this.handleMovement(entity.uuid, entity, delta);
             }
