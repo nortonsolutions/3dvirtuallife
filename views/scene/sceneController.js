@@ -15,7 +15,7 @@ import { Hero } from '/hero.js'
  */
 // var floorBuffer = 0;
 var upRaycasterTestLength = 200; 
-var downRaycasterTestLength = 350;
+var downRaycasterTestLength = 40;
 var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
 var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
@@ -92,62 +92,43 @@ export class SceneController {
 
     setElevation(uniqueId, entity) {
 
+        var otherObjects = this.objects3D.filter(el => {
+            return this.getObjectName(el) != entity.objectName &&
+                    this.getObjectName(el) != "floor";
+        });
+
+        // Offset downRay
+        let downRayOriginHeight = entity.position.y + 10;
         let feetPosition = entity.position.y - entity.attributes.height;
-        
+
+        this.mixers[uniqueId].downRaycaster.ray.origin.copy(entity.position);
+        this.mixers[uniqueId].downRaycaster.ray.origin.y = downRayOriginHeight;
+
         this.mixers[uniqueId].upRaycaster.ray.origin.copy(entity.position);
-        this.mixers[uniqueId].upRaycaster.ray.origin.y = 0;
+        this.mixers[uniqueId].upRaycaster.ray.origin.y = -10;
         let floorElevation = this.mixers[uniqueId].upRaycaster.intersectObject(this.floor, true)[0].distance;
-        
-        let thisElevation = floorElevation;
 
-        if (this.mixers[uniqueId].justJumped || this.mixers[uniqueId].standingUpon) {
+        // Am I over an object?
 
-            this.mixers[uniqueId].downRaycaster.ray.origin.copy(entity.position);
-            this.mixers[uniqueId].downRaycaster.ray.origin.y = downRaycasterTestLength - 10;
-
-            var otherObjects = this.objects3D.filter(el => {
-                return this.getObjectName(el) != entity.objectName &&
-                       this.getObjectName(el) != "floor";
-            });
-
-            let downwardIntersections = this.mixers[uniqueId].downRaycaster.intersectObjects( otherObjects, true );
-            
-            console.dir(downwardIntersections);
-            if (downwardIntersections[0]) {
-
+        let downwardIntersections = this.mixers[uniqueId].downRaycaster.intersectObjects( otherObjects, true );
+        if (downwardIntersections[0]) { // YES
+            var topOfObject = downRayOriginHeight - downwardIntersections[0].distance;
+            if (feetPosition <= topOfObject) {
                 this.mixers[uniqueId].standingUpon = this.getRootObject3D(downwardIntersections[0].object);
-                var topOfObject = this.mixers[uniqueId].downRaycaster.ray.origin.y - downwardIntersections[0].distance;
-                
-                if (feetPosition <= topOfObject) {
-                    thisElevation = topOfObject;
-                    this.mixers[uniqueId].velocity.y = Math.max( 0, this.mixers[uniqueId].velocity.y );
-                    this.mixers[uniqueId].canJump = true;
-                    this.mixers[uniqueId].justJumped = false;
-                }
-
-
-            } else {
-                this.mixers[uniqueId].standingUpon = null;
-                if (feetPosition <= floorElevation) {
-                    thisElevation = floorElevation;
-                    this.mixers[uniqueId].velocity.y = Math.max( 0, this.mixers[uniqueId].velocity.y );
-                    this.mixers[uniqueId].canJump = true;
-                    this.mixers[uniqueId].justJumped = false;
-                } 
-            }
-
-        } else {
-
-            if (feetPosition <= floorElevation) {
-                thisElevation = floorElevation;
+                entity.position.y = topOfObject + entity.attributes.height;
                 this.mixers[uniqueId].velocity.y = Math.max( 0, this.mixers[uniqueId].velocity.y );
                 this.mixers[uniqueId].canJump = true;
                 this.mixers[uniqueId].justJumped = false;
-            } 
+            }
+        } else { // NO
+            this.mixers[uniqueId].standingUpon = null;
+            if (feetPosition <= floorElevation) {
+                entity.position.y = floorElevation + entity.attributes.height;
+                this.mixers[uniqueId].velocity.y = Math.max( 0, this.mixers[uniqueId].velocity.y );
+                this.mixers[uniqueId].canJump = true;
+                this.mixers[uniqueId].justJumped = false;
+            }
         }
-
-        entity.position.y = thisElevation + entity.attributes.height;
-
     }
 
     addToObjects3D(object) {
@@ -317,7 +298,6 @@ export class SceneController {
                 standingUpon: null,
                 canJump: true,
                 selectedObject: null,
-                onObject: false
             }
 
             // DEFAULT:

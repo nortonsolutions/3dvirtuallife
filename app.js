@@ -104,8 +104,6 @@ export const app = () => {
             
             }
             
-            console.log("context")
-            console.dir(context);
             loadTemplate('modal-body', data.type, context, () => {
                 if (data.type == "inventory") addInventoryEvents();
             });
@@ -187,9 +185,6 @@ export const app = () => {
             var descId = data[1];
             var quantId = data[2];
             
-            console.log('event target:')
-            console.dir(ev.target);
-
             ev.target.appendChild(document.getElementById(id));
             ev.target.appendChild(document.getElementById(descId));
             ev.target.appendChild(document.getElementById(quantId));

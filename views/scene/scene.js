@@ -189,7 +189,7 @@ class Scene {
                 let heroMixer = this.controller.mixers.hero;
                 
                 if ( heroMixer.canJump === true ) {
-                    heroMixer.velocity.y += 850;
+                    heroMixer.velocity.y += 350;
                     this.controller.fadeToAction("hero", "Jump", 0.2)
                 }
                 heroMixer.canJump = false;
@@ -492,7 +492,7 @@ class Scene {
                 if (mixers[key].moves) {
                     mixers[key].absVelocity = Math.max(Math.abs(mixers[key].velocity.x), Math.abs(mixers[key].velocity.z));
     
-                    // if (key=="hero") console.log(mixers[key].absVelocity);
+
                     if (mixers[key].absVelocity < .1 && (mixers[key].activeActionName == 'Walking' || mixers[key].activeActionName == 'Running')) {
                         this.controller.fadeToAction( key, 'Idle', 0.2);
                     } else if (mixers[key].absVelocity >= .1 && mixers[key].activeActionName == 'Idle') {
@@ -528,20 +528,17 @@ class Scene {
             mRaycaster.ray.origin.y += 20;
         }
 
-        // console.log(`${uniqueId}: origin: ${mRaycaster.ray.origin.x},${mRaycaster.ray.origin.y},${mRaycaster.ray.origin.z}`);
-        // console.log(`${uniqueId}: direction: ${mRaycaster.ray.direction.x},${mRaycaster.ray.direction.y},${mRaycaster.ray.direction.z}`);
-
         let movementIntersects = mRaycaster.intersectObjects(this.controller.objects3D, true).filter(el => this.controller.getRootObject3D(el.object) != entity);
         
         if (movementIntersects.length == 0) {
-            
+
             entity.translateX( this.controller.mixers[uniqueId].velocity.x * delta );
             entity.translateY( this.controller.mixers[uniqueId].velocity.y * delta );
             entity.translateZ( this.controller.mixers[uniqueId].velocity.z * delta );
 
-            // if (uniqueId!="hero") console.log(`this.controller.mixers[uniqueId].velocity.z: ${this.controller.mixers[uniqueId].velocity.z}`);
             if (Math.abs(entity.getWorldPosition(entity.position).x) >= this.planeHeight/2 || 
             Math.abs(entity.getWorldPosition(entity.position).z) >= this.planeWidth/2) {
+
                 entity.translateX( -this.controller.mixers[uniqueId].velocity.x * delta );
                 entity.translateY( -this.controller.mixers[uniqueId].velocity.y * delta );
                 entity.translateZ( -this.controller.mixers[uniqueId].velocity.z * delta );
@@ -591,8 +588,6 @@ class Scene {
             this.controller.eventDepot.fire('hideDescription', {}); 
         }
 
-        // console.log(closest);
-
     }
 
     handleAutoZoom = () => {
@@ -638,8 +633,6 @@ class Scene {
 
         if (this.controller.mixers.hero) {
 
-            let heroObj = this.controls.getObject();
-
             // INERTIA
             this.controller.mixers.hero.velocity.x -= this.controller.mixers.hero.velocity.x * 10.0 * delta;
             this.controller.mixers.hero.velocity.z -= this.controller.mixers.hero.velocity.z * 10.0 * delta;
@@ -652,9 +645,9 @@ class Scene {
             if ( moveForward || moveBackward ) this.controller.mixers.hero.velocity.z -= this.controller.mixers.hero.direction.z * 1000.0 * this.hero.attributes.agility * delta;
             if ( moveLeft || moveRight ) this.controller.mixers.hero.velocity.x -= this.controller.mixers.hero.direction.x * 1000.0 * this.hero.attributes.agility * delta;
 
-            this.identifySelectedObject(heroObj);
+            this.identifySelectedObject(this.controls.getObject());
 
-            this.handleMovement( "hero", heroObj, delta );
+            this.handleMovement( "hero", this.controls.getObject(), delta );
             
             if (this.controller.mixers.hero.standingUpon && this.controller.mixers.hero.standingUpon.attributes.routeTo && typeof this.controller.mixers.hero.standingUpon.attributes.routeTo.level == "number") {
                 if (this.controller.mixers.hero.standingUpon.attributes.unlocked) {
@@ -677,7 +670,7 @@ class Scene {
             this.handleAutoZoom();
 
             if (this.terrain.overheadPointLight) {
-                this.overheadPointLight.position.copy(heroObj.position);
+                this.overheadPointLight.position.copy(this.controls.getObject().position);
                 this.overheadPointLight.position.y = this.hero.attributes.height + 40;
            }
         }
@@ -714,7 +707,6 @@ class Scene {
             this.time = performance.now();
             this.delta = ( this.time - this.prevTime ) / 1000;
 
-            // console.log(`delta: ${this.delta}`)
             this.handleHeroMovement(this.delta);
             this.handleEntityMovement(this.delta);
             this.handleMixers(this.delta);
