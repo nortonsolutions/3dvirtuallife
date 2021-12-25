@@ -60,13 +60,15 @@ class Scene {
         navbarHeight = document.querySelector('.navbar').clientHeight;
     
         this.camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / (SCREEN_HEIGHT - navbarHeight), 1, cameraReach );
-        this.camera.position.set( 0, cameraElevationDefault, cameraDistanceDefault );
+        this.camera.position.set( 0, cameraElevationDefault + this.hero.attributes.height, cameraDistanceDefault );
         
         this.scene = new THREE.Scene();
 
-        this.addControls();
-        this.addBackground();
+
+        
         this.addFloor(() => {
+            this.addControls();
+            this.addBackground();
             this.seedObjects3D();
             this.addHero3D();
             this.addLights();
@@ -155,7 +157,7 @@ class Scene {
             this.scene.add( this.overheadPointLight );
         }
         
-        this.proximityLight = new THREE.PointLight( 0x00ff00, 2, 150, 30 );
+        this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 3 );
         this.proximityLight.position.set( 0, 0, 0 );
         this.scene.add( this.proximityLight );
 
@@ -254,6 +256,7 @@ class Scene {
     addFloor(callback) {
 
         this.controller.load(this.terrain, (gltf) => {
+            
             this.controller.floor = gltf.scene;
             this.controller.floor.objectName = "floor";
             this.controller.floor.objectType = "floor"; 
@@ -262,7 +265,7 @@ class Scene {
             this.controller.objects3D.push(this.controller.floor);
             setTimeout(() => {
                 callback();
-            }, 200);
+            }, 500);
         }, undefined, function ( error ) {
             console.error( error );
         });
@@ -278,21 +281,16 @@ class Scene {
             let controlsObj = this.controls.getObject();
 
             // Adjustments for hero:
-            // model.position.z -= 40;
-            model.position.y -= this.hero.attributes.height;
             model.rotation.y = Math.PI;
-
 
             // Set hero location:
             controlsObj.translateX( this.hero.location.x * multiplier );
             controlsObj.translateZ( this.hero.location.z * multiplier );
             controlsObj.translateY( this.controller.determineElevationGeneric(
-                this.hero.location.x * multiplier, this.hero.location.z * multiplier, "hero") + this.hero.attributes.height 
+                this.hero.location.x * multiplier, this.hero.location.z * multiplier, "hero")
             );
             
             controlsObj.attributes = this.hero.attributes;
-
-            // this.hero.attributes.height? this.hero.attributes.height : 20 ); 
             controlsObj.add( model );
             
             this.controller.createMixer( model, gltf.animations, "hero" );
@@ -323,7 +321,7 @@ class Scene {
                             let iModel = iGltf.scene;
                             iModel.position.x = object.location.x * multiplier;
                             iModel.position.z = object.location.z * multiplier;
-                            iModel.position.y = this.controller.determineElevationGeneric(model.position.x, model.position.z,object.name) + object.attributes.elevation + contentItem.attributes.elevation;
+                            iModel.position.y = this.controller.determineElevationGeneric(model.position.x, model.position.z,object.name) + object.attributes.height + contentItem.attributes.elevation;
                             this.controller.objects3D.push( iModel );
                             this.scene.add( iModel );
                         })
@@ -513,19 +511,21 @@ class Scene {
      */
     handleMovement = ( uniqueId, entity, delta ) => {
 
+
+
         var yAxisRotation = new THREE.Euler( 0, entity.rotation.y, 0, 'YXZ' );
         let worldDirection = new THREE.Vector3().copy(this.controller.mixers[uniqueId].direction).applyEuler( yAxisRotation );
         
         let mRaycaster = this.controller.mixers[uniqueId].movementRaycaster;
         mRaycaster.ray.origin.copy( entity.position );
+        mRaycaster.ray.origin.y += entity.attributes.height;
         mRaycaster.ray.direction.x = - worldDirection.x;
         mRaycaster.ray.direction.z = - worldDirection.z;
+        
 
         if (uniqueId != "hero") {
-            
             mRaycaster.ray.direction.x = - mRaycaster.ray.direction.x;
             mRaycaster.ray.direction.z = - mRaycaster.ray.direction.z;
-            mRaycaster.ray.origin.y += 20;
         }
 
         let movementIntersects = mRaycaster.intersectObjects(this.controller.objects3D, true).filter(el => this.controller.getRootObject3D(el.object) != entity);
@@ -549,12 +549,13 @@ class Scene {
             }
         } else {
             
+
             this.controller.mixers[uniqueId].velocity.x = 0;
             this.controller.mixers[uniqueId].velocity.y = 0;
             this.controller.mixers[uniqueId].velocity.z = 0;
 
             if (uniqueId != "hero") {
-                entity.rotateY(2);
+                entity.rotateY(Math.PI/4);
             } 
         }
 
@@ -567,7 +568,9 @@ class Scene {
         this.proximityLight.rotation.copy(heroObj.rotation);
         this.proximityLight.position.copy(heroObj.position);
         this.proximityLight.translateZ(-40);
-        this.proximityLight.translateY(-10);
+        this.proximityLight.translateY(40);
+
+        // console.table(this.proximityLight.position);
 
         let closest = Infinity;
 
@@ -592,6 +595,7 @@ class Scene {
 
     handleAutoZoom = () => {
         this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
+        this.cameraBackray.ray.origin.y += this.hero.attributes.height;
 
         // NEEDS PITCH as well
         let cameraDirection = this.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
@@ -608,7 +612,7 @@ class Scene {
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
                 this.camera.position.z -= cameraDistanceDefault / 30;
-                if (this.camera.position.y > (this.controls.getObject().position.y + 10)) this.camera.position.y -= cameraElevationDefault / 30;
+                if (this.camera.position.y > cameraElevationDefault + this.hero.attributes.height) this.camera.position.y -= cameraElevationDefault / 30;
             }
         } else {
             if (this.camera.position.z <= cameraDistanceDefault) {
@@ -671,7 +675,7 @@ class Scene {
 
             if (this.terrain.overheadPointLight) {
                 this.overheadPointLight.position.copy(this.controls.getObject().position);
-                this.overheadPointLight.position.y = this.hero.attributes.height + 40;
+                this.overheadPointLight.position.y = cameraElevationDefault + 100;
            }
         }
     }

@@ -4,14 +4,14 @@ export const Structures = {
     
     shed: {
         name: 'shed',
-        gltf: 'sceneHouse.gltf',
+        gltf: 'sceneHouse.glb',
         description: 'Wooden Shed with a locked door',
         type: 'structure',
         location: { x: 0, y: 0, z: 0},
         attributes: {
             animates: false,
             scale: 100,
-            elevation: 0,
+            elevation: 0
         }
     
     },

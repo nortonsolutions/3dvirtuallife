@@ -14,8 +14,8 @@ import { Hero } from '/hero.js'
  *  
  */
 // var floorBuffer = 0;
-var upRaycasterTestLength = 200; 
-var downRaycasterTestLength = 40;
+var upRaycasterTestLength = 500; 
+var downRaycasterTestLength = 70;
 var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
 var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
@@ -95,34 +95,53 @@ export class SceneController {
         
         let distanceFromAbove = this.downRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
 
-        return (this.downRaycasterGeneric.ray.origin.y - distanceFromAbove);
+        let genericElevation = this.downRaycasterGeneric.ray.origin.y - distanceFromAbove + 2; 
+        // console.log(`genericElevation for ${name}: ${genericElevation}`);
+        return (genericElevation);
     }
 
     setElevation(uniqueId, entity) {
 
+
         var otherObjects = this.objects3D.filter(el => {
             return this.getObjectName(el) != entity.objectName
-                    // this.getObjectName(el) != "floor";
         });
 
+        // if (uniqueId=="hero") {
+        //     console.log(`entity.position.y upon setElevation: ${entity.position.y}`);
+        //     console.dir(otherObjects);
+        // }
+
+
         // Offset downRay
-        let downRayOriginHeight = entity.position.y + 10;
-        let feetPosition = entity.position.y - entity.attributes.height;
+        let downRayOriginHeight = entity.position.y + 30;
 
         this.mixers[uniqueId].downRaycaster.ray.origin.copy(entity.position);
         this.mixers[uniqueId].downRaycaster.ray.origin.y = downRayOriginHeight;
         // Am I over an object?
 
+        // if (uniqueId == "hero") {
+        //     console.log("this.mixers[uniqueId].downRaycaster.ray.origin")
+        //     console.table(this.mixers[uniqueId].downRaycaster.ray.origin);
+        // }
         let downwardIntersections = this.mixers[uniqueId].downRaycaster.intersectObjects( otherObjects, true );
         if (downwardIntersections[0]) { // YES
-            var topOfObject = downRayOriginHeight - downwardIntersections[0].distance;
-            if (feetPosition <= topOfObject) {
+            var topOfObject = downRayOriginHeight - downwardIntersections[0].distance + 2;
+            if (entity.position.y <= topOfObject) {
                 this.mixers[uniqueId].standingUpon = this.getRootObject3D(downwardIntersections[0].object);
-                entity.position.y = topOfObject + entity.attributes.height;
+                entity.position.y = topOfObject;
                 this.mixers[uniqueId].velocity.y = Math.max( 0, this.mixers[uniqueId].velocity.y );
                 this.mixers[uniqueId].canJump = true;
                 this.mixers[uniqueId].justJumped = false;
             }
+        } else {
+            // DEBUG
+            this.mixers[uniqueId].standingUpon = null;
+            entity.position.y = this.determineElevationGeneric(entity.position.x, entity.position.z, uniqueId);
+            // if (uniqueId == "hero") {
+            //     console.log("this.controls.getObject().position");
+            //     console.table(this.scene.controls.getObject().position);
+            // }
         }
     }
 
@@ -287,7 +306,7 @@ export class SceneController {
                 direction: new THREE.Vector3(),
                 velocity: new THREE.Vector3(),
                 downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength ),
-                movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 0, 0 ), 0, 40 ),
+                movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, 40 ),
                 justJumped: false,
                 standingUpon: null,
                 canJump: true,

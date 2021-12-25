@@ -7,7 +7,7 @@ export const Entities = {
         attributes: {
             moves: true,
             animates: true,
-            height: 0,
+            height: 20,
             elevation: 0,
             scale: 10,
             elevation: 0,
@@ -25,7 +25,7 @@ export const Entities = {
         attributes: {
             moves: true,
             animates: true,
-            height: 0,
+            height: 20,
             elevation: 0,
             scale: 10,
             agility: 1,

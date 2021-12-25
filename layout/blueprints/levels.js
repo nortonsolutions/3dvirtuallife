@@ -8,7 +8,7 @@ import {Structures} from './structures.js';
 export const levels = [
 
     {
-        level: 0,
+        level: 2,
         width: 12, //26
         length: 12, //26
         name: "In the valley of mist",
@@ -75,9 +75,9 @@ export const levels = [
         ]
     },
     {
-        level: 2,
-        width: 40, //32
-        length: 27,  //32
+        level: 0,
+        width: 45, //32
+        length: 45,  //32
         name: "Catacomb",
         background: '',
         terrain: {
