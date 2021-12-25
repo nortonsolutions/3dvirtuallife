@@ -80,21 +80,29 @@ export class SceneController {
 
         this.upRaycasterGeneric.ray.origin.x = x;
         this.upRaycasterGeneric.ray.origin.z = z;
-        this.upRaycasterGeneric.ray.origin.y = 0;
+        this.upRaycasterGeneric.ray.origin.y = -20;
 
         if (! this.upRaycasterGeneric.intersectObject(this.floor, true)[0]) {
             console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
             console.error(this.floor);
             console.error(`${name} = ${x},${z}`);
         }
-        return this.upRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
+
+        let distanceFromBase = this.upRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
+
+        this.downRaycasterGeneric.ray.origin.copy (this.upRaycasterGeneric.ray.origin);
+        this.downRaycasterGeneric.ray.origin.y += (distanceFromBase + 20);
+        
+        let distanceFromAbove = this.downRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
+
+        return (this.downRaycasterGeneric.ray.origin.y - distanceFromAbove);
     }
 
     setElevation(uniqueId, entity) {
 
         var otherObjects = this.objects3D.filter(el => {
-            return this.getObjectName(el) != entity.objectName &&
-                    this.getObjectName(el) != "floor";
+            return this.getObjectName(el) != entity.objectName
+                    // this.getObjectName(el) != "floor";
         });
 
         // Offset downRay
@@ -103,11 +111,6 @@ export class SceneController {
 
         this.mixers[uniqueId].downRaycaster.ray.origin.copy(entity.position);
         this.mixers[uniqueId].downRaycaster.ray.origin.y = downRayOriginHeight;
-
-        this.mixers[uniqueId].upRaycaster.ray.origin.copy(entity.position);
-        this.mixers[uniqueId].upRaycaster.ray.origin.y = -10;
-        let floorElevation = this.mixers[uniqueId].upRaycaster.intersectObject(this.floor, true)[0].distance;
-
         // Am I over an object?
 
         let downwardIntersections = this.mixers[uniqueId].downRaycaster.intersectObjects( otherObjects, true );
@@ -116,14 +119,6 @@ export class SceneController {
             if (feetPosition <= topOfObject) {
                 this.mixers[uniqueId].standingUpon = this.getRootObject3D(downwardIntersections[0].object);
                 entity.position.y = topOfObject + entity.attributes.height;
-                this.mixers[uniqueId].velocity.y = Math.max( 0, this.mixers[uniqueId].velocity.y );
-                this.mixers[uniqueId].canJump = true;
-                this.mixers[uniqueId].justJumped = false;
-            }
-        } else { // NO
-            this.mixers[uniqueId].standingUpon = null;
-            if (feetPosition <= floorElevation) {
-                entity.position.y = floorElevation + entity.attributes.height;
                 this.mixers[uniqueId].velocity.y = Math.max( 0, this.mixers[uniqueId].velocity.y );
                 this.mixers[uniqueId].canJump = true;
                 this.mixers[uniqueId].justJumped = false;
@@ -291,7 +286,6 @@ export class SceneController {
                 absVelocity: 0,
                 direction: new THREE.Vector3(),
                 velocity: new THREE.Vector3(),
-                upRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ), 0, upRaycasterTestLength ),
                 downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength ),
                 movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 0, 0 ), 0, 40 ),
                 justJumped: false,
