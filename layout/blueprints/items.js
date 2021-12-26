@@ -64,13 +64,13 @@ export const Items = {
     },
     crystalBall: {
         name: 'crystalBall',
-        gltf: 'crystalBall.glb',
+        gltf: 'crystalball.glb',
         image: 'crystalBall.png',
         description: 'A gleaming ball of crystal',
         type: 'item',
         attributes: {
             animates: false,
-            scale: 40,
+            scale: 100,
             elevation: 30
         }
     },

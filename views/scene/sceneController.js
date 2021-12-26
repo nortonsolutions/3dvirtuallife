@@ -1,5 +1,4 @@
 import { Scene } from '/scene/scene.js';
-import { Hero } from '/hero.js'
 
 /**
  * SceneController has a Scene object for graphical display, and keeps track
@@ -14,7 +13,7 @@ import { Hero } from '/hero.js'
  *  
  */
 // var floorBuffer = 0;
-var upRaycasterTestLength = 500; 
+var upRaycasterTestLength = 700; 
 var downRaycasterTestLength = 70;
 var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
 var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
@@ -78,26 +77,29 @@ export class SceneController {
 
     determineElevationGeneric(x,z, name) {
 
+        let yOffset = 40;
+
         this.upRaycasterGeneric.ray.origin.x = x;
         this.upRaycasterGeneric.ray.origin.z = z;
-        this.upRaycasterGeneric.ray.origin.y = -20;
+        this.upRaycasterGeneric.ray.origin.y = -yOffset;
+        
 
-        if (! this.upRaycasterGeneric.intersectObject(this.floor, true)[0]) {
+        if (this.upRaycasterGeneric.intersectObject(this.floor, true)[0]) {
+            let distanceFromBase = this.upRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
+
+            this.downRaycasterGeneric.ray.origin.copy (this.upRaycasterGeneric.ray.origin);
+            this.downRaycasterGeneric.ray.origin.y += (distanceFromBase + yOffset);
+            
+            let distanceFromAbove = this.downRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
+            let genericElevation = this.downRaycasterGeneric.ray.origin.y - distanceFromAbove + 5; 
+            // console.log(`genericElevation for ${name}: ${genericElevation}`);
+            return (genericElevation);
+        } else {
             console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
             console.error(this.floor);
             console.error(`${name} = ${x},${z}`);
         }
 
-        let distanceFromBase = this.upRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
-
-        this.downRaycasterGeneric.ray.origin.copy (this.upRaycasterGeneric.ray.origin);
-        this.downRaycasterGeneric.ray.origin.y += (distanceFromBase + 20);
-        
-        let distanceFromAbove = this.downRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
-
-        let genericElevation = this.downRaycasterGeneric.ray.origin.y - distanceFromAbove + 2; 
-        // console.log(`genericElevation for ${name}: ${genericElevation}`);
-        return (genericElevation);
     }
 
     setElevation(uniqueId, entity) {

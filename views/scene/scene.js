@@ -47,12 +47,15 @@ class Scene {
         this.terrain = terrain;
 
         this.animate = this.animate.bind(this);
+        this.deanimate = this.deanimate.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
         this.seedObjects3D = this.seedObjects3D.bind(this);
         this.addControls = this.addControls.bind(this);
         
         this.controls = null;
         this.scene = null;
+
+        this.requestAnimationFrameID = null;
     }
 
     init(callback) {
@@ -64,8 +67,6 @@ class Scene {
         
         this.scene = new THREE.Scene();
 
-
-        
         this.addFloor(() => {
             this.addControls();
             this.addBackground();
@@ -82,6 +83,8 @@ class Scene {
             document.body.appendChild( this.stats.dom );
     
             this.addEventListeners();
+            
+
             if (callback) callback();
         });
 
@@ -157,7 +160,7 @@ class Scene {
             this.scene.add( this.overheadPointLight );
         }
         
-        this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 3 );
+        this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 30 );
         this.proximityLight.position.set( 0, 0, 0 );
         this.scene.add( this.proximityLight );
 
@@ -294,6 +297,7 @@ class Scene {
             controlsObj.add( model );
             
             this.controller.createMixer( model, gltf.animations, "hero" );
+            this.updateHeroLocation();
         })
     }
 
@@ -543,9 +547,6 @@ class Scene {
                 entity.translateY( -this.controller.mixers[uniqueId].velocity.y * delta );
                 entity.translateZ( -this.controller.mixers[uniqueId].velocity.z * delta );
 
-                if (uniqueId != "hero") {
-                    entity.rotateY(Math.PI);
-                }
             }
         } else {
             
@@ -555,8 +556,8 @@ class Scene {
             this.controller.mixers[uniqueId].velocity.z = 0;
 
             if (uniqueId != "hero") {
-                entity.rotateY(Math.PI/4);
-            } 
+                entity.rotateY(Math.PI/8);
+            }
         }
 
         this.controller.setElevation( uniqueId, entity );
@@ -624,12 +625,20 @@ class Scene {
     
     // Calculate hero location using grid coordinates
     updateHeroLocation = () => {
+
         let { x, y, z } = this.controls.getObject().position;
         
         let zOffset = (z < 0) ? 20 : -20;
         
         this.hero.location.x = x / multiplier;
         this.hero.location.z = (z+zOffset) / multiplier;
+        this.controller.mixers.hero.velocity.x = 0;
+        this.controller.mixers.hero.velocity.z = 0;
+
+        moveForward = false;
+        moveBackward = false;
+        moveLeft = false;
+        moveRight = false;
 
     }
 
@@ -656,8 +665,6 @@ class Scene {
             if (this.controller.mixers.hero.standingUpon && this.controller.mixers.hero.standingUpon.attributes.routeTo && typeof this.controller.mixers.hero.standingUpon.attributes.routeTo.level == "number") {
                 if (this.controller.mixers.hero.standingUpon.attributes.unlocked) {
                     
-                    this.updateHeroLocation();
-
                     this.controller.eventDepot.fire('saveLevel', {
                         hero: this.hero.basic(),
                         level: this.controller.level
@@ -705,38 +712,47 @@ class Scene {
 
     animate() {
         
-        requestAnimationFrame( this.animate );
-        if ( this.controls.isLocked === true && this.running ) {
+        this.requestAnimationFrameID = requestAnimationFrame( this.animate );
+        if (this.running) {
 
-            this.time = performance.now();
-            this.delta = ( this.time - this.prevTime ) / 1000;
+            if ( this.controls.isLocked === true && this.running ) {
 
-            this.handleHeroMovement(this.delta);
-            this.handleEntityMovement(this.delta);
-            this.handleMixers(this.delta);
-
-            if (this.backgroundMesh) this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
-
-            this.prevTime = this.time;
+                this.time = performance.now();
+                this.delta = ( this.time - this.prevTime ) / 1000;
+    
+                this.handleHeroMovement(this.delta);
+                this.handleEntityMovement(this.delta);
+                this.handleMixers(this.delta);
+    
+                if (this.backgroundMesh) this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
+    
+                this.prevTime = this.time;
+            
+            } else {
+                this.prevTime = performance.now();
+            }
+            this.renderer.render( this.scene, this.camera );
+    
+                if (minimap) {
+    
+                    // renderer.setViewport( 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
+                    // renderer.render( scene, activeCamera );
+                    // cameraMinimap.lookAt(this.controls.getObject().position);
+                    // renderer.setViewport( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
+                    // renderer.render( scene, camera );
+                    this.rendererMinimap.render(this.scene, this.cameraMinimap);
+                    this.compass.lookAt( DUENORTH );
+            }
+    
+    
+            this.stats.update();
 
         } else {
-            this.prevTime = performance.now();
-        }
-        this.renderer.render( this.scene, this.camera );
-
-        if (minimap) {
-
-            // renderer.setViewport( 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
-            // renderer.render( scene, activeCamera );
-            // cameraMinimap.lookAt(this.controls.getObject().position);
-            // renderer.setViewport( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
-            // renderer.render( scene, camera );
-            this.rendererMinimap.render(this.scene, this.cameraMinimap);
-            this.compass.lookAt( DUENORTH );
+            cancelAnimationFrame( this.requestAnimationFrameID );
+            this.dispose(this.scene);
+            this.scene = null;
         }
 
-
-        this.stats.update();
     }
 
     dispose(item) {
@@ -753,11 +769,9 @@ class Scene {
 
     deanimate(callback) {
         this.running = false;
-        
-        cancelAnimationFrame( this.animate );
         document.getElementById('minimap').firstElementChild.remove();
 
-        this.dispose(this.scene);
+
         callback();
     }
 
