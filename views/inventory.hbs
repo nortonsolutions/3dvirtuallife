@@ -6,7 +6,7 @@
 
             <div class="col-xs-1-12">
                 <div class="card">
-                <div class="card-body tooltipper dragSpot">
+                <div class="card-body tooltipper dragSpot" id={{index}}>
                         {{#if name}}
                         <img id="{{name}}" class="draggable" draggable="true" src="/models/png/{{image}}" quant="{{name}}quant" describedBy="{{name}}desc">
                         <span id="{{name}}desc" class="tooltippertext">{{description}}</span>
@@ -31,7 +31,12 @@
                 <span id="{{equipped.Middle2R_end.name}}desc" class="tooltippertext">{{equipped.Middle2R_end.description}}</span>
             {{/if}}
         </div>
-        <div id="handL" class="body four tooltipper dragSpot"></div>
+        <div id="Middle2L_end" class="body four tooltipper dragSpot">
+            {{#if equipped.Middle2L_end}}
+                <img id="{{equipped.Middle2L_end.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.Middle2L_end.image}}" describedBy="{{equipped.Middle2L_end.name}}desc">
+                <span id="{{equipped.Middle2L_end.name}}desc" class="tooltippertext">{{equipped.Middle2L_end.description}}</span>
+            {{/if}}
+        </div>
         <div id="special" class="body five tooltipper dragSpot"></div>
         <div id="feet" class="body six tooltipper dragSpot"></div>
         <div id="drop" class="seven dropOnly"></div>

@@ -43,17 +43,28 @@ export class Hero {
         return max;
     }
 
-    addToInventory(itemName) {
+    addToInventory(itemName, desiredIndex) {
 
-        let itemIndex = this.inventory.map(el => el.itemName).indexOf(itemName);
+        var quantity;
+        var itemIndex = this.inventory.map(el => el.itemName).indexOf(itemName);
         if (itemIndex != -1) {
-            this.inventory[itemIndex].quantity++;
+            quantity = this.inventory[itemIndex].quantity + 1;
         } else {
-            this.inventory[this.firstInventorySlot()] = {
-                itemName: itemName,
-                quantity: 1
-            }
+
+            // If desiredIndex is already defined, use the first inventory slot
+            if (this.inventory[desiredIndex]) {
+                itemIndex = this.firstInventorySlot();
+            } else itemIndex = desiredIndex;
+
+            quantity = 1;
         }
+
+        this.inventory[itemIndex] = {
+            itemName: itemName,
+            quantity: quantity
+        }
+
+        return {itemIndex, quantity};
     }
 
     removeFromInventory(itemName) {
@@ -67,41 +78,64 @@ export class Hero {
         }
     }
 
+    swapInventoryPositions(first,second) {
+        let temp = {...this.inventory[first]};
+        let temp2 = {...this.inventory[second]};
+        this.inventory[first] = temp2;
+        this.inventory[second] = temp;
+    }
+
     getInventory() {
         return this.inventory;
     }
 
+    /* Assumes item is the full Object3D after loading */
     equip(area, item) {
+        this.equipped[area] = item.objectName;
 
-        this.addToBodyPart(this.model, area, item);
-        
+        item.position.set(0,0,0);
+        item.rotation.y = Math.PI;
+        item.scale.copy(new THREE.Vector3( .1,.1,.1 ));
+        // this.addToBodyPart(this.model, area, item);
+        this.model.getObjectByName(area).add(item);
     }
 
-    findBodyPartByName(current, name) {
-
-        if (current.name == name ) {
-            return current;
-        } else {
-            current.children.forEach(child => {
-                return this.findBodyPartByName(child, name);
-            })
-        }
+    /* Unequips by bodypart and itemName */
+    unequip(area, itemName) {
+        delete this.equipped[area];
+        // this.removeFromBodyPart(this.model, area, item);
+        // findBodyPartByName(this.model, area).remove(item);
+        let thisArea = this.model.getObjectByName(area);
+        thisArea.children.forEach(child => {
+            thisArea.remove(child);
+        })
     }
 
-    addToBodyPart(current, name, componentToAdd) {
+    // findBodyPartByName(current, name) {
 
-        if (current.name == name ) {
-            componentToAdd.position.set(0,0,0);
-            componentToAdd.rotation.y = Math.PI;
-            componentToAdd.scale.copy(new THREE.Vector3( .1,.1,.1 ));
-            current.add(componentToAdd);
-            return current;
-        } else {
-            current.children.forEach(child => {
-                return this.addToBodyPart(child, name, componentToAdd);
-            })
-        }
-    }
+    //     if (current.name == name ) {
+    //         return current;
+    //     } else {
+    //         current.children.forEach(child => {
+    //             return this.findBodyPartByName(child, name);
+    //         })
+    //     }
+    // }
+
+    // addToBodyPart(current, area, componentToAdd) {
+
+    //     if (current.name == area ) {
+    //         componentToAdd.position.set(0,0,0);
+    //         componentToAdd.rotation.y = Math.PI;
+    //         componentToAdd.scale.copy(new THREE.Vector3( .1,.1,.1 ));
+    //         current.add(componentToAdd);
+    //         return current;
+    //     } else {
+    //         current.children.forEach(child => {
+    //             return this.addToBodyPart(child, area, componentToAdd);
+    //         })
+    //     }
+    // }
 
     basic() {
 

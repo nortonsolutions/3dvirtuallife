@@ -172,7 +172,19 @@ export const app = () => {
         }
 
         const drag = (ev) => {
-            ev.dataTransfer.setData("text", ev.target.id + ':' + ev.target.attributes.describedBy.value + ':' + ev.target.attributes.quant.value);
+
+            let quantity = Array.from(ev.target.parentNode.classList).includes('body')? 1 : ev.target.attributes.quant.value;
+            var textToSend = ev.target.id + ':' 
+                + ev.target.attributes.describedBy.value + ':' 
+                + quantity + ':' 
+                + ev.target.parentNode.id;
+
+            // } else {
+                // textToSend = ev.target.id + ':' + ev.target.attributes.describedBy.value + ':' + ev.target.attributes.quant.value + ':' + ev.target.parentNode.attributes.index.value;
+            // }
+            
+            console.log(textToSend)
+            ev.dataTransfer.setData("text", textToSend);
             ev.dataTransfer.setDragImage(new Image(ev.target.src),10,10);
         }
 
@@ -181,20 +193,64 @@ export const app = () => {
 
             let data = ev.dataTransfer.getData("text").split(':');
 
-            var id = data[0];
-            var descId = data[1];
-            var quantId = data[2];
+            var itemName = data[0]; // name of item
+            var descId = data[1]; // 
+            var quantId = data[2]; //
+            var index = data[3];  // bodyPart by name if equipped item 
             
-            ev.target.appendChild(document.getElementById(id));
-            ev.target.appendChild(document.getElementById(descId));
-            ev.target.appendChild(document.getElementById(quantId));
+            if (index.length > 2) {
 
-            if (Array.from(ev.target.classList).includes('body')) {
-                game.hero.equipped[ev.target.id] = id;
-                sceneController.loadObject3DbyName(id, (gltf) => {
-                    game.hero.equip(ev.target.id, gltf.scene);
-                });
-            };
+                // item may be requipped to new bodypart, or placed back in inventory
+                if (! Array.from(ev.target.classList).includes('body')) {
+
+                    game.hero.unequip(index, itemName);
+                    let {itemIndex,quantity} = game.hero.addToInventory(itemName,ev.target.id);
+                    
+                    let targetElement = document.getElementById(itemIndex);
+
+                    targetElement.appendChild(document.getElementById(itemName));
+                    targetElement.appendChild(document.getElementById(descId));
+                    let quantEl = document.createElement('span');
+                    quantEl.id = itemName+"quant";
+                    quantEl.innerText = quantity;
+                    targetElement.appendChild(quantEl);
+
+
+                } else { // Body part to body part
+
+                    ev.target.appendChild(document.getElementById(itemName));
+                    ev.target.appendChild(document.getElementById(descId));
+                    game.hero.unequip(index, itemName);
+                    sceneController.loadObject3DbyName(itemName, (gltf) => {
+                        game.hero.equip(ev.target.id, gltf.scene);s
+                    });
+
+                }
+
+            } else {
+                // source is inventory; may be moved to another slot or equip
+                ev.target.appendChild(document.getElementById(itemName));
+                ev.target.appendChild(document.getElementById(descId));
+
+                if (! Array.from(ev.target.classList).includes('body')) {
+
+                    ev.target.appendChild(document.getElementById(quantId));
+                    game.hero.swapInventoryPositions(index, ev.target.id);
+
+                } else {
+                    
+                    // TODO: unequip the current item if applicable back to inventory spot
+
+                    document.getElementById(quantId).remove();
+                    sceneController.loadObject3DbyName(itemName, (gltf) => {
+                        game.hero.equip(ev.target.id, gltf.scene);
+                    });
+                }
+            }
+
+
+
+
         }
 
         const dropOnly = (ev) => {
