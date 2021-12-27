@@ -9,8 +9,8 @@
                 <div class="card-body tooltipper dragSpot" id={{index}}>
                         {{#if name}}
                         <img id="{{name}}" class="draggable" draggable="true" src="/models/png/{{image}}" quant="{{name}}quant" describedBy="{{name}}desc">
-                        <span id="{{name}}desc" class="tooltippertext">{{description}}</span>
-                        <span id="{{name}}quant">{{quantity}}</span>
+                        <span id="{{name}}desc" class="tooltippertext noClick">{{description}}</span>
+                        <span id="{{name}}quant" class="noClick">{{quantity}}</span>
 
                         {{/if}}
                 </div>
@@ -22,19 +22,21 @@
         </div>
     </div>
 
-    <div class="col-4 charGrid p-1">
+    <div class="col-4 charGrid py-1">
         <div id="head" class="body one tooltipper dragSpot"></div>
         <div id="body" class="body two tooltipper dragSpot"></div>
         <div id="Middle2R_end" class="body three tooltipper dragSpot">
             {{#if equipped.Middle2R_end}}
-                <img id="{{equipped.Middle2R_end.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.Middle2R_end.image}}" describedBy="{{equipped.Middle2R_end.name}}desc">
-                <span id="{{equipped.Middle2R_end.name}}desc" class="tooltippertext">{{equipped.Middle2R_end.description}}</span>
+                <img id="{{equipped.Middle2R_end.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.Middle2R_end.image}}" quant="{{equipped.Middle2R_end.name}}quant" describedBy="{{equipped.Middle2R_end.name}}desc">
+                <span id="{{equipped.Middle2R_end.name}}desc" class="tooltippertext noClick">{{equipped.Middle2R_end.description}}</span>
+                <span id="{{equipped.Middle2R_end.name}}quant" class="noClick">1</span>
             {{/if}}
         </div>
         <div id="Middle2L_end" class="body four tooltipper dragSpot">
             {{#if equipped.Middle2L_end}}
-                <img id="{{equipped.Middle2L_end.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.Middle2L_end.image}}" describedBy="{{equipped.Middle2L_end.name}}desc">
-                <span id="{{equipped.Middle2L_end.name}}desc" class="tooltippertext">{{equipped.Middle2L_end.description}}</span>
+                <img id="{{equipped.Middle2L_end.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.Middle2L_end.image}}" quant="{{equipped.Middle2R_end.name}}quant" describedBy="{{equipped.Middle2L_end.name}}desc">
+                <span id="{{equipped.Middle2L_end.name}}desc" class="tooltippertext noClick">{{equipped.Middle2L_end.description}}</span>
+                <span id="{{equipped.Middle2R_end.name}}quant" class="noClick">1</span>
             {{/if}}
         </div>
         <div id="special" class="body five tooltipper dragSpot"></div>

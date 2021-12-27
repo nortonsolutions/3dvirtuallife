@@ -173,91 +173,192 @@ export const app = () => {
 
         const drag = (ev) => {
 
-            let quantity = Array.from(ev.target.parentNode.classList).includes('body')? 1 : ev.target.attributes.quant.value;
+            // let quantity = Array.from(ev.target.parentNode.classList).includes('body')? 1 : ;
             var textToSend = ev.target.id + ':' 
                 + ev.target.attributes.describedBy.value + ':' 
-                + quantity + ':' 
+                + ev.target.attributes.quant.value + ':' 
                 + ev.target.parentNode.id;
 
-            // } else {
-                // textToSend = ev.target.id + ':' + ev.target.attributes.describedBy.value + ':' + ev.target.attributes.quant.value + ':' + ev.target.parentNode.attributes.index.value;
-            // }
-            
             console.log(textToSend)
             ev.dataTransfer.setData("text", textToSend);
             ev.dataTransfer.setDragImage(new Image(ev.target.src),10,10);
         }
 
+        // Verify that the element is of class 'dragSpot'
+        const getDragSpot = (el) => {
+            if (Array.from(el.classList).includes('dragSpot')) {
+                return el;
+            } else {
+                return getDragSpot(el.parentNode);
+            }
+        }
+
         const drop = (ev) => {
+
+
             ev.preventDefault();
+            
+            let targetElement = getDragSpot(ev.target);
 
             let data = ev.dataTransfer.getData("text").split(':');
 
-            var itemName = data[0]; // name of item
-            var descId = data[1]; // 
-            var quantId = data[2]; //
-            var index = data[3];  // bodyPart by name if equipped item 
+            var itemName = data[0]; // name of item and id of source draggable element
+            var descId = data[1]; // id of description element
+            var quantId = data[2]; // id of quantity element
+            var index = data[3];  // inventory # ... or bodyPart by name
             
-            if (index.length > 2) {
-
-                // item may be requipped to new bodypart, or placed back in inventory
-                if (! Array.from(ev.target.classList).includes('body')) {
-
-                    game.hero.unequip(index, itemName);
-                    let {itemIndex,quantity} = game.hero.addToInventory(itemName,ev.target.id);
+            if (index.length < 2) { // source is inventory
+                
+                if (! Array.from(targetElement.classList).includes('body')) { // To another slot
                     
-                    let targetElement = document.getElementById(itemIndex);
+                    if (targetElement.firstElementChild) {
+
+                        let itemNameToSwap = targetElement.firstElementChild.id;
+                        let descIdToSwap = targetElement.firstElementChild.attributes.describedBy.value;
+                        let quantIdToSwap = targetElement.firstElementChild.attributes.quant.value;
+
+                        let swapTargetElement = document.getElementById(itemName).parentNode;
+                        swapTargetElement.appendChild(document.getElementById(itemNameToSwap));
+                        swapTargetElement.appendChild(document.getElementById(descIdToSwap));
+                        swapTargetElement.appendChild(document.getElementById(quantIdToSwap));
+
+                    }
 
                     targetElement.appendChild(document.getElementById(itemName));
                     targetElement.appendChild(document.getElementById(descId));
-                    let quantEl = document.createElement('span');
-                    quantEl.id = itemName+"quant";
-                    quantEl.innerText = quantity;
-                    targetElement.appendChild(quantEl);
+                    targetElement.appendChild(document.getElementById(quantId));
+                    game.hero.swapInventoryPositions(index, targetElement.id);
 
+                } else { // Inventory to body part
 
-                } else { // Body part to body part
-
-                    ev.target.appendChild(document.getElementById(itemName));
-                    ev.target.appendChild(document.getElementById(descId));
-                    game.hero.unequip(index, itemName);
                     sceneController.loadObject3DbyName(itemName, (gltf) => {
-                        game.hero.equip(ev.target.id, gltf.scene);s
+                        
+                        if (targetElement.firstElementChild) { // If the bodypart is already equipped...
+
+                            // Identify the item to swap back to inventory
+                            let itemNameToSwap = targetElement.firstElementChild.id;
+                            let descIdToSwap = targetElement.firstElementChild.attributes.describedBy.value;
+                            let quantIdToSwap = targetElement.firstElementChild.attributes.quant.value;
+                            let indexToSwap = targetElement.id; 
+
+                            // Unequip this item
+                            game.hero.unequip(indexToSwap);
+
+                            // Put the item back in the original location (index)
+                            let {itemIndex,quantity} = game.hero.addToInventory(itemNameToSwap,index);
+
+                            // Determine where to put the item in the inventory based on itemIndex
+                            let finalTargetElement = document.getElementById(itemIndex);
+
+                            // Clean up if necessary
+                            if (finalTargetElement.childNodes) {
+                                Array.from(finalTargetElement.childNodes).forEach(el => el.remove());
+                            }
+        
+                            // Append the item details into place
+                            finalTargetElement.appendChild(document.querySelector('.body #' + itemNameToSwap));
+                            finalTargetElement.appendChild(document.querySelector('.body #' + descIdToSwap));
+                            finalTargetElement.appendChild(document.querySelector('.body #' + quantIdToSwap));
+                            document.getElementById(quantIdToSwap).innerText = quantity;
+    
+                        }
+
+                        let quantityRemaining = game.hero.removeFromInventory(itemName);
+                        game.hero.equip(targetElement.id, gltf.scene);
+
+                        if (quantityRemaining == 0) {
+
+                            targetElement.appendChild(document.getElementById(itemName));
+                            targetElement.appendChild(document.getElementById(descId));
+                            targetElement.appendChild(document.getElementById(quantId));
+                            
+                        } else {
+
+                            var dupe = document.getElementById(itemName).cloneNode(true);
+                            var dupeDesc = document.getElementById(descId).cloneNode(true);
+                            var dupeQuant = document.getElementById(quantId).cloneNode(true);
+
+                            dupeQuant.innerText = '1';
+
+                            dupe.addEventListener('dragstart', drag);
+                            targetElement.appendChild(dupe);
+                            targetElement.appendChild(dupeDesc);
+                            targetElement.appendChild(dupeQuant);
+
+                            document.getElementById(quantId).innerHTML = quantityRemaining;
+                        }
                     });
+                } 
 
-                }
+            } else { // source is body part
+    
+                if (! Array.from(targetElement.classList).includes('body')) { // back to inventory
 
-            } else {
-                // source is inventory; may be moved to another slot or equip
-                ev.target.appendChild(document.getElementById(itemName));
-                ev.target.appendChild(document.getElementById(descId));
-
-                if (! Array.from(ev.target.classList).includes('body')) {
-
-                    ev.target.appendChild(document.getElementById(quantId));
-                    game.hero.swapInventoryPositions(index, ev.target.id);
-
-                } else {
+                    game.hero.unequip(index);
+                    let {itemIndex,quantity} = game.hero.addToInventory(itemName,targetElement.id);
                     
-                    // TODO: unequip the current item if applicable back to inventory spot
+                    let finalTargetElement = document.getElementById(itemIndex);
 
-                    document.getElementById(quantId).remove();
+                    Array.from(finalTargetElement.childNodes).forEach(el => el.remove());
+
+                    finalTargetElement.appendChild(document.getElementById(itemName));
+                    finalTargetElement.appendChild(document.getElementById(descId));
+                    finalTargetElement.appendChild(document.getElementById(quantId));
+                    document.getElementById(quantId).innerText = quantity;
+
+                } else { // body part to body part
+
+                    game.hero.unequip(index);
+
+                    if (targetElement.firstElementChild) {
+                        let itemNameToSwap = targetElement.firstElementChild.id;
+                        let descIdToSwap = targetElement.firstElementChild.attributes.describedBy.value;
+                        let quantIdToSwap = targetElement.firstElementChild.attributes.quant.value;
+
+                        let swapTargetElement = document.getElementById(itemName).parentNode;
+                        swapTargetElement.appendChild(document.getElementById(itemNameToSwap));
+                        swapTargetElement.appendChild(document.getElementById(descIdToSwap));
+                        swapTargetElement.appendChild(document.getElementById(quantIdToSwap));
+                    }
+                    
+                    targetElement.appendChild(document.querySelector('.body #' + itemName));
+                    targetElement.appendChild(document.querySelector('.body #' + descId));
+                    targetElement.appendChild(document.querySelector('.body #' + quantId));
+
                     sceneController.loadObject3DbyName(itemName, (gltf) => {
                         game.hero.equip(ev.target.id, gltf.scene);
                     });
+
                 }
-            }
 
+            } 
 
-
-
+            console.dir(game.hero.inventory);        
         }
 
         const dropOnly = (ev) => {
             ev.preventDefault();
+
+
             let data = ev.dataTransfer.getData("text").split(':');
 
-            var itemName = data[0];
+            var itemName = data[0]; // name of item and id of source draggable element
+            var descId = data[1]; // id of description element
+            var quantId = data[2]; // id of quantity element
+            var index = data[3];  // inventory # ... or bodyPart by name
+
+            let rootElement = document;
+            if (index.length > 2) rootElement = document.querySelector('.body');
+
+            let previousQuantity = document.getElementById(quantId).innerText;
+            if (previousQuantity == "1") {
+                rootElement.getElementById(itemName).remove();
+                rootElement.getElementById(descId).remove();
+                rootElement.getElementById(quantId).remove();
+            } else {
+                rootElement.getElementById(quantId).innerText = Number(previousQuantity) - 1;
+            }
+
             eventDepot.fire('dropItem', itemName);
         }
 

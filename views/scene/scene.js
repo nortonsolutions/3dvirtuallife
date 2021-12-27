@@ -155,7 +155,7 @@ class Scene {
         }
 
         if (this.terrain.overheadPointLight) {
-            this.overheadPointLight = new THREE.PointLight( 0xf37509, 20, 450, 1 );
+            this.overheadPointLight = new THREE.PointLight( 0xf37509, 10, 150, 1 );
             this.overheadPointLight.position.set( 0, 0, 0 );
             this.scene.add( this.overheadPointLight );
         }
@@ -249,9 +249,16 @@ class Scene {
 
     setToRenderDoubleSided(object) {
 
+
         if (object.material) {
-            object.material.side = THREE.DoubleSide;
-        } else {
+            if (object.material.name != "Roof") { 
+                object.material.side = THREE.DoubleSide;
+            } else {
+                object.material.side = THREE.FrontSide;
+            }
+        }
+
+        if (object.children) {
             object.children.forEach(e => this.setToRenderDoubleSided(e)); 
         }
     }
@@ -682,8 +689,10 @@ class Scene {
 
             if (this.terrain.overheadPointLight) {
                 this.overheadPointLight.position.copy(this.controls.getObject().position);
-                this.overheadPointLight.position.y = cameraElevationDefault + 100;
-           }
+                this.overheadPointLight.rotation.copy(this.controls.getObject().rotation);
+                this.overheadPointLight.position.y = 80;
+                this.overheadPointLight.translateZ(-100);
+            }
         }
     }
 

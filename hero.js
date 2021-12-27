@@ -67,15 +67,24 @@ export class Hero {
         return {itemIndex, quantity};
     }
 
+    /**
+     * returns the remaining quantity
+     */
     removeFromInventory(itemName) {
 
-        let index = this.inventory.findIndex(el => el.itemName);
+        let index = this.inventory.findIndex(el => {
+            return el != undefined && el.itemName == itemName
+        });
         
         if (this.inventory[index].quantity > 1) {
             this.inventory[index].quantity--;
+            return this.inventory[index].quantity;
         } else {
             this.inventory[index] = {};
+            return 0;
         }
+
+        
     }
 
     swapInventoryPositions(first,second) {
@@ -101,7 +110,7 @@ export class Hero {
     }
 
     /* Unequips by bodypart and itemName */
-    unequip(area, itemName) {
+    unequip(area) {
         delete this.equipped[area];
         // this.removeFromBodyPart(this.model, area, item);
         // findBodyPartByName(this.model, area).remove(item);
