@@ -330,11 +330,25 @@ class Scene {
 
                 if (object.name == "torch") {
                     
+                    params.Torch();
+                    
                     let fire = new Fire();
                     fire.single();
                     fire.updateAll(params);
-                    fire.fire.scale.set(.1, .1, .1);
+                    fire.fire.scale.set(.04, .01, .04);
+                    fire.fire.translateY(.15);
+                    fire.fire.translateZ(-.15);
+                    
+                    let fire2 = new Fire();
+                    fire2.single();
+                    fire2.updateAll(params);
+                    fire2.fire.scale.set(.04, .01, .04);
+                    fire2.fire.translateY(.15);
+                    fire2.fire.translateZ(-.15);
+                    fire2.fire.rotation.y = Math.PI/2;
+
                     model.add( fire.fire );
+                    model.add( fire2.fire );
                 }
 
                 if (object.attributes.contentItems) {

@@ -14,9 +14,33 @@ import {Hero} from '/hero.js';
 class Game {
 
     constructor(props, eventDepot) {
+
         this.props = props;
         this.eventDepot = eventDepot;
         this.hero = new Hero(props.hero, this.eventDepot);
+
+        this.addQueryGameListener = this.addQueryGameListener.bind(this);
+        this.addQueryGameListener();
+
+        
+    }
+
+    addQueryGameListener() {
+        this.eventDepot.addListener('queryGame', (data) => {
+
+            let {key, queryName} = data;
+
+            let response = null;
+
+            switch (queryName) {
+                case 'getHeroEquipped':
+                    response = this.hero.equipped;        
+                    break;
+            }
+
+            this.eventDepot.fire('gameResponse' + key, response);
+
+        })
     }
 
     setLevel(level) {
@@ -44,6 +68,9 @@ class Game {
     getObjectDetail(objectName,detailName) {
         return this.layoutManager.getObjectDetail(objectName,detailName);
     }
+
+
+
 }
 
 /**

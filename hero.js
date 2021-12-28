@@ -105,6 +105,20 @@ export class Hero {
         item.rotation.y = Math.PI;
         item.scale.copy(new THREE.Vector3( .1,.1,.1 ));
         // this.addToBodyPart(this.model, area, item);
+
+        if (item.objectName == "torch") {
+            switch (area) {
+                case "Middle2R_end": 
+                    item.rotation.z = -Math.PI/5;
+                    break;
+                case "Middle2L_end":
+                    //item.rotation.z = Math.PI/8;
+                    break;
+                default:
+            }
+        }
+
+
         this.model.getObjectByName(area).add(item);
     }
 

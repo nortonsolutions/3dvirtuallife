@@ -18,6 +18,8 @@ var downRaycasterTestLength = 70;
 var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
 var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
+import { Fire, params } from './fire.js' 
+
 export class SceneController {
 
     constructor(hero, layoutManager, eventDepot) {
@@ -73,6 +75,13 @@ export class SceneController {
                 
             })
         });
+
+        this.eventDepot.addListener('loadObject3DbyName', (data) => {
+            this.loadObject3DbyName(data.itemName, (itemGltf) => {
+                this.hero.equip(data.bodyPart, itemGltf.scene);
+            });
+        })
+        
     }
 
     determineElevationGeneric(x,z, name) {
@@ -198,6 +207,33 @@ export class SceneController {
             model.objectName = object.name;
             model.objectType = object.type;
             model.attributes = object.attributes;
+
+            if (objectName == "torch") {
+                
+                params.Torch();
+                
+                let fire = new Fire();
+                fire.single();
+                fire.updateAll(params);
+                fire.fire.scale.set(.04, .01, .04);
+                fire.fire.translateY(.15);
+                fire.fire.translateZ(-.15);
+                
+                let fire2 = new Fire();
+                fire2.single();
+                fire2.updateAll(params);
+                fire2.fire.scale.set(.04, .01, .04);
+                fire2.fire.translateY(.15);
+                fire2.fire.translateZ(-.15);
+                fire2.fire.rotation.y = Math.PI/2;
+
+                model.add( fire.fire );
+                model.add( fire2.fire );
+
+            }
+
+
+
             callback(gltf);
         });
     }

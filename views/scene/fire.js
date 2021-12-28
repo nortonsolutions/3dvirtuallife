@@ -22,13 +22,14 @@ class Fire {
 
     constructor() {
 
-        this.plane = new THREE.CylinderBufferGeometry( 0, 2, 10, 12 );
-        // this.plane = new THREE.PlaneBufferGeometry( 20, 20 );
+        // this.plane = new THREE.CylinderBufferGeometry( 0, 1, 5, 12, 1, true, 0, 3 * Math.PI );
+        this.plane = new THREE.PlaneBufferGeometry( 5, 20 );
         this.fire = new THREE.Fire( this.plane, {
             textureWidth: 512,
             textureHeight: 512,
             debug: false
         } );
+        this.fire.material.side = THREE.DoubleSide;
     }
 
     single() {
@@ -36,7 +37,10 @@ class Fire {
         this.fire.clearSources();
         // this.addSource = function ( u, v, radius, density = null, windX = null, windY = null ) {
 
-        this.fire.addSource( 0.5, 0.1, .6, 1.0, 0.0, 1.0 );
+        // this.addSource( 0.5, 0.1, 0.1, 1.0, 0.0, 1.0 );
+        this.fire.addSource( 0.5, 0.05, 0.07, 5, 0.0, 1.0 );
+
+
 
     };
 
