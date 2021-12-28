@@ -29,6 +29,8 @@ var minimap = false;
  * then updates the objects array with locations after each animation.
  */
 
+import { Fire, params } from './fire.js' 
+
 class Scene {
 
     constructor(hero, length, width, terrain, background, controller) {
@@ -155,7 +157,7 @@ class Scene {
         }
 
         if (this.terrain.overheadPointLight) {
-            this.overheadPointLight = new THREE.PointLight( 0xf37509, 10, 150, 1 );
+            this.overheadPointLight = new THREE.PointLight( 0xf37509, 15, 350, 3 );
             this.overheadPointLight.position.set( 0, 0, 0 );
             this.scene.add( this.overheadPointLight );
         }
@@ -324,6 +326,15 @@ class Scene {
 
                 if (object.attributes.animates) {
                     this.controller.createMixer( model, gltf.animations, model.uuid );
+                }
+
+                if (object.name == "torch") {
+                    
+                    let fire = new Fire();
+                    fire.single();
+                    fire.updateAll(params);
+                    fire.fire.scale.set(.1, .1, .1);
+                    model.add( fire.fire );
                 }
 
                 if (object.attributes.contentItems) {
@@ -691,7 +702,7 @@ class Scene {
                 this.overheadPointLight.position.copy(this.controls.getObject().position);
                 this.overheadPointLight.rotation.copy(this.controls.getObject().rotation);
                 this.overheadPointLight.position.y = 80;
-                this.overheadPointLight.translateZ(-100);
+                this.overheadPointLight.translateZ(-80);
             }
         }
     }

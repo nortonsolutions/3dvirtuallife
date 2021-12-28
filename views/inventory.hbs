@@ -20,6 +20,12 @@
 
             
         </div>
+
+        <div class="row">
+            <div class="col-4 text-center">page {{pageNumber}}</div>
+            <div id="backPage" class="col-2">{{#if pageNumber}}<button type="button" class="btn btn-primary btn-standard mx-1">-</button>{{/if}}</div>
+            <div id="nextPage" class="col-2"><button type="button" class="btn btn-primary btn-standard mr-1">+</button></div>
+        </div>
     </div>
 
     <div class="col-4 charGrid py-1">
@@ -43,6 +49,10 @@
         <div id="feet" class="body six tooltipper dragSpot"></div>
         <div id="drop" class="seven dropOnly"></div>
     </div>
+
+    
+
+    
 
 
 </div>

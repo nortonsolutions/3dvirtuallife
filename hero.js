@@ -46,13 +46,13 @@ export class Hero {
     addToInventory(itemName, desiredIndex) {
 
         var quantity;
-        var itemIndex = this.inventory.map(el => el.itemName).indexOf(itemName);
+        var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
         if (itemIndex != -1) {
             quantity = this.inventory[itemIndex].quantity + 1;
         } else {
 
             // If desiredIndex is already defined, use the first inventory slot
-            if (this.inventory[desiredIndex]) {
+            if (desiredIndex == undefined || this.inventory[desiredIndex]) {
                 itemIndex = this.firstInventorySlot();
             } else itemIndex = desiredIndex;
 
@@ -80,11 +80,10 @@ export class Hero {
             this.inventory[index].quantity--;
             return this.inventory[index].quantity;
         } else {
-            this.inventory[index] = {};
+            this.inventory[index] = null;
             return 0;
         }
 
-        
     }
 
     swapInventoryPositions(first,second) {

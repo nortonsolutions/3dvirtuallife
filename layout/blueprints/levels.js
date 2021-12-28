@@ -61,6 +61,7 @@ export const levels = [
         items: [
             Items.bagOfGems,
             Items.mace,
+            Items.torch,
             Items.keyToChest
         ],
         structures: [

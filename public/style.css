@@ -285,3 +285,7 @@ main {
 .noClick {
     pointer-events: none !important;
 }
+
+.btn-standard {
+    width: 40px;
+}

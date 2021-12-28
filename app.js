@@ -57,6 +57,45 @@ export const app = () => {
             document.getElementById('minimap').style.display = minimap? 'block' : 'none';
         });
 
+        const getInventoryContext = (pageNumber) => {
+
+            let inventoryPageSize = 12;
+            // startingIndex will advance by inventoryPageSize for each page
+            let startingIndex = pageNumber? pageNumber * inventoryPageSize: 0;
+
+            var context = { equipped: {}, inventory: [], pageNumber: pageNumber };
+            
+            Object.keys(game.hero.equipped).forEach(key => {
+                context.equipped[key] = {
+                    name: game.hero.equipped[key],
+                    description: game.getObjectDetail(game.hero.equipped[key],'description'),
+                    image: game.getObjectDetail(game.hero.equipped[key],'image'),
+                };
+            });
+
+            for (let index = startingIndex; index < startingIndex + inventoryPageSize; index++) {
+                let key = game.hero.inventory[index] && game.hero.inventory[index].itemName ? game.hero.inventory[index].itemName : undefined;
+                if (!(key == undefined)) {
+                    context.inventory[index] = {
+                        index: index,
+                        name: key,
+                        description: game.getObjectDetail(key,'description'),
+                        image: game.getObjectDetail(key,'image'),
+                        quantity: game.hero.inventory[index].quantity
+                    };
+                } else {
+                    context.inventory[index] = {
+                        index: index,
+                        name: '',
+                        description: '',
+                        image: 'blank.PNG',
+                        quantity: 0
+                    }
+                }
+            }
+            return context;
+        }
+
         eventDepot.addListener('modal', (data) => {
 
             eventDepot.fire('unlockControls', {});
@@ -64,44 +103,11 @@ export const app = () => {
 
             switch (data.type) {
                 case 'inventory': 
-
-                    let inventoryPageSize = 12;
-                    // startingIndex will advance by inventoryPageSize for each page
-                    let startingIndex = data.page? data.page * inventoryPageSize: 0;
-
-                    context = { equipped: {}, inventory: [] };
-                    
-                    Object.keys(game.hero.equipped).forEach(key => {
-                        context.equipped[key] = {
-                            name: game.hero.equipped[key],
-                            description: game.getObjectDetail(game.hero.equipped[key],'description'),
-                            image: game.getObjectDetail(game.hero.equipped[key],'image'),
-                        };
-                    });
-
-                    for (let index = startingIndex; index < startingIndex + inventoryPageSize; index++) {
-                        let key = game.hero.inventory[index] && game.hero.inventory[index].itemName ? game.hero.inventory[index].itemName : undefined;
-                        if (!(key == undefined)) {
-                            context.inventory[index] = {
-                                index: index,
-                                name: key,
-                                description: game.getObjectDetail(key,'description'),
-                                image: game.getObjectDetail(key,'image'),
-                                quantity: game.hero.inventory[index].quantity
-                            };
-                        } else {
-                            context.inventory[index] = {
-                                index: index,
-                                name: '',
-                                description: '',
-                                image: 'blank.PNG',
-                                quantity: 0
-                            }
-                        }
-                    }
+                    context = getInventoryContext(0);
                     break;
+                
                 default:
-            
+
             }
             
             loadTemplate('modal-body', data.type, context, () => {
@@ -113,8 +119,6 @@ export const app = () => {
             var modalTitle = document.getElementById('modal-title').innerHTML = data.title;
 
             modal.style.display = "block";
-
-
 
             function escape() {
                 modal.style.display = "none";
