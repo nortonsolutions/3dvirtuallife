@@ -123,5 +123,35 @@ handleDelete = (url, data, callback) => {
     })
 }
 
+queryGame = async function(queryName, eventDepot, args) {
+        
+    let key = getRndInteger(1,100000);
 
+    let result = await new Promise((resolve, reject) => {
+        eventDepot.addListener('gameResponse' + key, response => {
+            resolve(response);
+        })
+        eventDepot.fire('queryGame', { key, queryName, args });
+    })
+
+    eventDepot.removeListeners('gameResponse' + key);
+    return result;
+    
+}
+
+querySC = async function(queryName, eventDepot, args) {
+        
+    let key = getRndInteger(1,100000);
+
+    let result = await new Promise((resolve, reject) => {
+        eventDepot.addListener('SCResponse' + key, response => {
+            resolve(response);
+        })
+        eventDepot.fire('querySC', { key, queryName, args });
+    })
+
+    eventDepot.removeListeners('SCResponse' + key);
+    return result;
+    
+}
 

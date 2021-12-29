@@ -21,14 +21,14 @@ class Game {
 
         this.addQueryGameListener = this.addQueryGameListener.bind(this);
         this.addQueryGameListener();
-
         
+
     }
 
     addQueryGameListener() {
         this.eventDepot.addListener('queryGame', (data) => {
 
-            let {key, queryName} = data;
+            let {key, queryName, args} = data;
 
             let response = null;
 

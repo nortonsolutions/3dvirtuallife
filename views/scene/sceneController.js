@@ -42,7 +42,8 @@ export class SceneController {
         this.background = this.layout.background;
         this.terrain = this.layout.terrain;
         this.objects = layoutManager.getLevelObjects();  
-
+        this.fireParams = params;
+        
         this.loader = new THREE.GLTFLoader();
                 
         // objects3D is used for raycast intersections
@@ -56,6 +57,23 @@ export class SceneController {
     }
 
     addEventListeners() {
+
+        this.eventDepot.addListener('querySC', (data) => {
+
+            let {key, queryName, args} = data;
+
+            let response = null;
+
+            switch (queryName) {
+                case 'getFire':
+                    response = this.getFire(this.fireParams);
+                    break;
+            }
+
+            this.eventDepot.fire('SCResponse' + key, response);
+
+        })
+
         this.eventDepot.addListener('takeItem', (data) => {
             
             this.removeFromScenebyUUID(data.uuid);
@@ -207,37 +225,30 @@ export class SceneController {
             model.objectName = object.name;
             model.objectType = object.type;
             model.attributes = object.attributes;
-
-            if (objectName == "torch") {
-                
-                params.Torch();
-                
-                let fire = new Fire();
-                fire.single();
-                fire.updateAll(params);
-                fire.fire.scale.set(.04, .01, .04);
-                fire.fire.translateY(.15);
-                fire.fire.translateZ(-.15);
-                
-                let fire2 = new Fire();
-                fire2.single();
-                fire2.updateAll(params);
-                fire2.fire.scale.set(.04, .01, .04);
-                fire2.fire.translateY(.15);
-                fire2.fire.translateZ(-.15);
-                fire2.fire.rotation.y = Math.PI/2;
-
-                model.add( fire.fire );
-                model.add( fire2.fire );
-
-            }
-
-
-
             callback(gltf);
         });
     }
     
+    getFire(params) {
+
+        let fireObj = new THREE.Group;
+
+        let fire = new Fire();
+        fire.single();
+        fire.updateAll(params);
+        
+        let fire2 = new Fire();
+        fire2.single();
+        fire2.updateAll(params);
+
+        fire2.fire.rotation.y = Math.PI/2;
+
+        fireObj.add( fire.fire );
+        fireObj.add( fire2.fire );
+
+        return fireObj;
+    }
+
     /** Position of the model should be set before animating */
     createGUI(gltf) {
         this.scene.createGUI( model, gltf.animations, model.uuid );

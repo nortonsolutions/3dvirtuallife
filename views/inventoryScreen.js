@@ -10,17 +10,6 @@ class InventoryScreen {
 
     }
 
-    queryGame(queryName, key) {
-
-        return new Promise((resolve, reject) => {
-            this.eventDepot.addListener('gameResponse' + key, response => {
-                resolve(response);
-            })
-            this.eventDepot.fire('queryGame', { key, queryName });
-        })
-
-    }
-
     getInventoryContext = (pageNumber) => {
 
         this.pageNumber = pageNumber;
@@ -30,12 +19,9 @@ class InventoryScreen {
         let startingIndex = this.pageNumber? this.pageNumber * inventoryPageSize: 0;
     
         var context = { equipped: {}, inventory: [], pageNumber: pageNumber };
-        
-        let key = getRndInteger(1,100000);
-        this.queryGame('getHeroEquipped', key).then(response => {
-            let heroEquipped = response;
-            console.log(heroEquipped);
-            this.eventDepot.removeListeners('gameResponse' + key);
+
+        queryGame('getHeroEquipped', this.eventDepot).then(response => {
+            console.log(response);
         })
 
         Object.keys(this.game.hero.equipped).forEach(key => {

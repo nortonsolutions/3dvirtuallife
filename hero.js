@@ -107,15 +107,30 @@ export class Hero {
         // this.addToBodyPart(this.model, area, item);
 
         if (item.objectName == "torch") {
-            switch (area) {
-                case "Middle2R_end": 
-                    item.rotation.z = -Math.PI/5;
-                    break;
-                case "Middle2L_end":
-                    //item.rotation.z = Math.PI/8;
-                    break;
-                default:
-            }
+
+            querySC('getFire', this.eventDepot).then(fireObj => {
+
+                // this.fireParams.Torch();
+                fireObj.scale.set(.04, .01, .04);
+                fireObj.translateY(.08);
+                fireObj.translateZ(-.32);
+                fireObj.translateX(.01);
+                fireObj.rotateX(-Math.PI/5);
+                fireObj.rotateZ(-Math.PI/20);
+
+                item.add(fireObj);
+
+
+                switch (area) {
+                    case "Middle2R_end": 
+                        item.rotation.z = -Math.PI/5;
+                        break;
+                    case "Middle2L_end":
+                        //item.rotation.z = Math.PI/8;
+                        break;
+                    default:
+                }
+            })
         }
 
 
