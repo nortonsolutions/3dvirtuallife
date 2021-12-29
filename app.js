@@ -26,12 +26,15 @@ export const app = () => {
         
         eventDepot.addListener('loadLevel', (data) => {
             game.eventDepot.fire('unlockControls', {});
+            game.unregisterListeners();
+
             sceneController.deanimateScene(() => {
                 sceneController = null;
             });
 
             props.hero = data.hero;
             props.level = data.level;
+            props.layouts = JSON.parse(localStorage.getItem('gameProps')).layouts;
             props.hero.location = data.location;
             props.hero.location.x -= 1;
             startGame();
@@ -39,7 +42,10 @@ export const app = () => {
 
         eventDepot.addListener('saveLevel', (data) => {
             
-            props = {...props, ...data};
+            props.hero = data.hero;
+            props.level = data.level;
+            props.layouts[data.level] = data.layouts[data.level];
+
             localStorage.setItem('gameProps', JSON.stringify(props)); 
 
         });

@@ -66,7 +66,7 @@ export class SceneController {
 
             switch (queryName) {
                 case 'getFire':
-                    response = this.getFire(this.fireParams);
+                    response = this.getFire(args);
                     break;
             }
 
@@ -199,6 +199,12 @@ export class SceneController {
 
 
     deanimateScene(callback) {
+
+        this.eventDepot.removeListeners('loadObject3DbyName');
+        this.eventDepot.removeListeners('querySC');
+        this.eventDepot.removeListeners('takeItem');
+        this.eventDepot.removeListeners('dropItem');
+
         this.scene.unregisterEventListeners();
         this.scene.deanimate(() => {
 
@@ -230,6 +236,8 @@ export class SceneController {
     }
     
     getFire(params) {
+
+        if (!params) params = this.fireParams;
 
         let fireObj = new THREE.Group;
 

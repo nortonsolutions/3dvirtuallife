@@ -25,6 +25,10 @@ class Game {
 
     }
 
+    unregisterListeners() {
+        this.eventDepot.removeListeners('queryGame');
+    }
+
     addQueryGameListener() {
         this.eventDepot.addListener('queryGame', (data) => {
 

@@ -273,9 +273,7 @@ class Scene {
             this.setToRenderDoubleSided(this.controller.floor);
 
             // Iterate through the floor and add torches to all the sconces
-
-
-
+            this.addSconces(this.controller.floor);
             this.scene.add( this.controller.floor );
             this.controller.objects3D.push(this.controller.floor);
             setTimeout(() => {
@@ -284,6 +282,31 @@ class Scene {
         }, undefined, function ( error ) {
             console.error( error );
         });
+    }
+
+    addSconces = (object) => {
+        if (/sconce/i.test(object.name)) {
+
+            querySC('getFire', this.controller.eventDepot).then(fireObj => {
+
+                // this.fireParams.Torch();
+                fireObj.scale.set(.3, .02, .3);
+                fireObj.translateY(.15);
+                // fireObj.translateZ(-.32);
+                // fireObj.translateX(.01);
+                // fireObj.rotateX(-Math.PI/5);
+                // fireObj.rotateZ(-Math.PI/20);
+
+                object.add(fireObj);
+            })
+
+        } else {
+            if (object.children) {
+                object.children.forEach(el => {
+                    this.addSconces(el);
+                })
+            }
+        }
     }
 
     addHero3D = () => {
@@ -679,16 +702,23 @@ class Scene {
             if (this.controller.mixers.hero.standingUpon && this.controller.mixers.hero.standingUpon.attributes.routeTo && typeof this.controller.mixers.hero.standingUpon.attributes.routeTo.level == "number") {
                 if (this.controller.mixers.hero.standingUpon.attributes.unlocked) {
                     
-                    this.controller.eventDepot.fire('saveLevel', {
+                    let saveData = {
                         hero: this.hero.basic(),
-                        level: this.controller.level
-                    });
+                        level: this.controller.level,
+                        layouts: []
+                    }
+                    
+                    saveData.layouts[this.controller.level] = this.controller.layoutManager.layout
+                    
+                    this.controller.eventDepot.fire('saveLevel', saveData);
 
-                    this.controller.eventDepot.fire('loadLevel', {
+                    let loadData = {
+                        hero: this.hero.basic(),
                         level: this.controller.mixers.hero.standingUpon.attributes.routeTo.level,
                         location: this.controller.mixers.hero.standingUpon.attributes.routeTo.location,
-                        hero: this.hero
-                    });
+                    }
+
+                    this.controller.eventDepot.fire('loadLevel', loadData);
                 }
             }
 
@@ -796,8 +826,6 @@ class Scene {
         document.removeEventListener( 'keydown', this.onKeyDown, false );
         document.removeEventListener( 'keyup', this.onKeyUp, false );
         window.removeEventListener( 'resize', this.onWindowResize, false );
-        this.controller.eventDepot.removeListeners('takeItem');
-        this.controller.eventDepot.removeListeners('dropItem');
         this.controller.eventDepot.removeListeners('lockControls');
         this.controller.eventDepot.removeListeners('unlockControls');
     }

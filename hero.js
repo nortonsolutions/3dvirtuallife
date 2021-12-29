@@ -104,7 +104,6 @@ export class Hero {
         item.position.set(0,0,0);
         item.rotation.y = Math.PI;
         item.scale.copy(new THREE.Vector3( .1,.1,.1 ));
-        // this.addToBodyPart(this.model, area, item);
 
         if (item.objectName == "torch") {
 
@@ -130,49 +129,23 @@ export class Hero {
                         break;
                     default:
                 }
+                this.model.getObjectByName(area).add(item);
             })
+        } else {
+            this.model.getObjectByName(area).add(item);
         }
 
 
-        this.model.getObjectByName(area).add(item);
+        
     }
 
-    /* Unequips by bodypart and itemName */
     unequip(area) {
         delete this.equipped[area];
-        // this.removeFromBodyPart(this.model, area, item);
-        // findBodyPartByName(this.model, area).remove(item);
         let thisArea = this.model.getObjectByName(area);
         thisArea.children.forEach(child => {
             thisArea.remove(child);
         })
     }
-
-    // findBodyPartByName(current, name) {
-
-    //     if (current.name == name ) {
-    //         return current;
-    //     } else {
-    //         current.children.forEach(child => {
-    //             return this.findBodyPartByName(child, name);
-    //         })
-    //     }
-    // }
-
-    // addToBodyPart(current, area, componentToAdd) {
-
-    //     if (current.name == area ) {
-    //         componentToAdd.position.set(0,0,0);
-    //         componentToAdd.rotation.y = Math.PI;
-    //         componentToAdd.scale.copy(new THREE.Vector3( .1,.1,.1 ));
-    //         current.add(componentToAdd);
-    //         return current;
-    //     } else {
-    //         current.children.forEach(child => {
-    //             return this.addToBodyPart(child, area, componentToAdd);
-    //         })
-    //     }
-    // }
 
     basic() {
 
