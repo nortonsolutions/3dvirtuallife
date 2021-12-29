@@ -358,14 +358,20 @@ class Scene {
                     object.attributes.contentItems.forEach(contentItem => {
                         this.controller.load(contentItem, (iGltf) => {
                             let iModel = iGltf.scene;
-                            iModel.position.x = object.location.x * multiplier;
-                            iModel.position.z = object.location.z * multiplier;
-                            iModel.position.y = this.controller.determineElevationGeneric(model.position.x, model.position.z,object.name) + object.attributes.height + contentItem.attributes.elevation;
+                            iModel.position.x = model.position.x;
+                            iModel.position.z = model.position.z;
+                            iModel.position.y = model.position.y + contentItem.attributes.elevation;
                             this.controller.objects3D.push( iModel );
                             this.scene.add( iModel );
+
+                            // console.log(`${contentItem.name} @`);
+                            // console.table(iModel.position);
                         })
                     });
                 }
+
+                // console.log(`${object.name} @`);
+                // console.table(model.position);
 
                 this.controller.objects3D.push( model );
                 this.scene.add( model );
@@ -727,7 +733,7 @@ class Scene {
             if (this.terrain.overheadPointLight) {
                 this.overheadPointLight.position.copy(this.controls.getObject().position);
                 this.overheadPointLight.rotation.copy(this.controls.getObject().rotation);
-                this.overheadPointLight.position.y = 80;
+                this.overheadPointLight.position.y = this.controls.getObject().position.y + 60;
                 this.overheadPointLight.translateZ(-80);
             }
         }
@@ -787,7 +793,7 @@ class Scene {
                     // renderer.setViewport( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
                     // renderer.render( scene, camera );
                     this.rendererMinimap.render(this.scene, this.cameraMinimap);
-                    this.compass.lookAt( DUENORTH );
+                    if (this.compass) this.compass.lookAt( DUENORTH );
             }
     
     

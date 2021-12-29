@@ -55,7 +55,6 @@ export const Items = {
         image: 'broadsword.png',
         description: 'A simple wooden torch',
         type: 'item',
-        location: { x: 0, y: 0, z: 0},
         attributes: {
             equippable: ['handR', 'handL'],
             animates: false,
@@ -84,7 +83,7 @@ export const Items = {
         type: 'item',
         attributes: {
             animates: false,
-            scale: 100,
+            scale: 50,
             elevation: 30
         }
     },

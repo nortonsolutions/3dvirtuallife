@@ -61,11 +61,11 @@ export const levels = [
         items: [
             Items.bagOfGems,
             Items.mace,
-            Items.torch,
-            Items.keyToChest
+            {...Items.torch, location: { x: 0, y: 0, z: 0}},
+            {...Items.keyToChest, location: { x: 1, y: 0, z: 0 }}
         ],
         structures: [
-            Structures.ancientChest,
+            {...Structures.ancientChest, location: { x: 0, y: 0, z: -1 }},
             Structures.archway0,
             Structures.archway2,
         ],
@@ -93,7 +93,7 @@ export const levels = [
             }
         },
         items: [
-            Items.crystalBall
+            {...Items.crystalBall, location: { x: 10, y: 0, z: 0 }}
         ],
         structures: [
             Structures.archway1

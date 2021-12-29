@@ -27,6 +27,7 @@ export const Structures = {
             key: 'keyToShed',
             scale: 100,
             elevation: 1,
+            unlocked: false,
             routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } },
         }
     
@@ -103,8 +104,9 @@ export const Structures = {
             elevation: 0,
             animates: true,
             key: 'keyToChest',
+            unlocked: false,
             contentItems: [
-                Items.crystalBall
+                {...Items.bagOfGems, location: { x: 0, y: 30, z: 0 }}
             ]
         }
     }
