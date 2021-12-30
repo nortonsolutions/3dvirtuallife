@@ -16,17 +16,19 @@ class Game {
     constructor(props, eventDepot) {
 
         this.props = props;
+        this.setLocalStorage();
+
         this.eventDepot = eventDepot;
         this.hero = new Hero(props.hero, this.eventDepot);
 
         this.addQueryGameListener = this.addQueryGameListener.bind(this);
         this.addQueryGameListener();
-        
-
     }
 
     unregisterListeners() {
         this.eventDepot.removeListeners('queryGame');
+        this.layoutManager.removeEventListeners();
+        this.hero.removeEventListeners();
     }
 
     addQueryGameListener() {
@@ -37,8 +39,8 @@ class Game {
             let response = null;
 
             switch (queryName) {
-                case 'getHeroEquipped':
-                    response = this.hero.equipped;        
+                case 'swapInventoryPositions':
+                    this.hero.swapInventoryPositions(args.first, args.second);
                     break;
             }
 
@@ -52,13 +54,13 @@ class Game {
     }
     
     setGameLayout() {
-        this.layoutManager = new LayoutManager(this.props);
+        this.layoutManager = new LayoutManager(this.props, this.eventDepot);
         this.gameLayout = this.layoutManager.getLayout();
         this.hero.location = this.props.hero.location;
     }
 
-    setLocalStorage(props) {
-        localStorage.setItem('gameProps') = props;
+    setLocalStorage() {
+        localStorage.setItem('gameProps', JSON.stringify(this.props));
     }
 
     getLocalStorage() {
@@ -68,13 +70,6 @@ class Game {
     stats() {
         console.dir(this.gameLayout);
     }
-
-    getObjectDetail(objectName,detailName) {
-        return this.layoutManager.getObjectDetail(objectName,detailName);
-    }
-
-
-
 }
 
 /**

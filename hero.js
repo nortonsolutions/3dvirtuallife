@@ -22,17 +22,72 @@ export class Hero {
         this.addEventListeners();
 
         // Actually just a starting/saved location
-        if (hero.location) this.location = hero.location;
+        this.location = hero.location? hero.location : {};
+        this.cacheHero();
+        
+
+    }
+
+    cacheHero() {
+        localStorage.setItem('gameHero', JSON.stringify(this.basic()));
     }
 
     addEventListeners() {
-        this.eventDepot.addListener('takeItem', (data) => {
-            this.addToInventory(data.name);
+
+        this.eventDepot.addListener('updateHeroLocation', data => {
+            this.location.x = data.x;
+            this.location.y = data.y;
+            this.location.z = data.z;
+            this.cacheHero();
+        })
+
+        this.eventDepot.addListener('swapInventoryPositions', (data) => {
+            this.swapInventoryPositions(data.first, data.second);
+            this.cacheHero();
         });
 
-        this.eventDepot.addListener('dropItem', (itemName) => {
-            this.removeFromInventory(itemName);
+        this.eventDepot.addListener('unequipItem', (data) => {
+            this.unequip(data);
+            this.cacheHero();
         });
+
+        this.eventDepot.addListener('equipItem', (data) => {
+            this.equip(data.bodyPart, data.itemName);
+            this.cacheHero();
+        });
+
+        this.eventDepot.addListener('placeItem', (data) => {
+            this.addToInventory(data.itemName, data.desiredIndex);
+            this.cacheHero();
+        });
+
+        this.eventDepot.addListener('takeItemFromScene', (data) => {
+            this.addToInventory(data.itemName);
+            this.cacheHero();
+        });
+
+        this.eventDepot.addListener('removeItem', (itemName) => {
+            this.removeFromInventory(itemName);
+            this.cacheHero();
+        });
+
+        this.eventDepot.addListener('dropItemToScene', (data) => {
+            this.removeFromInventory(data.itemName);
+            this.cacheHero();
+        });
+
+    }
+
+    removeEventListeners() {
+        
+        this.eventDepot.removeListeners('updateHeroLocation');
+        this.eventDepot.removeListeners('swapInventoryPositions');
+        this.eventDepot.removeListeners('unequipItem');
+        this.eventDepot.removeListeners('equipItem');
+        this.eventDepot.removeListeners('placeItem');
+        this.eventDepot.removeListeners('takeItemFromScene');
+        this.eventDepot.removeListeners('removeItem');
+        this.eventDepot.removeListeners('dropItemToScene');
     }
 
     firstInventorySlot() {
@@ -97,46 +152,8 @@ export class Hero {
         return this.inventory;
     }
 
-    /* Assumes item is the full Object3D after loading */
-    equip(area, item) {
-        this.equipped[area] = item.objectName;
-
-        item.position.set(0,0,0);
-        item.rotation.y = Math.PI;
-        item.scale.copy(new THREE.Vector3( .1,.1,.1 ));
-
-        if (item.objectName == "torch") {
-
-            querySC('getFire', this.eventDepot).then(fireObj => {
-
-                // this.fireParams.Torch();
-                fireObj.scale.set(.04, .01, .04);
-                fireObj.translateY(.08);
-                fireObj.translateZ(-.32);
-                fireObj.translateX(.01);
-                fireObj.rotateX(-Math.PI/5);
-                fireObj.rotateZ(-Math.PI/20);
-
-                item.add(fireObj);
-
-
-                switch (area) {
-                    case "Middle2R_end": 
-                        item.rotation.z = -Math.PI/5;
-                        break;
-                    case "Middle2L_end":
-                        //item.rotation.z = Math.PI/8;
-                        break;
-                    default:
-                }
-                this.model.getObjectByName(area).add(item);
-            })
-        } else {
-            this.model.getObjectByName(area).add(item);
-        }
-
-
-        
+    equip(area, itemName) {
+        this.equipped[area] = itemName;
     }
 
     unequip(area) {

@@ -46,7 +46,7 @@ export const Items = {
             equippable: ['handR', 'handL'],
             animates: false,
             scale: 100,
-            elevation: 5
+            elevation: 10
         } 
     },
     torch: {

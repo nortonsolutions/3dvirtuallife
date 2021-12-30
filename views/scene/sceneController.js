@@ -74,29 +74,61 @@ export class SceneController {
 
         })
 
-        this.eventDepot.addListener('takeItem', (data) => {
-            
+        this.eventDepot.addListener('takeItemFromScene', (data) => {
             this.removeFromScenebyUUID(data.uuid);
         });
 
-        this.eventDepot.addListener('dropItem', (itemName) => {
-            let object = this.layoutManager.getObject(itemName);
-            this.loadObject3DbyName(itemName, (gltf) => {
+        this.eventDepot.addListener('dropItemToScene', (data) => {
+            let object = this.layoutManager.getObject(data.itemName);
+            this.loadObject3DbyName(data.itemName, (gltf) => {
                 let model = gltf.scene;
                 model.position.copy(this.scene.controls.getObject().position);
-                model.position.y = this.determineElevationGeneric(model.position.x, model.position.y, itemName) + object.attributes.elevation;
-                
-                // Add to layoutManager's levelObjects as well with grid coordinates, for future loads
-                
+                model.position.y = this.determineElevationGeneric(model.position.x, model.position.y, data.itemName) + object.attributes.elevation;
                 this.scene.scene.add(model);
                 this.addToObjects3D(model);
                 
             })
         });
 
-        this.eventDepot.addListener('loadObject3DbyName', (data) => {
+        this.eventDepot.addListener('equipItem', (data) => {
+
+            let area = data.bodyPart;
             this.loadObject3DbyName(data.itemName, (itemGltf) => {
-                this.hero.equip(data.bodyPart, itemGltf.scene);
+
+                let item = itemGltf.scene;
+                item.position.set(0,0,0);
+                item.rotation.y = Math.PI;
+                item.scale.copy(new THREE.Vector3( .1,.1,.1 ));
+        
+                if (item.objectName == "torch") {
+        
+                    querySC('getFire', this.eventDepot).then(fireObj => {
+        
+                        // this.fireParams.Torch();
+                        fireObj.scale.set(.04, .01, .04);
+                        fireObj.translateY(.08);
+                        fireObj.translateZ(-.32);
+                        fireObj.translateX(.01);
+                        fireObj.rotateX(-Math.PI/5);
+                        fireObj.rotateZ(-Math.PI/20);
+        
+                        item.add(fireObj);
+        
+        
+                        switch (area) {
+                            case "Middle2R_end": 
+                                item.rotation.z = -Math.PI/5;
+                                break;
+                            case "Middle2L_end":
+                                //item.rotation.z = Math.PI/8;
+                                break;
+                            default:
+                        }
+                        this.hero.model.getObjectByName(area).add(item);
+                    })
+                } else {
+                    this.hero.model.getObjectByName(area).add(item);
+                }
             });
         })
         
@@ -200,10 +232,10 @@ export class SceneController {
 
     deanimateScene(callback) {
 
-        this.eventDepot.removeListeners('loadObject3DbyName');
-        this.eventDepot.removeListeners('querySC');
-        this.eventDepot.removeListeners('takeItem');
-        this.eventDepot.removeListeners('dropItem');
+        this.eventDepot.removeListeners('takeItemFromScene');
+        this.eventDepot.removeListeners('dropItemToScene');
+        this.eventDepot.removeListeners('equipItem');
+        
 
         this.scene.unregisterEventListeners();
         this.scene.deanimate(() => {

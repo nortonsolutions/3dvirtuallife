@@ -2,11 +2,11 @@
 
 class InventoryScreen {
  
-    constructor(eventDepot,game, modal) {
+    constructor(eventDepot, modal) {
 
-        this.game = game;
-        this.eventDepot = eventDepot; // used for dropItem, etc.
-        this.modal = modal;  // will be used for loadTemplate on page +/-
+        this.location = {};
+        this.eventDepot = eventDepot;
+        this.modal = modal;
 
     }
 
@@ -19,28 +19,28 @@ class InventoryScreen {
         let startingIndex = this.pageNumber? this.pageNumber * inventoryPageSize: 0;
     
         var context = { equipped: {}, inventory: [], pageNumber: pageNumber };
-
-        queryGame('getHeroEquipped', this.eventDepot).then(response => {
-            console.log(response);
-        })
-
-        Object.keys(this.game.hero.equipped).forEach(key => {
-            context.equipped[key] = {
-                name: this.game.hero.equipped[key],
-                description: this.game.getObjectDetail(this.game.hero.equipped[key],'description'),
-                image: this.game.getObjectDetail(this.game.hero.equipped[key],'image')
+        
+        var hero = JSON.parse(localStorage.getItem('gameHero'));
+        var gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
+        
+        Object.keys(hero.equipped).forEach(bodyPart => {
+            let objectName = hero.equipped[bodyPart];
+            context.equipped[bodyPart] = {
+                name: objectName,
+                description: gameObjects[objectName].description,
+                image: gameObjects[objectName].image
             };
         });
-    
+
         for (let index = startingIndex; index < startingIndex + inventoryPageSize; index++) {
-            let key = this.game.hero.inventory[index] && this.game.hero.inventory[index].itemName ? this.game.hero.inventory[index].itemName : undefined;
-            if (!(key == undefined)) {
+            let objectName = hero.inventory[index] && hero.inventory[index].itemName ? hero.inventory[index].itemName : undefined;
+            if (!(objectName == undefined)) {
                 context.inventory[index] = {
                     index: index,
-                    name: key,
-                    description: this.game.getObjectDetail(key,'description'),
-                    image: this.game.getObjectDetail(key,'image'),
-                    quantity: this.game.hero.inventory[index].quantity
+                    name: objectName,
+                    description: gameObjects[objectName].description,
+                    image: gameObjects[objectName].image,
+                    quantity: hero.inventory[index].quantity
                 };
             } else {
                 context.inventory[index] = {
@@ -52,6 +52,8 @@ class InventoryScreen {
                 }
             }
         }
+
+        this.location = hero.location;
         return context;
     }
 
@@ -92,164 +94,66 @@ class InventoryScreen {
             let data = ev.dataTransfer.getData("text").split(':');
     
             var itemName = data[0]; // name of item and id of source draggable element
-            var descId = data[1]; // id of description element
-            var quantId = data[2]; // id of quantity element
+            // var descId = data[1]; // id of description element
+            // var quantId = data[2]; // id of quantity element
             var index = data[3];  // inventory # ... or bodyPart by name
             
             if (index.length < 2) { // source is inventory
                 
                 if (! Array.from(targetElement.classList).includes('body')) { // To another slot
-                    
+
+                    this.eventDepot.fire('swapInventoryPositions', {first: index, second: targetElement.id});
+    
+                } else { 
+
                     if (targetElement.firstElementChild) {
-    
                         let itemNameToSwap = targetElement.firstElementChild.id;
-                        let descIdToSwap = targetElement.firstElementChild.attributes.describedBy.value;
-                        let quantIdToSwap = targetElement.firstElementChild.attributes.quant.value;
-    
-                        let swapTargetElement = document.getElementById(itemName).parentNode;
-                        swapTargetElement.appendChild(document.getElementById(itemNameToSwap));
-                        swapTargetElement.appendChild(document.getElementById(descIdToSwap));
-                        swapTargetElement.appendChild(document.getElementById(quantIdToSwap));
-    
+                        this.eventDepot.fire('unequipItem', targetElement.id);
+                        this.eventDepot.fire('placeItem', {itemName: itemNameToSwap, desiredIndex: index});
                     }
-    
-                    targetElement.appendChild(document.getElementById(itemName));
-                    targetElement.appendChild(document.getElementById(descId));
-                    targetElement.appendChild(document.getElementById(quantId));
-                    this.game.hero.swapInventoryPositions(index, targetElement.id);
-    
-                } else { // Inventory to body part
-    
-                    if (targetElement.firstElementChild) { // If the bodypart is already equipped...
+                    this.eventDepot.fire('removeItem', itemName)
+                    this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName});
 
-                        // Identify the item to swap back to inventory
-                        let itemNameToSwap = targetElement.firstElementChild.id;
-                        let descIdToSwap = targetElement.firstElementChild.attributes.describedBy.value;
-                        let quantIdToSwap = targetElement.firstElementChild.attributes.quant.value;
-                        let indexToSwap = targetElement.id; 
-
-                        // Unequip this item
-                        this.game.hero.unequip(indexToSwap);
-
-                        // Put the item back in the original location (index)
-                        let {itemIndex,quantity} = this.game.hero.addToInventory(itemNameToSwap,index);
-
-                        // Determine where to put the item in the inventory based on itemIndex
-                        let finalTargetElement = document.getElementById(itemIndex);
-
-                        // Clean up if necessary
-                        if (finalTargetElement.childNodes) {
-                            Array.from(finalTargetElement.childNodes).forEach(el => el.remove());
-                        }
-    
-                        // Append the item details into place
-                        finalTargetElement.appendChild(document.querySelector('.body #' + itemNameToSwap));
-                        finalTargetElement.appendChild(document.querySelector('.body #' + descIdToSwap));
-                        finalTargetElement.appendChild(document.querySelector('.body #' + quantIdToSwap));
-                        document.getElementById(quantIdToSwap).innerText = quantity;
-
-                    }
-
-                    let quantityRemaining = this.game.hero.removeFromInventory(itemName);
-                    
-                    this.eventDepot.fire('loadObject3DbyName', {itemName, bodyPart: targetElement.id});
-
-                    if (quantityRemaining == 0) {
-
-                        targetElement.appendChild(document.getElementById(itemName));
-                        targetElement.appendChild(document.getElementById(descId));
-                        targetElement.appendChild(document.getElementById(quantId));
-                        
-                    } else {
-
-                        var dupe = document.getElementById(itemName).cloneNode(true);
-                        var dupeDesc = document.getElementById(descId).cloneNode(true);
-                        var dupeQuant = document.getElementById(quantId).cloneNode(true);
-
-                        dupeQuant.innerText = '1';
-
-                        dupe.addEventListener('dragstart', drag);
-                        targetElement.appendChild(dupe);
-                        targetElement.appendChild(dupeDesc);
-                        targetElement.appendChild(dupeQuant);
-
-                        document.getElementById(quantId).innerHTML = quantityRemaining;
-                    }
                 } 
     
             } else { // source is body part
     
                 if (! Array.from(targetElement.classList).includes('body')) { // back to inventory
     
-                    this.game.hero.unequip(index);
-                    let {itemIndex,quantity} = this.game.hero.addToInventory(itemName,targetElement.id);
-                    
-                    let finalTargetElement = document.getElementById(itemIndex);
-    
-                    if (finalTargetElement) {
-                        Array.from(finalTargetElement.childNodes).forEach(el => el.remove());
-    
-                        finalTargetElement.appendChild(document.getElementById(itemName));
-                        finalTargetElement.appendChild(document.getElementById(descId));
-                        finalTargetElement.appendChild(document.getElementById(quantId));
-                        document.getElementById(quantId).innerText = quantity;
-                    } else {
-                        document.getElementById(itemName).remove();
-                        document.getElementById(descId).remove();
-                        document.getElementById(quantId).remove();
-                    }
+                    this.eventDepot.fire('unequipItem', index);
+                    this.eventDepot.fire('placeItem', {itemName, desiredIndex: targetElement.id});
     
                 } else { // body part to body part
     
-                    this.game.hero.unequip(index);
-    
+                    this.eventDepot.fire('unequipItem', index);
+
                     if (targetElement.firstElementChild) {
+
                         let itemNameToSwap = targetElement.firstElementChild.id;
-                        let descIdToSwap = targetElement.firstElementChild.attributes.describedBy.value;
-                        let quantIdToSwap = targetElement.firstElementChild.attributes.quant.value;
-    
-                        let swapTargetElement = document.getElementById(itemName).parentNode;
-                        swapTargetElement.appendChild(document.getElementById(itemNameToSwap));
-                        swapTargetElement.appendChild(document.getElementById(descIdToSwap));
-                        swapTargetElement.appendChild(document.getElementById(quantIdToSwap));
+                        this.eventDepot.fire('unequipItem', ev.target.parentNode.id);
+                        this.eventDepot.fire('equipItem', {bodyPart: index, itemName: itemNameToSwap});
                     }
-                    
-                    targetElement.appendChild(document.querySelector('.body #' + itemName));
-                    targetElement.appendChild(document.querySelector('.body #' + descId));
-                    targetElement.appendChild(document.querySelector('.body #' + quantId));
-    
-                    this.eventDepot.fire('loadObject3DbyName', {itemName, bodyPart: ev.target.id});
+
+                    this.eventDepot.fire('equipItem', {bodyPart: ev.target.parentNode.id, itemName});
                 }
     
-            } 
-    
-            console.dir(this.game.hero.inventory);        
+            }
+            
+            this.refresh();
         }
     
         const dropOnly = (ev) => {
             ev.preventDefault();
-    
-    
             let data = ev.dataTransfer.getData("text").split(':');
-    
-            var itemName = data[0]; // name of item and id of source draggable element
-            var descId = data[1]; // id of description element
-            var quantId = data[2]; // id of quantity element
-            var index = data[3];  // inventory # ... or bodyPart by name
-    
-            let rootElement = document;
-            if (index.length > 2) rootElement = document.querySelector('.body');
-    
-            let previousQuantity = document.getElementById(quantId).innerText;
-            if (previousQuantity == "1") {
-                rootElement.getElementById(itemName).remove();
-                rootElement.getElementById(descId).remove();
-                rootElement.getElementById(quantId).remove();
-            } else {
-                rootElement.getElementById(quantId).innerText = Number(previousQuantity) - 1;
+
+            let dropData = {
+                itemName: data[0],
+                location: this.location
             }
-    
-            this.eventDepot.fire('dropItem', itemName);
+
+            this.eventDepot.fire('dropItemToScene', dropData);
+
+            this.refresh();
         }
     
         document.querySelectorAll('.draggable').forEach(draggableElement => {
@@ -282,6 +186,13 @@ class InventoryScreen {
             });
         })
     
+    }
+
+    refresh = () => {
+        let context = this.getInventoryContext(this.pageNumber);
+        this.modal.loadTemplate('modal-body', 'inventory', context, () => {
+            this.addInventoryEvents();
+        });
     }
 
 }

@@ -202,6 +202,7 @@ class Scene {
                 break;
 
             case 73: // i
+                this.updateHeroLocation(false);
                 this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
 
             case 77: // m
@@ -332,7 +333,7 @@ class Scene {
             controlsObj.add( model );
             
             this.controller.createMixer( model, gltf.animations, "hero" );
-            this.updateHeroLocation();
+            this.updateHeroLocation(true);
         })
     }
 
@@ -402,29 +403,25 @@ class Scene {
 
                     let thisObj = mixers.hero.selectedObject;
 
-                    // Get the parent name/type
                     let objectName = this.controller.getObjectName(thisObj);
                     let objectType = this.controller.getObjectType(thisObj);
                     
-                    // If it is an item, pick it up and add to inventory
                     if (objectType == "item") {
-                        this.controller.eventDepot.fire('takeItem', {name: objectName, uuid: thisObj.uuid});
-                    // If it is a friendly entity, engage the conversation
+                        this.controller.eventDepot.fire('takeItemFromScene', {itemName: objectName, uuid: thisObj.uuid});
+
                     } else if (objectType == "friendly") {
                         
-                        // TODO: Get the intersected object's properties from the level manager.
+                        // TODO: conversation
                         this.controls.unlock();
                         this.controller.eventDepot.fire('modal', { name: objectName });
                    
                     } else if (objectType == "beast") {
 
+                        // TODO: combat
                         this.controller.fadeToAction("hero", "Punch", 0.2)
-                        // TODO: act upon the enemy with the object in hand
-
 
                     } else if (objectType == "structure") {
                         
-                        // Does this structure require a key?
                         var accessible = thisObj.attributes.key ? 
                             this.hero.inventory.map(el => {
                                 return el? el.itemName: null;
@@ -667,14 +664,17 @@ class Scene {
     }
     
     // Calculate hero location using grid coordinates
-    updateHeroLocation = () => {
+    updateHeroLocation = (offset = false) => {
 
         let { x, y, z } = this.controls.getObject().position;
         
-        let zOffset = (z < 0) ? 20 : -20;
-        
-        this.hero.location.x = x / multiplier;
-        this.hero.location.z = (z+zOffset) / multiplier;
+        if (offset) {
+            z = z + (z < 0) ? 20 : -20;
+            x = x + (x < 0) ? 20 : -20;
+        }
+
+        this.controller.eventDepot.fire('updateHeroLocation', { x: x / multiplier, y, z: z / multiplier });
+
         this.controller.mixers.hero.velocity.x = 0;
         this.controller.mixers.hero.velocity.z = 0;
 

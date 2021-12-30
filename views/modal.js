@@ -1,12 +1,11 @@
 
 import { InventoryScreen } from './inventoryScreen.js'
 
-
 class Modal {
 
-    constructor(eventDepot, game) {
+    constructor(eventDepot) {
 
-        this.inventoryScreen = new InventoryScreen(eventDepot, game, this);
+        this.inventoryScreen = new InventoryScreen(eventDepot, this);
 
         eventDepot.addListener('modal', (data) => {
 

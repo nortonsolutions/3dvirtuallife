@@ -51,7 +51,8 @@ export const app = () => {
         });
 
         eventDepot.addListener('showDescription', (data) => {
-            let description = game.getObjectDetail(data.objectName,'description');
+
+            let description = JSON.parse(localStorage.getItem('gameObjects'))[data.objectName].description;
             document.getElementById('message').innerHTML = description;
         });
 
@@ -87,7 +88,7 @@ export const app = () => {
         game.stats(); // currently just dumps objects to console
         sceneController = new SceneController(game.hero, game.layoutManager, game.eventDepot);
         
-        modal = new Modal(eventDepot, game);
+        modal = new Modal(eventDepot);
 
         sceneController.animateScene();
     }

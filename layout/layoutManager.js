@@ -36,34 +36,60 @@ import {Structures} from './blueprints/structures.js';
 
 class LayoutManager {
 
-    constructor(props) {
+    constructor(props, eventDepot) {
 
         this.props = props;
+        this.level = props.level;
+        this.eventDepot = eventDepot;
 
         this.allItems = Items;
         this.allStructures = Structures;
         this.allEntities = Entities;
         this.allObjects = {...Items, ...Structures, ...Entities, ...{ floor: { description: "floor"}}};
 
+        localStorage.setItem('gameObjects', JSON.stringify(this.allObjects));
+        
         this.layout = {};
         
-        if (props.layouts[props.level]) {
-            this.layout = props.layouts[props.level];
+        if (props.layouts[this.level]) {
+            this.layout = props.layouts[this.level];
         } else {
-            this.levelBuilder = new LevelBuilder(this.props.level);
+            this.levelBuilder = new LevelBuilder(this.level);
             this.layout = this.levelBuilder.getLayout();
         }
 
         this.props.hero.location = this.props.hero.location? this.props.hero.location : this.levelBuilder.randomUniqueLocation();
-        
+        this.addEventListeners();
+    }
+
+    addEventListeners() {
+        this.eventDepot.addListener('takeItemFromScene', (data) => {
+            // TODO: update layout and localStorage  (data.itemName)
+            this.layout.items.filter(el => el.name != data.itemName);
+            this.cacheLayout();
+        });
+
+        this.eventDepot.addListener('dropItemToScene', (data) => {
+            let item = this.allItems[data.itemName];
+            item.location = data.location;
+            this.layout.items.push(item);
+            this.cacheLayout();
+        });
+    }
+
+    removeEventListeners() {
+        this.eventDepot.removeListeners('takeItemFromScene');
+        this.eventDepot.removeListeners('dropItemToScene');
+    }
+
+    cacheLayout() {
+        let currentProps = JSON.parse(localStorage.getItem('gameProps'));
+        currentProps.layouts[this.level] = this.layout;
+        localStorage.setItem('gameProps', JSON.stringify(currentProps));
     }
 
     getObject(name) {
         return this.allObjects[name];
-    }
-
-    getObjectDetail(objectName,detailName) {
-        return this.allObjects[objectName][detailName];
     }
 
     getAllItems() {
@@ -84,10 +110,6 @@ class LayoutManager {
 
     getLevel() {
         return this.props.level;
-    }
-
-    updateLayout(payload) {
-        this.layout = {...this.layout, ...payload};
     }
 
     getLevelObjects() {
