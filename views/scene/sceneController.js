@@ -22,7 +22,7 @@ import { Fire, params } from './fire.js'
 
 export class SceneController {
 
-    constructor(hero, layoutManager, eventDepot) {
+    constructor(hero, layout, eventDepot, allObjects) {
 
         this.moveForward = false;
         this.moveBackward = false;
@@ -30,20 +30,16 @@ export class SceneController {
         this.moveRight = false;
 
         this.hero = hero;
+        this.layout = layout;
+        this.eventDepot = eventDepot;
+        this.allObjects = allObjects;
+
         this.scene = null;
         this.floor = null;
         this.upRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ), 0, upRaycasterTestLength);
         this.downRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength);
 
-        this.eventDepot = eventDepot;
-        this.layoutManager = layoutManager;
-        this.level = layoutManager.getLevel();
-        this.layout = layoutManager.getLayout();
-        this.background = this.layout.background;
-        this.terrain = this.layout.terrain;
-        this.objects = layoutManager.getLevelObjects();  
         this.fireParams = params;
-        
         this.loader = new THREE.GLTFLoader();
                 
         // objects3D is used for raycast intersections
@@ -56,37 +52,54 @@ export class SceneController {
         this.addEventListeners();
     }
 
+    animateScene() {
+        this.scene = new Scene(this);
+
+        this.scene.init(() => {
+            this.scene.animate();
+        });
+    }
+
+    deanimateScene(callback) {
+
+        this.eventDepot.removeListeners('takeItemFromScene');
+        this.eventDepot.removeListeners('dropItemToScene');
+        this.eventDepot.removeListeners('equipItem');
+
+        this.scene.unregisterEventListeners();
+        this.scene.deanimate(() => {
+
+            this.scene = null;
+            this.objects3D.forEach(obj3D => {
+                obj3D.dispose();
+            })
+            callback();
+        });
+
+    }
+
+    getObjectByName(name) {
+        return this.allObjects[name];
+    }
+
     addEventListeners() {
-
-        this.eventDepot.addListener('querySC', (data) => {
-
-            let {key, queryName, args} = data;
-
-            let response = null;
-
-            switch (queryName) {
-                case 'getFire':
-                    response = this.getFire(args);
-                    break;
-            }
-
-            this.eventDepot.fire('SCResponse' + key, response);
-
-        })
 
         this.eventDepot.addListener('takeItemFromScene', (data) => {
             this.removeFromScenebyUUID(data.uuid);
+            this.eventDepot.fire('removeItemFromLayout', data.uuid);
         });
 
         this.eventDepot.addListener('dropItemToScene', (data) => {
-            let object = this.layoutManager.getObject(data.itemName);
+            let object = this.getObjectByName(data.itemName);
             this.loadObject3DbyName(data.itemName, (gltf) => {
                 let model = gltf.scene;
                 model.position.copy(this.scene.controls.getObject().position);
                 model.position.y = this.determineElevationGeneric(model.position.x, model.position.y, data.itemName) + object.attributes.elevation;
                 this.scene.scene.add(model);
                 this.addToObjects3D(model);
-                
+
+                data.uuid = model.uuid;
+                this.eventDepot.fire('addItemToLayout', data);
             })
         });
 
@@ -102,33 +115,32 @@ export class SceneController {
         
                 if (item.objectName == "torch") {
         
-                    querySC('getFire', this.eventDepot).then(fireObj => {
-        
-                        // this.fireParams.Torch();
-                        fireObj.scale.set(.04, .01, .04);
-                        fireObj.translateY(.08);
-                        fireObj.translateZ(-.32);
-                        fireObj.translateX(.01);
-                        fireObj.rotateX(-Math.PI/5);
-                        fireObj.rotateZ(-Math.PI/20);
-        
-                        item.add(fireObj);
-        
-        
-                        switch (area) {
-                            case "Middle2R_end": 
-                                item.rotation.z = -Math.PI/5;
-                                break;
-                            case "Middle2L_end":
-                                //item.rotation.z = Math.PI/8;
-                                break;
-                            default:
-                        }
-                        this.hero.model.getObjectByName(area).add(item);
-                    })
-                } else {
-                    this.hero.model.getObjectByName(area).add(item);
-                }
+                    let fireObj = this.getFire();
+
+                    // this.fireParams.Torch();
+                    fireObj.scale.set(.04, .01, .04);
+                    fireObj.translateY(.08);
+                    fireObj.translateZ(-.32);
+                    fireObj.translateX(.01);
+                    fireObj.rotateX(-Math.PI/5);
+                    fireObj.rotateZ(-Math.PI/20);
+    
+                    item.add(fireObj);
+    
+                    switch (area) {
+                        case "Middle2R_end": 
+                            item.rotation.z = -Math.PI/5;
+                            break;
+                        case "Middle2L_end":
+                            //item.rotation.z = Math.PI/8;
+                            break;
+                        default:
+                    }
+
+                } 
+                
+                this.hero.model.getObjectByName(area).add(item);
+                
             });
         })
         
@@ -168,25 +180,13 @@ export class SceneController {
             return this.getObjectName(el) != entity.objectName
         });
 
-        // if (uniqueId=="hero") {
-        //     console.log(`entity.position.y upon setElevation: ${entity.position.y}`);
-        //     console.dir(otherObjects);
-        // }
-
-
-        // Offset downRay
         let downRayOriginHeight = entity.position.y + 30;
 
         this.mixers[uniqueId].downRaycaster.ray.origin.copy(entity.position);
         this.mixers[uniqueId].downRaycaster.ray.origin.y = downRayOriginHeight;
-        // Am I over an object?
 
-        // if (uniqueId == "hero") {
-        //     console.log("this.mixers[uniqueId].downRaycaster.ray.origin")
-        //     console.table(this.mixers[uniqueId].downRaycaster.ray.origin);
-        // }
         let downwardIntersections = this.mixers[uniqueId].downRaycaster.intersectObjects( otherObjects, true );
-        if (downwardIntersections[0]) { // YES
+        if (downwardIntersections[0]) { 
             var topOfObject = downRayOriginHeight - downwardIntersections[0].distance + 2;
             if (entity.position.y <= topOfObject) {
                 this.mixers[uniqueId].standingUpon = this.getRootObject3D(downwardIntersections[0].object);
@@ -196,13 +196,10 @@ export class SceneController {
                 this.mixers[uniqueId].justJumped = false;
             }
         } else {
-            // DEBUG
+
             this.mixers[uniqueId].standingUpon = null;
             entity.position.y = this.determineElevationGeneric(entity.position.x, entity.position.z, uniqueId);
-            // if (uniqueId == "hero") {
-            //     console.log("this.controls.getObject().position");
-            //     console.table(this.scene.controls.getObject().position);
-            // }
+
         }
     }
 
@@ -221,52 +218,45 @@ export class SceneController {
         });
     }
 
-    animateScene() {
-        this.scene = new Scene(this.hero, this.layout.length, this.layout.width, this.terrain, this.background, this);
-
-        this.scene.init(() => {
-            this.scene.animate();
-        });
-    }
-
-
-    deanimateScene(callback) {
-
-        this.eventDepot.removeListeners('takeItemFromScene');
-        this.eventDepot.removeListeners('dropItemToScene');
-        this.eventDepot.removeListeners('equipItem');
-        
-
-        this.scene.unregisterEventListeners();
-        this.scene.deanimate(() => {
-
-            this.scene = null;
-            this.objects3D.forEach(obj3D => {
-                obj3D.dispose();
-            })
-            callback();
-        });
-
-    }
-
     /** This method will not set the position of the object3D, nor create a GUI.
      * The return object 'gltf' will have a model (scene) and animations if applicable.
       */
     loadObject3DbyName(objectName, callback) {
 
-        let object = this.layoutManager.getObject(objectName);
-        this.loader.load( '/models/3d/gltf/' + object.gltf, (gltf) => {
-            let model = gltf.scene;
-            model.scale.x = object.attributes.scale;
-            model.scale.y = object.attributes.scale;
-            model.scale.z = object.attributes.scale;
-            model.objectName = object.name;
-            model.objectType = object.type;
-            model.attributes = object.attributes;
+        let object = this.getObjectByName(objectName);
+        this.load( object, (gltf) => {
             callback(gltf);
         });
     }
-    
+
+    load(object, callback) {
+        
+        this.loader.load( '/models/3d/gltf/' + object.gltf, (gltf) => {
+        
+            let model = gltf.scene;
+            
+            model.objectName = object.name;
+            model.objectType = object.type;
+            model.attributes = object.attributes;
+            model.scale.x = object.attributes.scale;
+            model.scale.y = object.attributes.scale;
+            model.scale.z = object.attributes.scale;
+            
+            if (object.equipped) {
+                Object.keys(object.equipped).forEach(bodyPart => {
+                    this.loadObject3DbyName(object.equipped[bodyPart], (itemGltf) => {
+                        object.equip(bodyPart, itemGltf.scene);
+                    })
+                })
+            }
+            
+            callback(gltf);
+
+        }, undefined, function ( error ) {
+            console.error( error );
+        });
+    }
+
     getFire(params) {
 
         if (!params) params = this.fireParams;
@@ -324,33 +314,7 @@ export class SceneController {
         }
     }
 
-    load(object, callback) {
-        
-        this.loader.load( '/models/3d/gltf/' + object.gltf, (gltf) => {
-        
-            let model = gltf.scene;
-            
-            model.objectName = object.name;
-            model.objectType = object.type;
-            model.attributes = object.attributes;
-            model.scale.x = object.attributes.scale;
-            model.scale.y = object.attributes.scale;
-            model.scale.z = object.attributes.scale;
-            
-            if (object.equipped) {
-                Object.keys(object.equipped).forEach(bodyPart => {
-                    this.loadObject3DbyName(object.equipped[bodyPart], (itemGltf) => {
-                        object.equip(bodyPart, itemGltf.scene);
-                    })
-                })
-            }
-            
-            callback(gltf);
 
-        }, undefined, function ( error ) {
-            console.error( error );
-        });
-    }
 
     createMixer( model, animations, uniqueId ) {
 
@@ -387,7 +351,7 @@ export class SceneController {
 
 
         if (model.attributes.moves) {
-        // if (uniqueId == "hero" || model.objectType == "friendly" || model.objectType == "beast") {
+
             mixerObj = {
                 ...mixerObj,
                 moves: true,
@@ -402,7 +366,6 @@ export class SceneController {
                 selectedObject: null,
             }
 
-            // DEFAULT:
             mixerObj.activeAction.play();
             
         }
@@ -412,8 +375,6 @@ export class SceneController {
 
     fadeToAction = ( uuid, actionName, duration ) => {
         
-        // Get the mixer for this uuid:
-
         if ( this.mixers[uuid].activeActionName !== actionName ) {
 
             let newAction = this.actions[ uuid + actionName ];
@@ -436,8 +397,7 @@ export class SceneController {
                 this.mixers[uuid].mixer.removeEventListener('finished', restoreState );
                 this.fadeToAction( uuid, this.mixers[uuid].previousActionName, 0.1 );
             }
-    
-            // After fadeToAction ({emote}, {seconds}), fadeToAction ({state}, {seconds}) again
+
             if (emotes.includes(actionName)) {
                 this.mixers[uuid].mixer.addEventListener( 'finished', restoreState );
             }
@@ -445,7 +405,7 @@ export class SceneController {
     }
 
     runActiveAction = (uuid, duration) => {
-        // Get the mixer for this uuid:
+
         this.mixers[uuid].activeAction
             .reset()
             .setEffectiveTimeScale( 1 )

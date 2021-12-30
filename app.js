@@ -4,33 +4,29 @@
 */
 import { EventDepot } from '/public/eventDepot.js';
 import { Game, GameAPI } from '/game.js';
-import { SceneController } from '/scene/sceneController.js'
 import { Modal } from '/views/modal.js';
 
 export const app = () => {
 
     var gameAPI = new GameAPI();
 
-    // Some game details will be provided, either new or restored game
+    var game;
+
     var props = 
     localStorage.getItem('gameProps')? 
-    JSON.parse(localStorage.getItem('gameProps')): gameAPI.newGame('Dave', 20);
-
-    var game;
-    var modal;
-    var sceneController;
+    JSON.parse(localStorage.getItem('gameProps')): 
+    gameAPI.newGame('Dave', 20);
+    
     var eventDepot = new EventDepot();
+    var modal = new Modal(eventDepot);
+    
     var minimap = false;
 
     const addEventListeners = () => {
         
         eventDepot.addListener('loadLevel', (data) => {
             game.eventDepot.fire('unlockControls', {});
-            game.unregisterListeners();
-
-            sceneController.deanimateScene(() => {
-                sceneController = null;
-            });
+            game.stop();
 
             props.hero = data.hero;
             props.level = data.level;
@@ -38,16 +34,6 @@ export const app = () => {
             props.hero.location = data.location;
             props.hero.location.x -= 1;
             startGame();
-        });
-
-        eventDepot.addListener('saveLevel', (data) => {
-            
-            props.hero = data.hero;
-            props.level = data.level;
-            props.layouts[data.level] = data.layouts[data.level];
-
-            localStorage.setItem('gameProps', JSON.stringify(props)); 
-
         });
 
         eventDepot.addListener('showDescription', (data) => {
@@ -82,14 +68,9 @@ export const app = () => {
     addEventListeners();
 
     const startGame = () => {
-        game = new Game(props, eventDepot);
-        game.setGameLayout();
-
-        game.stats(); // currently just dumps objects to console
-        sceneController = new SceneController(game.hero, game.layoutManager, game.eventDepot);
         
-        modal = new Modal(eventDepot);
+        game = new Game(props, eventDepot);
+        game.start();
 
-        sceneController.animateScene();
     }
 }

@@ -31,7 +31,7 @@ var minimap = false;
 
 class Scene {
 
-    constructor(hero, length, width, terrain, background, controller) {
+    constructor(controller) {
 
         this.prevTime = performance.now();
 
@@ -39,13 +39,14 @@ class Scene {
         this.controller = controller;
         this.running = true;
 
-        this.planeWidth = width? width * multiplier : 2000;
-        this.planeHeight = length? length * multiplier : 2000;
+        this.planeWidth = controller.layout.width? controller.layout.width * multiplier : 2000;
+        this.planeHeight = controller.layout.length? controller.layout.length * multiplier : 2000;
 
-        this.hero = hero;
-        this.background = background;
-        this.terrain = terrain;
-
+        this.hero = controller.hero;
+        this.background = controller.layout.background;
+        this.terrain = controller.layout.terrain;
+        this.layout = controller.layout;
+        
         this.animate = this.animate.bind(this);
         this.deanimate = this.deanimate.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
@@ -288,19 +289,11 @@ class Scene {
     addSconces = (object) => {
         if (/sconce/i.test(object.name)) {
 
-            querySC('getFire', this.controller.eventDepot).then(fireObj => {
-
-                // this.fireParams.Torch();
-                fireObj.scale.set(.3, .02, .3);
-                fireObj.translateY(.15);
-                // fireObj.translateZ(-.32);
-                // fireObj.translateX(.01);
-                // fireObj.rotateX(-Math.PI/5);
-                // fireObj.rotateZ(-Math.PI/20);
-
-                object.add(fireObj);
-            })
-
+            let fireObj = this.controller.getFire();
+            // this.fireParams.Torch();
+            fireObj.scale.set(.3, .02, .3);
+            fireObj.translateY(.15);
+            object.add(fireObj);
         } else {
             if (object.children) {
                 object.children.forEach(el => {
@@ -337,50 +330,51 @@ class Scene {
         })
     }
 
+    seedObjects3D = () => {
+        this.layout.items.forEach(item => this.seedObject3D(item));
+        this.layout.structures.forEach(structure => this.seedObject3D(structure));
+        this.layout.entities.forEach(entity => this.seedObject3D(entity));
+    }
+
     /** 
      * Create 3D representation of each object:
      */ 
-    seedObjects3D = () => {
+    seedObject3D = (object) => {
 
-        this.controller.objects.forEach(object => {
+        this.controller.load(object, (gltf) => {
 
-            this.controller.load(object, (gltf) => {
+            let model = gltf.scene;
 
-                let model = gltf.scene;
-                model.position.x = object.location.x * multiplier;
-                model.position.z = object.location.z * multiplier;
-                model.position.y = this.controller.determineElevationGeneric(model.position.x, model.position.z,object.name) + object.attributes.elevation;
+            object.uuid = model.uuid;
+            model.position.x = object.location.x * multiplier;
+            model.position.z = object.location.z * multiplier;
+            model.position.y = this.controller.determineElevationGeneric(model.position.x, model.position.z,object.name) + object.attributes.elevation;
+            
+            if (object.attributes.animates) {
+                this.controller.createMixer( model, gltf.animations, model.uuid );
+            }
 
-                if (object.attributes.animates) {
-                    this.controller.createMixer( model, gltf.animations, model.uuid );
-                }
+            if (object.attributes.contentItems) {
+                object.attributes.contentItems.forEach(contentItem => {
+                    this.controller.load(contentItem, (iGltf) => {
+                        let iModel = iGltf.scene;
+                        iModel.position.x = model.position.x;
+                        iModel.position.z = model.position.z;
+                        iModel.position.y = model.position.y + contentItem.attributes.elevation;
+                        this.controller.objects3D.push( iModel );
+                        this.scene.add( iModel );
+                    })
+                });
+            }
 
-                if (object.attributes.contentItems) {
-                    object.attributes.contentItems.forEach(contentItem => {
-                        this.controller.load(contentItem, (iGltf) => {
-                            let iModel = iGltf.scene;
-                            iModel.position.x = model.position.x;
-                            iModel.position.z = model.position.z;
-                            iModel.position.y = model.position.y + contentItem.attributes.elevation;
-                            this.controller.objects3D.push( iModel );
-                            this.scene.add( iModel );
+            // console.log(`${object.name} @`);
+            // console.table(model.position);
 
-                            // console.log(`${contentItem.name} @`);
-                            // console.table(iModel.position);
-                        })
-                    });
-                }
+            this.controller.objects3D.push( model );
+            this.scene.add( model );
 
-                // console.log(`${object.name} @`);
-                // console.table(model.position);
-
-                this.controller.objects3D.push( model );
-                this.scene.add( model );
-
-            }, undefined, function ( error ) {
-                console.error( error );
-            });
-
+        }, undefined, function ( error ) {
+            console.error( error );
         });
     }
 
@@ -708,15 +702,7 @@ class Scene {
             if (this.controller.mixers.hero.standingUpon && this.controller.mixers.hero.standingUpon.attributes.routeTo && typeof this.controller.mixers.hero.standingUpon.attributes.routeTo.level == "number") {
                 if (this.controller.mixers.hero.standingUpon.attributes.unlocked) {
                     
-                    let saveData = {
-                        hero: this.hero.basic(),
-                        level: this.controller.level,
-                        layouts: []
-                    }
-                    
-                    saveData.layouts[this.controller.level] = this.controller.layoutManager.layout
-                    
-                    this.controller.eventDepot.fire('saveLevel', saveData);
+                    this.controller.eventDepot.fire('saveLayout');
 
                     let loadData = {
                         hero: this.hero.basic(),

@@ -8,8 +8,8 @@
  * 
  */
 
-import {LayoutManager} from './layout/layoutManager.js';
-import {Hero} from '/hero.js';
+import { LayoutManager } from './layout/layoutManager.js';
+import { Hero } from '/hero.js';
 
 class Game {
 
@@ -21,42 +21,34 @@ class Game {
         this.eventDepot = eventDepot;
         this.hero = new Hero(props.hero, this.eventDepot);
 
-        this.addQueryGameListener = this.addQueryGameListener.bind(this);
-        this.addQueryGameListener();
+        // this.addQueryGameListener = this.addQueryGameListener.bind(this);
+        // this.addQueryGameListener();
     }
 
-    unregisterListeners() {
-        this.eventDepot.removeListeners('queryGame');
-        this.layoutManager.removeEventListeners();
-        this.hero.removeEventListeners();
+    stop() {
+        // this.eventDepot.removeListeners('queryGame');
+        this.layoutManager.shutdown();
+        this.hero.stop();
+        
+        this.layoutManager = null;
+        this.hero = null;
     }
 
-    addQueryGameListener() {
-        this.eventDepot.addListener('queryGame', (data) => {
-
-            let {key, queryName, args} = data;
-
-            let response = null;
-
-            switch (queryName) {
-                case 'swapInventoryPositions':
-                    this.hero.swapInventoryPositions(args.first, args.second);
-                    break;
-            }
-
-            this.eventDepot.fire('gameResponse' + key, response);
-
-        })
-    }
+    // addQueryGameListener() {
+    //     this.eventDepot.addListener('queryGame', (data) => {
+    //         let {key, queryName, args} = data;
+    //         let response = null;
+    //         switch (queryName) {
+    //             case 'swapInventoryPositions':
+    //                 this.hero.swapInventoryPositions(args.first, args.second);
+    //                 break;
+    //         }
+    //         this.eventDepot.fire('gameResponse' + key, response);
+    //     })
+    // }
 
     setLevel(level) {
         this.props.level = level;
-    }
-    
-    setGameLayout() {
-        this.layoutManager = new LayoutManager(this.props, this.eventDepot);
-        this.gameLayout = this.layoutManager.getLayout();
-        this.hero.location = this.props.hero.location;
     }
 
     setLocalStorage() {
@@ -67,8 +59,11 @@ class Game {
         return JSON.parse(localStorage.getItem('gameProps'));
     }
 
-    stats() {
-        console.dir(this.gameLayout);
+    start() {
+
+        this.layoutManager = new LayoutManager(this.props, this.eventDepot);
+        this.layoutManager.launch(this.hero);
+
     }
 }
 

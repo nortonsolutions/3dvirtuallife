@@ -28,10 +28,11 @@
  * location changes to the world.
  */
 
-import {LevelBuilder} from './levelBuilder.js';
-import {Items} from './blueprints/items.js';
-import {Entities} from './blueprints/entities.js';
-import {Structures} from './blueprints/structures.js';
+import { LevelBuilder } from './levelBuilder.js';
+import { Items } from './blueprints/items.js';
+import { Entities } from './blueprints/entities.js';
+import { Structures } from './blueprints/structures.js';
+import { SceneController } from '/scene/sceneController.js'
 
 
 class LayoutManager {
@@ -58,38 +59,49 @@ class LayoutManager {
             this.layout = this.levelBuilder.getLayout();
         }
 
-        this.props.hero.location = this.props.hero.location? this.props.hero.location : this.levelBuilder.randomUniqueLocation();
         this.addEventListeners();
     }
 
+    launch(hero) {
+        
+        this.sceneController = new SceneController(hero, this.layout, this.eventDepot, this.allObjects);
+        this.sceneController.animateScene();
+    }
+
     addEventListeners() {
-        this.eventDepot.addListener('takeItemFromScene', (data) => {
-            // TODO: update layout and localStorage  (data.itemName)
-            this.layout.items.filter(el => el.name != data.itemName);
+        this.eventDepot.addListener('removeItemFromLayout', (uuid) => {
+            this.layout.items = this.layout.items.filter(el => el.uuid != uuid);
             this.cacheLayout();
         });
 
-        this.eventDepot.addListener('dropItemToScene', (data) => {
+        this.eventDepot.addListener('addItemToLayout', (data) => {
             let item = this.allItems[data.itemName];
             item.location = data.location;
+            item.uuid = data.uuid;
             this.layout.items.push(item);
             this.cacheLayout();
         });
+
+        this.eventDepot.addListener('saveLayout', (uuid) => {
+            this.cacheLayout();
+        });
+
     }
 
-    removeEventListeners() {
-        this.eventDepot.removeListeners('takeItemFromScene');
-        this.eventDepot.removeListeners('dropItemToScene');
+    shutdown() {
+        this.eventDepot.removeListeners('removeItemFromLayout');
+        this.eventDepot.removeListeners('addItemToLayout');
+        this.eventDepot.removeListeners('saveLayout');
+        
+        this.sceneController.deanimateScene(() => {
+            this.sceneController = null;
+        });
     }
 
     cacheLayout() {
         let currentProps = JSON.parse(localStorage.getItem('gameProps'));
         currentProps.layouts[this.level] = this.layout;
         localStorage.setItem('gameProps', JSON.stringify(currentProps));
-    }
-
-    getObject(name) {
-        return this.allObjects[name];
     }
 
     getAllItems() {

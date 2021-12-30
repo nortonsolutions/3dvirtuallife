@@ -22,7 +22,7 @@ export class Hero {
         this.addEventListeners();
 
         // Actually just a starting/saved location
-        this.location = hero.location? hero.location : {};
+        this.location = hero.location? hero.location : { x: 0, y: 0, z: 0 };
         this.cacheHero();
         
 
@@ -78,7 +78,7 @@ export class Hero {
 
     }
 
-    removeEventListeners() {
+    stop() {
         
         this.eventDepot.removeListeners('updateHeroLocation');
         this.eventDepot.removeListeners('swapInventoryPositions');
