@@ -10,6 +10,7 @@ export class Hero {
     // }
 
     constructor(hero, eventDepot) {
+        
         this.name = hero.name;
         this.gltf = hero.gltf;
         this.model = hero.model;
@@ -29,7 +30,7 @@ export class Hero {
     }
 
     cacheHero() {
-        localStorage.setItem('gameHero', JSON.stringify(this.basic()));
+        localStorage.setItem('gameHeroTemplate', JSON.stringify(this.template()));
     }
 
     addEventListeners() {
@@ -169,7 +170,7 @@ export class Hero {
         })
     }
 
-    basic() {
+    template() {
 
         return {
             name: this.name,

@@ -1,31 +1,9 @@
 /**
- * A 'Location' is like a room, in which multiple people can coexist.
- * Later the concept of boundaries for fermionic matter will exist
- * within the sphere of a single location, so two objects cannot
- * occupy the exact spacetime coordinate.
- * 
- * 'Self' refers to the player, who controls himself and his things.
- * 
- * 'Others' are like the human player, and may represent other human
- * players who have joined the game, or artificial intelligence.
- * They will compete with the player to carry out various objectives,
- * compete for territory and prizes, etc.  They can be cooperative
- * and engage in trades or other negotiations as well.
- * 
- * 'Items' are items of interest in the game, things to be possessed
- * by the player or others.  The may be animate or inanimate, or may
- * provide special abilities, etc.  The prototypical item is a key,
- * which can be used to unlock a doorway which leads to a prize.
- * 
- * 'Structures' occupy space in the world but cannot be possessed, 
- * such as buildings, permanent fixtures, etc.
- * 
- * This class is the controller of the layout, accepting a number of
- * Others to place on the layout, along with an array of Items to disperse.
- * 
- * This class will NOT be responsible for keeping track of further movement,
- * as each entity or item will keep track of its own location and communicate
- * location changes to the world.
+ * The LayoutManager manages the layout and the SceneController.
+ * Its events have to do with updating the layout in localStorage.
+ * It receives props (level, layouts[]) from the Game, and a Hero
+ * object with launch.  It then passes the hero, current layout,
+ * eventDepot and allObjects objects to the Scene Controller.
  */
 
 import { LevelBuilder } from './levelBuilder.js';
@@ -39,8 +17,8 @@ class LayoutManager {
 
     constructor(props, eventDepot) {
 
-        this.props = props;
-        this.level = props.level;
+        this.props = localStorage.getItem('gameProps')? JSON.parse(localStorage.getItem('gameProps')): props;
+        this.props.level = props.level;
         this.eventDepot = eventDepot;
 
         this.allItems = Items;
@@ -52,13 +30,16 @@ class LayoutManager {
         
         this.layout = {};
         
-        if (props.layouts[this.level]) {
-            this.layout = props.layouts[this.level];
+
+
+        if (this.props.layouts[this.props.level]) {
+            this.layout = this.props.layouts[this.props.level];
         } else {
-            this.levelBuilder = new LevelBuilder(this.level);
+            this.levelBuilder = new LevelBuilder(this.props.level);
             this.layout = this.levelBuilder.getLayout();
         }
 
+        this.cacheLayout();
         this.addEventListeners();
     }
 
@@ -82,15 +63,19 @@ class LayoutManager {
             this.cacheLayout();
         });
 
-        this.eventDepot.addListener('saveLayout', (uuid) => {
+        this.eventDepot.addListener('saveLayout', () => {
             this.cacheLayout();
         });
 
         this.eventDepot.addListener('updateStructureAttributes', (data) => {
             // {uuid: thisObj.uuid, attributes: thisObj.attributes}
             var index = this.layout.structures.findIndex(el => el.uuid == data.uuid);
-            this.layout.structures[index].attributes = {...this.layout.structures[index].attributes, ...data.attributes};
-            this.cacheLayout();
+            if (index == -1) {
+                console.log('NOT FOUND');
+            } else {
+                this.layout.structures[index].attributes = {...this.layout.structures[index].attributes, ...data.attributes};
+                this.cacheLayout();
+            }
         });
 
     }
@@ -108,7 +93,15 @@ class LayoutManager {
 
     cacheLayout() {
         let currentProps = JSON.parse(localStorage.getItem('gameProps'));
-        currentProps.layouts[this.level] = this.layout;
+        
+        if (currentProps) {
+            currentProps.level = this.props.level;
+            currentProps.layouts[this.props.level] = this.layout;
+        } else {
+            currentProps = { level: this.props.level };
+            currentProps.layouts = [];
+            currentProps.layouts[this.props.level] = this.layout;
+        }
         localStorage.setItem('gameProps', JSON.stringify(currentProps));
     }
 

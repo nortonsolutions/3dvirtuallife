@@ -334,6 +334,8 @@ class Scene {
         this.layout.items.forEach(item => this.seedObject3D(item));
         this.layout.structures.forEach(structure => this.seedObject3D(structure));
         this.layout.entities.forEach(entity => this.seedObject3D(entity));
+        this.controller.eventDepot.fire('saveLayout', {});
+
     }
 
     /** 
@@ -382,12 +384,11 @@ class Scene {
     }
 
     onMouseClick = (e) => {
-        console.log(`Controls object:`);
-        console.dir(this.controls.getObject().position);
+        // console.log(`Controls object:`);
+        // console.dir(this.controls.getObject().position);
 
-        console.log(`Objects3D object:`);
-        console.dir(this.controller.objects3D);
-
+        // console.log(`Objects3D object:`);
+        // console.dir(this.controller.objects3D);
     }
 
     onMouseDown = (e) => {
@@ -710,10 +711,10 @@ class Scene {
             if (this.controller.mixers.hero.standingUpon && this.controller.mixers.hero.standingUpon.attributes.routeTo && typeof this.controller.mixers.hero.standingUpon.attributes.routeTo.level == "number") {
                 if (this.controller.mixers.hero.standingUpon.attributes.unlocked) {
                     
-                    this.controller.eventDepot.fire('saveLayout');
+                    this.controller.eventDepot.fire('saveLayout', {});
 
                     let loadData = {
-                        hero: this.hero.basic(),
+
                         level: this.controller.mixers.hero.standingUpon.attributes.routeTo.level,
                         location: this.controller.mixers.hero.standingUpon.attributes.routeTo.location,
                     }

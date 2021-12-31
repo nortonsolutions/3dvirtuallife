@@ -13,57 +13,44 @@ import { Hero } from '/hero.js';
 
 class Game {
 
-    constructor(props, eventDepot) {
+    constructor(props, heroTemplate, eventDepot) {
 
         this.props = props;
-        this.setLocalStorage();
-
+        this.heroTemplate = heroTemplate;
         this.eventDepot = eventDepot;
-        this.hero = new Hero(props.hero, this.eventDepot);
 
-        // this.addQueryGameListener = this.addQueryGameListener.bind(this);
-        // this.addQueryGameListener();
+        this.hero = new Hero(this.heroTemplate, this.eventDepot);
+
+        this.stop = this.stop.bind(this);
+        this.start = this.start.bind(this);
+
+        eventDepot.addListener('loadLevel', (data) => {
+            this.eventDepot.fire('unlockControls', {});
+            if (this.layoutManager) this.stop();
+    
+            this.props.level = data.level;
+            this.hero.location = data.location;
+            this.hero.location.x -= 1;
+            
+            this.start();
+        });
+
+        eventDepot.addListener('saveLocalStorage', () => {
+            saveLocalStorage();
+        });
     }
 
     stop() {
-        // this.eventDepot.removeListeners('queryGame');
         this.layoutManager.shutdown();
-        this.hero.stop();
-        
         this.layoutManager = null;
-        this.hero = null;
-    }
-
-    // addQueryGameListener() {
-    //     this.eventDepot.addListener('queryGame', (data) => {
-    //         let {key, queryName, args} = data;
-    //         let response = null;
-    //         switch (queryName) {
-    //             case 'swapInventoryPositions':
-    //                 this.hero.swapInventoryPositions(args.first, args.second);
-    //                 break;
-    //         }
-    //         this.eventDepot.fire('gameResponse' + key, response);
-    //     })
-    // }
-
-    setLevel(level) {
-        this.props.level = level;
-    }
-
-    setLocalStorage() {
-        localStorage.setItem('gameProps', JSON.stringify(this.props));
-    }
-
-    getLocalStorage() {
-        return JSON.parse(localStorage.getItem('gameProps'));
+        // this.hero.stop();
+        // this.hero = null;
     }
 
     start() {
 
         this.layoutManager = new LayoutManager(this.props, this.eventDepot);
         this.layoutManager.launch(this.hero);
-
     }
 }
 
@@ -76,36 +63,30 @@ class Game {
 */
 class GameAPI {
     
-    constructor() {
-
-    }
+    constructor() {}
     
     /**
      * Fresh game props from scratch with only personal details provided.
      */
-    newGame(name,height) {
+    newHeroTemplate(name,height) {
         return {
-            hero: {
-                name: name,
-                type: "hero",
-                location: { x: 0, y: 0, z: 0 },
-                attributes: {
-                    moves: true,
-                    height: height,
-                    scale: 10,
-                    elevation: 0,
-                    life: 0,
-                    manna: 0,
-                    strength: 1,
-                    agility: 3
-                },
-                gltf: 'robot.glb',
-                model: null,
-                inventory: [],
-                equipped: {}
+            name: name,
+            type: "hero",
+            location: { x: 0, y: 0, z: 0 },
+            attributes: {
+                moves: true,
+                height: height,
+                scale: 10,
+                elevation: 0,
+                life: 0,
+                manna: 0,
+                strength: 1,
+                agility: 3
             },
-            level: 0,
-            layouts: []
+            gltf: 'robot.glb',
+            model: null,
+            inventory: [],
+            equipped: {}
         }
     }
 

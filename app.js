@@ -1,6 +1,7 @@
 /**
 * This index module has the primary EventDepot, GameAPI, Game, and SceneController.
-* It handles events which deal with HTML user interaction like the modal display.
+* It handles events which deal with HTML user interaction like the modal display,
+* saving and loading props and hero template from localStorage, starting or joining games.
 */
 import { EventDepot } from '/public/eventDepot.js';
 import { Game, GameAPI } from '/game.js';
@@ -10,8 +11,9 @@ export const app = () => {
 
     var gameAPI = new GameAPI();
 
-    var game;
-    var props;
+    var game = null;
+    var props = { level: 0, layouts: [] }
+    var heroTemplate = gameAPI.newHeroTemplate('dave', 20);
 
     var eventDepot = new EventDepot();
     var modal = new Modal(eventDepot);
@@ -20,20 +22,7 @@ export const app = () => {
 
     const addEventListeners = () => {
         
-        eventDepot.addListener('loadLevel', (data) => {
-            game.eventDepot.fire('unlockControls', {});
-            game.stop();
-
-            props.hero = data.hero;
-            props.level = data.level;
-            props.layouts = JSON.parse(localStorage.getItem('gameProps')).layouts;
-            props.hero.location = data.location;
-            props.hero.location.x -= 1;
-            startGame(data.level);
-        });
-
         eventDepot.addListener('showDescription', (data) => {
-
             let description = JSON.parse(localStorage.getItem('gameObjects'))[data.objectName].description;
             document.getElementById('message').innerHTML = description;
         });
@@ -55,8 +44,35 @@ export const app = () => {
         Array.from(document.querySelectorAll('.startGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
+                startGame();
+            })
+        })
+
+        Array.from(document.querySelectorAll('.clearGame')).forEach(el => {
+            el.addEventListener('click', e => {
+                e.preventDefault();
                 localStorage.clear();
-                startGame(-1);
+            })
+        })
+
+        Array.from(document.querySelectorAll('.saveGame')).forEach(el => {
+            el.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Send the following data to the server for saving
+                console.log(localStorage.getItem('gameProps'));
+                console.log(localStorage.getItem('gameHeroTemplate'));
+
+            })
+        })
+
+        Array.from(document.querySelectorAll('.loadGame')).forEach(el => {
+            el.addEventListener('click', e => {
+                e.preventDefault();
+
+                // MOCK DATA loading existing game for now, for gameHeroTemplate and gameProps
+                props = localStorage.getItem('gameProps');
+                heroTemplate = localStorage.getItem('gameHeroTemplate');
                 
             })
         })
@@ -64,16 +80,10 @@ export const app = () => {
 
     addEventListeners();
 
-    const startGame = (level) => {
-
-        if (level == -1) {
-            props = 
-            localStorage.getItem('gameProps')? 
-            JSON.parse(localStorage.getItem('gameProps')): 
-            gameAPI.newGame('Dave', 20);
-        }
+    const startGame = () => {
         
-        game = new Game(props, eventDepot);
+        if (game && game.layoutManager) game.stop();
+        game = new Game(props, heroTemplate, eventDepot);
         game.start();
 
     }
