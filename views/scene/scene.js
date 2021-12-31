@@ -352,6 +352,9 @@ class Scene {
             
             if (object.attributes.animates) {
                 this.controller.createMixer( model, gltf.animations, model.uuid );
+                if (object.attributes.unlocked) {
+                    this.controller.mixers[model.uuid].activeAction.play();
+                }
             }
 
             if (object.attributes.contentItems) {
@@ -529,7 +532,7 @@ class Scene {
             let mixers = this.controller.mixers;
             Object.keys(mixers).forEach(key => {
                 
-                
+
                 if (mixers[key].moves) {
                     mixers[key].absVelocity = Math.max(Math.abs(mixers[key].velocity.x), Math.abs(mixers[key].velocity.z));
     
@@ -812,14 +815,13 @@ class Scene {
 
     deanimate(callback) {
         this.running = false;
-        document.getElementById('minimap').firstElementChild.remove();
-
-
+        if (document.getElementById('minimap').firstElementChild) document.getElementById('minimap').firstElementChild.remove();
         callback();
     }
 
     unregisterEventListeners = () => {
-        this.instructions.removeEventListener( 'click', this.controls.lock, false );
+        if (this.instructions) this.instructions.removeEventListener( 'click', this.controls.lock, false );
+        
         document.removeEventListener( 'keydown', this.onKeyDown, false );
         document.removeEventListener( 'keyup', this.onKeyUp, false );
         window.removeEventListener( 'resize', this.onWindowResize, false );

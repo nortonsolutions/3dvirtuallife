@@ -20,7 +20,7 @@ class InventoryScreen {
     
         var context = { equipped: {}, inventory: [], pageNumber: pageNumber };
         
-        var hero = JSON.parse(localStorage.getItem('gameHero'));
+        var hero = JSON.parse(localStorage.getItem('gameHeroTemplate'));
         var gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
         
         Object.keys(hero.equipped).forEach(bodyPart => {
