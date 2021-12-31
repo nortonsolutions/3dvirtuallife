@@ -8,7 +8,7 @@ export const Items = {
         attributes: {
             animates: false,
             scale: 100,
-            elevation: 10
+            elevation: 20
         }
     },
     keyToChest: {
@@ -46,7 +46,7 @@ export const Items = {
             equippable: ['handR', 'handL'],
             animates: false,
             scale: 100,
-            elevation: 10
+            elevation: 20
         } 
     },
     torch: {

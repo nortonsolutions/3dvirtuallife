@@ -98,7 +98,7 @@ class InventoryScreen {
             // var quantId = data[2]; // id of quantity element
             var index = data[3];  // inventory # ... or bodyPart by name
             
-            if (index.length < 2) { // source is inventory
+            if (index.length < 3) { // source is inventory
                 
                 if (! Array.from(targetElement.classList).includes('body')) { // To another slot
 
@@ -148,7 +148,8 @@ class InventoryScreen {
 
             let dropData = {
                 itemName: data[0],
-                location: this.location
+                location: this.location,
+                source: data[3]
             }
 
             this.eventDepot.fire('dropItemToScene', dropData);

@@ -86,9 +86,17 @@ class LayoutManager {
             this.cacheLayout();
         });
 
+        this.eventDepot.addListener('updateStructureAttributes', (data) => {
+            // {uuid: thisObj.uuid, attributes: thisObj.attributes}
+            var index = this.layout.structures.findIndex(el => el.uuid == data.uuid);
+            this.layout.structures[index].attributes = {...this.layout.structures[index].attributes, ...data.attributes};
+            this.cacheLayout();
+        });
+
     }
 
     shutdown() {
+        this.eventDepot.removeListeners('updateStructureAttributes');
         this.eventDepot.removeListeners('removeItemFromLayout');
         this.eventDepot.removeListeners('addItemToLayout');
         this.eventDepot.removeListeners('saveLayout');

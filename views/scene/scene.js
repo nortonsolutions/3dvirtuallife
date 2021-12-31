@@ -287,7 +287,7 @@ class Scene {
     }
 
     addSconces = (object) => {
-        if (/sconce/i.test(object.name)) {
+        if (/^sconce/i.test(object.name)) {
 
             let fireObj = this.controller.getFire();
             // this.fireParams.Torch();
@@ -423,7 +423,7 @@ class Scene {
                             true;
                         
                         if (accessible) {
-                            thisObj.attributes.unlocked = true;
+                            this.updateStructureAttributes(thisObj, {unlocked: true});
                             if (mixers[thisObj.uuid] && mixers[thisObj.uuid].activeAction) {
                                 this.controller.runActiveAction(thisObj.uuid, 0.2);
                             }
@@ -437,6 +437,11 @@ class Scene {
                 moveForward = true;
                 break;
         }
+    }
+
+    updateStructureAttributes = (object, payload) =>  {
+        object.attributes = {...object.attributes, ...payload};
+        this.controller.eventDepot.fire('updateStructureAttributes', {uuid: object.uuid, attributes: payload});
     }
 
     onMouseUp = (e) => {

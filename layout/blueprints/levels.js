@@ -73,6 +73,7 @@ export const levels = [
             Entities.john,
             Entities.evilOne,
             Entities.evilOne
+
         ]
     },
     {

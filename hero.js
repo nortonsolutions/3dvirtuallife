@@ -72,7 +72,12 @@ export class Hero {
         });
 
         this.eventDepot.addListener('dropItemToScene', (data) => {
-            this.removeFromInventory(data.itemName);
+            
+            if (data.source.length < 3) {  // inventory
+                this.removeFromInventory(data.itemName);
+            } else { // equipped
+                this.unequip(data.source);
+            }
             this.cacheHero();
         });
 
