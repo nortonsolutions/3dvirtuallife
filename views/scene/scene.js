@@ -334,7 +334,7 @@ class Scene {
         this.layout.items.forEach(item => this.seedObject3D(item));
         this.layout.structures.forEach(structure => this.seedObject3D(structure));
         this.layout.entities.forEach(entity => this.seedObject3D(entity));
-        this.controller.eventDepot.fire('saveLayout', {});
+        this.controller.eventDepot.fire('cacheLayout', {});
 
     }
 
@@ -537,13 +537,16 @@ class Scene {
                 if (mixers[key].moves) {
                     mixers[key].absVelocity = Math.max(Math.abs(mixers[key].velocity.x), Math.abs(mixers[key].velocity.z));
     
-
-                    if (mixers[key].absVelocity < .1 && (mixers[key].activeActionName == 'Walking' || mixers[key].activeActionName == 'Running')) {
-                        this.controller.fadeToAction( key, 'Idle', 0.2);
-                    } else if (mixers[key].absVelocity >= .1 && mixers[key].activeActionName == 'Idle') {
-                        this.controller.fadeToAction( key, 'Walking', 0.2);
-                    } else if (mixers[key].absVelocity >= 199 && mixers[key].activeActionName == 'Walking') {
-                        this.controller.fadeToAction( key, 'Running', 0.2);
+                    if (mixers[key].name != "rat") {
+                        if (mixers[key].absVelocity < .1 && (mixers[key].activeActionName == 'Walking' || mixers[key].activeActionName == 'Running')) {
+                            this.controller.fadeToAction( key, 'Idle', 0.2);
+                        } else if (mixers[key].absVelocity >= .1 && mixers[key].activeActionName == 'Idle') {
+                            this.controller.fadeToAction( key, 'Walking', 0.2);
+                        } else if (mixers[key].absVelocity >= 199 && mixers[key].activeActionName == 'Walking') {
+                            this.controller.fadeToAction( key, 'Running', 0.2);
+                        }
+                    } else {
+                        
                     }
                 }
 
@@ -711,7 +714,7 @@ class Scene {
             if (this.controller.mixers.hero.standingUpon && this.controller.mixers.hero.standingUpon.attributes.routeTo && typeof this.controller.mixers.hero.standingUpon.attributes.routeTo.level == "number") {
                 if (this.controller.mixers.hero.standingUpon.attributes.unlocked) {
                     
-                    this.controller.eventDepot.fire('saveLayout', {});
+                    this.controller.eventDepot.fire('cacheLayout', {});
 
                     let loadData = {
 

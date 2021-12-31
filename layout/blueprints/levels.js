@@ -36,9 +36,7 @@ export const levels = [
             Structures.grate
         ],
         entities: [
-            Entities.evilOne,
-            Entities.evilOne,
-            Entities.john
+            Entities.rat
         ]
     },
     {
@@ -72,7 +70,9 @@ export const levels = [
         entities: [
             Entities.john,
             Entities.evilOne,
-            Entities.evilOne
+            Entities.evilOne,
+            Entities.rat
+
 
         ]
     },

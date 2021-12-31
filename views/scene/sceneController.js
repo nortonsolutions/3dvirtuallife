@@ -384,6 +384,9 @@ export class SceneController {
             this.mixers[uuid].activeActionName = actionName;
             this.mixers[uuid].activeAction = newAction;
 
+            if (this.mixers[uuid] != "rat") {
+                // console.log('test');
+            }
             this.mixers[uuid].previousAction.fadeOut( duration );
 
             this.mixers[uuid].activeAction

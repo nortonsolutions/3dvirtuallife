@@ -63,7 +63,7 @@ class LayoutManager {
             this.cacheLayout();
         });
 
-        this.eventDepot.addListener('saveLayout', () => {
+        this.eventDepot.addListener('cacheLayout', () => {
             this.cacheLayout();
         });
 
@@ -84,7 +84,7 @@ class LayoutManager {
         this.eventDepot.removeListeners('updateStructureAttributes');
         this.eventDepot.removeListeners('removeItemFromLayout');
         this.eventDepot.removeListeners('addItemToLayout');
-        this.eventDepot.removeListeners('saveLayout');
+        this.eventDepot.removeListeners('cacheLayout');
         
         this.sceneController.deanimateScene(() => {
             this.sceneController = null;
