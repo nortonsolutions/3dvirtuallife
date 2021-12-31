@@ -11,12 +11,8 @@ export const app = () => {
     var gameAPI = new GameAPI();
 
     var game;
+    var props;
 
-    var props = 
-    localStorage.getItem('gameProps')? 
-    JSON.parse(localStorage.getItem('gameProps')): 
-    gameAPI.newGame('Dave', 20);
-    
     var eventDepot = new EventDepot();
     var modal = new Modal(eventDepot);
     
@@ -33,7 +29,7 @@ export const app = () => {
             props.layouts = JSON.parse(localStorage.getItem('gameProps')).layouts;
             props.hero.location = data.location;
             props.hero.location.x -= 1;
-            startGame();
+            startGame(data.level);
         });
 
         eventDepot.addListener('showDescription', (data) => {
@@ -59,7 +55,8 @@ export const app = () => {
         Array.from(document.querySelectorAll('.startGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
-                startGame();
+                localStorage.clear();
+                startGame(-1);
                 
             })
         })
@@ -67,7 +64,14 @@ export const app = () => {
 
     addEventListeners();
 
-    const startGame = () => {
+    const startGame = (level) => {
+
+        if (level == -1) {
+            props = 
+            localStorage.getItem('gameProps')? 
+            JSON.parse(localStorage.getItem('gameProps')): 
+            gameAPI.newGame('Dave', 20);
+        }
         
         game = new Game(props, eventDepot);
         game.start();
