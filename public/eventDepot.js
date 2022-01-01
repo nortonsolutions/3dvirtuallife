@@ -30,6 +30,12 @@ class EventDepot {
     removeListeners(eventName) {
         delete this.eventRegistry[eventName];
     }
+
+    /* Listener function must be named */
+    removeListener(eventName, uniqueId) {
+        this.eventRegistry[eventName] = this.eventRegistry[eventName].filter(el => el.name != uniqueId);
+        console.dir(this.eventRegistry[eventName]);
+    }
 }
 
 export { EventDepot };

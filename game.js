@@ -80,7 +80,7 @@ class GameAPI {
                 elevation: 0,
                 stats: {
                     health: "05/05",
-                    manna: "00/00",
+                    mana: "00/00",
                     strength: "01/01",
                     agility: "03/03"
                 }
@@ -88,7 +88,9 @@ class GameAPI {
             gltf: 'robot.glb',
             model: null,
             inventory: [],
+            spells: [],
             equipped: {}
+
         }
     }
 

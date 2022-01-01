@@ -10,19 +10,11 @@ class Modal {
         eventDepot.addListener('modal', (data) => {
 
             eventDepot.fire('unlockControls', {});
-            var context;
-        
-            switch (data.type) {
-                case 'inventory': 
-                    context = this.inventoryScreen.getInventoryContext(0);
-                    break;
-                
-                default:
-        
-            }
+            var context = this.inventoryScreen.getContext(data.type, 0);
             
             this.loadTemplate('modal-body', data.type, context, () => {
-                if (data.type == "inventory") this.inventoryScreen.addInventoryEvents();
+                if (data.type == "inventory" || data.type == "spells") 
+                this.inventoryScreen.addInventoryEvents(data.type);
             });
             
             var modal = document.getElementById('myModal');

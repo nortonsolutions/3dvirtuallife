@@ -16,6 +16,7 @@ export class Hero {
         this.model = hero.model;
         this.attributes = hero.attributes;
         this.inventory = hero.inventory;
+        this.spells = hero.spells;
         this.equipped = hero.equipped;
         this.eventDepot = eventDepot;
         
@@ -72,13 +73,13 @@ export class Hero {
             this.cacheHero();
         });
 
-        this.eventDepot.addListener('setHeroStat', (type, points) => {
-            this.attributes.stats[type] = points + '/' + this.attributes[type].split('/')[1];
-            this.cacheHero();s
+        this.eventDepot.addListener('setHeroStat', (data) => {
+            this.attributes.stats[data.type] = data.points + this.attributes.stats[data.type].substring(2);
+            this.cacheHero();
         })
 
-        this.eventDepot.addListener('setHeroStatMax', (type, points) => {
-            this.attributes.stats[type] = this.attributes[type].split('/')[0] + '/' + points;
+        this.eventDepot.addListener('setHeroStatMax', (data) => {
+            this.attributes.stats[data.type] = this.attributes.stats[data.type].substring(0,3) + data.points;
             this.cacheHero();
         })
 
@@ -114,6 +115,8 @@ export class Hero {
         return max;
     }
 
+
+    
     addToInventory(itemName, desiredIndex) {
 
         var quantity;
@@ -154,7 +157,6 @@ export class Hero {
             this.inventory[index] = null;
             return 0;
         }
-
     }
 
     swapInventoryPositions(first,second) {
@@ -190,6 +192,7 @@ export class Hero {
             gltf: this.gltf,
             model: null,
             inventory: this.inventory,
+            spells: this.spells,
             equipped: this.equipped
         }
     }

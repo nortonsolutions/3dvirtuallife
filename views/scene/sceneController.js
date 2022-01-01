@@ -49,6 +49,11 @@ export class SceneController {
 
         this.addEventListeners = this.addEventListeners.bind(this);
         this.deanimateScene = this.deanimateScene.bind(this);
+
+        this.takeItemFromScene = this.takeItemFromScene.bind(this);
+        this.dropItemToScene = this.dropItemToScene.bind(this);
+        this.equipItem = this.equipItem.bind(this);
+
         this.addEventListeners();
     }
 
@@ -62,9 +67,9 @@ export class SceneController {
 
     deanimateScene(callback) {
 
-        this.eventDepot.removeListeners('takeItemFromScene');
-        this.eventDepot.removeListeners('dropItemToScene');
-        this.eventDepot.removeListeners('equipItem');
+        this.eventDepot.removeListener('takeItemFromScene', 'bound takeItemFromScene');
+        this.eventDepot.removeListener('dropItemToScene', 'bound dropItemToScene');
+        this.eventDepot.removeListener('equipItem', 'bound equipItem');
 
         this.scene.unregisterEventListeners();
         this.scene.deanimate(() => {
@@ -82,67 +87,71 @@ export class SceneController {
         return this.allObjects[name];
     }
 
+    takeItemFromScene(data) {
+        this.removeFromScenebyUUID(data.uuid);
+        this.eventDepot.fire('removeItemFromLayout', data.uuid);
+    }
+
+    dropItemToScene(data) {
+        let object = this.getObjectByName(data.itemName);
+        this.loadObject3DbyName(data.itemName, (gltf) => {
+            let model = gltf.scene;
+            model.position.copy(this.scene.controls.getObject().position);
+            model.position.y = this.determineElevationGeneric(model.position.x, model.position.y, data.itemName) + object.attributes.elevation;
+            this.scene.scene.add(model);
+            this.addToObjects3D(model);
+
+            data.uuid = model.uuid;
+            this.eventDepot.fire('addItemToLayout', data);
+        })
+    }
+
+    equipItem(data) {
+
+        let area = data.bodyPart;
+        this.loadObject3DbyName(data.itemName, (itemGltf) => {
+
+            let item = itemGltf.scene;
+            item.position.set(0,0,0);
+            item.rotation.y = Math.PI;
+            item.scale.copy(new THREE.Vector3( .1,.1,.1 ));
+    
+            if (item.objectName == "torch") {
+    
+                let fireObj = this.getFire();
+
+                // this.fireParams.Torch();
+                fireObj.scale.set(.04, .01, .04);
+                fireObj.translateY(.08);
+                fireObj.translateZ(-.32);
+                fireObj.translateX(.01);
+                fireObj.rotateX(-Math.PI/5);
+                fireObj.rotateZ(-Math.PI/20);
+
+                item.add(fireObj);
+
+                switch (area) {
+                    case "Middle2R_end": 
+                        item.rotation.z = -Math.PI/5;
+                        break;
+                    case "Middle2L_end":
+                        //item.rotation.z = Math.PI/8;
+                        break;
+                    default:
+                }
+
+            } 
+            
+            this.hero.model.getObjectByName(area).add(item);
+            
+        });
+    }
+
     addEventListeners() {
 
-        this.eventDepot.addListener('takeItemFromScene', (data) => {
-            this.removeFromScenebyUUID(data.uuid);
-            this.eventDepot.fire('removeItemFromLayout', data.uuid);
-        });
-
-        this.eventDepot.addListener('dropItemToScene', (data) => {
-            let object = this.getObjectByName(data.itemName);
-            this.loadObject3DbyName(data.itemName, (gltf) => {
-                let model = gltf.scene;
-                model.position.copy(this.scene.controls.getObject().position);
-                model.position.y = this.determineElevationGeneric(model.position.x, model.position.y, data.itemName) + object.attributes.elevation;
-                this.scene.scene.add(model);
-                this.addToObjects3D(model);
-
-                data.uuid = model.uuid;
-                this.eventDepot.fire('addItemToLayout', data);
-            })
-        });
-
-        this.eventDepot.addListener('equipItem', (data) => {
-
-            let area = data.bodyPart;
-            this.loadObject3DbyName(data.itemName, (itemGltf) => {
-
-                let item = itemGltf.scene;
-                item.position.set(0,0,0);
-                item.rotation.y = Math.PI;
-                item.scale.copy(new THREE.Vector3( .1,.1,.1 ));
-        
-                if (item.objectName == "torch") {
-        
-                    let fireObj = this.getFire();
-
-                    // this.fireParams.Torch();
-                    fireObj.scale.set(.04, .01, .04);
-                    fireObj.translateY(.08);
-                    fireObj.translateZ(-.32);
-                    fireObj.translateX(.01);
-                    fireObj.rotateX(-Math.PI/5);
-                    fireObj.rotateZ(-Math.PI/20);
-    
-                    item.add(fireObj);
-    
-                    switch (area) {
-                        case "Middle2R_end": 
-                            item.rotation.z = -Math.PI/5;
-                            break;
-                        case "Middle2L_end":
-                            //item.rotation.z = Math.PI/8;
-                            break;
-                        default:
-                    }
-
-                } 
-                
-                this.hero.model.getObjectByName(area).add(item);
-                
-            });
-        })
+        this.eventDepot.addListener('takeItemFromScene', this.takeItemFromScene);
+        this.eventDepot.addListener('dropItemToScene', this.dropItemToScene);
+        this.eventDepot.addListener('equipItem', this.equipItem)
         
     }
 

@@ -7,10 +7,12 @@
  */
 
 import { LevelBuilder } from './levelBuilder.js';
+import { Spells } from './blueprints/spells.js';
 import { Items } from './blueprints/items.js';
 import { Entities } from './blueprints/entities.js';
 import { Structures } from './blueprints/structures.js';
 import { SceneController } from '/scene/sceneController.js'
+
 
 
 class LayoutManager {
@@ -24,7 +26,8 @@ class LayoutManager {
         this.allItems = Items;
         this.allStructures = Structures;
         this.allEntities = Entities;
-        this.allObjects = {...Items, ...Structures, ...Entities, ...{ floor: { description: "floor"}}};
+        this.allSpells = Spells;
+        this.allObjects = {...Items, ...Structures, ...Entities, ...Spells, ...{ floor: { description: "floor"}}};
 
         localStorage.setItem('gameObjects', JSON.stringify(this.allObjects));
         
@@ -115,6 +118,10 @@ class LayoutManager {
 
     getAllEntities() {
         return this.allEntities;
+    }
+
+    getAllSpells() {
+        return this.allSpells;
     }
 
     getLayout() {

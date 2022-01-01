@@ -13,7 +13,7 @@ export const Entities = {
             elevation: 0,
             stats: {
                 health: "02/02",
-                manna: "00/00",
+                mana: "00/00",
                 strength: "01/01",
                 agility: "01/01"
             }
@@ -33,7 +33,7 @@ export const Entities = {
             elevation: 0,
             stats: {
                 health: "02/02",
-                manna: "00/00",
+                mana: "00/00",
                 strength: "01/01",
                 agility: "01/01"
             }

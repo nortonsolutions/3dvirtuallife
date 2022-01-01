@@ -205,10 +205,16 @@ class Scene {
             case 73: // i
                 this.updateHeroLocation(false);
                 this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
+                break;
+                
+            case 82: // r
+                this.controller.eventDepot.fire('modal', { type: 'spells', title: 'Spells' });
+                break;
 
             case 77: // m
                 minimap = !minimap;
                 this.controller.eventDepot.fire('minimap', {});
+                break;
         }
 
     };
@@ -274,8 +280,7 @@ class Scene {
             this.controller.floor.objectType = "floor"; 
             this.setToRenderDoubleSided(this.controller.floor);
 
-            // Iterate through the floor and add torches to all the sconces
-            this.addSconces(this.controller.floor);
+            // this.addSconces(this.controller.floor);
             this.scene.add( this.controller.floor );
             this.controller.objects3D.push(this.controller.floor);
             setTimeout(() => {
@@ -496,11 +501,11 @@ class Scene {
 
         {/* <div id="heroStats" class="d-none">
             Health: <meter id="health" low="30" high="70" max="100" value="0" optimum="90"></meter>
-            Manna: <meter id="manna" low="30" high="70" max="100" value="0" optimum="90"></meter>
+            Mana: <meter id="mana" low="30" high="70" max="100" value="0" optimum="90"></meter>
         </div> */}
 
         this.controller.eventDepot.addListener('setHeroStat', (data) => {
-            if (data.type == "health" || data.type == "manna") {
+            if (data.type == "health" || data.type == "mana") {
                 let el = document.getElementById(data.type);
                 el.value = data.points;
                 el.innerText = data.points;
@@ -508,12 +513,12 @@ class Scene {
         })
 
         this.controller.eventDepot.addListener('setHeroStatMax', (data) => {
-            if (data.type == "health" || data.type == "manna") {
+            if (data.type == "health" || data.type == "mana") {
                 let el = document.getElementById(data.type);
-                el.attributes.max = data.points;
-                el.attributes.optimum = Math.floor(data.points*.9);
-                el.attributes.low = Math.floor(data.points*.3);
-                el.attributes.high = Math.floor(data.points*.7);
+                el.max = data.points;
+                el.optimum = Math.floor(data.points*.9);
+                el.low = Math.floor(data.points*.3);
+                el.high = Math.floor(data.points*.7);
             }
         })
 
