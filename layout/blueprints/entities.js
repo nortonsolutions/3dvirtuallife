@@ -11,10 +11,12 @@ export const Entities = {
             elevation: 0,
             scale: 10,
             elevation: 0,
-            strength: 0,
-            agility: 1,
-            wisdom: 0,
-            life: 2
+            stats: {
+                health: "02/02",
+                manna: "00/00",
+                strength: "01/01",
+                agility: "01/01"
+            }
         }
     },
     rat: {
@@ -29,10 +31,12 @@ export const Entities = {
             elevation: 0,
             scale: 100,
             elevation: 0,
-            strength: 0,
-            agility: 1,
-            wisdom: 0,
-            life: 2
+            stats: {
+                health: "02/02",
+                manna: "00/00",
+                strength: "01/01",
+                agility: "01/01"
+            }
         }
     },
     john: {
@@ -46,11 +50,13 @@ export const Entities = {
             height: 20,
             elevation: 0,
             scale: 10,
-            agility: 1,
             elevation: 0,
             conversation: [],
             offers: [],
-            accepts: []
+            accepts: [],
+            stats: {
+                agility: "01/01"
+            }
         }
     }
 }

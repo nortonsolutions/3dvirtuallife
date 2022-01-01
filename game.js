@@ -78,10 +78,12 @@ class GameAPI {
                 height: height,
                 scale: 10,
                 elevation: 0,
-                life: 0,
-                manna: 0,
-                strength: 1,
-                agility: 3
+                stats: {
+                    health: "05/05",
+                    manna: "00/00",
+                    strength: "01/01",
+                    agility: "03/03"
+                }
             },
             gltf: 'robot.glb',
             model: null,

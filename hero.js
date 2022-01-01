@@ -72,6 +72,16 @@ export class Hero {
             this.cacheHero();
         });
 
+        this.eventDepot.addListener('setHeroStat', (type, points) => {
+            this.attributes.stats[type] = points + '/' + this.attributes[type].split('/')[1];
+            this.cacheHero();s
+        })
+
+        this.eventDepot.addListener('setHeroStatMax', (type, points) => {
+            this.attributes.stats[type] = this.attributes[type].split('/')[0] + '/' + points;
+            this.cacheHero();
+        })
+
         this.eventDepot.addListener('dropItemToScene', (data) => {
             
             if (data.source.length < 3) {  // inventory

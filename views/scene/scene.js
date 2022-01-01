@@ -61,7 +61,7 @@ class Scene {
 
     init(callback) {
 
-        navbarHeight = document.querySelector('.navbar').clientHeight;
+        navbarHeight = 0; // document.querySelector('.navbar').clientHeight;
     
         this.camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / (SCREEN_HEIGHT - navbarHeight), 1, cameraReach );
         this.camera.position.set( 0, cameraElevationDefault + this.hero.attributes.height, cameraDistanceDefault );
@@ -84,7 +84,7 @@ class Scene {
             document.body.appendChild( this.stats.dom );
     
             this.addEventListeners();
-            
+
 
             if (callback) callback();
         });
@@ -324,10 +324,27 @@ class Scene {
             
             controlsObj.attributes = this.hero.attributes;
             controlsObj.add( model );
-            
+
             this.controller.createMixer( model, gltf.animations, "hero" );
             this.updateHeroLocation(true);
+            this.updateHeroStats();
         })
+    }
+
+    updateHeroStats = () => {
+
+        Object.keys(this.hero.attributes.stats).forEach(stat => {
+            
+            let points = this.hero.attributes.stats[stat].split('/')
+            let cur = points[0];
+            let max = points[1];
+
+            this.controller.eventDepot.fire('setHeroStatMax', { type: stat, points: max});
+            this.controller.eventDepot.fire('setHeroStat', { type: stat, points: cur});
+
+        })
+
+        document.getElementById('heroStats').classList.remove('d-none');
     }
 
     seedObjects3D = () => {
@@ -477,6 +494,29 @@ class Scene {
         this.blocker = document.getElementById( 'blocker' );
         this.instructions = document.getElementById( 'instructions' );
 
+        {/* <div id="heroStats" class="d-none">
+            Health: <meter id="health" low="30" high="70" max="100" value="0" optimum="90"></meter>
+            Manna: <meter id="manna" low="30" high="70" max="100" value="0" optimum="90"></meter>
+        </div> */}
+
+        this.controller.eventDepot.addListener('setHeroStat', (data) => {
+            if (data.type == "health" || data.type == "manna") {
+                let el = document.getElementById(data.type);
+                el.value = data.points;
+                el.innerText = data.points;
+            }
+        })
+
+        this.controller.eventDepot.addListener('setHeroStatMax', (data) => {
+            if (data.type == "health" || data.type == "manna") {
+                let el = document.getElementById(data.type);
+                el.attributes.max = data.points;
+                el.attributes.optimum = Math.floor(data.points*.9);
+                el.attributes.low = Math.floor(data.points*.3);
+                el.attributes.high = Math.floor(data.points*.7);
+            }
+        })
+
         this.controller.eventDepot.addListener('lockControls', () => {
             this.controls.lock();
         })
@@ -546,7 +586,7 @@ class Scene {
                             this.controller.fadeToAction( key, 'Running', 0.2);
                         }
                     } else {
-                        
+
                     }
                 }
 
@@ -704,8 +744,10 @@ class Scene {
             this.controller.mixers.hero.direction.x = Number( moveLeft ) - Number( moveRight );
             this.controller.mixers.hero.direction.normalize(); // this ensures consistent movements in all directions
             
-            if ( moveForward || moveBackward ) this.controller.mixers.hero.velocity.z -= this.controller.mixers.hero.direction.z * 1000.0 * this.hero.attributes.agility * delta;
-            if ( moveLeft || moveRight ) this.controller.mixers.hero.velocity.x -= this.controller.mixers.hero.direction.x * 1000.0 * this.hero.attributes.agility * delta;
+            let agility = this.hero.attributes.stats.agility.substring(0,2);
+
+            if ( moveForward || moveBackward ) this.controller.mixers.hero.velocity.z -= this.controller.mixers.hero.direction.z * 1000.0 * agility * delta;
+            if ( moveLeft || moveRight ) this.controller.mixers.hero.velocity.x -= this.controller.mixers.hero.direction.x * 1000.0 * agility * delta;
 
             this.identifySelectedObject(this.controls.getObject());
 
@@ -749,8 +791,8 @@ class Scene {
                 this.controller.mixers[entity.uuid].velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
                 // Basic movement always in the z-axis direction for this entity
-                this.controller.mixers[entity.uuid].velocity.z = getRnd(.2,entity.attributes.agility) * 100;
-                this.controller.mixers[entity.uuid].velocity.x = 0; // getRndInteger(.2,entity.attributes.agility) * 100;
+                this.controller.mixers[entity.uuid].velocity.z = getRnd(.2,entity.attributes.stats.agility.substring(0,2)) * 100;
+                this.controller.mixers[entity.uuid].velocity.x = 0;
                 
                 this.controller.mixers[entity.uuid].direction.z = getRnd(-.2,.2);
                 this.controller.mixers[entity.uuid].direction.x = getRnd(-.2,.2);
