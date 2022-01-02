@@ -253,14 +253,6 @@ export class SceneController {
             model.scale.y = object.attributes.scale;
             model.scale.z = object.attributes.scale;
             
-            if (object.equipped) {
-                Object.keys(object.equipped).forEach(bodyPart => {
-                    this.loadObject3DbyName(object.equipped[bodyPart], (itemGltf) => {
-                        object.equip(bodyPart, itemGltf.scene);
-                    })
-                })
-            }
-            
             callback(gltf);
 
         }, undefined, function ( error ) {
@@ -391,11 +383,16 @@ export class SceneController {
                 direction: new THREE.Vector3(),
                 velocity: new THREE.Vector3(),
                 downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength ),
-                movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, 40 ),
+                movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, uniqueId == "hero"? 40 : 80 ),
                 justJumped: false,
                 standingUpon: null,
                 canJump: true,
                 selectedObject: null,
+            }
+
+            if (uniqueId != "hero") {
+                mixerObj.movementRaycasterR = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, 80 )
+                mixerObj.movementRaycasterL = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, 80 )
             }
 
             mixerObj.activeAction.play();
@@ -416,9 +413,6 @@ export class SceneController {
             this.mixers[uuid].activeActionName = actionName;
             this.mixers[uuid].activeAction = newAction;
 
-            if (this.mixers[uuid] != "rat") {
-                // console.log('test');
-            }
             this.mixers[uuid].previousAction.fadeOut( duration );
 
             this.mixers[uuid].activeAction

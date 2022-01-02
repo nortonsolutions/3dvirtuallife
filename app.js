@@ -76,6 +76,13 @@ export const app = () => {
                 
             })
         })
+
+        Array.from(document.querySelectorAll('.quitGame')).forEach(el => {
+            el.addEventListener('click', e => {
+                e.preventDefault();
+
+            })
+        })
     }
 
     addEventListeners();

@@ -36,6 +36,45 @@ export const Items = {
             elevation: 10
         }
     },
+    bluepotion: {
+        name: 'bluepotion',
+        gltf: 'bluepotion.glb',
+        image: 'bluepotion.png',
+        description: 'A glowing blue mana potion',
+        type: 'item',
+        attributes: {
+            animates: false,
+            scale: 5,
+            elevation: 10,
+            mana: 2
+        }
+    },
+    greenpotion: {
+        name: 'greenpotion',
+        gltf: 'greenpotion.glb',
+        image: 'greenpotion.png',
+        description: 'A bubbling green potion',
+        type: 'item',
+        attributes: {
+            animates: false,
+            scale: 5,
+            elevation: 10,
+            damage: 2
+        }
+    },
+    redpotion: {
+        name: 'redpotion',
+        gltf: 'redpotion.glb',
+        image: 'redpotion.png',
+        description: 'A gleaming red life potion',
+        type: 'item',
+        attributes: {
+            animates: false,
+            scale: 5,
+            elevation: 10,
+            health: 2
+        }
+    },
     smallSword: {
         name: 'smallSword',
         gltf: 'broadsword.glb',

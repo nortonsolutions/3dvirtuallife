@@ -27,7 +27,8 @@ export const levels = [
         },
         items: [
             Items.keyToShed,
-            Items.smallSword
+            Items.smallSword,
+            Items.redpotion
         ],
         structures: [
             Structures.shed,

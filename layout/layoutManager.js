@@ -83,7 +83,7 @@ class LayoutManager {
 
     }
 
-    shutdown() {
+    shutdown(callback) {
         this.eventDepot.removeListeners('updateStructureAttributes');
         this.eventDepot.removeListeners('removeItemFromLayout');
         this.eventDepot.removeListeners('addItemToLayout');
@@ -91,6 +91,7 @@ class LayoutManager {
         
         this.sceneController.deanimateScene(() => {
             this.sceneController = null;
+            callback();
         });
     }
 

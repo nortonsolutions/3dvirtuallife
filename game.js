@@ -26,13 +26,16 @@ class Game {
 
         eventDepot.addListener('loadLevel', (data) => {
             this.eventDepot.fire('unlockControls', {});
-            if (this.layoutManager) this.stop();
+            if (this.layoutManager) this.stop(() => {
+
+                // Refresh the hero from stored template
+                this.hero = new Hero(JSON.parse(localStorage.getItem('gameHeroTemplate')), this.eventDepot);
+                this.props.level = data.level;
+                this.hero.location = data.location;
+                this.hero.location.x -= 1;
+                this.start();
+            });
     
-            this.props.level = data.level;
-            this.hero.location = data.location;
-            this.hero.location.x -= 1;
-            
-            this.start();
         });
 
         eventDepot.addListener('saveLocalStorage', () => {
@@ -40,11 +43,14 @@ class Game {
         });
     }
 
-    stop() {
-        this.layoutManager.shutdown();
-        this.layoutManager = null;
-        // this.hero.stop();
-        // this.hero = null;
+    stop(callback) {
+        this.layoutManager.shutdown(() => {
+            this.layoutManager = null;
+            this.hero.stop(() => {
+                this.hero = null;
+                callback();
+            });
+        });
     }
 
     start() {
@@ -79,7 +85,7 @@ class GameAPI {
                 scale: 10,
                 elevation: 0,
                 stats: {
-                    health: "05/05",
+                    health: "03/05",
                     mana: "00/00",
                     strength: "01/01",
                     agility: "03/03"

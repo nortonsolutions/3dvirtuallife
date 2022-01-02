@@ -95,7 +95,19 @@ export class Hero {
 
     }
 
-    stop() {
+    dispose(item) {
+        if (item.children.length == 0) {
+            if (item.dispose) item.dispose();
+            return;
+        } else {
+            item.children.forEach(child => {
+                this.dispose(child);
+            })
+        }
+        if (item.dispose) item.dispose();
+    }
+
+    stop(callback) {
         
         this.eventDepot.removeListeners('updateHeroLocation');
         this.eventDepot.removeListeners('swapInventoryPositions');
@@ -105,6 +117,8 @@ export class Hero {
         this.eventDepot.removeListeners('takeItemFromScene');
         this.eventDepot.removeListeners('removeItem');
         this.eventDepot.removeListeners('dropItemToScene');
+        this.dispose(this.model);
+        callback();
     }
 
     firstInventorySlot() {

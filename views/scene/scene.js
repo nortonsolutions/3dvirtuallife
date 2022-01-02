@@ -318,6 +318,13 @@ class Scene {
             
             this.hero.model = model;
 
+            if (this.hero.equipped) {
+                Object.keys(this.hero.equipped).forEach(bodyPart => {
+                    this.controller.eventDepot.fire('equipItem', {bodyPart, itemName: this.hero.equipped[bodyPart]});
+                })
+            }
+
+
             let controlsObj = this.controls.getObject();
 
             // Adjustments for hero:
@@ -585,7 +592,7 @@ class Scene {
                 if (mixers[key].moves) {
                     mixers[key].absVelocity = Math.max(Math.abs(mixers[key].velocity.x), Math.abs(mixers[key].velocity.z));
     
-                    if (mixers[key].name != "rat") {
+                    // if (mixers[key].name != "rat") {
                         if (mixers[key].absVelocity < .1 && (mixers[key].activeActionName == 'Walking' || mixers[key].activeActionName == 'Running')) {
                             this.controller.fadeToAction( key, 'Idle', 0.2);
                         } else if (mixers[key].absVelocity >= .1 && mixers[key].activeActionName == 'Idle') {
@@ -593,9 +600,9 @@ class Scene {
                         } else if (mixers[key].absVelocity >= 199 && mixers[key].activeActionName == 'Walking') {
                             this.controller.fadeToAction( key, 'Running', 0.2);
                         }
-                    } else {
+                    // } else {
 
-                    }
+                    // }
                 }
 
                 mixers[key].mixer.update( delta );
@@ -608,8 +615,6 @@ class Scene {
      * Direction is relative to the entity in question
      */
     handleMovement = ( uniqueId, entity, delta ) => {
-
-
 
         var yAxisRotation = new THREE.Euler( 0, entity.rotation.y, 0, 'YXZ' );
         let worldDirection = new THREE.Vector3().copy(this.controller.mixers[uniqueId].direction).applyEuler( yAxisRotation );
@@ -640,7 +645,9 @@ class Scene {
                 entity.translateX( -this.controller.mixers[uniqueId].velocity.x * delta );
                 entity.translateY( -this.controller.mixers[uniqueId].velocity.y * delta );
                 entity.translateZ( -this.controller.mixers[uniqueId].velocity.z * delta );
-
+                if (uniqueId != "hero") {
+                    entity.rotateY(Math.PI/4);
+                }
             }
         } else {
             
@@ -650,7 +657,7 @@ class Scene {
             this.controller.mixers[uniqueId].velocity.z = 0;
 
             if (uniqueId != "hero") {
-                entity.rotateY(Math.PI/8);
+                entity.rotateY(Math.PI/4);
             }
         }
 
@@ -818,7 +825,6 @@ class Scene {
                 if (offsetX > .9) offsetX = 0;
                 sprite.material.map.offset.x = offsetX;
             })
-    
         }
     }
 
