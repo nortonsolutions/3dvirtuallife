@@ -34,6 +34,7 @@ export class SceneController {
         this.eventDepot = eventDepot;
         this.allObjects = allObjects;
 
+
         this.scene = null;
         this.floor = null;
         this.upRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ), 0, upRaycasterTestLength);
@@ -46,6 +47,7 @@ export class SceneController {
         this.objects3D = [];
         this.mixers = {};
         this.actions = {};
+        this.sprites = [];
 
         this.addEventListeners = this.addEventListeners.bind(this);
         this.deanimateScene = this.deanimateScene.bind(this);
@@ -286,6 +288,27 @@ export class SceneController {
         fireObj.add( fire2.fire );
 
         return fireObj;
+    }
+
+
+    getSprite(name, spriteNumber) {
+        
+        let spriteMap = new THREE.TextureLoader().load( '/models/png/' + name + '.png' );
+        // How much a single repetition of the texture is offset from the beginning
+        spriteMap.offset = {x: 1 / 10 * spriteNumber, y: 0};
+        // How many times the texture is repeated across the surface
+        spriteMap.repeat = {x: 1 / 10, y: 1};
+
+        var spriteMaterial = new THREE.SpriteMaterial({
+            opacity: 1,
+            transparent: true,
+            map: spriteMap,
+            rotation: Math.PI
+        });
+
+        var sprite = new THREE.Sprite(spriteMaterial);
+        this.sprites.push(sprite);
+        return sprite;
     }
 
     /** Position of the model should be set before animating */

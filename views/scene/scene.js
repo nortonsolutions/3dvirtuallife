@@ -280,7 +280,7 @@ class Scene {
             this.controller.floor.objectType = "floor"; 
             this.setToRenderDoubleSided(this.controller.floor);
 
-            // this.addSconces(this.controller.floor);
+            this.addSconces(this.controller.floor);
             this.scene.add( this.controller.floor );
             this.controller.objects3D.push(this.controller.floor);
             setTimeout(() => {
@@ -292,13 +292,16 @@ class Scene {
     }
 
     addSconces = (object) => {
-        if (/^sconce/i.test(object.name)) {
+        if (/sconce/i.test(object.name)) {
 
-            let fireObj = this.controller.getFire();
+            // let fireObj = this.controller.getFire();
             // this.fireParams.Torch();
-            fireObj.scale.set(.3, .02, .3);
+
+            let fireObj = this.controller.getSprite("flame", 0);
+            fireObj.scale.set(.4, .4, .4);
             fireObj.translateY(.15);
             object.add(fireObj);
+
         } else {
             if (object.children) {
                 object.children.forEach(el => {
@@ -807,6 +810,18 @@ class Scene {
         });
     }
 
+    handleSprites() {
+        if (this.requestAnimationFrameID % 7 == 0) {
+            this.controller.sprites.forEach(sprite => {
+
+                let offsetX = sprite.material.map.offset.x + (1 / 10);
+                if (offsetX > .9) offsetX = 0;
+                sprite.material.map.offset.x = offsetX;
+            })
+    
+        }
+    }
+
     animate() {
         
         this.requestAnimationFrameID = requestAnimationFrame( this.animate );
@@ -820,7 +835,8 @@ class Scene {
                 this.handleHeroMovement(this.delta);
                 this.handleEntityMovement(this.delta);
                 this.handleMixers(this.delta);
-    
+                this.handleSprites();
+
                 if (this.backgroundMesh) this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
     
                 this.prevTime = this.time;
