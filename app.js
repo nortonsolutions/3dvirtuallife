@@ -70,9 +70,9 @@ export const app = () => {
             el.addEventListener('click', e => {
                 e.preventDefault();
 
-                // MOCK DATA loading existing game for now, for gameHeroTemplate and gameProps
-                props = localStorage.getItem('gameProps');
-                heroTemplate = localStorage.getItem('gameHeroTemplate');
+                // MOCK DATA loading existing game for now, for gameHeroTemplate
+                props = JSON.parse(localStorage.getItem('gameProps'));
+                heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
                 
             })
         })
@@ -90,8 +90,8 @@ export const app = () => {
     const startGame = () => {
         
         if (game && game.layoutManager) game.stop();
-        game = new Game(props, heroTemplate, eventDepot);
-        game.start();
+        game = new Game(heroTemplate, eventDepot);
+        game.start(props.level);
 
     }
 }

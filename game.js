@@ -9,13 +9,13 @@
  */
 
 import { LayoutManager } from './layout/layoutManager.js';
-import { Hero } from '/hero.js';
+import { Hero } from '/entities/hero.js';
 
 class Game {
 
-    constructor(props, heroTemplate, eventDepot) {
+    constructor(heroTemplate, eventDepot) {
 
-        this.props = props;
+        // this.props = props;
         this.heroTemplate = heroTemplate;
         this.eventDepot = eventDepot;
 
@@ -28,12 +28,17 @@ class Game {
             this.eventDepot.fire('unlockControls', {});
             if (this.layoutManager) this.stop(() => {
 
+                let heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
+                
+                // JIC: update the location to match that specified in the event
+                heroTemplate.location = data.location;
+                heroTemplate.location.x -= 1;
+
                 // Refresh the hero from stored template
-                this.hero = new Hero(JSON.parse(localStorage.getItem('gameHeroTemplate')), this.eventDepot);
-                this.props.level = data.level;
-                this.hero.location = data.location;
-                this.hero.location.x -= 1;
-                this.start();
+                this.hero = new Hero(heroTemplate, this.eventDepot);
+
+
+                this.start(data.level);
             });
     
         });
@@ -53,9 +58,9 @@ class Game {
         });
     }
 
-    start() {
+    start(level) {
 
-        this.layoutManager = new LayoutManager(this.props, this.eventDepot);
+        this.layoutManager = new LayoutManager(level, this.eventDepot);
         this.layoutManager.launch(this.hero);
     }
 }
@@ -82,6 +87,8 @@ class GameAPI {
             attributes: {
                 moves: true,
                 height: height,
+                length: 20,
+                width: 20,
                 scale: 10,
                 elevation: 0,
                 stats: {

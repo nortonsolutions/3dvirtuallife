@@ -177,9 +177,11 @@ export class SceneController {
             // console.log(`genericElevation for ${name}: ${genericElevation}`);
             return (genericElevation);
         } else {
-            console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
-            console.error(this.floor);
-            console.error(`${name} = ${x},${z}`);
+
+            return -1;
+            // console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
+            // console.error(this.floor);
+            // console.error(`${name} = ${x},${z}`);
         }
 
     }
@@ -209,8 +211,24 @@ export class SceneController {
         } else {
 
             this.mixers[uniqueId].standingUpon = null;
-            entity.position.y = this.determineElevationGeneric(entity.position.x, entity.position.z, uniqueId);
+            
+            let newYposition = this.determineElevationGeneric(entity.position.x, entity.position.z, uniqueId);
 
+            while (newYposition == -1) { // move toward center until ground found
+                entity.position.x = this.shiftTowardCenter(entity.position.x);
+                entity.position.z = this.shiftTowardCenter(entity.position.rotateZ);
+                newYposition = this.determineElevationGeneric(entity.position.x, entity.position.z, uniqueId);
+            }
+            entity.position.y = newYposition;
+            
+        }
+    }
+
+    shiftTowardCenter(value) {
+        if (value != 0) {
+            if (value > 0) {
+                return value--;
+            } else return value++;
         }
     }
 
@@ -283,13 +301,13 @@ export class SceneController {
     }
 
 
-    getSprite(name, spriteNumber) {
+    getSprite(name, spriteNumber, frames) {
         
         let spriteMap = new THREE.TextureLoader().load( '/models/png/' + name + '.png' );
         // How much a single repetition of the texture is offset from the beginning
-        spriteMap.offset = {x: 1 / 10 * spriteNumber, y: 0};
+        spriteMap.offset = {x: 1 / frames * spriteNumber, y: 0};
         // How many times the texture is repeated across the surface
-        spriteMap.repeat = {x: 1 / 10, y: 1};
+        spriteMap.repeat = {x: 1 / frames, y: 1};
 
         var spriteMaterial = new THREE.SpriteMaterial({
             opacity: 1,
@@ -299,7 +317,7 @@ export class SceneController {
         });
 
         var sprite = new THREE.Sprite(spriteMaterial);
-        this.sprites.push(sprite);
+        this.sprites.push({ sprite, frames });
         return sprite;
     }
 
@@ -383,16 +401,17 @@ export class SceneController {
                 direction: new THREE.Vector3(),
                 velocity: new THREE.Vector3(),
                 downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength ),
-                movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, uniqueId == "hero"? 40 : 80 ),
+                movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, model.attributes.length/2 + 20 ),
                 justJumped: false,
                 standingUpon: null,
                 canJump: true,
                 selectedObject: null,
             }
 
+            // Add side raycasters for AIs for enhanced movement
             if (uniqueId != "hero") {
-                mixerObj.movementRaycasterR = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, 80 )
-                mixerObj.movementRaycasterL = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, 80 )
+                mixerObj.movementRaycasterR = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, model.attributes.width/2 + 20 )
+                mixerObj.movementRaycasterL = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, model.attributes.width/2 + 20 )
             }
 
             mixerObj.activeAction.play();

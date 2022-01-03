@@ -17,12 +17,12 @@ import { SceneController } from '/scene/sceneController.js'
 
 class LayoutManager {
 
-    constructor(props, eventDepot) {
+    constructor(level, eventDepot) {
 
-        this.props = localStorage.getItem('gameProps')? JSON.parse(localStorage.getItem('gameProps')): props;
-        this.props.level = props.level;
+        this.props = localStorage.getItem('gameProps')? JSON.parse(localStorage.getItem('gameProps')): { level: 0, layouts: [] };
+        this.props.level = level;
         this.eventDepot = eventDepot;
-
+        
         this.allItems = Items;
         this.allStructures = Structures;
         this.allEntities = Entities;
@@ -33,8 +33,6 @@ class LayoutManager {
         
         this.layout = {};
         
-
-
         if (this.props.layouts[this.props.level]) {
             this.layout = this.props.layouts[this.props.level];
         } else {

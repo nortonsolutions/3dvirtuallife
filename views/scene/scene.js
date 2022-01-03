@@ -297,8 +297,8 @@ class Scene {
             // let fireObj = this.controller.getFire();
             // this.fireParams.Torch();
 
-            let fireObj = this.controller.getSprite("flame", 0);
-            fireObj.scale.set(.4, .4, .4);
+            let fireObj = this.controller.getSprite("flame", 0, 40);
+            fireObj.scale.set(.3, .4, .3);
             fireObj.translateY(.15);
             object.add(fireObj);
 
@@ -341,6 +341,7 @@ class Scene {
             controlsObj.add( model );
 
             this.controller.createMixer( model, gltf.animations, "hero" );
+            
             this.updateHeroLocation(true);
             this.updateHeroStats();
         })
@@ -404,9 +405,6 @@ class Scene {
                 });
             }
 
-            // console.log(`${object.name} @`);
-            // console.table(model.position);
-
             this.controller.objects3D.push( model );
             this.scene.add( model );
 
@@ -419,8 +417,8 @@ class Scene {
         // console.log(`Controls object:`);
         // console.dir(this.controls.getObject().position);
 
-        // console.log(`Objects3D object:`);
-        // console.dir(this.controller.objects3D);
+        console.log(`Objects3D object:`);
+        console.dir(this.controller.objects3D);
     }
 
     onMouseDown = (e) => {
@@ -610,61 +608,6 @@ class Scene {
         }
     }
 
-    /**
-     * This function will move an entity from one location to another.
-     * Direction is relative to the entity in question
-     */
-    handleMovement = ( uniqueId, entity, delta ) => {
-
-        var yAxisRotation = new THREE.Euler( 0, entity.rotation.y, 0, 'YXZ' );
-        let worldDirection = new THREE.Vector3().copy(this.controller.mixers[uniqueId].direction).applyEuler( yAxisRotation );
-        
-        let mRaycaster = this.controller.mixers[uniqueId].movementRaycaster;
-        mRaycaster.ray.origin.copy( entity.position );
-        mRaycaster.ray.origin.y += entity.attributes.height;
-        mRaycaster.ray.direction.x = - worldDirection.x;
-        mRaycaster.ray.direction.z = - worldDirection.z;
-        
-
-        if (uniqueId != "hero") {
-            mRaycaster.ray.direction.x = - mRaycaster.ray.direction.x;
-            mRaycaster.ray.direction.z = - mRaycaster.ray.direction.z;
-        }
-
-        let movementIntersects = mRaycaster.intersectObjects(this.controller.objects3D, true).filter(el => this.controller.getRootObject3D(el.object) != entity);
-        
-        if (movementIntersects.length == 0) {
-
-            entity.translateX( this.controller.mixers[uniqueId].velocity.x * delta );
-            entity.translateY( this.controller.mixers[uniqueId].velocity.y * delta );
-            entity.translateZ( this.controller.mixers[uniqueId].velocity.z * delta );
-
-            if (Math.abs(entity.getWorldPosition(entity.position).x) >= this.planeHeight/2 || 
-            Math.abs(entity.getWorldPosition(entity.position).z) >= this.planeWidth/2) {
-
-                entity.translateX( -this.controller.mixers[uniqueId].velocity.x * delta );
-                entity.translateY( -this.controller.mixers[uniqueId].velocity.y * delta );
-                entity.translateZ( -this.controller.mixers[uniqueId].velocity.z * delta );
-                if (uniqueId != "hero") {
-                    entity.rotateY(Math.PI/4);
-                }
-            }
-        } else {
-            
-
-            this.controller.mixers[uniqueId].velocity.x = 0;
-            this.controller.mixers[uniqueId].velocity.y = 0;
-            this.controller.mixers[uniqueId].velocity.z = 0;
-
-            if (uniqueId != "hero") {
-                entity.rotateY(Math.PI/4);
-            }
-        }
-
-        this.controller.setElevation( uniqueId, entity );
-
-    }
-
     identifySelectedObject(heroObj) {
 
         this.proximityLight.rotation.copy(heroObj.rotation);
@@ -746,6 +689,109 @@ class Scene {
 
     }
 
+/**
+     * This function will move an entity from one location to another.
+     * Direction is relative to the entity in question
+     */
+    handleMovement = ( uniqueId, entity, delta ) => {
+
+        var yAxisRotation = new THREE.Euler( 0, entity.rotation.y, 0, 'YXZ' );
+        let worldDirection = new THREE.Vector3().copy(this.controller.mixers[uniqueId].direction).applyEuler( yAxisRotation );
+        
+        let mRaycaster = this.controller.mixers[uniqueId].movementRaycaster;
+        mRaycaster.ray.origin.copy( entity.position );
+        mRaycaster.ray.origin.y += entity.attributes.height;
+        mRaycaster.ray.direction.x = worldDirection.x;
+        mRaycaster.ray.direction.z = worldDirection.z;
+        
+        if (uniqueId == "hero") { // hero's direction is 180 reversed
+        
+            mRaycaster.ray.direction.x = - mRaycaster.ray.direction.x;
+            mRaycaster.ray.direction.z = - mRaycaster.ray.direction.z;
+
+            // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
+            let fIntersects = mRaycaster.intersectObjects(this.controller.objects3D, true).filter(el => this.controller.getRootObject3D(el.object) != entity);
+            
+            if (fIntersects.length == 0) {
+
+                entity.translateX( this.controller.mixers[uniqueId].velocity.x * delta );
+                entity.translateY( this.controller.mixers[uniqueId].velocity.y * delta );
+                entity.translateZ( this.controller.mixers[uniqueId].velocity.z * delta );          
+    
+            } else {
+    
+                console.log(`Hero fIntersects:`);
+                console.dir(fIntersects[0]);
+                this.controller.mixers[uniqueId].velocity.x = 0;
+                this.controller.mixers[uniqueId].velocity.y = 0;
+                this.controller.mixers[uniqueId].velocity.z = 0;
+            }
+
+        } else { // handle side raycasters for AI's
+
+            // movementIntersects = movementIntersects.sort((a,b) => a.distance < b.distance);
+            let worldDirectionL = new THREE.Vector3(1,0,0).applyEuler( yAxisRotation );
+        
+            let mRaycasterL = this.controller.mixers[uniqueId].movementRaycasterL;
+            mRaycasterL.ray.origin.copy( entity.position );
+            mRaycasterL.ray.origin.y += entity.attributes.height;
+            mRaycasterL.ray.direction.x = worldDirectionL.x;
+            mRaycasterL.ray.direction.z = worldDirectionL.z;
+
+            let worldDirectionR = new THREE.Vector3(-1,0,0).applyEuler( yAxisRotation );
+        
+            let mRaycasterR = this.controller.mixers[uniqueId].movementRaycasterR;
+            mRaycasterR.ray.origin.copy( entity.position );
+            mRaycasterR.ray.origin.y += entity.attributes.height;
+            mRaycasterR.ray.direction.x = worldDirectionR.x;
+            mRaycasterR.ray.direction.z = worldDirectionR.z;
+
+            // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
+            let fIntersects = mRaycaster.intersectObjects(this.controller.objects3D, true).filter(el => this.controller.getRootObject3D(el.object) != entity);
+            let rIntersects = mRaycasterR.intersectObjects(this.controller.objects3D, true).filter(el => this.controller.getRootObject3D(el.object) != entity);
+            let lIntersects = mRaycasterL.intersectObjects(this.controller.objects3D, true).filter(el => this.controller.getRootObject3D(el.object) != entity);
+
+            if (fIntersects.length == 0) {
+                entity.translateZ( this.controller.mixers[uniqueId].velocity.z * delta );
+            } else {
+
+                console.log(`${entity.objectName} fIntersects:`);
+                console.dir(fIntersects[0]);
+                this.controller.mixers[uniqueId].velocity.z = 0;
+                entity.rotateY(Math.PI);
+            }
+
+            if (rIntersects.length != 0 && lIntersects.length != 0) {
+                // If intersections are both on left and right, stay the course.
+            } else {
+                if (rIntersects.length != 0) {
+                    entity.translateX( 2 );
+                    console.log(`${entity.objectName} rIntersects:`);
+                    console.dir(rIntersects[0]);
+                }
+                
+                if (lIntersects.length != 0) {
+                    entity.translateX( -2 );       
+                    console.log(`${entity.objectName} lIntersects:`);
+                    console.dir(lIntersects[0]);
+                }  
+
+            }
+
+
+
+            entity.translateY( this.controller.mixers[uniqueId].velocity.y * delta );
+        }
+
+
+        // let offMap = Math.abs(entity.getWorldPosition(entity.position).x) >= this.planeHeight/2 || 
+        // Math.abs(entity.getWorldPosition(entity.position).z) >= this.planeWidth/2;
+
+
+        this.controller.setElevation( uniqueId, entity );
+
+    }
+
     handleHeroMovement(delta) {
 
         if (this.controller.mixers.hero) {
@@ -800,7 +846,7 @@ class Scene {
             if (this.controller.mixers[entity.uuid]) {
             
                 // Make a random rotation (yaw)
-                entity.rotateY(getRndInteger(-1,2)/100);
+                entity.rotateY(getRndInteger(-5,5)/100);
                 
                 // GRAVITY
                 this.controller.mixers[entity.uuid].velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
@@ -809,8 +855,8 @@ class Scene {
                 this.controller.mixers[entity.uuid].velocity.z = getRnd(.2,entity.attributes.stats.agility.substring(0,2)) * 100;
                 this.controller.mixers[entity.uuid].velocity.x = 0;
                 
-                this.controller.mixers[entity.uuid].direction.z = getRnd(-.2,.2);
-                this.controller.mixers[entity.uuid].direction.x = getRnd(-.2,.2);
+                this.controller.mixers[entity.uuid].direction.z = 0.2; // getRnd(0,.2);
+                // this.controller.mixers[entity.uuid].direction.x = getRnd(-.2,.2);
 
                 this.handleMovement(entity.uuid, entity, delta);
             }
@@ -818,12 +864,13 @@ class Scene {
     }
 
     handleSprites() {
-        if (this.requestAnimationFrameID % 7 == 0) {
+        if (this.requestAnimationFrameID % 3 == 0) {
             this.controller.sprites.forEach(sprite => {
 
-                let offsetX = sprite.material.map.offset.x + (1 / 10);
-                if (offsetX > .9) offsetX = 0;
-                sprite.material.map.offset.x = offsetX;
+                let offsetX = sprite.sprite.material.map.offset.x + (1 / sprite.frames);
+                // if (offsetX > (sprite.frames - 1) / sprite.frames) offsetX = 0;
+                if (offsetX >= .99) offsetX = 0;
+                sprite.sprite.material.map.offset.x = offsetX;
             })
         }
     }

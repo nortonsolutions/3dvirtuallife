@@ -9,8 +9,8 @@ export const levels = [
 
     {
         level: 0,
-        width: 12, //26
-        length: 12, //26
+        width: 6, //26
+        length: 6, //26
         name: "In the valley of mist",
         background: 'clouds.png',
         terrain: {
@@ -37,6 +37,9 @@ export const levels = [
             Structures.grate
         ],
         entities: [
+            // Entities.john,
+            // Entities.evilOne,
+            // Entities.evilOne,
             Entities.rat
         ]
     },
@@ -72,8 +75,8 @@ export const levels = [
             Entities.john,
             Entities.evilOne,
             Entities.evilOne,
+            Entities.rat,
             Entities.rat
-
 
         ]
     },
@@ -101,6 +104,7 @@ export const levels = [
             Structures.archway1
         ],
         entities: [
+            {...Entities.rat, location: { x: 10, y: 0, z: 0 }}
         ]
     }
  
