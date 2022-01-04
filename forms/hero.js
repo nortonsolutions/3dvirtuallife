@@ -1,30 +1,34 @@
-export class Hero {
+import { IntelligentForm } from './intelligent.js'
 
-    // Sample empty hero:
-    // {
-    //     name: 'Dave',
-    //     attributes: {
-    //          height: 20
-    //     },
-    //     inventory: []
-    // }
+/**
+ * The Hero is a significant extension of the
+ * IntelligentForm which has hooks for all the
+ * Hero interactions, saved games, etc.
+ * 
+ * It keeps track of its own template for caching,
+ * including inventory, spells, equipped items,
+ * and attributes/statistics.
+ */
+export class Hero extends IntelligentForm {
 
-    constructor(hero, eventDepot) {
+    constructor(heroTemplate, eventDepot) {
         
-        this.name = hero.name;
-        this.gltf = hero.gltf;
-        this.model = hero.model;
-        this.attributes = hero.attributes;
-        this.inventory = hero.inventory;
-        this.spells = hero.spells;
-        this.equipped = hero.equipped;
+        super();
+
+        this.name = heroTemplate.name;
+        this.gltf = heroTemplate.gltf;
+        this.model = heroTemplate.model;
+        this.attributes = heroTemplate.attributes;
+        this.inventory = heroTemplate.inventory;
+        this.spells = heroTemplate.spells;
+        this.equipped = heroTemplate.equipped;
         this.eventDepot = eventDepot;
         
         this.addEventListeners = this.addEventListeners.bind(this);
         this.addEventListeners();
 
         // Actually just a starting/saved location
-        this.location = hero.location? hero.location : { x: 0, y: 0, z: 0 };
+        this.location = heroTemplate.location? heroTemplate.location : { x: 0, y: 0, z: 0 };
         this.cacheHero();
         
 

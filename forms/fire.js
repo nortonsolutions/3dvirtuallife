@@ -1,3 +1,5 @@
+import { StandardForm } from './standard.js'
+
 var params = {
 
     color1: '#ffffff',
@@ -18,11 +20,11 @@ var params = {
 
 };
 
-class Fire {
+class Fire extends StandardForm {
 
     constructor() {
+        super();
 
-        // this.plane = new THREE.CylinderBufferGeometry( 0, 1, 5, 12, 1, true, 0, 3 * Math.PI );
         this.plane = new THREE.PlaneBufferGeometry( 5, 20 );
         this.fire = new THREE.Fire( this.plane, {
             textureWidth: 512,

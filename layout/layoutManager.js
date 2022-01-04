@@ -13,8 +13,6 @@ import { Entities } from './blueprints/entities.js';
 import { Structures } from './blueprints/structures.js';
 import { SceneController } from '/scene/sceneController.js'
 
-
-
 class LayoutManager {
 
     constructor(level, eventDepot) {
@@ -44,9 +42,9 @@ class LayoutManager {
         this.addEventListeners();
     }
 
-    launch(hero) {
+    launch(heroTemplate) {
         
-        this.sceneController = new SceneController(hero, this.layout, this.eventDepot, this.allObjects);
+        this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects);
         this.sceneController.animateScene();
     }
 

@@ -9,7 +9,6 @@
  */
 
 import { LayoutManager } from './layout/layoutManager.js';
-import { Hero } from '/entities/hero.js';
 
 class Game {
 
@@ -18,8 +17,6 @@ class Game {
         // this.props = props;
         this.heroTemplate = heroTemplate;
         this.eventDepot = eventDepot;
-
-        this.hero = new Hero(this.heroTemplate, this.eventDepot);
 
         this.stop = this.stop.bind(this);
         this.start = this.start.bind(this);
@@ -33,11 +30,6 @@ class Game {
                 // JIC: update the location to match that specified in the event
                 heroTemplate.location = data.location;
                 heroTemplate.location.x -= 1;
-
-                // Refresh the hero from stored template
-                this.hero = new Hero(heroTemplate, this.eventDepot);
-
-
                 this.start(data.level);
             });
     
@@ -61,7 +53,7 @@ class Game {
     start(level) {
 
         this.layoutManager = new LayoutManager(level, this.eventDepot);
-        this.layoutManager.launch(this.hero);
+        this.layoutManager.launch(this.heroTemplate);
     }
 }
 

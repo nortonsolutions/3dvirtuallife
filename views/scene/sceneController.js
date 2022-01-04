@@ -1,5 +1,6 @@
 import { Scene } from '/scene/scene.js';
-import { EntityFactory } from '/entities/entityFactory.js';
+import { FormFactory } from '/forms/formFactory.js';
+import { Hero } from '/forms/hero.js';
 
 /**
  * SceneController has a Scene object for graphical display, and keeps track
@@ -21,13 +22,13 @@ var downRaycasterTestLength = 70;
 var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
 var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
-import { Fire, params } from './fire.js' 
+import { Fire, params } from '/forms/fire.js' 
 
 export class SceneController {
 
-    constructor(hero, layout, eventDepot, allObjects) {
+    constructor(heroTemplate, layout, eventDepot, allObjects) {
 
-        this.hero = hero;
+        this.hero = new Hero(heroTemplate, eventDepot); // Eventually use FormFactory to create hero
         this.layout = layout;
         this.eventDepot = eventDepot;
         this.allObjects = allObjects;
@@ -715,7 +716,7 @@ export class SceneController {
 
     }
 
-    handleHeroMovement(delta, callback) {
+    handleHeroMovement(delta) {
 
         if (this.mixers.hero) {
 
@@ -774,13 +775,10 @@ export class SceneController {
                 
                 // GRAVITY
                 this.mixers[entity.uuid].velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
-
-
                 this.mixers[entity.uuid].velocity.z = getRnd(.2,entity.attributes.stats.agility.substring(0,2)) * 100;
 
                 // Basic movement always in the z-axis direction for this entity
                 this.mixers[entity.uuid].velocity.x = 0;
-                
                 this.mixers[entity.uuid].direction.z = 0.2; // getRnd(0,.2);
 
                 this.handleMovement(entity.uuid, entity, delta);
@@ -825,6 +823,8 @@ export class SceneController {
                 this.mixers[uniqueId].velocity.x = 0;
                 this.mixers[uniqueId].velocity.y = 0;
                 this.mixers[uniqueId].velocity.z = 0;
+
+                this.scene.helper.position.copy(fIntersects[0].point);
             }
 
         } else { // handle side raycasters for AI's
@@ -859,6 +859,8 @@ export class SceneController {
                 console.dir(fIntersects[0]);
                 this.mixers[uniqueId].velocity.z = 0;
                 entity.rotateY(Math.PI);
+                this.scene.helper.position.copy(fIntersects[0].point);
+                this.scene.helper.material.color = { r: 0, g: 0, b: 1 };
             }
 
             if (rIntersects.length != 0 && lIntersects.length != 0) {
@@ -868,12 +870,16 @@ export class SceneController {
                     entity.translateX( 2 );
                     console.log(`${entity.objectName} rIntersects:`);
                     console.dir(rIntersects[0]);
+                    this.scene.helper.position.copy(rIntersects[0].point);
+                    this.scene.helper.material.color = { r: 1, g: 0, b: 0 };
                 }
                 
                 if (lIntersects.length != 0) {
                     entity.translateX( -2 );       
                     console.log(`${entity.objectName} lIntersects:`);
                     console.dir(lIntersects[0]);
+                    this.scene.helper.position.copy(lIntersects[0].point);
+                    this.scene.helper.material.color = { r: 0, g: 1, b: 0 };
                 }  
 
             }

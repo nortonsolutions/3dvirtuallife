@@ -74,6 +74,8 @@ class Scene {
         this.addControls();
         this.addBackground();
         this.addEventListeners();
+        this.addHelper();
+
         if (callback) callback();
     }
 
@@ -216,8 +218,8 @@ class Scene {
 
     addHelper() {
 
-        this.helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(5), new THREE.MeshBasicMaterial({ color: 'red' }));
-        this.helper.visible = false;
+        this.helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(10), new THREE.MeshBasicMaterial({ color: 'blue' }));
+        this.helper.visible = true;
         this.scene.add( this.helper );
 
     }
