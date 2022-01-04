@@ -29,15 +29,15 @@ export const Entities = {
             moves: true,
             animates: true,
             height: 20,
-            length: 60,
+            length: 80,
             width: 20,
             elevation: 0,
-            scale: 100,
+            scale: 60,
             stats: {
                 health: "02/02",
                 mana: "00/00",
                 strength: "01/01",
-                agility: "01/01"
+                agility: "01/02"
             }
         }
     },

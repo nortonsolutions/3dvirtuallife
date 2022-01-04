@@ -22,6 +22,10 @@ export const app = () => {
 
     const addEventListeners = () => {
         
+        eventDepot.addListener('showHeroStats', () => {
+            document.getElementById('heroStats').classList.remove('d-none');
+        });
+        
         eventDepot.addListener('showDescription', (data) => {
             let description = JSON.parse(localStorage.getItem('gameObjects'))[data.objectName].description;
             document.getElementById('message').innerHTML = description;
