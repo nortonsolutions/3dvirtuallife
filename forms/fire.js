@@ -42,8 +42,6 @@ class Fire extends StandardForm {
         // this.addSource( 0.5, 0.1, 0.1, 1.0, 0.0, 1.0 );
         this.fire.addSource( 0.5, 0.05, 0.07, 5, 0.0, 1.0 );
 
-
-
     };
 
     multiple() {

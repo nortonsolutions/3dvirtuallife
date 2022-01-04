@@ -28,7 +28,9 @@ export class SceneController {
 
     constructor(heroTemplate, layout, eventDepot, allObjects) {
 
-        this.hero = new Hero(heroTemplate, eventDepot); // Eventually use FormFactory to create hero
+        this.formFactory = new FormFactory();
+        this.hero = this.formFactory.newForm('hero', heroTemplate, eventDepot);
+
         this.layout = layout;
         this.eventDepot = eventDepot;
         this.allObjects = allObjects;
@@ -570,6 +572,11 @@ export class SceneController {
             model.position.z = object.location.z * multiplier;
             model.position.y = this.determineElevationGeneric(model.position.x, model.position.z,object.name) + object.attributes.elevation;
             
+            // Set movable objects rotation to 180 to match the Hero
+            if (object.attributes.moves) {
+                model.rotation.y = Math.PI;
+            }
+
             if (object.attributes.animates) {
                 this.createMixer( model, gltf.animations, model.uuid );
                 if (object.attributes.unlocked) {
@@ -649,11 +656,8 @@ export class SceneController {
                 selectedObject: null,
             }
 
-            // Add side raycasters for AIs for enhanced movement
-            if (uniqueId != "hero") {
-                mixerObj.movementRaycasterR = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, model.attributes.width/2 + 20 )
-                mixerObj.movementRaycasterL = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, model.attributes.width/2 + 20 )
-            }
+            mixerObj.movementRaycasterR = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, model.attributes.width/2 + 20 )
+            mixerObj.movementRaycasterL = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, model.attributes.width/2 + 20 )
 
             mixerObj.activeAction.play();
             
@@ -799,92 +803,76 @@ export class SceneController {
         let mRaycaster = this.mixers[uniqueId].movementRaycaster;
         mRaycaster.ray.origin.copy( entity.position );
         mRaycaster.ray.origin.y += entity.attributes.height;
-        mRaycaster.ray.direction.x = worldDirection.x;
-        mRaycaster.ray.direction.z = worldDirection.z;
-        
-        if (uniqueId == "hero") { // hero's direction is 180 reversed
-        
-            mRaycaster.ray.direction.x = - mRaycaster.ray.direction.x;
-            mRaycaster.ray.direction.z = - mRaycaster.ray.direction.z;
+        mRaycaster.ray.direction.x = -worldDirection.x;
+        mRaycaster.ray.direction.z = -worldDirection.z;
 
-            // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
-            let fIntersects = mRaycaster.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
+        // Essentially set Lx = -wDz and Lz = wDx, then Rx = wDz and Rz = -wDx
+        let worldDirectionL = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, -Math.PI/2, 0, 'YXZ' ));
+        let worldDirectionR = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, Math.PI/2, 0, 'YXZ' ));
+
+        if (worldDirection.x != 0 || worldDirection.z != 0) {
+            console.log("worldDirection")
+            console.table(worldDirection)
+            console.log("worldDirectionL")
+            console.table(worldDirectionL)
+            console.log("worldDirectionR")
+            console.table(worldDirectionR)
+    
+        }
+        
+        let mRaycasterL = this.mixers[uniqueId].movementRaycasterL;
+        mRaycasterL.ray.origin.copy( entity.position );
+        mRaycasterL.ray.origin.y += entity.attributes.height;
+        mRaycasterL.ray.direction.x = worldDirectionL.x;
+        mRaycasterL.ray.direction.z = worldDirectionL.z;
+
+        let mRaycasterR = this.mixers[uniqueId].movementRaycasterR;
+        mRaycasterR.ray.origin.copy( entity.position );
+        mRaycasterR.ray.origin.y += entity.attributes.height;
+        mRaycasterR.ray.direction.x = worldDirectionR.x;
+        mRaycasterR.ray.direction.z = worldDirectionR.z;
+
+        // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
+        let fIntersects = mRaycaster.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
+        let rIntersects = mRaycasterR.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
+        let lIntersects = mRaycasterL.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
+
+        if (fIntersects.length == 0) { // Nothing is in the front, so move forward at given velocity
             
-            if (fIntersects.length == 0) {
+            entity.translateX( this.mixers[uniqueId].velocity.x * delta );
+            entity.translateY( this.mixers[uniqueId].velocity.y * delta );
+            entity.translateZ( this.mixers[uniqueId].velocity.z * delta );
 
-                entity.translateX( this.mixers[uniqueId].velocity.x * delta );
-                entity.translateY( this.mixers[uniqueId].velocity.y * delta );
-                entity.translateZ( this.mixers[uniqueId].velocity.z * delta );          
-    
-            } else {
-    
-                console.log(`Hero fIntersects:`);
-                console.dir(fIntersects[0]);
-                this.mixers[uniqueId].velocity.x = 0;
-                this.mixers[uniqueId].velocity.y = 0;
-                this.mixers[uniqueId].velocity.z = 0;
-
-                this.scene.helper.position.copy(fIntersects[0].point);
+            if (rIntersects.length != 0) { // intersections on the right?
+                entity.position.x += mRaycasterL.ray.direction.x;
+                entity.position.z += mRaycasterL.ray.direction.z;
+                this.scene.helper.position.copy(rIntersects[0].point);
+                this.scene.helper.material.color = { r: 1, g: 0, b: 0 };
             }
 
-        } else { // handle side raycasters for AI's
-
-            // movementIntersects = movementIntersects.sort((a,b) => a.distance < b.distance);
-            let worldDirectionL = new THREE.Vector3(1,0,0).applyEuler( yAxisRotation );
-        
-            let mRaycasterL = this.mixers[uniqueId].movementRaycasterL;
-            mRaycasterL.ray.origin.copy( entity.position );
-            mRaycasterL.ray.origin.y += entity.attributes.height;
-            mRaycasterL.ray.direction.x = worldDirectionL.x;
-            mRaycasterL.ray.direction.z = worldDirectionL.z;
-
-            let worldDirectionR = new THREE.Vector3(-1,0,0).applyEuler( yAxisRotation );
-        
-            let mRaycasterR = this.mixers[uniqueId].movementRaycasterR;
-            mRaycasterR.ray.origin.copy( entity.position );
-            mRaycasterR.ray.origin.y += entity.attributes.height;
-            mRaycasterR.ray.direction.x = worldDirectionR.x;
-            mRaycasterR.ray.direction.z = worldDirectionR.z;
-
-            // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
-            let fIntersects = mRaycaster.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
-            let rIntersects = mRaycasterR.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
-            let lIntersects = mRaycasterL.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
-
-            if (fIntersects.length == 0) {
-                entity.translateZ( this.mixers[uniqueId].velocity.z * delta );
-            } else {
-
-                console.log(`${entity.objectName} fIntersects:`);
-                console.dir(fIntersects[0]);
-                this.mixers[uniqueId].velocity.z = 0;
-                entity.rotateY(Math.PI);
-                this.scene.helper.position.copy(fIntersects[0].point);
+            if (lIntersects.length != 0) { // intersections on the left?
+                entity.position.x += mRaycasterR.ray.direction.x;
+                entity.position.z += mRaycasterR.ray.direction.z;       
+                // console.log(`${entity.objectName} lIntersects:`);
+                // console.dir(lIntersects[0]);
+                this.scene.helper.position.copy(lIntersects[0].point);
                 this.scene.helper.material.color = { r: 0, g: 0, b: 1 };
+            }  
+
+
+        } else { // Something is blocking, so stop without moving
+            
+            this.mixers[uniqueId].velocity.x = 0;
+            this.mixers[uniqueId].velocity.y = 0;
+            this.mixers[uniqueId].velocity.z = 0;
+
+            // Show the helper in front:
+            this.scene.helper.position.copy(fIntersects[0].point);
+            this.scene.helper.material.color = { r: 0, g: 1, b: 0 };
+
+            if (uniqueId != "hero") { // AI - turn around
+                entity.rotateY(Math.PI);
             }
-
-            if (rIntersects.length != 0 && lIntersects.length != 0) {
-                // If intersections are both on left and right, stay the course.
-            } else {
-                if (rIntersects.length != 0) {
-                    entity.translateX( 2 );
-                    console.log(`${entity.objectName} rIntersects:`);
-                    console.dir(rIntersects[0]);
-                    this.scene.helper.position.copy(rIntersects[0].point);
-                    this.scene.helper.material.color = { r: 1, g: 0, b: 0 };
-                }
-                
-                if (lIntersects.length != 0) {
-                    entity.translateX( -2 );       
-                    console.log(`${entity.objectName} lIntersects:`);
-                    console.dir(lIntersects[0]);
-                    this.scene.helper.position.copy(lIntersects[0].point);
-                    this.scene.helper.material.color = { r: 0, g: 1, b: 0 };
-                }  
-
-            }
-
-
 
             entity.translateY( this.mixers[uniqueId].velocity.y * delta );
         }

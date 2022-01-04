@@ -17,4 +17,18 @@ export class FormFactory {
 
     }
 
+    newForm(type, template, eventDepot) {
+
+        let form = null;
+        switch (type) {
+            case "hero":
+                form = new Hero(template, eventDepot);
+                break;
+        }
+
+        return form;
+    }
+
+
+
 }
