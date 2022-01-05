@@ -14,6 +14,8 @@ export const levels = [
         name: "In the valley of mist",
         background: 'clouds.png',
         terrain: {
+            name: 'floor',
+            type: 'floor',
             description: 'valley',
             gltf: 'valley.glb',
             fog: true,
@@ -37,7 +39,7 @@ export const levels = [
             Structures.grate
         ],
         entities: [
-            // Entities.john,
+            Entities.john,
             // Entities.evilOne,
             // Entities.evilOne,
             // Entities.rat
@@ -50,6 +52,8 @@ export const levels = [
         name: "In the dungeon",
         background: '',
         terrain: {
+            name: 'floor',
+            type: 'floor',
             description: 'dungeon',
             gltf: 'dungeon.glb',
             fog: true,
@@ -87,6 +91,8 @@ export const levels = [
         name: "Catacomb",
         background: '',
         terrain: {
+            name: 'floor',
+            type: 'floor',
             description: 'catacomb',
             gltf: 'catacomb.glb',
             fog: true,

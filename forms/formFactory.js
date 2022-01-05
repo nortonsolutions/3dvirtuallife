@@ -13,22 +13,44 @@ import { Fire } from './fire.js';
 
 export class FormFactory {
 
-    constructor(props) {
+    constructor(eventDepot) {
+        this.loader = new THREE.GLTFLoader();
+        this.eventDepot = eventDepot;
 
+        this.setToRenderDoubleSided = this.setToRenderDoubleSided.bind(this);
     }
 
-    newForm(type, template, eventDepot) {
+    newForm(type, template) {
 
         let form = null;
         switch (type) {
             case "hero":
-                form = new Hero(template, eventDepot);
+                form = new Hero(template, this);
+                break;
+            case "floor":
+                form = new StandardForm(template, this);
+                this.setToRenderDoubleSided(form);
+                // this.addSconces(this.floor);
                 break;
         }
 
         return form;
     }
 
+    setToRenderDoubleSided(object) {
+
+        if (object.material) {
+            if (object.material.name != "Roof") { 
+                object.material.side = THREE.DoubleSide;
+            } else {
+                object.material.side = THREE.FrontSide;
+            }
+        }
+
+        if (object.children) {
+            object.children.forEach(e => this.setToRenderDoubleSided(e)); 
+        }
+    }
 
 
 }

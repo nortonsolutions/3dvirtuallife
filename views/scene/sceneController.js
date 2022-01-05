@@ -1,6 +1,5 @@
 import { Scene } from '/scene/scene.js';
 import { FormFactory } from '/forms/formFactory.js';
-import { Hero } from '/forms/hero.js';
 
 /**
  * SceneController has a Scene object for graphical display, and keeps track
@@ -19,53 +18,52 @@ var multiplier = 100;
 var upRaycasterTestLength = 700; 
 var downRaycasterTestLength = 70;
 
-var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
-var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
-
 import { Fire, params } from '/forms/fire.js' 
 
 export class SceneController {
 
     constructor(heroTemplate, layout, eventDepot, allObjects) {
-
-        this.formFactory = new FormFactory();
-        this.hero = this.formFactory.newForm('hero', heroTemplate, eventDepot);
-
+        
         this.layout = layout;
+        this.heroTemplate = heroTemplate;
         this.eventDepot = eventDepot;
         this.allObjects = allObjects;
 
+        this.formFactory = new FormFactory(eventDepot);
+        this.forms = [];
+
         this.scene = null;
         this.floor = null;
+
         this.upRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ), 0, upRaycasterTestLength);
         this.downRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength);
 
         this.fireParams = params;
-        this.loader = new THREE.GLTFLoader();
-                
-        // objects3D is used for raycast intersections
+
+
+        // To be removed:
         this.objects3D = [];
-        this.mixers = {};
-        this.actions = {};
         this.sprites = [];
 
+        // Bindings:
         this.addEventListeners = this.addEventListeners.bind(this);
         this.deanimateScene = this.deanimateScene.bind(this);
-
         this.takeItemFromScene = this.takeItemFromScene.bind(this);
         this.dropItemToScene = this.dropItemToScene.bind(this);
         this.equipItem = this.equipItem.bind(this);
         this.seedObjects3D = this.seedObjects3D.bind(this);
         
+        this.hero = this.formFactory.newForm("hero", this.heroTemplate);
+        
         this.addEventListeners();
     }
 
     animateScene() {
+
         this.scene = new Scene(this);
         this.scene.init(() => {
-
             this.addFloor(() => {
-                this.seedObjects3D();
+                // this.seedObjects3D();
                 this.addHero3D();
                 this.addLights();
                 this.scene.animate();
@@ -73,6 +71,71 @@ export class SceneController {
             
         });
     }
+
+    addFloor(callback) {
+
+        this.floor = this.formFactory.newForm("floor", this.layout.terrain);
+        this.floor.load(() => {
+            this.addToScene(this.floor.model);
+            callback();
+        });
+
+        // setTimeout(() => {
+        // }, 200);
+    }
+
+    addLights() {
+
+        if (this.layout.terrain.hemisphereLight) {
+            var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
+            light.position.set( 0.5, 1, 0.75 );
+            this.scene.scene.add( light );
+        }
+
+        if (this.layout.terrain.overheadPointLight) {
+            this.overheadPointLight = new THREE.PointLight( 0xf37509, 15, 350, 3 );
+            this.overheadPointLight.position.set( 0, 0, 0 );
+            this.scene.scene.add( this.overheadPointLight );
+        }
+        
+        this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 30 );
+        this.proximityLight.position.set( 0, 0, 0 );
+        this.scene.scene.add( this.proximityLight );
+
+    }
+
+    addHero3D = () => {
+
+        this.hero.load(() => {
+            // this.addToScene(this.hero.model);
+
+            if (this.hero.equipped) {
+                Object.keys(this.hero.equipped).forEach(bodyPart => {
+                    this.eventDepot.fire('equipItem', {bodyPart, itemName: this.hero.equipped[bodyPart]});
+                })
+            }
+
+            let controlsObj = this.scene.controls.getObject();
+
+            // Adjustments for hero:
+            this.hero.model.rotation.y = Math.PI;
+
+            // Set hero location:
+            controlsObj.translateX( this.hero.location.x * multiplier );
+            controlsObj.translateZ( this.hero.location.z * multiplier );
+            controlsObj.translateY( this.determineElevationGeneric(
+                this.hero.location.x * multiplier, this.hero.location.z * multiplier, "hero")
+            );
+            
+            controlsObj.attributes = this.hero.attributes;
+            controlsObj.add( this.hero.model );
+
+            this.updateHeroLocation(true);
+            this.updateHeroStats();
+
+        })
+    }
+
 
     deanimateScene(callback) {
 
@@ -94,6 +157,24 @@ export class SceneController {
 
     }
 
+    addToScene(model) {
+
+        this.scene.scene.add( model );
+        this.forms.push( model );
+
+    }
+
+    removeFromScenebyUUID(uuid) {
+
+        this.scene.scene.remove(this.scene.scene.children.find(el => {
+            return el.uuid == uuid;
+        }));
+
+        this.forms = this.forms.filter(el => {
+            return el.uuid != uuid;
+        });
+    }
+
     getObjectByName(name) {
         return this.allObjects[name];
     }
@@ -105,7 +186,7 @@ export class SceneController {
 
     dropItemToScene(data) {
         let object = this.getObjectByName(data.itemName);
-        this.loadObject3DbyName(data.itemName, (gltf) => {
+        this.loadFormbyName(data.itemName, (gltf) => {
             let model = gltf.scene;
             model.position.copy(this.scene.controls.getObject().position);
             model.position.y = this.determineElevationGeneric(model.position.x, model.position.y, data.itemName) + object.attributes.elevation;
@@ -120,7 +201,7 @@ export class SceneController {
     equipItem(data) {
 
         let area = data.bodyPart;
-        this.loadObject3DbyName(data.itemName, (itemGltf) => {
+        this.loadFormbyName(data.itemName, (itemGltf) => {
 
             let item = itemGltf.scene;
             item.position.set(0,0,0);
@@ -214,13 +295,13 @@ export class SceneController {
         this.upRaycasterGeneric.ray.origin.y = -yOffset;
         
 
-        if (this.upRaycasterGeneric.intersectObject(this.floor, true)[0]) {
-            let distanceFromBase = this.upRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
+        if (this.upRaycasterGeneric.intersectObject(this.floor.model, true)[0]) {
+            let distanceFromBase = this.upRaycasterGeneric.intersectObject(this.floor.model, true)[0].distance;
 
             this.downRaycasterGeneric.ray.origin.copy (this.upRaycasterGeneric.ray.origin);
             this.downRaycasterGeneric.ray.origin.y += (distanceFromBase + yOffset);
             
-            let distanceFromAbove = this.downRaycasterGeneric.intersectObject(this.floor, true)[0].distance;
+            let distanceFromAbove = this.downRaycasterGeneric.intersectObject(this.floor.model, true)[0].distance;
             let genericElevation = this.downRaycasterGeneric.ray.origin.y - distanceFromAbove + 5; 
             // console.log(`genericElevation for ${name}: ${genericElevation}`);
             return (genericElevation);
@@ -280,49 +361,14 @@ export class SceneController {
         }
     }
 
-    addToObjects3D(object) {
-        this.objects3D.push(object);
-    }
-
-    removeFromScenebyUUID(uuid) {
-
-        this.scene.scene.remove(this.scene.scene.children.find(el => {
-            return el.uuid == uuid;
-        }));
-
-        this.objects3D = this.objects3D.filter(el => {
-            return el.uuid != uuid;
-        });
-    }
-
     /** This method will not set the position of the object3D, nor create a GUI.
      * The return object 'gltf' will have a model (scene) and animations if applicable.
-      */
-    loadObject3DbyName(objectName, callback) {
+     */
+    loadFormbyName(objectName, callback) {
 
         let object = this.getObjectByName(objectName);
-        this.load( object, (gltf) => {
+        this.formFactory.load( object, (gltf) => {
             callback(gltf);
-        });
-    }
-
-    load(object, callback) {
-        
-        this.loader.load( '/models/3d/gltf/' + object.gltf, (gltf) => {
-        
-            let model = gltf.scene;
-            
-            model.objectName = object.name;
-            model.objectType = object.type;
-            model.attributes = object.attributes;
-            model.scale.x = object.attributes.scale;
-            model.scale.y = object.attributes.scale;
-            model.scale.z = object.attributes.scale;
-            
-            callback(gltf);
-
-        }, undefined, function ( error ) {
-            console.error( error );
         });
     }
 
@@ -404,41 +450,8 @@ export class SceneController {
         }
     }
 
-    setToRenderDoubleSided(object) {
 
 
-        if (object.material) {
-            if (object.material.name != "Roof") { 
-                object.material.side = THREE.DoubleSide;
-            } else {
-                object.material.side = THREE.FrontSide;
-            }
-        }
-
-        if (object.children) {
-            object.children.forEach(e => this.setToRenderDoubleSided(e)); 
-        }
-    }
-
-    addFloor(callback) {
-
-        this.load(this.layout.terrain, (gltf) => {
-            
-            this.floor = gltf.scene;
-            this.floor.objectName = "floor";
-            this.floor.objectType = "floor"; 
-            this.setToRenderDoubleSided(this.floor);
-
-            this.addSconces(this.floor);
-            this.scene.scene.add( this.floor );
-            this.objects3D.push(this.floor);
-            setTimeout(() => {
-                callback();
-            }, 200);
-        }, undefined, function ( error ) {
-            console.error( error );
-        });
-    }
 
     addSconces = (object) => {
         if (/sconce/i.test(object.name)) {
@@ -460,61 +473,9 @@ export class SceneController {
         }
     }
 
-    addLights() {
 
-        if (this.layout.terrain.hemisphereLight) {
-            var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
-            light.position.set( 0.5, 1, 0.75 );
-            this.scene.scene.add( light );
-        }
 
-        if (this.layout.terrain.overheadPointLight) {
-            this.overheadPointLight = new THREE.PointLight( 0xf37509, 15, 350, 3 );
-            this.overheadPointLight.position.set( 0, 0, 0 );
-            this.scene.scene.add( this.overheadPointLight );
-        }
-        
-        this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 30 );
-        this.proximityLight.position.set( 0, 0, 0 );
-        this.scene.scene.add( this.proximityLight );
 
-    }
-
-    addHero3D = () => {
-
-        this.load(this.hero, (gltf) => {
-            let model = gltf.scene;
-            
-            this.hero.model = model;
-
-            if (this.hero.equipped) {
-                Object.keys(this.hero.equipped).forEach(bodyPart => {
-                    this.eventDepot.fire('equipItem', {bodyPart, itemName: this.hero.equipped[bodyPart]});
-                })
-            }
-
-            let controlsObj = this.scene.controls.getObject();
-
-            // Adjustments for hero:
-            model.rotation.y = Math.PI;
-
-            // Set hero location:
-            controlsObj.translateX( this.hero.location.x * multiplier );
-            controlsObj.translateZ( this.hero.location.z * multiplier );
-            controlsObj.translateY( this.determineElevationGeneric(
-                this.hero.location.x * multiplier, this.hero.location.z * multiplier, "hero")
-            );
-            
-            controlsObj.attributes = this.hero.attributes;
-            controlsObj.add( model );
-
-            this.createMixer( model, gltf.animations, "hero" );
-            
-            this.updateHeroLocation(true);
-            this.updateHeroStats();
-
-        })
-    }
 
     updateHeroStats = () => {
 
@@ -544,10 +505,6 @@ export class SceneController {
         }
 
         this.eventDepot.fire('updateHeroLocation', { x: x / multiplier, y, z: z / multiplier });
-
-        this.mixers.hero.velocity.x = 0;
-        this.mixers.hero.velocity.z = 0;
-
     }
 
     seedObjects3D = () => {
@@ -563,7 +520,7 @@ export class SceneController {
      */ 
     seedObject3D = (object) => {
 
-        this.load(object, (gltf) => {
+        this.formFactory.load(object, (gltf) => {
 
             let model = gltf.scene;
 
@@ -572,10 +529,10 @@ export class SceneController {
             model.position.z = object.location.z * multiplier;
             model.position.y = this.determineElevationGeneric(model.position.x, model.position.z,object.name) + object.attributes.elevation;
             
-            // Set movable objects rotation to 180 to match the Hero
-            if (object.attributes.moves) {
-                model.rotation.y = Math.PI;
-            }
+            // // Set movable objects rotation to 180 to match the Hero
+            // if (object.attributes.moves) {
+            //     model.rotation.y = Math.PI;
+            // }
 
             if (object.attributes.animates) {
                 this.createMixer( model, gltf.animations, model.uuid );
@@ -586,7 +543,7 @@ export class SceneController {
 
             if (object.attributes.contentItems) {
                 object.attributes.contentItems.forEach(contentItem => {
-                    this.load(contentItem, (iGltf) => {
+                    this.formFactory.load(contentItem, (iGltf) => {
                         let iModel = iGltf.scene;
                         iModel.position.x = model.position.x;
                         iModel.position.z = model.position.z;
@@ -605,66 +562,6 @@ export class SceneController {
         });
     }
 
-
-    createMixer( model, animations, uniqueId ) {
-
-        var thisMixer = new THREE.AnimationMixer( model );
-
-        let firstAnimationName = '';
-        animations.forEach((animation,index) => {
-
-            var action = thisMixer.clipAction( animation );
-            if (index == 0) { firstAnimationName = animation.name };
-
-            if ( emotes.indexOf( animation.name ) >= 0 || states.indexOf( animation.name ) >= 4) {
-                action.clampWhenFinished = true;
-                action.loop = THREE.LoopOnce;
-            } else if (model.objectType=='structure') {
-                action.clampWhenFinished = true;
-                action.loop = THREE.LoopPingPong;
-                action.repetitions = 1;
-            }
-
-            this.actions[ uniqueId + animation.name ] = action;
-
-        });
-
-        var mixerObj = { 
-        
-            name: model.objectName, 
-            mixer: thisMixer,
-            activeActionName: 'Idle', // 'Idle',
-            activeAction: this.actions[uniqueId + firstAnimationName],
-            previousActionName: '',
-            previousAction: null,
-        };
-
-
-        if (model.attributes.moves) {
-
-            mixerObj = {
-                ...mixerObj,
-                moves: true,
-                absVelocity: 0,
-                direction: new THREE.Vector3(),
-                velocity: new THREE.Vector3(),
-                downRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength ),
-                movementRaycaster: new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, model.attributes.length/2 + 20 ),
-                justJumped: false,
-                standingUpon: null,
-                canJump: true,
-                selectedObject: null,
-            }
-
-            mixerObj.movementRaycasterR = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, model.attributes.width/2 + 20 )
-            mixerObj.movementRaycasterL = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, model.attributes.width/2 + 20 )
-
-            mixerObj.activeAction.play();
-            
-        }
-
-        this.mixers[uniqueId] = mixerObj;
-    }
 
     handleMixers(delta) {
         if ( this.mixers ) {
@@ -720,167 +617,6 @@ export class SceneController {
 
     }
 
-    handleHeroMovement(delta) {
-
-        if (this.mixers.hero) {
-
-            let heroObj = this.scene.controls.getObject();
-
-            // INERTIA
-            this.mixers.hero.velocity.x -= this.mixers.hero.velocity.x * 10.0 * delta;
-            this.mixers.hero.velocity.z -= this.mixers.hero.velocity.z * 10.0 * delta;
-            this.mixers.hero.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
-
-            this.mixers.hero.direction.z = Number( this.scene.moveForward ) - Number( this.scene.moveBackward );
-            this.mixers.hero.direction.x = Number( this.scene.moveLeft ) - Number( this.scene.moveRight );
-            this.mixers.hero.direction.normalize(); // this ensures consistent movements in all directions
-            
-            let agility = this.hero.attributes.stats.agility.substring(0,2);
-
-            if ( this.scene.moveForward || this.scene.moveBackward ) this.mixers.hero.velocity.z -= this.mixers.hero.direction.z * 1000.0 * agility * delta;
-            if ( this.scene.moveLeft || this.scene.moveRight ) this.mixers.hero.velocity.x -= this.mixers.hero.direction.x * 1000.0 * agility * delta;
-
-            this.identifySelectedObject(heroObj);
-            this.handleMovement( "hero", heroObj, delta );
-            
-            if (this.mixers.hero.standingUpon && this.mixers.hero.standingUpon.attributes.routeTo && typeof this.mixers.hero.standingUpon.attributes.routeTo.level == "number") {
-                if (this.mixers.hero.standingUpon.attributes.unlocked) {
-                    
-                    this.eventDepot.fire('cacheLayout', {});
-
-                    let loadData = {
-
-                        level: this.mixers.hero.standingUpon.attributes.routeTo.level,
-                        location: this.mixers.hero.standingUpon.attributes.routeTo.location,
-                    }
-
-                    this.eventDepot.fire('loadLevel', loadData);
-                }
-            }
-
-            this.scene.handleAutoZoom();
-
-            if (this.layout.terrain.overheadPointLight) {
-                this.overheadPointLight.position.copy(heroObj.position);
-                this.overheadPointLight.rotation.copy(heroObj.rotation);
-                this.overheadPointLight.position.y = heroObj.position.y + 60;
-                this.overheadPointLight.translateZ(-80);
-            }
-        }
-    }
-
-    handleEntityMovement(delta) {
-        this.objects3D.filter(el => el.objectType == 'friendly' || el.objectType == 'beast').forEach(entity => {
-            
-            if (this.mixers[entity.uuid]) {
-            
-                // Make a random rotation (yaw)
-                entity.rotateY(getRndInteger(-5,5)/100);
-                
-                // GRAVITY
-                this.mixers[entity.uuid].velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
-                this.mixers[entity.uuid].velocity.z = getRnd(.2,entity.attributes.stats.agility.substring(0,2)) * 100;
-
-                // Basic movement always in the z-axis direction for this entity
-                this.mixers[entity.uuid].velocity.x = 0;
-                this.mixers[entity.uuid].direction.z = 0.2; // getRnd(0,.2);
-
-                this.handleMovement(entity.uuid, entity, delta);
-            }
-        });
-    }
-
-
-    /**
-     * This function will move an entity from one location to another.
-     * Direction is relative to the entity in question
-     */
-    handleMovement = ( uniqueId, entity, delta ) => {
-
-        var yAxisRotation = new THREE.Euler( 0, entity.rotation.y, 0, 'YXZ' );
-        let worldDirection = new THREE.Vector3().copy(this.mixers[uniqueId].direction).applyEuler( yAxisRotation );
-        
-        let mRaycaster = this.mixers[uniqueId].movementRaycaster;
-        mRaycaster.ray.origin.copy( entity.position );
-        mRaycaster.ray.origin.y += entity.attributes.height;
-        mRaycaster.ray.direction.x = -worldDirection.x;
-        mRaycaster.ray.direction.z = -worldDirection.z;
-
-        // Essentially set Lx = -wDz and Lz = wDx, then Rx = wDz and Rz = -wDx
-        let worldDirectionL = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, -Math.PI/2, 0, 'YXZ' ));
-        let worldDirectionR = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, Math.PI/2, 0, 'YXZ' ));
-
-        if (worldDirection.x != 0 || worldDirection.z != 0) {
-            console.log("worldDirection")
-            console.table(worldDirection)
-            console.log("worldDirectionL")
-            console.table(worldDirectionL)
-            console.log("worldDirectionR")
-            console.table(worldDirectionR)
-    
-        }
-        
-        let mRaycasterL = this.mixers[uniqueId].movementRaycasterL;
-        mRaycasterL.ray.origin.copy( entity.position );
-        mRaycasterL.ray.origin.y += entity.attributes.height;
-        mRaycasterL.ray.direction.x = worldDirectionL.x;
-        mRaycasterL.ray.direction.z = worldDirectionL.z;
-
-        let mRaycasterR = this.mixers[uniqueId].movementRaycasterR;
-        mRaycasterR.ray.origin.copy( entity.position );
-        mRaycasterR.ray.origin.y += entity.attributes.height;
-        mRaycasterR.ray.direction.x = worldDirectionR.x;
-        mRaycasterR.ray.direction.z = worldDirectionR.z;
-
-        // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
-        let fIntersects = mRaycaster.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
-        let rIntersects = mRaycasterR.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
-        let lIntersects = mRaycasterL.intersectObjects(this.objects3D, true).filter(el => this.getRootObject3D(el.object) != entity);
-
-        if (fIntersects.length == 0) { // Nothing is in the front, so move forward at given velocity
-            
-            entity.translateX( this.mixers[uniqueId].velocity.x * delta );
-            entity.translateY( this.mixers[uniqueId].velocity.y * delta );
-            entity.translateZ( this.mixers[uniqueId].velocity.z * delta );
-
-            if (rIntersects.length != 0) { // intersections on the right?
-                entity.position.x += mRaycasterL.ray.direction.x;
-                entity.position.z += mRaycasterL.ray.direction.z;
-                this.scene.helper.position.copy(rIntersects[0].point);
-                this.scene.helper.material.color = { r: 1, g: 0, b: 0 };
-            }
-
-            if (lIntersects.length != 0) { // intersections on the left?
-                entity.position.x += mRaycasterR.ray.direction.x;
-                entity.position.z += mRaycasterR.ray.direction.z;       
-                // console.log(`${entity.objectName} lIntersects:`);
-                // console.dir(lIntersects[0]);
-                this.scene.helper.position.copy(lIntersects[0].point);
-                this.scene.helper.material.color = { r: 0, g: 0, b: 1 };
-            }  
-
-
-        } else { // Something is blocking, so stop without moving
-            
-            this.mixers[uniqueId].velocity.x = 0;
-            this.mixers[uniqueId].velocity.y = 0;
-            this.mixers[uniqueId].velocity.z = 0;
-
-            // Show the helper in front:
-            this.scene.helper.position.copy(fIntersects[0].point);
-            this.scene.helper.material.color = { r: 0, g: 1, b: 0 };
-
-            if (uniqueId != "hero") { // AI - turn around
-                entity.rotateY(Math.PI);
-            }
-
-            entity.translateY( this.mixers[uniqueId].velocity.y * delta );
-        }
-
-        this.setElevation( uniqueId, entity );
-
-    }
-
     fadeToAction = ( uuid, actionName, duration ) => {
         
         if ( this.mixers[uuid].activeActionName !== actionName ) {
@@ -925,6 +661,14 @@ export class SceneController {
             .setEffectiveWeight( 1 )
             .fadeIn( duration )
             .play();
+    }
+
+    handleAnimated(delta) {
+
+    }
+
+    handleHeroMovement(delta) {
+        this.hero.handleMovement(delta, this.objects3D);
     }
 
 }

@@ -89,7 +89,7 @@ class Scene {
         this.cameraMinimap.rotation.set( -Math.PI / 2, 0, 0 );
         this.controls.getObject().add(this.cameraMinimap);
 
-        this.controller.loader.load( '/models/3d/gltf/arrow.gltf', (gltf) => {
+        this.controller.formFactory.loader.load( '/models/3d/gltf/arrow.gltf', (gltf) => {
             this.compass = gltf.scene;
             this.compass.scale.set( 100, 100, 100 );
             this.compass.children[0].material.side = THREE.FrontSide;
@@ -302,6 +302,10 @@ class Scene {
 
         this.controller.eventDepot.addListener('unlockControls', () => {
             this.controls.unlock();
+            this.moveForward = false;
+            this.moveBackward = false;
+            this.moveLeft = false;
+            this.moveRight = false;
         })
 
         this.instructions.addEventListener( 'click', () => {
@@ -397,10 +401,10 @@ class Scene {
                 this.time = performance.now();
                 this.delta = ( this.time - this.prevTime ) / 1000;
     
-                this.controller.handleHeroMovement(this.delta);
-                this.controller.handleEntityMovement(this.delta);
-                this.controller.handleMixers(this.delta);
-                this.handleSprites();
+                // this.controller.handleHeroMovement(this.delta);
+                // this.controller.handleEntityMovement(this.delta);
+                // this.controller.handleMixers(this.delta);
+                // this.handleSprites();
 
                 if (this.controller.backgroundMesh) this.controller.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
     

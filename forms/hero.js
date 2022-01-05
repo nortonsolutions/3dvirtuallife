@@ -11,19 +11,20 @@ import { IntelligentForm } from './intelligent.js'
  */
 export class Hero extends IntelligentForm {
 
-    constructor(heroTemplate, eventDepot) {
+    constructor(heroTemplate, formFactory) {
         
-        super();
+        super(heroTemplate, formFactory);
 
         this.name = heroTemplate.name;
         this.gltf = heroTemplate.gltf;
         this.model = heroTemplate.model;
-        this.attributes = heroTemplate.attributes;
         this.inventory = heroTemplate.inventory;
         this.spells = heroTemplate.spells;
         this.equipped = heroTemplate.equipped;
-        this.eventDepot = eventDepot;
+        this.eventDepot = formFactory.eventDepot;
         
+        this.selectedObject = null;
+
         this.addEventListeners = this.addEventListeners.bind(this);
         this.addEventListeners();
 
@@ -35,7 +36,7 @@ export class Hero extends IntelligentForm {
     }
 
     cacheHero() {
-        localStorage.setItem('gameHeroTemplate', JSON.stringify(this.template()));
+        localStorage.setItem('gameHeroTemplate', JSON.stringify(this.returnTemplate()));
     }
 
     addEventListeners() {
@@ -44,6 +45,9 @@ export class Hero extends IntelligentForm {
             this.location.x = data.x;
             this.location.y = data.y;
             this.location.z = data.z;
+
+            this.velocity.x = 0;
+            this.velocity.z = 0;
             this.cacheHero();
         })
 
@@ -200,7 +204,7 @@ export class Hero extends IntelligentForm {
         })
     }
 
-    template() {
+    returnTemplate() {
 
         return {
             name: this.name,
