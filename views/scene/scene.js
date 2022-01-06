@@ -90,7 +90,7 @@ class Scene {
             }
         }
 
-        // this.compass = this.controller.formFactory.newForm(null, compassTemplate, "gltf", this.controller.floor.model);
+        // this.compass = this.controller.formFactory.newForm(null, compassTemplate, this.controller.floor.model);
         // this.compass.load(() => {
         //     this.compass.model.children[0].material.side = THREE.FrontSide;
         //     this.compass.model.position.set( 0, cameraMinimapElevationDefault/2, -cameraMinimapElevationDefault/10);
@@ -164,8 +164,6 @@ class Scene {
                 break;
 
             case 32: // space
-                let heroMixer = this.controller.mixers.hero;
-                
                 if ( this.controller.hero.canJump === true ) {
                     this.controller.hero.velocity.y += 350;
                     this.controller.hero.fadeToAction("hero", "Jump", 0.2)
@@ -203,22 +201,22 @@ class Scene {
 
             case 38: // up
             case 87: // w
-                this.moveForward = false;
+                this.controller.hero.moveForward = false;
                 break;
 
             case 37: // left
             case 65: // a
-                this.moveLeft = false;
+                this.controller.hero.moveLeft = false;
                 break;
 
             case 40: // down
             case 83: // s
-                this.moveBackward = false;
+                this.controller.hero.moveBackward = false;
                 break;
 
             case 39: // right
             case 68: // d
-                this.moveRight = false;
+                this.controller.hero.moveRight = false;
                 break;
 
         }
@@ -253,7 +251,7 @@ class Scene {
             case 1:
                 break;
             case 2:
-                this.moveForward = true;
+                this.controller.hero.moveForward = true;
                 break;
         }
     }
@@ -267,7 +265,7 @@ class Scene {
             case 1:
                 break;
             case 2:
-                this.moveForward = false;
+                this.controller.hero.moveForward = false;
                 break;
         }
     }

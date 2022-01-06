@@ -47,8 +47,8 @@ function getObjectType(obj) {
 function shiftTowardCenter(value) {
     if (value != 0) {
         if (value > 0) {
-            return value--;
-        } else return value++;
+            return value - 5;
+        } else return value + 5;
     }
 }
 

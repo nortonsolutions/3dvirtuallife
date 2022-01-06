@@ -38,7 +38,6 @@ export class Hero extends IntelligentForm {
         this.moveRight = false;
 
         this.cacheHero();
-        
 
     }
 
@@ -108,6 +107,47 @@ export class Hero extends IntelligentForm {
             this.cacheHero();
         });
 
+        this.eventDepot.addListener('mouse0click', () => {
+
+            if (this.selectedObject) {
+
+                let thisObj = this.selectedObject;
+
+                let objectName = getObjectName(thisObj);
+                let objectType = getObjectType(thisObj);
+                
+                if (objectType == "item") {
+                    this.eventDepot.fire('takeItemFromScene', {itemName: objectName, uuid: thisObj.uuid});
+
+                } else if (objectType == "friendly") {
+                    
+                    // TODO: conversation
+                    this.eventDepot.fire('unlockControls', {});
+                    this.eventDepot.fire('modal', { name: objectName });
+                
+                } else if (objectType == "beast") {
+
+                    // TODO: combat
+                    this.fadeToAction("Punch", 0.2)
+
+                } else if (objectType == "structure") {
+                    
+                    var accessible = thisObj.attributes.key ? 
+                        this.inventory.map(el => {
+                            return el? el.itemName: null;
+                        }).includes(thisObj.attributes.key) :
+                        true;
+                    
+                    if (accessible) {
+                        this.updateStructureAttributes(thisObj, {unlocked: true});
+                        if (this.activeAction) {
+                            this.runActiveAction(0.2);
+                        }
+                    }
+                }
+            }   
+        })
+
         this.eventDepot.addListener('unlockControls', () => {
             this.moveForward = false;
             this.moveBackward = false;
@@ -139,6 +179,7 @@ export class Hero extends IntelligentForm {
         this.eventDepot.removeListeners('takeItemFromScene');
         this.eventDepot.removeListeners('removeItem');
         this.eventDepot.removeListeners('dropItemToScene');
+        this.eventDepot.removeListeners('mouse0click');
         this.dispose(this.model);
         callback();
     }
@@ -264,8 +305,7 @@ export class Hero extends IntelligentForm {
     }
 
     move(otherForms, delta) {
-        // super.move(worldDirection, delta);
-
+        
         let otherModels = otherForms.map(el => el.model);
 
         // INERTIA
@@ -291,84 +331,20 @@ export class Hero extends IntelligentForm {
 
         let worldDirection = new THREE.Vector3().copy(this.direction).applyEuler( this.controls.rotation );
         
-        let mRaycaster = this.movementRaycaster;
-        mRaycaster.ray.origin.copy( this.model.position );
-        mRaycaster.ray.origin.y += this.attributes.height;
-        mRaycaster.ray.direction.x = -worldDirection.x; // -worldDirection.x;
-        mRaycaster.ray.direction.z = -worldDirection.z; // -worldDirection.z;
+        super.move(otherModels, worldDirection, delta)
 
-        // Essentially set Lx = -wDz and Lz = wDx, then Rx = wDz and Rz = -wDx
-        // let worldDirectionL = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, -Math.PI/2, 0, 'YXZ' ));
-        // let worldDirectionR = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, Math.PI/2, 0, 'YXZ' ));
+        // entity.translateY( this.mixers[uniqueId].velocity.y * delta );
+        if (this.setElevation( otherModels ) == -1) {
 
-        // if (worldDirection.x != 0 || worldDirection.z != 0) {
-        //     console.log(`${uniqueId} rc: ${mRaycaster.ray.direction.x},${mRaycaster.ray.direction.z}`);
-        //     console.log(`${uniqueId} mixerV: ${this.mixers[uniqueId].velocity.x},${this.mixers[uniqueId].velocity.z}`);
-        //     console.log(`${uniqueId} mixerD: ${this.mixers[uniqueId].direction.x},${this.mixers[uniqueId].direction.z}`);
-        //     console.log(`${uniqueId} rotationY: ${entity.rotation.y}`);
-        // }
-        
-        // let mRaycasterL = this.mixers[uniqueId].movementRaycasterL;
-        // mRaycasterL.ray.origin.copy( entity.position );
-        // mRaycasterL.ray.origin.y += entity.attributes.height;
-        // mRaycasterL.ray.direction.x = worldDirectionL.x;
-        // mRaycasterL.ray.direction.z = worldDirectionL.z;
+            this.controls.translateX( -this.velocity.x * delta );
+            this.controls.translateY( -this.velocity.y * delta );
+            this.controls.translateZ( -this.velocity.z * delta );
 
-        // let mRaycasterR = this.mixers[uniqueId].movementRaycasterR;
-        // mRaycasterR.ray.origin.copy( entity.position );
-        // mRaycasterR.ray.origin.y += entity.attributes.height;
-        // mRaycasterR.ray.direction.x = worldDirectionR.x;
-        // mRaycasterR.ray.direction.z = worldDirectionR.z;
-
-        // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
-        let fIntersects = mRaycaster.intersectObjects(otherModels, true);
-        // let rIntersects = mRaycasterR.intersectObjects(this.objects3D, true).filter(el => getRootObject3D(el.object) != entity);
-        // let lIntersects = mRaycasterL.intersectObjects(this.objects3D, true).filter(el => getRootObject3D(el.object) != entity);
-
-        if (fIntersects.length == 0) { // Nothing is in the front, so move forward at given velocity
-            
-            this.model.translateX( this.velocity.x * delta );
-            this.model.translateY( this.velocity.y * delta );
-            this.model.translateZ( this.velocity.z * delta );
-
-            // if (rIntersects.length != 0) { // intersections on the right?
-            //     entity.position.x += mRaycasterL.ray.direction.x;
-            //     entity.position.z += mRaycasterL.ray.direction.z;
-            //     this.scene.helper.position.copy(rIntersects[0].point);
-            //     this.scene.helper.material.color = { r: 1, g: 0, b: 0 };
-            // }
-
-            // if (lIntersects.length != 0) { // intersections on the left?
-            //     entity.position.x += mRaycasterR.ray.direction.x;
-            //     entity.position.z += mRaycasterR.ray.direction.z;       
-            //     // console.log(`${entity.objectName} lIntersects:`);
-            //     // console.dir(lIntersects[0]);
-            //     this.scene.helper.position.copy(lIntersects[0].point);
-            //     this.scene.helper.material.color = { r: 0, g: 0, b: 1 };
-            // }  
-
-
-        } else { // Something is blocking, so stop without moving
-            
             this.velocity.x = 0;
             this.velocity.y = 0;
             this.velocity.z = 0;
 
-            this.model.translateX( -this.velocity.x * delta );
-            this.model.translateY( -this.velocity.y * delta );
-            this.model.translateZ( -this.velocity.z * delta );
-
-            this.eventDepot.fire('updateHelper', { position: fIntersects[0].point, color: { r: 0, g: 1, b: 0 }});
-
-
-            
-        }
-
-        // entity.translateY( this.mixers[uniqueId].velocity.y * delta );
-        this.setElevation( otherModels );
-        
-        
-        
+        };
         
         if (this.standingUpon && this.standingUpon.attributes.routeTo && typeof this.standingUpon.attributes.routeTo.level == "number") {
             if (this.standingUpon.attributes.unlocked) {
@@ -385,12 +361,4 @@ export class Hero extends IntelligentForm {
             }
         }
     }
-
-    animate(delta) {
-
-    }
-
-
-
-
 }

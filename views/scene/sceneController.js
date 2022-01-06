@@ -106,7 +106,7 @@ export class SceneController {
 
     addHero3D(callback) {
 
-        this.hero = this.formFactory.newForm("hero", this.heroTemplate, "gltf", this.floor.model);
+        this.hero = this.formFactory.newForm("hero", this.heroTemplate, this.floor.model);
 
         this.hero.load(() => {
             
@@ -203,8 +203,6 @@ export class SceneController {
         this.eventDepot.removeListener('takeItemFromScene', 'bound takeItemFromScene');
         this.eventDepot.removeListener('dropItemToScene', 'bound dropItemToScene');
         this.eventDepot.removeListener('equipItem', 'bound equipItem');
-        this.eventDepot.removeListeners('mouse0click');
-        
 
         this.scene.unregisterEventListeners();
         this.scene.deanimate(() => {
@@ -294,52 +292,7 @@ export class SceneController {
         this.eventDepot.addListener('takeItemFromScene', this.takeItemFromScene);
         this.eventDepot.addListener('dropItemToScene', this.dropItemToScene);
         this.eventDepot.addListener('equipItem', this.equipItem)
-        this.eventDepot.addListener('mouse0click', () => {
-            let mixers = this.mixers;
-                if (mixers.hero && mixers.hero.selectedObject) {
-
-                let thisObj = mixers.hero.selectedObject;
-
-                let objectName = getObjectName(thisObj);
-                let objectType = getObjectType(thisObj);
-                
-                if (objectType == "item") {
-                    this.eventDepot.fire('takeItemFromScene', {itemName: objectName, uuid: thisObj.uuid});
-
-                } else if (objectType == "friendly") {
-                    
-                    // TODO: conversation
-                    this.eventDepot.fire('unlockControls', {});
-                    this.eventDepot.fire('modal', { name: objectName });
-                
-                } else if (objectType == "beast") {
-
-                    // TODO: combat
-                    this.fadeToAction("hero", "Punch", 0.2)
-
-                } else if (objectType == "structure") {
-                    
-                    var accessible = thisObj.attributes.key ? 
-                        this.hero.inventory.map(el => {
-                            return el? el.itemName: null;
-                        }).includes(thisObj.attributes.key) :
-                        true;
-                    
-                    if (accessible) {
-                        this.updateStructureAttributes(thisObj, {unlocked: true});
-                        if (mixers[thisObj.uuid] && mixers[thisObj.uuid].activeAction) {
-                            this.runActiveAction(thisObj.uuid, 0.2);
-                        }
-                    }
-                }
-            }
-        })
-
     }
-
-
-
-
 
     /** This method will not set the position of the object3D, nor create a GUI.
      * The return object 'gltf' will have a model (scene) and animations if applicable.
@@ -399,10 +352,6 @@ export class SceneController {
     createGUI(gltf) {
         this.scene.createGUI( model, gltf.animations, model.uuid );
     }
-
-
-
-
 
     addSconces = (object) => {
         if (/sconce/i.test(object.name)) {
@@ -479,81 +428,9 @@ export class SceneController {
         });
     }
 
-
-    handleMixers(delta) {
-        if ( this.mixers ) {
-
-            let mixers = this.mixers;
-            Object.keys(mixers).forEach(key => {
-                
-
-                if (mixers[key].moves) {
-                    mixers[key].absVelocity = Math.max(Math.abs(mixers[key].velocity.x), Math.abs(mixers[key].velocity.z));
-
-                    if (mixers[key].absVelocity < .1 && (mixers[key].activeActionName == 'Walking' || mixers[key].activeActionName == 'Running')) {
-                        this.fadeToAction( key, 'Idle', 0.2);
-                    } else if (mixers[key].absVelocity >= .1 && mixers[key].activeActionName == 'Idle') {
-                        this.fadeToAction( key, 'Walking', 0.2);
-                    } else if (mixers[key].absVelocity >= 199 && mixers[key].activeActionName == 'Walking') {
-                        this.fadeToAction( key, 'Running', 0.2);
-                    }
-                }
-
-                mixers[key].mixer.update( delta );
-            })
-        }
-    }
-
-
-
-    fadeToAction = ( uuid, actionName, duration ) => {
-        
-        if ( this.mixers[uuid].activeActionName !== actionName ) {
-
-            let newAction = this.actions[ uuid + actionName ];
-
-            this.mixers[uuid].previousActionName = this.mixers[uuid].activeActionName;
-            this.mixers[uuid].previousAction = this.mixers[uuid].activeAction;
-            this.mixers[uuid].activeActionName = actionName;
-            this.mixers[uuid].activeAction = newAction;
-
-            this.mixers[uuid].previousAction.fadeOut( duration );
-
-            this.mixers[uuid].activeAction
-                .reset()
-                .setEffectiveTimeScale( 1 )
-                .setEffectiveWeight( 1 )
-                .fadeIn( duration )
-                .play();
-
-            const restoreState = () => {
-                this.mixers[uuid].mixer.removeEventListener('finished', restoreState );
-                this.fadeToAction( uuid, this.mixers[uuid].previousActionName, 0.1 );
-            }
-
-            if (emotes.includes(actionName)) {
-                this.mixers[uuid].mixer.addEventListener( 'finished', restoreState );
-            }
-        }
-    }
-
     updateStructureAttributes = (object, payload) =>  {
         object.attributes = {...object.attributes, ...payload};
         this.eventDepot.fire('updateStructureAttributes', {uuid: object.uuid, attributes: payload});
-    }
-
-    runActiveAction = (uuid, duration) => {
-
-        this.mixers[uuid].activeAction
-            .reset()
-            .setEffectiveTimeScale( 1 )
-            .setEffectiveWeight( 1 )
-            .fadeIn( duration )
-            .play();
-    }
-
-    handleAnimated(delta) {
-
     }
 
 }

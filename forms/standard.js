@@ -61,22 +61,29 @@ export class StandardForm {
 
     determineElevationFromBase() {
 
+        var model;
+        if (this.type == "hero") {
+            model = this.controls;
+        } else {
+            model = this.model;
+        }
+
         let yOffset = 40;
 
-        this.upRaycaster.ray.origin.x = this.model.position.x;
-        this.upRaycaster.ray.origin.z = this.model.position.z;
+        this.upRaycaster.ray.origin.x = model.position.x;
+        this.upRaycaster.ray.origin.z = model.position.z;
         this.upRaycaster.ray.origin.y = -yOffset;
         
 
-        if (this.upRaycasterGeneric.intersectObject(this.floorModel, true)[0]) {
-            let distanceFromBase = this.upRaycasterGeneric.intersectObject(this.floorModel, true)[0].distance;
+        if (this.upRaycaster.intersectObject(this.floorModel, true)[0]) {
+            let distanceFromBase = this.upRaycaster.intersectObject(this.floorModel, true)[0].distance;
 
-            this.downRaycaster.ray.origin.copy (this.upRaycasterGeneric.ray.origin);
-            this.downRaycasterGeneric.ray.origin.y += (distanceFromBase + yOffset);
+            this.downRaycaster.ray.origin.copy (this.upRaycaster.ray.origin);
+            this.downRaycaster.ray.origin.y += (distanceFromBase + yOffset);
             
-            let distanceFromAbove = this.downRaycasterGeneric.intersectObject(this.floorModel, true)[0].distance;
-            let genericElevation = this.downRaycasterGeneric.ray.origin.y - distanceFromAbove + 5; 
-            return (genericElevation);
+            let distanceFromAbove = this.downRaycaster.intersectObject(this.floorModel, true)[0].distance;
+            let elevation = this.downRaycaster.ray.origin.y - distanceFromAbove + 5; 
+            return (elevation);
         } else {
 
             return -1;
