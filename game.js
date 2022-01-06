@@ -12,7 +12,7 @@ import { LayoutManager } from './layout/layoutManager.js';
 
 class Game {
 
-    constructor(heroTemplate, eventDepot) {
+    constructor(heroTemplate, eventDepot, loader, floorModel) {
 
         // this.props = props;
         this.heroTemplate = heroTemplate;

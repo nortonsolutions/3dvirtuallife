@@ -1,5 +1,7 @@
 // TODO: simplify and consolidate?  Some overlap here.
 
+var multiplier = 100;
+
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min) ) + min;
 }
@@ -10,7 +12,45 @@ function getRnd(min,max) {
 
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
-  }
+}
+
+function getRootObject3D(obj) {
+    if (obj.objectName) {
+        return obj;
+    } else if (obj.parent == null) {
+        return null;
+    } else {
+        return getRootObject3D(obj.parent);
+    }
+}
+
+function getObjectName(obj) {
+    if (obj.objectName) {
+        return obj.objectName;
+    } else if (obj.parent == null) {
+        return null;
+    } else {
+        return getObjectName(obj.parent);
+    }
+}
+
+function getObjectType(obj) {
+    if (obj.objectType) {
+        return obj.objectType;
+    } else if (obj.parent == null) {
+        return null;
+    } else {
+        return getObjectType(obj.parent);
+    }
+}
+
+function shiftTowardCenter(value) {
+    if (value != 0) {
+        if (value > 0) {
+            return value--;
+        } else return value++;
+    }
+}
 
 postOptions = (data) => {
     return {

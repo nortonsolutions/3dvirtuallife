@@ -14,10 +14,6 @@ import { FormFactory } from '/forms/formFactory.js';
  *  
  */
 
-var multiplier = 100;
-var upRaycasterTestLength = 700; 
-var downRaycasterTestLength = 70;
-
 import { Fire, params } from '/forms/fire.js' 
 
 export class SceneController {
@@ -35,9 +31,6 @@ export class SceneController {
         this.scene = null;
         this.floor = null;
 
-        this.upRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ), 0, upRaycasterTestLength);
-        this.downRaycasterGeneric = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength);
-
         this.fireParams = params;
 
 
@@ -53,7 +46,7 @@ export class SceneController {
         this.equipItem = this.equipItem.bind(this);
         this.seedObjects3D = this.seedObjects3D.bind(this);
         
-        this.hero = this.formFactory.newForm("hero", this.heroTemplate);
+        
         
         this.addEventListeners();
     }
@@ -63,20 +56,27 @@ export class SceneController {
         this.scene = new Scene(this);
         this.scene.init(() => {
             this.addFloor(() => {
+
                 // this.seedObjects3D();
-                this.addHero3D();
                 this.addLights();
-                this.scene.animate();
+                this.addHero3D(() => {
+                    this.scene.animate();
+                });
             });
             
         });
+    }
+
+    addToScene(form) {
+        this.scene.add( form.model );
+        this.forms.push( form );
     }
 
     addFloor(callback) {
 
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
         this.floor.load(() => {
-            this.addToScene(this.floor.model);
+            this.addToScene(this.floor);
             callback();
         });
 
@@ -89,53 +89,114 @@ export class SceneController {
         if (this.layout.terrain.hemisphereLight) {
             var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
             light.position.set( 0.5, 1, 0.75 );
-            this.scene.scene.add( light );
+            this.scene.add( light );
         }
 
         if (this.layout.terrain.overheadPointLight) {
             this.overheadPointLight = new THREE.PointLight( 0xf37509, 15, 350, 3 );
             this.overheadPointLight.position.set( 0, 0, 0 );
-            this.scene.scene.add( this.overheadPointLight );
+            this.scene.add( this.overheadPointLight );
         }
-        
+
+        // Proximity Light is used for object selection/identification
         this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 30 );
         this.proximityLight.position.set( 0, 0, 0 );
-        this.scene.scene.add( this.proximityLight );
-
+        this.scene.add( this.proximityLight );
     }
 
-    addHero3D = () => {
+    addHero3D(callback) {
+
+        this.hero = this.formFactory.newForm("hero", this.heroTemplate, "gltf", this.floor.model);
 
         this.hero.load(() => {
-            // this.addToScene(this.hero.model);
-
+            
             if (this.hero.equipped) {
                 Object.keys(this.hero.equipped).forEach(bodyPart => {
                     this.eventDepot.fire('equipItem', {bodyPart, itemName: this.hero.equipped[bodyPart]});
                 })
             }
 
-            let controlsObj = this.scene.controls.getObject();
+            this.hero.controls = this.scene.controls.getObject();
 
             // Adjustments for hero:
             this.hero.model.rotation.y = Math.PI;
 
             // Set hero location:
-            controlsObj.translateX( this.hero.location.x * multiplier );
-            controlsObj.translateZ( this.hero.location.z * multiplier );
-            controlsObj.translateY( this.determineElevationGeneric(
-                this.hero.location.x * multiplier, this.hero.location.z * multiplier, "hero")
-            );
+            this.hero.controls.translateX( this.hero.location.x * multiplier );
+            this.hero.controls.translateZ( this.hero.location.z * multiplier );
+            // this.hero.controls.translateY( this.determineElevationFromBase(
+            //     this.hero.location.x * multiplier, this.hero.location.z * multiplier, "hero")
+            // );
             
-            controlsObj.attributes = this.hero.attributes;
-            controlsObj.add( this.hero.model );
+            this.hero.controls.attributes = this.hero.attributes;
+            this.hero.controls.add( this.hero.model );
+            
+            this.hero.controls.objectName = this.hero.name;
+            this.hero.controls.objectType = "hero";
+            this.forms.push( this.hero );
 
-            this.updateHeroLocation(true);
-            this.updateHeroStats();
+            this.hero.updateHeroLocation(this.hero.controls.position, true);
+            this.hero.updateHeroStats();
+
+            callback();
 
         })
     }
 
+    handleMovement(delta) {
+        this.forms.forEach(form => {
+            if (form.moves) {
+
+                let otherForms = this.forms.filter(el => el != form);
+                form.move(otherForms, delta);
+            }
+
+            if (form.animations && form.animations.length != 0) {
+                form.animate(delta);
+            }
+            
+        })
+
+        this.identifySelectedObject(this.scene.controls.getObject());
+        
+        let nonHeroModels = this.forms.filter(el => el.type != "hero").map(el => el.model);
+        this.scene.handleAutoZoom(nonHeroModels);
+    }
+
+    identifySelectedObject(controlsObject) {
+
+        if (this.layout.terrain.overheadPointLight) {
+            this.overheadPointLight.position.copy(controlsObject.position);
+            this.overheadPointLight.rotation.copy(controlsObject.rotation);
+            this.overheadPointLight.position.y = controlsObject.position.y + 60;
+            this.overheadPointLight.translateZ(-80);
+        }
+
+        this.proximityLight.rotation.copy(controlsObject.rotation);
+        this.proximityLight.position.copy(controlsObject.position);
+        this.proximityLight.translateZ(-40);
+        this.proximityLight.translateY(40);
+
+        let closest = Infinity;
+
+        this.objects3D.forEach(o => {
+            let distance = o.position.distanceTo(this.proximityLight.position);
+            if (distance <= 50 && distance < closest) {
+                // If the object is unlocked, exclude to allow selecting the contents
+                if (!o.attributes.contentItems || (o.attributes.contentItems && !o.attributes.unlocked))  {
+                    closest = distance;
+                    this.hero.selectedObject = o;
+                    this.eventDepot.fire('showDescription', { objectType: getObjectType(o), objectName: getObjectName(o) }); 
+                }
+            }
+        })
+
+        if (closest > 50) {
+            this.hero.selectedObject = null;
+            this.eventDepot.fire('hideDescription', {}); 
+        }
+
+    }
 
     deanimateScene(callback) {
 
@@ -157,19 +218,9 @@ export class SceneController {
 
     }
 
-    addToScene(model) {
-
-        this.scene.scene.add( model );
-        this.forms.push( model );
-
-    }
-
     removeFromScenebyUUID(uuid) {
 
-        this.scene.scene.remove(this.scene.scene.children.find(el => {
-            return el.uuid == uuid;
-        }));
-
+        this.scene.removeFromScenebyUUID(uuid);
         this.forms = this.forms.filter(el => {
             return el.uuid != uuid;
         });
@@ -189,8 +240,8 @@ export class SceneController {
         this.loadFormbyName(data.itemName, (gltf) => {
             let model = gltf.scene;
             model.position.copy(this.scene.controls.getObject().position);
-            model.position.y = this.determineElevationGeneric(model.position.x, model.position.y, data.itemName) + object.attributes.elevation;
-            this.scene.scene.add(model);
+            model.position.y = this.determineElevationFromBase(model.position.x, model.position.y, data.itemName) + object.attributes.elevation;
+            this.scene.add(model);
             this.addToObjects3D(model);
 
             data.uuid = model.uuid;
@@ -249,8 +300,8 @@ export class SceneController {
 
                 let thisObj = mixers.hero.selectedObject;
 
-                let objectName = this.getObjectName(thisObj);
-                let objectType = this.getObjectType(thisObj);
+                let objectName = getObjectName(thisObj);
+                let objectType = getObjectType(thisObj);
                 
                 if (objectType == "item") {
                     this.eventDepot.fire('takeItemFromScene', {itemName: objectName, uuid: thisObj.uuid});
@@ -286,80 +337,9 @@ export class SceneController {
 
     }
 
-    determineElevationGeneric(x,z, name) {
-
-        let yOffset = 40;
-
-        this.upRaycasterGeneric.ray.origin.x = x;
-        this.upRaycasterGeneric.ray.origin.z = z;
-        this.upRaycasterGeneric.ray.origin.y = -yOffset;
-        
-
-        if (this.upRaycasterGeneric.intersectObject(this.floor.model, true)[0]) {
-            let distanceFromBase = this.upRaycasterGeneric.intersectObject(this.floor.model, true)[0].distance;
-
-            this.downRaycasterGeneric.ray.origin.copy (this.upRaycasterGeneric.ray.origin);
-            this.downRaycasterGeneric.ray.origin.y += (distanceFromBase + yOffset);
-            
-            let distanceFromAbove = this.downRaycasterGeneric.intersectObject(this.floor.model, true)[0].distance;
-            let genericElevation = this.downRaycasterGeneric.ray.origin.y - distanceFromAbove + 5; 
-            // console.log(`genericElevation for ${name}: ${genericElevation}`);
-            return (genericElevation);
-        } else {
-
-            return -1;
-            // console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
-            // console.error(this.floor);
-            // console.error(`${name} = ${x},${z}`);
-        }
-
-    }
-
-    setElevation(uniqueId, entity) {
 
 
-        var otherObjects = this.objects3D.filter(el => {
-            return this.getObjectName(el) != entity.objectName
-        });
 
-        let downRayOriginHeight = entity.position.y + 30;
-
-        this.mixers[uniqueId].downRaycaster.ray.origin.copy(entity.position);
-        this.mixers[uniqueId].downRaycaster.ray.origin.y = downRayOriginHeight;
-
-        let downwardIntersections = this.mixers[uniqueId].downRaycaster.intersectObjects( otherObjects, true );
-        if (downwardIntersections[0]) { 
-            var topOfObject = downRayOriginHeight - downwardIntersections[0].distance + 2;
-            if (entity.position.y <= topOfObject) {
-                this.mixers[uniqueId].standingUpon = this.getRootObject3D(downwardIntersections[0].object);
-                entity.position.y = topOfObject;
-                this.mixers[uniqueId].velocity.y = Math.max( 0, this.mixers[uniqueId].velocity.y );
-                this.mixers[uniqueId].canJump = true;
-                this.mixers[uniqueId].justJumped = false;
-            }
-        } else {
-
-            this.mixers[uniqueId].standingUpon = null;
-            
-            let newYposition = this.determineElevationGeneric(entity.position.x, entity.position.z, uniqueId);
-
-            while (newYposition == -1) { // move toward center until ground found
-                entity.position.x = this.shiftTowardCenter(entity.position.x);
-                entity.position.z = this.shiftTowardCenter(entity.position.rotateZ);
-                newYposition = this.determineElevationGeneric(entity.position.x, entity.position.z, uniqueId);
-            }
-            entity.position.y = newYposition;
-            
-        }
-    }
-
-    shiftTowardCenter(value) {
-        if (value != 0) {
-            if (value > 0) {
-                return value--;
-            } else return value++;
-        }
-    }
 
     /** This method will not set the position of the object3D, nor create a GUI.
      * The return object 'gltf' will have a model (scene) and animations if applicable.
@@ -420,35 +400,6 @@ export class SceneController {
         this.scene.createGUI( model, gltf.animations, model.uuid );
     }
 
-    getRootObject3D = (obj) => {
-        if (obj.objectName) {
-            return obj;
-        } else if (obj.parent == null) {
-            return null;
-        } else {
-            return this.getRootObject3D(obj.parent);
-        }
-    }
-
-    getObjectName = (obj) => {
-        if (obj.objectName) {
-            return obj.objectName;
-        } else if (obj.parent == null) {
-            return null;
-        } else {
-            return this.getObjectName(obj.parent);
-        }
-    }
-
-    getObjectType = (obj) => {
-        if (obj.objectType) {
-            return obj.objectType;
-        } else if (obj.parent == null) {
-            return null;
-        } else {
-            return this.getObjectType(obj.parent);
-        }
-    }
 
 
 
@@ -473,40 +424,6 @@ export class SceneController {
         }
     }
 
-
-
-
-
-    updateHeroStats = () => {
-
-        Object.keys(this.hero.attributes.stats).forEach(stat => {
-            
-            let points = this.hero.attributes.stats[stat].split('/')
-            let cur = points[0];
-            let max = points[1];
-
-            this.eventDepot.fire('setHeroStatMax', { type: stat, points: max});
-            this.eventDepot.fire('setHeroStat', { type: stat, points: cur});
-
-        })
-
-        this.eventDepot.fire('showHeroStats', {});
-        
-    }
-
-    // Calculate hero location using grid coordinates
-    updateHeroLocation = (offset = false) => {
-
-        let { x, y, z } = this.scene.controls.getObject().position;
-        
-        if (offset) {
-            z = z + (z < 0) ? 20 : -20;
-            x = x + (x < 0) ? 20 : -20;
-        }
-
-        this.eventDepot.fire('updateHeroLocation', { x: x / multiplier, y, z: z / multiplier });
-    }
-
     seedObjects3D = () => {
         this.layout.items.forEach(item => this.seedObject3D(item));
         this.layout.structures.forEach(structure => this.seedObject3D(structure));
@@ -527,7 +444,7 @@ export class SceneController {
             object.uuid = model.uuid;
             model.position.x = object.location.x * multiplier;
             model.position.z = object.location.z * multiplier;
-            model.position.y = this.determineElevationGeneric(model.position.x, model.position.z,object.name) + object.attributes.elevation;
+            model.position.y = this.determineElevationFromBase(model.position.x, model.position.z,object.name) + object.attributes.elevation;
             
             // // Set movable objects rotation to 180 to match the Hero
             // if (object.attributes.moves) {
@@ -549,13 +466,13 @@ export class SceneController {
                         iModel.position.z = model.position.z;
                         iModel.position.y = model.position.y + contentItem.attributes.elevation;
                         this.objects3D.push( iModel );
-                        this.scene.scene.add( iModel );
+                        this.scene.add( iModel );
                     })
                 });
             }
 
             this.objects3D.push( model );
-            this.scene.scene.add( model );
+            this.scene.add( model );
 
         }, undefined, function ( error ) {
             console.error( error );
@@ -587,35 +504,7 @@ export class SceneController {
         }
     }
 
-    identifySelectedObject(heroObj) {
 
-        this.proximityLight.rotation.copy(heroObj.rotation);
-        this.proximityLight.position.copy(heroObj.position);
-        this.proximityLight.translateZ(-40);
-        this.proximityLight.translateY(40);
-
-        // console.table(this.proximityLight.position);
-
-        let closest = Infinity;
-
-        this.objects3D.forEach(o => {
-            let distance = o.position.distanceTo(this.proximityLight.position);
-            if (distance <= 50 && distance < closest) {
-                // If the object is unlocked, exclude to allow selecting the contents
-                if (!o.attributes.contentItems || (o.attributes.contentItems && !o.attributes.unlocked))  {
-                    closest = distance;
-                    this.mixers.hero.selectedObject = o;
-                    this.eventDepot.fire('showDescription', { objectType: this.getObjectType(o), objectName: this.getObjectName(o) }); 
-                }
-            }
-        })
-
-        if (closest > 50) {
-            this.mixers.hero.selectedObject = null;
-            this.eventDepot.fire('hideDescription', {}); 
-        }
-
-    }
 
     fadeToAction = ( uuid, actionName, duration ) => {
         
@@ -665,10 +554,6 @@ export class SceneController {
 
     handleAnimated(delta) {
 
-    }
-
-    handleHeroMovement(delta) {
-        this.hero.handleMovement(delta, this.objects3D);
     }
 
 }

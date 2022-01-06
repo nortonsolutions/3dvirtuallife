@@ -14,9 +14,6 @@ var BLACK = new THREE.Color('black');
 
 var navbarHeight;
 
-var SCREEN_WIDTH = window.innerWidth;
-var SCREEN_HEIGHT = window.innerHeight;
-
 var minimap = false;
 
 /**
@@ -29,10 +26,6 @@ class Scene {
 
     constructor(controller) {
 
-        this.moveForward = false;
-        this.moveBackward = false;
-        this.moveLeft = false;
-        this.moveRight = false;
 
         this.prevTime = performance.now();
 
@@ -41,9 +34,6 @@ class Scene {
         this.running = true;
 
         this.background = controller.layout.background;
-
-        this.hero = controller.hero;
-        this.layout = controller.layout;
         
         this.animate = this.animate.bind(this);
         this.deanimate = this.deanimate.bind(this);
@@ -60,13 +50,16 @@ class Scene {
 
         navbarHeight = 0; // document.querySelector('.navbar').clientHeight;
     
-        this.camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / (SCREEN_HEIGHT - navbarHeight), 1, this.cameraReach );
-        this.camera.position.set( 0, cameraElevationDefault + this.hero.attributes.height, cameraDistanceDefault );
+        this.camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, cameraReach );
+
+        // 20 should match this.hero.attributes.height?
+        this.camera.position.set( 0, cameraElevationDefault + 20, cameraDistanceDefault );
         
         this.scene = new THREE.Scene();
+
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
         this.renderer.setPixelRatio( window.devicePixelRatio );
-        this.renderer.setSize( SCREEN_WIDTH, (SCREEN_HEIGHT - navbarHeight));
+        this.renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
 
         this.stats = new Stats();
         document.body.appendChild( this.stats.dom );
@@ -89,15 +82,22 @@ class Scene {
         this.cameraMinimap.rotation.set( -Math.PI / 2, 0, 0 );
         this.controls.getObject().add(this.cameraMinimap);
 
-        this.controller.formFactory.loader.load( '/models/3d/gltf/arrow.gltf', (gltf) => {
-            this.compass = gltf.scene;
-            this.compass.scale.set( 100, 100, 100 );
-            this.compass.children[0].material.side = THREE.FrontSide;
-            this.compass.position.set( 0, cameraMinimapElevationDefault/2, -cameraMinimapElevationDefault/10);
-            this.controls.getObject().add(this.compass);
-        });
 
+        let compassTemplate = {
+            gltf: "arrow.gltf",
+            attributes: {
+                scale: 100
+            }
+        }
+
+        // this.compass = this.controller.formFactory.newForm(null, compassTemplate, "gltf", this.controller.floor.model);
+        // this.compass.load(() => {
+        //     this.compass.model.children[0].material.side = THREE.FrontSide;
+        //     this.compass.model.position.set( 0, cameraMinimapElevationDefault/2, -cameraMinimapElevationDefault/10);
+        //     this.controls.getObject().add(this.compass.model);
+        // });
         
+
 
         this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault);
         this.scene.add( this.controls.getObject() );
@@ -106,6 +106,15 @@ class Scene {
         document.addEventListener( 'keyup', this.onKeyUp, false );
     }
 
+    add ( model ) {
+        this.scene.add( model );
+    }
+
+    removeFromScenebyUUID(uuid) {
+        this.scene.remove(this.scene.scene.children.find(el => {
+            return el.uuid == uuid;
+        }));
+    }
     
     addBackground() {
 
@@ -126,7 +135,7 @@ class Scene {
             this.scene.background = BLACK;
         }
 
-        if (this.layout.terrain.fog) this.scene.fog = new THREE.Fog( this.layout.terrain.fogColor, 900, cameraReach );
+        if (this.controller.layout.terrain.fog) this.scene.fog = new THREE.Fog( this.controller.layout.terrain.fogColor, 900, cameraReach );
     }
 
 
@@ -136,43 +145,43 @@ class Scene {
 
             case 38: // up
             case 87: // w
-                this.moveForward = true;
+                this.controller.hero.moveForward = true;
                 break;
 
             case 37: // left
             case 65: // a
-                this.moveLeft = true;
+                this.controller.hero.moveLeft = true;
                 break;
 
             case 40: // down
             case 83: // s
-                this.moveBackward = true;
+                this.controller.hero.moveBackward = true;
                 break;
 
             case 39: // right
             case 68: // d
-                this.moveRight = true;
+                this.controller.hero.moveRight = true;
                 break;
 
             case 32: // space
                 let heroMixer = this.controller.mixers.hero;
                 
-                if ( heroMixer.canJump === true ) {
-                    heroMixer.velocity.y += 350;
-                    this.controller.fadeToAction("hero", "Jump", 0.2)
+                if ( this.controller.hero.canJump === true ) {
+                    this.controller.hero.velocity.y += 350;
+                    this.controller.hero.fadeToAction("hero", "Jump", 0.2)
                 }
-                heroMixer.canJump = false;
-                heroMixer.justJumped = true;
+                this.controller.hero.canJump = false;
+                this.controller.hero.justJumped = true;
                 break;
 
             case 73: // i
-                this.controller.updateHeroLocation(false);
+                this.controller.hero.updateHeroLocation(this.controls.getObject().position, false);
                 this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
                 
-                this.moveForward = false;
-                this.moveBackward = false;
-                this.moveLeft = false;
-                this.moveRight = false;
+                this.controller.hero.moveForward = false;
+                this.controller.hero.moveBackward = false;
+                this.controller.hero.moveLeft = false;
+                this.controller.hero.moveRight = false;
 
                 break;
                 
@@ -302,11 +311,13 @@ class Scene {
 
         this.controller.eventDepot.addListener('unlockControls', () => {
             this.controls.unlock();
-            this.moveForward = false;
-            this.moveBackward = false;
-            this.moveLeft = false;
-            this.moveRight = false;
         })
+
+        this.controller.eventDepot.addListener('updateHelper', (data) => {
+            this.helper.position.copy(data.position);
+            this.helper.material.color = data.color;
+        })
+        
 
         this.instructions.addEventListener( 'click', () => {
 
@@ -338,21 +349,19 @@ class Scene {
     }
 
     onWindowResize() {
-        SCREEN_WIDTH = window.innerWidth;
-        SCREEN_HEIGHT = window.innerHeight;
-
-        this.camera.aspect = SCREEN_WIDTH / (SCREEN_HEIGHT - navbarHeight);
+        this.camera.aspect = window.innerWidth / (window.innerHeight - navbarHeight);
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize( SCREEN_WIDTH, (SCREEN_HEIGHT - navbarHeight) );
+        this.renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight) );
     }
 
     getMovementRay(origin, direction) {
         return new THREE.Raycaster( origin, direction, 0, 10 );
     }
 
-    handleAutoZoom = () => {
+    handleAutoZoom = (otherModels) => {
+
         this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
-        this.cameraBackray.ray.origin.y += this.hero.attributes.height;
+        this.cameraBackray.ray.origin.y += this.controller.hero.attributes.height;
 
         // NEEDS PITCH as well
         let cameraDirection = this.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
@@ -361,15 +370,13 @@ class Scene {
         this.cameraBackray.ray.direction.y = -cameraDirection.y + 0.4
         this.cameraBackray.ray.direction.z = -cameraDirection.z
 
-        let backrayIntersections = 
-            [...this.cameraBackray.intersectObject(this.controller.floor, true), 
-            ...this.cameraBackray.intersectObjects(this.controller.objects3D.filter(el => el.objectType == 'structure'), true)]
-        
+        let backrayIntersections = this.cameraBackray.intersectObjects(otherModels, true);
+
         if (backrayIntersections[0]) {
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
                 this.camera.position.z -= cameraDistanceDefault / 30;
-                if (this.camera.position.y > cameraElevationDefault + this.hero.attributes.height) this.camera.position.y -= cameraElevationDefault / 30;
+                if (this.camera.position.y > cameraElevationDefault + this.controller.hero.attributes.height) this.camera.position.y -= cameraElevationDefault / 30;
             }
         } else {
             if (this.camera.position.z <= cameraDistanceDefault) {
@@ -401,7 +408,7 @@ class Scene {
                 this.time = performance.now();
                 this.delta = ( this.time - this.prevTime ) / 1000;
     
-                // this.controller.handleHeroMovement(this.delta);
+                this.controller.handleMovement(this.delta);
                 // this.controller.handleEntityMovement(this.delta);
                 // this.controller.handleMixers(this.delta);
                 // this.handleSprites();

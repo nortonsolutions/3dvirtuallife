@@ -8,22 +8,37 @@
  * Knows how to create its own model based on template.
  */
 
-export class StandardForm {
+var upRaycasterTestLength = 700; 
+var downRaycasterTestLength = 70;
 
-    constructor(template, formFactory) {
+
+export class StandardForm {
+    
+    constructor(template, eventDepot, loader, floorModel) {
 
         this.template = template;
+        this.eventDepot = eventDepot;
+        this.floorModel = floorModel;
+
+        this.upRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ), 0, upRaycasterTestLength);
+        this.downRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength );
+
         this.attributes = this.template.attributes;
-        this.formFactory = formFactory;
-        this.loader = new THREE.GLTFLoader();
         this.model = null;
+
+        switch (loader) {
+            case "gltf":
+            default: 
+                this.loader = new THREE.GLTFLoader();
+                break;
+        }
 
         this.load = this.load.bind(this);
     }
 
     load(callback) {
         
-        this.formFactory.loader.load( '/models/3d/gltf/' + this.template.gltf, (gltf) => {
+        this.loader.load( '/models/3d/gltf/' + this.template.gltf, (gltf) => {
         
             let model = gltf.scene;
             
@@ -42,6 +57,34 @@ export class StandardForm {
         }, undefined, function ( error ) {
             console.error( error );
         });
+    }
+
+    determineElevationFromBase() {
+
+        let yOffset = 40;
+
+        this.upRaycaster.ray.origin.x = this.model.position.x;
+        this.upRaycaster.ray.origin.z = this.model.position.z;
+        this.upRaycaster.ray.origin.y = -yOffset;
+        
+
+        if (this.upRaycasterGeneric.intersectObject(this.floorModel, true)[0]) {
+            let distanceFromBase = this.upRaycasterGeneric.intersectObject(this.floorModel, true)[0].distance;
+
+            this.downRaycaster.ray.origin.copy (this.upRaycasterGeneric.ray.origin);
+            this.downRaycasterGeneric.ray.origin.y += (distanceFromBase + yOffset);
+            
+            let distanceFromAbove = this.downRaycasterGeneric.intersectObject(this.floorModel, true)[0].distance;
+            let genericElevation = this.downRaycasterGeneric.ray.origin.y - distanceFromAbove + 5; 
+            return (genericElevation);
+        } else {
+
+            return -1;
+            // console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
+            // console.error(this.floor);
+            // console.error(`${name} = ${x},${z}`);
+        }
+
     }
 
 }
