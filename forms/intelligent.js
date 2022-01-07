@@ -16,15 +16,15 @@ export class IntelligentForm extends AnimatedForm{
         this.absVelocity = 0;
         this.direction = new THREE.Vector3();
         this.velocity = new THREE.Vector3();
-        this.rotation = new THREE.Vector3();
+        this.rotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
 
         this.justJumped = false;
         this.standingUpon = null;
         this.canJump = true;
 
-        this.movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.length/2 + 20 );
-        this.movementRaycasterR = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.width/2 + 20 )
-        this.movementRaycasterL = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.width/2 + 20 )
+        this.movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.length/2 + 60 );
+        // this.movementRaycasterR = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.width/2 + 20 )
+        // this.movementRaycasterL = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.width/2 + 20 )
         
     }
 
@@ -33,22 +33,23 @@ export class IntelligentForm extends AnimatedForm{
      * This function will move an entity from one location to another.
      * Direction is relative to the entity in question
      */
-    move(otherModels, worldDirection, delta) {
-        let mRaycaster = this.movementRaycaster;
-        mRaycaster.ray.origin.copy( this.model.position );
-        mRaycaster.ray.origin.y += this.attributes.height;
-        mRaycaster.ray.direction.x = -worldDirection.x; // -worldDirection.x;
-        mRaycaster.ray.direction.z = -worldDirection.z; // -worldDirection.z;
+    move(otherModels, delta) {
+        
+        let worldDirection = new THREE.Vector3().copy(this.direction).applyEuler( this.rotation );
+        this.movementRaycaster.ray.direction.x = worldDirection.x; // -worldDirection.x;
+        this.movementRaycaster.ray.direction.z = worldDirection.z; // -worldDirection.z;
+        this.movementRaycaster.ray.origin.y += this.attributes.height;
 
         // Essentially set Lx = -wDz and Lz = wDx, then Rx = wDz and Rz = -wDx
         // let worldDirectionL = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, -Math.PI/2, 0, 'YXZ' ));
         // let worldDirectionR = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, Math.PI/2, 0, 'YXZ' ));
 
         if (worldDirection.x != 0 || worldDirection.z != 0) {
-            console.log(`${this.name} rc: ${mRaycaster.ray.direction.x},${mRaycaster.ray.direction.z}`);
-            console.log(`${this.name} V: ${this.velocity.x},${this.velocity.z}`);
-            console.log(`${this.name} D: ${this.direction.x},${this.direction.z}`);
-            console.log(`${this.name} rotationY: ${this.controls.rotation.y}`);
+            console.log(`${this.objectName} wD: ${worldDirection.x},${worldDirection.z}`);
+            console.log(`${this.objectName} rc: ${this.movementRaycaster.ray.direction.x},${this.movementRaycaster.ray.direction.z}`);
+            console.log(`${this.objectName} V: ${this.velocity.x},${this.velocity.z}`);
+            console.log(`${this.objectName} D: ${this.direction.x},${this.direction.z}`);
+            console.log(`${this.objectName} rotationY: ${this.model.rotation.y}`);
         }
         
         // let mRaycasterL = this.mixers[uniqueId].movementRaycasterL;
@@ -64,15 +65,15 @@ export class IntelligentForm extends AnimatedForm{
         // mRaycasterR.ray.direction.z = worldDirectionR.z;
 
         // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
-        let fIntersects = mRaycaster.intersectObjects(otherModels, true);
+        let fIntersects = this.movementRaycaster.intersectObjects(otherModels, true);
         // let rIntersects = mRaycasterR.intersectObjects(this.objects3D, true).filter(el => getRootObject3D(el.object) != entity);
         // let lIntersects = mRaycasterL.intersectObjects(this.objects3D, true).filter(el => getRootObject3D(el.object) != entity);
 
         if (fIntersects.length == 0) { // Nothing is in the front, so move forward at given velocity
             
-            this.controls.translateX( this.velocity.x * delta );
-            this.controls.translateY( this.velocity.y * delta );
-            this.controls.translateZ( this.velocity.z * delta );
+            this.model.translateX( this.velocity.x * delta );
+            this.model.translateY( this.velocity.y * delta );
+            this.model.translateZ( this.velocity.z * delta );
 
             // if (rIntersects.length != 0) { // intersections on the right?
             //     entity.position.x += mRaycasterL.ray.direction.x;
@@ -106,24 +107,17 @@ export class IntelligentForm extends AnimatedForm{
 
     setElevation(otherModels) {
         
-        var model;
-        if (this.type == "hero") {
-            model = this.controls;
-        } else {
-            model = this.model;
-        }
+        let downRayOriginHeight = this.model.position.y + 30;
 
-        let downRayOriginHeight = model.position.y + 30;
-
-        this.downRaycaster.ray.origin.copy(model.position);
+        this.downRaycaster.ray.origin.copy(this.model.position);
         this.downRaycaster.ray.origin.y = downRayOriginHeight;
 
         let downwardIntersections = this.downRaycaster.intersectObjects( otherModels, true );
         if (downwardIntersections[0]) { 
             var topOfObject = downRayOriginHeight - downwardIntersections[0].distance + 2;
-            if (model.position.y <= topOfObject) {
+            if (this.model.position.y <= topOfObject) {
                 
-                model.position.y = topOfObject;
+                this.model.position.y = topOfObject;
                 let standingUpon = getRootObject3D(downwardIntersections[0].object);
                 this.standingUpon = {
                     objectName: standingUpon.objectName,
@@ -142,11 +136,11 @@ export class IntelligentForm extends AnimatedForm{
             let newYposition = this.determineElevationFromBase();
 
             if (newYposition == -1) { 
-                model.position.x = shiftTowardCenter(model.position.x);
-                model.position.z = shiftTowardCenter(model.position.z);
+                this.model.position.x = shiftTowardCenter(this.model.position.x);
+                this.model.position.z = shiftTowardCenter(this.model.position.z);
                 return -1;
             } else {
-                model.position.y = newYposition;
+                this.model.position.y = newYposition;
             }
         }
     }

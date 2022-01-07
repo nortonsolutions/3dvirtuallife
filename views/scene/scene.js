@@ -360,6 +360,7 @@ class Scene {
         let backrayIntersections = this.cameraBackray.intersectObjects(otherModels, true);
 
         if (backrayIntersections[0]) {
+            console.log(`Backray: ${backrayIntersections[0].distance}`);
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
                 this.camera.position.z -= cameraDistanceDefault / 30;

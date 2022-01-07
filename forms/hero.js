@@ -11,27 +11,22 @@ import { IntelligentForm } from './intelligent.js'
  */
 export class Hero extends IntelligentForm {
 
-    constructor(heroTemplate, sceneController) {
+    constructor(template, sceneController, controls) {
 
-        super(heroTemplate, sceneController);
+        super(template, sceneController);
 
-        this.name = heroTemplate.name;
-        this.type = heroTemplate.type;
-        this.gltf = heroTemplate.gltf;
-        this.model = heroTemplate.model;
-        this.inventory = heroTemplate.inventory;
-        this.attributes = heroTemplate.attributes;
-        this.spells = heroTemplate.spells;
-        this.equipped = heroTemplate.equipped;
-        this.eventDepot = sceneController.eventDepot;
-        
+        this.controls = controls;
+        this.inventory = this.template.inventory;
+        this.attributes = this.template.attributes;
+        this.spells = this.template.spells;
+        this.equipped = this.template.equipped;
         this.selectedObject = null;
 
         this.addEventListeners = this.addEventListeners.bind(this);
         this.addEventListeners();
 
         // Actually just a starting/saved location
-        this.location = heroTemplate.location? heroTemplate.location : { x: 0, y: 0, z: 0 };
+        this.location = this.template.location? this.template.location : { x: 0, y: 0, z: 0 };
 
         this.moveForward = false;
         this.moveBackward = false;
@@ -42,17 +37,35 @@ export class Hero extends IntelligentForm {
 
     }
 
+    /** For the hero, the load method is completely overridden, no super.load() call */
     load(callback) {
 
         super.load(() => {
+
+            /** For the hero, the controls obj IS the model, which contains the gltf model */
+            let modelCopy = this.model;
+            modelCopy.rotation.y = Math.PI;
+
+            this.model = this.controls;
+            this.model.add( modelCopy );
+
+            if (this.template.location) {
+                this.model.position.x = this.template.location.x * multiplier;
+                this.model.position.z = this.template.location.z * multiplier;
+                this.model.position.y = this.determineElevationFromBase();
+            }
+
             if (this.equipped) {
                 Object.keys(this.equipped).forEach(bodyPart => {
                     this.equip(bodyPart, this.equipped[bodyPart]);
                 })
             }
-            callback();
-        })
 
+            callback();
+
+        }, undefined, function ( error ) {
+            console.error( error );
+        });
     }
 
     cacheHero() {
@@ -62,6 +75,8 @@ export class Hero extends IntelligentForm {
     }
 
     addEventListeners() {
+
+        this.eventDepot = this.sceneController.eventDepot;
 
         this.eventDepot.addListener('updateHeroLocation', data => {
 
@@ -345,7 +360,7 @@ export class Hero extends IntelligentForm {
             type: "hero",
             location: this.location,
             attributes: this.attributes,
-            gltf: this.gltf,
+            gltf: this.template.gltf,
             model: null,
             inventory: this.inventory,
             spells: this.spells,
@@ -391,32 +406,26 @@ export class Hero extends IntelligentForm {
         this.velocity.z -= this.velocity.z * 10.0 * delta;
         this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
-        this.direction.z = Number( this.moveForward ) - Number( this.moveBackward );
-        this.direction.x = Number( this.moveLeft ) - Number( this.moveRight );
+        this.direction.z = Number( this.moveBackward ) - Number( this.moveForward );
+        this.direction.x = Number( this.moveRight ) - Number( this.moveLeft );
         this.direction.normalize(); // this ensures consistent movements in all directions
         
         let agility = this.attributes.stats.agility.substring(0,2);
 
-        if ( this.moveForward || this.moveBackward ) this.velocity.z -= this.direction.z * 1000.0 * agility * delta;
-        if ( this.moveLeft || this.moveRight ) this.velocity.x -= this.direction.x * 1000.0 * agility * delta;
+        if ( this.moveForward || this.moveBackward ) this.velocity.z += this.direction.z * 1000.0 * agility * delta;
+        if ( this.moveLeft || this.moveRight ) this.velocity.x += this.direction.x * 1000.0 * agility * delta;
 
-        // var yAxisRotation;
-        // if (uniqueId = "hero") {
-        //     yAxisRotation = new THREE.Euler( 0, entity.rotation.y, 0, 'YXZ' );
-        // } else {
-        //     yAxisRotation = new THREE.Euler( 0, -entity.rotation.y, 0, 'YXZ' );
-        // }
+        this.movementRaycaster.ray.origin.copy( this.model.position );
+        this.rotation.copy(this.model.rotation);
 
-        let worldDirection = new THREE.Vector3().copy(this.direction).applyEuler( this.controls.rotation );
-        
-        super.move(otherModels, worldDirection, delta)
+        super.move(otherModels, delta);
 
         // entity.translateY( this.mixers[uniqueId].velocity.y * delta );
         if (this.setElevation( otherModels ) == -1) {
 
-            this.controls.translateX( -this.velocity.x * delta );
-            this.controls.translateY( -this.velocity.y * delta );
-            this.controls.translateZ( -this.velocity.z * delta );
+            this.model.translateX( -this.velocity.x * delta );
+            this.model.translateY( -this.velocity.y * delta );
+            this.model.translateZ( -this.velocity.z * delta );
 
             this.velocity.x = 0;
             this.velocity.y = 0;

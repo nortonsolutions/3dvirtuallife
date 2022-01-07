@@ -57,6 +57,7 @@ export class SceneController {
                 this.addLights();
                 this.addHero(() => {
                     this.seedForms(() => {
+                        this.nonHeroModels = this.forms.filter(el => el.objectType != "hero").map(el => el.model);
                         this.scene.animate();
                     });
                 });
@@ -75,11 +76,13 @@ export class SceneController {
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
         this.floor.load(() => {
             this.addToScene(this.floor);
-            callback();
+            setTimeout(() => {
+                callback();
+            }, 500);
+            
         });
 
-        // setTimeout(() => {
-        // }, 200);
+
     }
 
     addLights() {
@@ -104,27 +107,10 @@ export class SceneController {
 
     addHero(callback) {
 
-        this.hero = this.formFactory.newForm("hero", this.heroTemplate);
-
+        this.hero = this.formFactory.newForm("hero", this.heroTemplate, this.scene.controls.getObject());
+        
         this.hero.load(() => {
-            
-            this.hero.controls = this.scene.controls.getObject();
 
-            // Adjustments for hero:
-            this.hero.model.rotation.y = Math.PI;
-
-            // Set hero location:
-            this.hero.controls.translateX( this.hero.location.x * multiplier );
-            this.hero.controls.translateZ( this.hero.location.z * multiplier );
-            // this.hero.controls.translateY( this.determineElevationFromBase(
-            //     this.hero.location.x * multiplier, this.hero.location.z * multiplier, "hero")
-            // );
-            
-            this.hero.controls.attributes = this.hero.attributes;
-            this.hero.controls.add( this.hero.model );
-            
-            this.hero.controls.objectName = this.hero.name;
-            this.hero.controls.objectType = "hero";
             this.forms.push( this.hero );
 
             this.eventDepot.fire('halt', {});
@@ -203,9 +189,7 @@ export class SceneController {
         })
 
         this.identifySelectedObject(this.scene.controls.getObject());
-        
-        let nonHeroModels = this.forms.filter(el => el.type != "hero").map(el => el.model);
-        this.scene.handleAutoZoom(nonHeroModels);
+        this.scene.handleAutoZoom(this.nonHeroModels);
     }
 
     identifySelectedObject(controlsObject) {

@@ -14,21 +14,18 @@ import { Fire } from './fire.js';
 export class FormFactory {
 
     constructor(sceneController) {
-        
         this.sceneController = sceneController;
-        this.setToRenderDoubleSided = this.setToRenderDoubleSided.bind(this);
     }
 
-    newForm(type, template) {
+    newForm(type, template, controls) {
 
         let form = null;
         switch (type) {
             case "hero":
-                form = new Hero(template, this.sceneController);
+                form = new Hero(template, this.sceneController, controls);
                 break;
             case "floor":
                 form = new StandardForm(template, this.sceneController);
-                this.setToRenderDoubleSided(form);
                 // this.addSconces(this.floor);
                 break;
             case "artificial":
@@ -45,20 +42,6 @@ export class FormFactory {
         return form;
     }
 
-    setToRenderDoubleSided(object) {
-
-        if (object.material) {
-            if (object.material.name != "Roof") { 
-                object.material.side = THREE.DoubleSide;
-            } else {
-                object.material.side = THREE.FrontSide;
-            }
-        }
-
-        if (object.children) {
-            object.children.forEach(e => this.setToRenderDoubleSided(e)); 
-        }
-    }
 
 
 }

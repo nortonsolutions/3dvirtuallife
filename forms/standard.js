@@ -23,9 +23,13 @@ export class StandardForm {
         this.upRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ), 0, upRaycasterTestLength);
         this.downRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength );
 
+        this.objectName = this.template.name;
+        this.objectType = this.template.type;
         this.attributes = this.template.attributes;
+        
         this.model = null;
 
+        this.setToRenderDoubleSided = this.setToRenderDoubleSided.bind(this);
         this.load = this.load.bind(this);
     }
 
@@ -44,13 +48,17 @@ export class StandardForm {
             model.scale.y = this.template.attributes.scale;
             model.scale.z = this.template.attributes.scale;
 
-            if (this.template.location) {
-                model.position.x = this.template.location.x * multiplier;
-                model.position.z = this.template.location.z * multiplier;
-            }
-            
             this.model = model;
             this.animations = gltf.animations;
+
+            if (this.template.location) {
+                this.model.position.x = this.template.location.x * multiplier;
+                this.model.position.z = this.template.location.z * multiplier;
+                this.model.position.y = this.determineElevationFromBase();
+
+            } else { // floor is the only form without location
+                this.setToRenderDoubleSided();
+            }
 
             callback();
 
@@ -61,17 +69,10 @@ export class StandardForm {
 
     determineElevationFromBase() {
 
-        var model;
-        if (this.type == "hero") {
-            model = this.controls;
-        } else {
-            model = this.model;
-        }
-
         let yOffset = 40;
 
-        this.upRaycaster.ray.origin.x = model.position.x;
-        this.upRaycaster.ray.origin.z = model.position.z;
+        this.upRaycaster.ray.origin.x = this.model.position.x;
+        this.upRaycaster.ray.origin.z = this.model.position.z;
         this.upRaycaster.ray.origin.y = -yOffset;
         
 
@@ -92,6 +93,22 @@ export class StandardForm {
             // console.error(`${name} = ${x},${z}`);
         }
 
+    }
+    
+    setToRenderDoubleSided(root) {
+
+        if (!root) root = this.model;
+        if (root.material) {
+            if (root.material.name != "Roof") { 
+                root.material.side = THREE.DoubleSide;
+            } else {
+                root.material.side = THREE.FrontSide;
+            }
+        }
+
+        if (root.children) {
+            root.children.forEach(e => this.setToRenderDoubleSided(e)); 
+        }
     }
 
 }
