@@ -39,9 +39,15 @@ export class StandardForm {
             model.objectName = this.template.name;
             model.objectType = this.template.type;
             model.attributes = this.template.attributes;
+
             model.scale.x = this.template.attributes.scale;
             model.scale.y = this.template.attributes.scale;
             model.scale.z = this.template.attributes.scale;
+
+            if (this.template.location) {
+                model.position.x = this.template.location.x * multiplier;
+                model.position.z = this.template.location.z * multiplier;
+            }
             
             this.model = model;
             this.animations = gltf.animations;

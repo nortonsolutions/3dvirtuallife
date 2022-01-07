@@ -48,14 +48,17 @@ export class AnimatedForm extends StandardForm{
             this.previousActionName = '';
             this.previousAction = null;
     
-            this.activeAction.play();
+            if (this.attributes.unlocked == undefined || this.attributes.unlocked) {
+                this.activeAction.play();
+            }
+
             callback();
 
         })
     }
 
     animate(delta) {
-        if (this.moves) {
+        if (this.attributes.moves) {
             this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
             if (this.absVelocity < .1 && (this.activeActionName == 'Walking' || this.activeActionName == 'Running')) {
@@ -72,7 +75,7 @@ export class AnimatedForm extends StandardForm{
 
     fadeToAction( actionName, duration ) {
         
-        console.log(`previous: ${this.previousActionName}, active: ${this.activeActionName}, new: ${actionName}`)
+        // console.log(`previous: ${this.previousActionName}, active: ${this.activeActionName}, new: ${actionName}`)
         if ( this.activeActionName !== actionName ) {
 
             
@@ -84,7 +87,6 @@ export class AnimatedForm extends StandardForm{
             this.activeAction = newAction;
 
             this.previousAction.fadeOut( duration );
-
 
             this.activeAction
                 .reset()
@@ -98,7 +100,6 @@ export class AnimatedForm extends StandardForm{
                 this.fadeToAction( this.previousActionName, 0.1 );
             }
 
-            console.log(actionName);
             if (this.emotes.includes(actionName)) {
                 this.mixer.addEventListener( 'finished', restoreState );
             }

@@ -31,6 +31,12 @@ export class FormFactory {
                 this.setToRenderDoubleSided(form);
                 // this.addSconces(this.floor);
                 break;
+            case "artificial":
+                form = new ArtificialForm(template, this.sceneController);
+                break;
+            case "animated":
+                form = new AnimatedForm(template, this.sceneController);
+                break;
             default:
                 form = new StandardForm(template, this.sceneController);
                 break;

@@ -13,8 +13,6 @@ export class IntelligentForm extends AnimatedForm{
         super(template, sceneController);
 
         // Animation mixer has been added by superclass
-
-        this.moves = true;
         this.absVelocity = 0;
         this.direction = new THREE.Vector3();
         this.velocity = new THREE.Vector3();

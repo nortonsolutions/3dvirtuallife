@@ -169,7 +169,7 @@ class Scene {
 
             case 73: // i
                 this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
-                this.controller.eventDepot.fire('haltMovement', {});
+                this.controller.eventDepot.fire('halt', {});
                 break;
                 
             case 82: // r

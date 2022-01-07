@@ -78,6 +78,7 @@ class GameAPI {
             location: { x: 0, y: 0, z: 0 },
             attributes: {
                 moves: true,
+                animates: true,
                 height: height,
                 length: 20,
                 width: 20,

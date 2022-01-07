@@ -20,6 +20,7 @@ export class Hero extends IntelligentForm {
         this.gltf = heroTemplate.gltf;
         this.model = heroTemplate.model;
         this.inventory = heroTemplate.inventory;
+        this.attributes = heroTemplate.attributes;
         this.spells = heroTemplate.spells;
         this.equipped = heroTemplate.equipped;
         this.eventDepot = sceneController.eventDepot;
@@ -78,7 +79,7 @@ export class Hero extends IntelligentForm {
 
         })
 
-        this.eventDepot.addListener('haltMovement', () => {
+        this.eventDepot.addListener('halt', () => {
 
             this.velocity.x = 0;
             this.velocity.z = 0;
@@ -222,7 +223,7 @@ export class Hero extends IntelligentForm {
         this.eventDepot.removeListeners('dropItemToScene');
         this.eventDepot.removeListeners('mouse0click');
         this.eventDepot.removeListeners('jump');
-        this.eventDepot.removeListeners('haltMovement');
+        this.eventDepot.removeListeners('halt');
         this.dispose(this.model);
         callback();
     }

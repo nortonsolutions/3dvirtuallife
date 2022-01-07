@@ -37,7 +37,6 @@ export class SceneController {
 
 
         // To be removed:
-        this.objects3D = [];
         this.sprites = [];
 
         // Bindings:
@@ -45,9 +44,7 @@ export class SceneController {
         this.deanimateScene = this.deanimateScene.bind(this);
         this.takeItemFromScene = this.takeItemFromScene.bind(this);
         this.dropItemToScene = this.dropItemToScene.bind(this);
-        this.seedObjects3D = this.seedObjects3D.bind(this);
-        
-        
+        this.seedForms = this.seedForms.bind(this);
         
         this.addEventListeners();
     }
@@ -57,11 +54,11 @@ export class SceneController {
         this.scene = new Scene(this);
         this.scene.init(() => {
             this.addFloor(() => {
-
-                // this.seedObjects3D();
                 this.addLights();
-                this.addHero3D(() => {
-                    this.scene.animate();
+                this.addHero(() => {
+                    this.seedForms(() => {
+                        this.scene.animate();
+                    });
                 });
             });
             
@@ -105,7 +102,7 @@ export class SceneController {
         this.scene.add( this.proximityLight );
     }
 
-    addHero3D(callback) {
+    addHero(callback) {
 
         this.hero = this.formFactory.newForm("hero", this.heroTemplate);
 
@@ -130,7 +127,7 @@ export class SceneController {
             this.hero.controls.objectType = "hero";
             this.forms.push( this.hero );
 
-            this.eventDepot.fire('haltMovement', {});
+            this.eventDepot.fire('halt', {});
             this.eventDepot.fire('updateHeroLocation', { location: this.hero.location, offset: true });
             
             this.hero.updateHeroStats();
@@ -140,15 +137,66 @@ export class SceneController {
         })
     }
 
+    seedForms(callback) {
+        // this.layout.items.forEach(item => this.seedObject3D(item));
+        this.layout.structures.forEach(structure => this.seedForm(structure));
+        // this.layout.entities.forEach(entity => this.seedObject3D(entity));
+        this.eventDepot.fire('cacheLayout', {});
+
+        callback();
+    }
+
+    /** 
+     * Create 3D representation of each object:
+     */ 
+    seedForm(formTemplate) {
+
+        var form;
+        if (formTemplate.attributes.moves) {
+            form = this.formFactory.newForm("artificial", formTemplate);
+        } else if (formTemplate.attributes.animates) {
+            form = this.formFactory.newForm("animated", formTemplate);
+        } else {
+            form = this.formFactory.newForm("standard", formTemplate);
+        }
+
+        form.load(() => {
+
+            this.addToScene(form);
+            // object.uuid = model.uuid;
+
+            // // Set movable objects rotation to 180 to match the Hero
+            // if (object.attributes.moves) {
+            //     form.model.rotation.y = Math.PI;
+            // }
+
+            if (form.attributes.contentItems) {
+                form.attributes.contentItems.forEach(contentItem => {
+
+                    this.loadFormbyName(contentItem, (contentForm) => {
+
+                        let model = contentForm.scene;
+                        model.position.x = form.model.position.x;
+                        model.position.z = form.model.position.z;
+                        model.position.y = form.model.position.y + contentItem.attributes.elevation;
+                        this.addToScene(contentForm);
+                    })
+                });
+            }
+        });
+    }
+
+
+
     handleMovement(delta) {
         this.forms.forEach(form => {
-            if (form.moves) {
+            if (form.attributes.moves) {
 
                 let otherForms = this.forms.filter(el => el != form);
                 form.move(otherForms, delta);
             }
 
-            if (form.animations && form.animations.length != 0) {
+            if (form.attributes.animates) {
                 form.animate(delta);
             }
             
@@ -176,8 +224,8 @@ export class SceneController {
 
         let closest = Infinity;
 
-        this.objects3D.forEach(o => {
-            let distance = o.position.distanceTo(this.proximityLight.position);
+        this.forms.forEach(o => {
+            let distance = o.model.position.distanceTo(this.proximityLight.position);
             if (distance <= 50 && distance < closest) {
                 // If the object is unlocked, exclude to allow selecting the contents
                 if (!o.attributes.contentItems || (o.attributes.contentItems && !o.attributes.unlocked))  {
@@ -231,12 +279,11 @@ export class SceneController {
 
     dropItemToScene(data) {
         let object = this.getObjectByName(data.itemName);
-        this.loadFormbyName(data.itemName, (gltf) => {
-            let model = gltf.scene;
+        this.loadFormbyName(data.itemName, (form) => {
+            let model = form.scene;
             model.position.copy(this.scene.controls.getObject().position);
             model.position.y = this.determineElevationFromBase(model.position.x, model.position.y, data.itemName) + object.attributes.elevation;
-            this.scene.add(model);
-            this.addToObjects3D(model);
+            this.addToScene(form);
 
             data.uuid = model.uuid;
             this.eventDepot.fire('addItemToLayout', data);
@@ -251,13 +298,23 @@ export class SceneController {
     }
 
     /** This method will not set the position of the object3D, nor create a GUI.
-     * The return object 'gltf' will have a model (scene) and animations if applicable.
+     * The return object 'form' will have a model (scene) and animations if applicable.
      */
     loadFormbyName(objectName, callback) {
 
         let object = this.getObjectByName(objectName);
-        this.formFactory.load( object, (gltf) => {
-            callback(gltf);
+        this.loader.load( object.gltf, (form) => {
+
+            let model = form.scene;
+            model.objectName = object.name;
+            model.objectType = object.type;
+            model.attributes = object.attributes;
+
+            model.scale.x = object.attributes.scale;
+            model.scale.y = object.attributes.scale;
+            model.scale.z = object.attributes.scale;
+
+            callback(form);
         });
     }
 
@@ -329,60 +386,7 @@ export class SceneController {
         }
     }
 
-    seedObjects3D = () => {
-        this.layout.items.forEach(item => this.seedObject3D(item));
-        this.layout.structures.forEach(structure => this.seedObject3D(structure));
-        this.layout.entities.forEach(entity => this.seedObject3D(entity));
-        this.eventDepot.fire('cacheLayout', {});
 
-    }
-
-    /** 
-     * Create 3D representation of each object:
-     */ 
-    seedObject3D = (object) => {
-
-        this.formFactory.load(object, (gltf) => {
-
-            let model = gltf.scene;
-
-            object.uuid = model.uuid;
-            model.position.x = object.location.x * multiplier;
-            model.position.z = object.location.z * multiplier;
-            model.position.y = this.determineElevationFromBase(model.position.x, model.position.z,object.name) + object.attributes.elevation;
-            
-            // // Set movable objects rotation to 180 to match the Hero
-            // if (object.attributes.moves) {
-            //     model.rotation.y = Math.PI;
-            // }
-
-            if (object.attributes.animates) {
-                this.createMixer( model, gltf.animations, model.uuid );
-                if (object.attributes.unlocked) {
-                    this.mixers[model.uuid].activeAction.play();
-                }
-            }
-
-            if (object.attributes.contentItems) {
-                object.attributes.contentItems.forEach(contentItem => {
-                    this.formFactory.load(contentItem, (iGltf) => {
-                        let iModel = iGltf.scene;
-                        iModel.position.x = model.position.x;
-                        iModel.position.z = model.position.z;
-                        iModel.position.y = model.position.y + contentItem.attributes.elevation;
-                        this.objects3D.push( iModel );
-                        this.scene.add( iModel );
-                    })
-                });
-            }
-
-            this.objects3D.push( model );
-            this.scene.add( model );
-
-        }, undefined, function ( error ) {
-            console.error( error );
-        });
-    }
 
     updateStructureAttributes = (object, payload) =>  {
         object.attributes = {...object.attributes, ...payload};
