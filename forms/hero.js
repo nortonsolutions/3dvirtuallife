@@ -160,13 +160,10 @@ export class Hero extends IntelligentForm {
 
             if (this.selectedObject) {
 
-                let thisObj = this.selectedObject;
-
-                let objectName = getObjectName(thisObj);
-                let objectType = getObjectType(thisObj);
+                let objectType = this.selectedObject.objectType;
                 
                 if (objectType == "item") {
-                    this.eventDepot.fire('takeItemFromScene', {itemName: objectName, uuid: thisObj.uuid});
+                    this.eventDepot.fire('takeItemFromScene', {itemName: this.selectedObject.objectName, uuid: this.selectedObject.model.uuid});
 
                 } else if (objectType == "friendly") {
                     
@@ -181,16 +178,16 @@ export class Hero extends IntelligentForm {
 
                 } else if (objectType == "structure") {
                     
-                    var accessible = thisObj.attributes.key ? 
+                    var accessible = this.selectedObject.attributes.key ? 
                         this.inventory.map(el => {
                             return el? el.itemName: null;
-                        }).includes(thisObj.attributes.key) :
+                        }).includes(this.selectedObject.attributes.key) :
                         true;
                     
                     if (accessible) {
-                        this.updateStructureAttributes(thisObj, {unlocked: true});
-                        if (this.activeAction) {
-                            this.runActiveAction(0.2);
+                        this.selectedObject.updateAttributes({unlocked: true});
+                        if (this.selectedObject.activeAction) {
+                            this.selectedObject.runActiveAction(0.2);
                         }
                     }
                 }

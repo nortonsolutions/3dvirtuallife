@@ -20,6 +20,7 @@ export class SceneController {
 
     constructor(heroTemplate, layout, eventDepot, allObjects) {
         
+        // layout is shared by SceneController and LayoutManager
         this.layout = layout;
         this.heroTemplate = heroTemplate;
         this.eventDepot = eventDepot;
@@ -77,13 +78,10 @@ export class SceneController {
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
         this.floor.load(() => {
             this.addToScene(this.floor);
-            setTimeout(() => {
+            // setTimeout(() => {
                 callback();
-            }, 500);
-            
+            // }, 500);
         });
-
-
     }
 
     addLights() {
@@ -125,7 +123,12 @@ export class SceneController {
     }
 
     seedForms(callback) {
-        // this.layout.items.forEach(item => this.seedObject3D(item));
+        this.layout.items.forEach((item,index) => {
+            this.seedForm(item).then(form => {
+                this.layout.items[index].uuid = form.model.uuid;
+            });
+        });
+
         this.layout.structures.forEach(structure => this.seedForm(structure));
         // this.layout.entities.forEach(entity => this.seedObject3D(entity));
         this.eventDepot.fire('cacheLayout', {});
@@ -147,35 +150,34 @@ export class SceneController {
             form = this.formFactory.newForm("standard", formTemplate);
         }
 
-        form.load(() => {
+        return new Promise((resolve,reject) => {
+            form.load(() => {
 
-            this.addToScene(form);
-            
-            if (form.objectType != "hero") {
-                this.nonHeroForms.push(form);
-                this.nonHeroModels.push(form.model);
-            }
-            // object.uuid = model.uuid;
-
-            // // Set movable objects rotation to 180 to match the Hero
-            // if (object.attributes.moves) {
-            //     form.model.rotation.y = Math.PI;
-            // }
-
-            if (form.attributes.contentItems) {
-                form.attributes.contentItems.forEach(contentItem => {
-
-                    this.loadFormbyName(contentItem, (contentForm) => {
-
-                        let model = contentForm.scene;
-                        model.position.x = form.model.position.x;
-                        model.position.z = form.model.position.z;
-                        model.position.y = form.model.position.y + contentItem.attributes.elevation;
-                        this.addToScene(contentForm);
-                    })
-                });
-            }
-        });
+                this.addToScene(form);
+                
+                if (form.objectType != "hero") {
+                    this.nonHeroForms.push(form);
+                    this.nonHeroModels.push(form.model);
+                }
+    
+                if (form.attributes.contentItems) {
+                    form.attributes.contentItems.forEach(contentItem => {
+    
+                        this.loadFormbyName(contentItem, (contentForm) => {
+    
+                            let model = contentForm.scene;
+                            model.position.x = form.model.position.x;
+                            model.position.z = form.model.position.z;
+                            model.position.y = form.model.position.y + contentItem.attributes.elevation;
+                            this.addToScene(contentForm);
+                        })
+                    });
+                }
+    
+                resolve(form);
+            });
+                
+        })
     }
 
 
@@ -252,32 +254,31 @@ export class SceneController {
 
     }
 
-    removeFromScenebyUUID(uuid) {
-
-        this.scene.removeFromScenebyUUID(uuid);
-        this.forms = this.forms.filter(el => {
-            return el.uuid != uuid;
-        });
-    }
-
     getObjectByName(name) {
         return this.allObjects[name];
     }
 
+    /** data: {itemName: ..., uuid: ...} */
     takeItemFromScene(data) {
-        this.removeFromScenebyUUID(data.uuid);
+
+        this.scene.removeFromScenebyUUID(data.uuid);
+        this.forms = this.forms.filter(el => {
+            return el.model.uuid != data.uuid;
+        });
+
         this.eventDepot.fire('removeItemFromLayout', data.uuid);
     }
 
+    /** data: {location ..., itemName..., } */
     dropItemToScene(data) {
-        let object = this.getObjectByName(data.itemName);
-        this.loadFormbyName(data.itemName, (form) => {
-            let model = form.scene;
-            model.position.copy(this.scene.controls.getObject().position);
-            model.position.y = this.determineElevationFromBase(model.position.x, model.position.y, data.itemName) + object.attributes.elevation;
-            this.addToScene(form);
+        
+        let itemTemplate = this.getObjectByName(data.itemName);
+        this.seedForm(itemTemplate).then(form => {
 
-            data.uuid = model.uuid;
+            form.model.position.copy(this.hero.model.position);
+            form.model.position.y = this.hero.determineElevationFromBase();
+
+            data.uuid = form.model.uuid;
             this.eventDepot.fire('addItemToLayout', data);
         })
     }
@@ -289,13 +290,15 @@ export class SceneController {
         
     }
 
-    /** This method will not set the position of the object3D, nor create a GUI.
+    /** 
+     * This method will not set the position of the object3D, nor create a GUI.
      * The return object 'form' will have a model (scene) and animations if applicable.
+     * Only for use with facade items like equipped.  ??
      */
     loadFormbyName(objectName, callback) {
 
         let object = this.getObjectByName(objectName);
-        this.loader.load( object.gltf, (form) => {
+        this.loader.load( '/models/3d/gltf/' + object.gltf, (form) => {
 
             let model = form.scene;
             model.objectName = object.name;
@@ -377,12 +380,4 @@ export class SceneController {
             }
         }
     }
-
-
-
-    updateStructureAttributes = (object, payload) =>  {
-        object.attributes = {...object.attributes, ...payload};
-        this.eventDepot.fire('updateStructureAttributes', {uuid: object.uuid, attributes: payload});
-    }
-
 }

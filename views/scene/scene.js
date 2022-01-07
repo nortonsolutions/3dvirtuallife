@@ -111,7 +111,7 @@ class Scene {
     }
 
     removeFromScenebyUUID(uuid) {
-        this.scene.remove(this.scene.scene.children.find(el => {
+        this.scene.remove(this.scene.children.find(el => {
             return el.uuid == uuid;
         }));
     }

@@ -54,7 +54,7 @@ export class StandardForm {
             if (this.template.location) {
                 this.model.position.x = this.template.location.x * multiplier;
                 this.model.position.z = this.template.location.z * multiplier;
-                this.model.position.y = this.determineElevationFromBase();
+                this.model.position.y = this.determineElevationFromBase() + this.attributes.elevation;
 
             } else { // floor is the only form without location
                 this.setToRenderDoubleSided();
@@ -110,5 +110,11 @@ export class StandardForm {
             root.children.forEach(e => this.setToRenderDoubleSided(e)); 
         }
     }
+
+    updateAttributes(payload) {
+        this.attributes = {...this.attributes, ...payload};
+        this.sceneController.eventDepot.fire('updateLayoutAttributes', {uuid: this.model.uuid, attributes: payload});
+    }
+
 
 }
