@@ -29,6 +29,8 @@ export class SceneController {
         this.loader = new THREE.GLTFLoader();
 
         this.forms = [];
+        this.nonHeroForms = [];
+        this.nonHeroModels = []; // this.forms.filter(el => el.objectType != "hero").map(el => el.model);
 
         this.scene = null;
         this.floor = null;
@@ -57,7 +59,6 @@ export class SceneController {
                 this.addLights();
                 this.addHero(() => {
                     this.seedForms(() => {
-                        this.nonHeroModels = this.forms.filter(el => el.objectType != "hero").map(el => el.model);
                         this.scene.animate();
                     });
                 });
@@ -149,6 +150,11 @@ export class SceneController {
         form.load(() => {
 
             this.addToScene(form);
+            
+            if (form.objectType != "hero") {
+                this.nonHeroForms.push(form);
+                this.nonHeroModels.push(form.model);
+            }
             // object.uuid = model.uuid;
 
             // // Set movable objects rotation to 180 to match the Hero
@@ -189,6 +195,8 @@ export class SceneController {
         })
 
         this.identifySelectedObject(this.scene.controls.getObject());
+
+        this.nonHeroModels = this.forms.filter(el => el.objectType != "hero").map(el => el.model);
         this.scene.handleAutoZoom(this.nonHeroModels);
     }
 
