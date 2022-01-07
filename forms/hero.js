@@ -55,19 +55,39 @@ export class Hero extends IntelligentForm {
     }
 
     cacheHero() {
+
         localStorage.setItem('gameHeroTemplate', JSON.stringify(this.returnTemplate()));
+
     }
 
     addEventListeners() {
 
         this.eventDepot.addListener('updateHeroLocation', data => {
-            this.location.x = data.x;
-            this.location.y = data.y;
-            this.location.z = data.z;
+
+            let { x, y, z } = data.location;
+        
+            if (data.offset) {
+                z = z + (z < 0) ? 1 : -1;
+                x = x + (x < 0) ? 1 : -1;
+            }
+
+            this.location.x = x;
+            this.location.y = y;
+            this.location.z = z;
+            this.cacheHero();
+
+        })
+
+        this.eventDepot.addListener('haltMovement', () => {
 
             this.velocity.x = 0;
             this.velocity.z = 0;
-            this.cacheHero();
+
+            this.moveForward = false;
+            this.moveBackward = false;
+            this.moveLeft = false;
+            this.moveRight = false;
+
         })
 
         this.eventDepot.addListener('swapInventoryPositions', (data) => {
@@ -168,6 +188,14 @@ export class Hero extends IntelligentForm {
             this.moveRight = false;
         })
 
+        this.eventDepot.addListener('jump', () => {
+            if ( this.canJump === true ) {
+                this.velocity.y += 350;
+                this.fadeToAction('Jump', 0.2)
+            }
+            this.canJump = false;
+            this.justJumped = true;
+        })
     }
 
     dispose(item) {
@@ -193,6 +221,8 @@ export class Hero extends IntelligentForm {
         this.eventDepot.removeListeners('removeItem');
         this.eventDepot.removeListeners('dropItemToScene');
         this.eventDepot.removeListeners('mouse0click');
+        this.eventDepot.removeListeners('jump');
+        this.eventDepot.removeListeners('haltMovement');
         this.dispose(this.model);
         callback();
     }
@@ -340,16 +370,15 @@ export class Hero extends IntelligentForm {
     }
 
     // Calculate hero location using grid coordinates
-    updateHeroLocation = (location, offset = false) => {
+    updateHeroLocationFromPosition() {
 
-        let { x, y, z } = location;
-        
-        if (offset) {
-            z = z + (z < 0) ? 20 : -20;
-            x = x + (x < 0) ? 20 : -20;
+        let location = {
+            x: this.controller.position.x / multplier,
+            y: this.controller.position.y / multplier,
+            z: this.controller.position.z / multplier
         }
+        this.eventDepot.fire('updateHeroLocation', { location, offset: false });
 
-        this.eventDepot.fire('updateHeroLocation', { x: x / multiplier, y, z: z / multiplier });
     }
 
     move(otherForms, delta) {

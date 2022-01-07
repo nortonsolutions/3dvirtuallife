@@ -1,7 +1,6 @@
 import { StandardForm } from './standard.js'
 
-var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
-var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
+
 
 /** AnimatedForms are forms that have animation actions
  * and a mixer.
@@ -13,6 +12,9 @@ export class AnimatedForm extends StandardForm{
         super(template, sceneController);
 
         this.actions = [];
+
+        this.states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
+        this.emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
     }
     
@@ -28,7 +30,7 @@ export class AnimatedForm extends StandardForm{
                 var action = this.mixer.clipAction( animation );
                 if (index == 0) { firstAnimationName = animation.name };
     
-                if ( emotes.indexOf( animation.name ) >= 0 || states.indexOf( animation.name ) >= 4) {
+                if ( this.emotes.indexOf( animation.name ) >= 0 || this.states.indexOf( animation.name ) >= 4) {
                     action.clampWhenFinished = true;
                     action.loop = THREE.LoopOnce;
                 } else if (this.model.objectType=='structure') {
@@ -68,10 +70,12 @@ export class AnimatedForm extends StandardForm{
         this.mixer.update( delta );
     }
 
-    fadeToAction = ( actionName, duration ) => {
+    fadeToAction( actionName, duration ) {
         
+        console.log(`previous: ${this.previousActionName}, active: ${this.activeActionName}, new: ${actionName}`)
         if ( this.activeActionName !== actionName ) {
 
+            
             let newAction = this.actions[ actionName ];
 
             this.previousActionName = this.activeActionName;
@@ -81,6 +85,7 @@ export class AnimatedForm extends StandardForm{
 
             this.previousAction.fadeOut( duration );
 
+
             this.activeAction
                 .reset()
                 .setEffectiveTimeScale( 1 )
@@ -89,17 +94,18 @@ export class AnimatedForm extends StandardForm{
                 .play();
 
             const restoreState = () => {
-                this.removeEventListener('finished', restoreState );
-                this.fadeToAction( uuid, this.previousActionName, 0.1 );
+                this.mixer.removeEventListener('finished', restoreState );
+                this.fadeToAction( this.previousActionName, 0.1 );
             }
 
-            if (emotes.includes(actionName)) {
-                this.addEventListener( 'finished', restoreState );
+            console.log(actionName);
+            if (this.emotes.includes(actionName)) {
+                this.mixer.addEventListener( 'finished', restoreState );
             }
         }
     }
 
-    runActiveAction = (duration) => {
+    runActiveAction(duration) {
 
         this.activeAction
             .reset()

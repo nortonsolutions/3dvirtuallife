@@ -130,7 +130,9 @@ export class SceneController {
             this.hero.controls.objectType = "hero";
             this.forms.push( this.hero );
 
-            this.hero.updateHeroLocation(this.hero.controls.position, true);
+            this.eventDepot.fire('haltMovement', {});
+            this.eventDepot.fire('updateHeroLocation', { location: this.hero.location, offset: true });
+            
             this.hero.updateHeroStats();
 
             callback();

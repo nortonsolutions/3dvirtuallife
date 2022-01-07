@@ -164,23 +164,12 @@ class Scene {
                 break;
 
             case 32: // space
-                if ( this.controller.hero.canJump === true ) {
-                    this.controller.hero.velocity.y += 350;
-                    this.controller.hero.fadeToAction("hero", "Jump", 0.2)
-                }
-                this.controller.hero.canJump = false;
-                this.controller.hero.justJumped = true;
+                this.controller.eventDepot.fire('jump', {});
                 break;
 
             case 73: // i
-                this.controller.hero.updateHeroLocation(this.controls.getObject().position, false);
                 this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
-                
-                this.controller.hero.moveForward = false;
-                this.controller.hero.moveBackward = false;
-                this.controller.hero.moveLeft = false;
-                this.controller.hero.moveRight = false;
-
+                this.controller.eventDepot.fire('haltMovement', {});
                 break;
                 
             case 82: // r
