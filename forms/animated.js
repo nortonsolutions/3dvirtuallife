@@ -8,9 +8,9 @@ var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
  */
 export class AnimatedForm extends StandardForm{
 
-    constructor(template, eventDepot, loader, floorModel) {
+    constructor(template, sceneController) {
 
-        super(template, eventDepot, loader, floorModel);
+        super(template, sceneController);
 
         this.actions = [];
 

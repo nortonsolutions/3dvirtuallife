@@ -25,7 +25,9 @@ export class SceneController {
         this.eventDepot = eventDepot;
         this.allObjects = allObjects;
 
-        this.formFactory = new FormFactory(eventDepot);
+        this.formFactory = new FormFactory(this);
+        this.loader = new THREE.GLTFLoader();
+
         this.forms = [];
 
         this.scene = null;
@@ -43,7 +45,6 @@ export class SceneController {
         this.deanimateScene = this.deanimateScene.bind(this);
         this.takeItemFromScene = this.takeItemFromScene.bind(this);
         this.dropItemToScene = this.dropItemToScene.bind(this);
-        this.equipItem = this.equipItem.bind(this);
         this.seedObjects3D = this.seedObjects3D.bind(this);
         
         
@@ -106,16 +107,10 @@ export class SceneController {
 
     addHero3D(callback) {
 
-        this.hero = this.formFactory.newForm("hero", this.heroTemplate, this.floor.model);
+        this.hero = this.formFactory.newForm("hero", this.heroTemplate);
 
         this.hero.load(() => {
             
-            if (this.hero.equipped) {
-                Object.keys(this.hero.equipped).forEach(bodyPart => {
-                    this.eventDepot.fire('equipItem', {bodyPart, itemName: this.hero.equipped[bodyPart]});
-                })
-            }
-
             this.hero.controls = this.scene.controls.getObject();
 
             // Adjustments for hero:
@@ -202,7 +197,6 @@ export class SceneController {
 
         this.eventDepot.removeListener('takeItemFromScene', 'bound takeItemFromScene');
         this.eventDepot.removeListener('dropItemToScene', 'bound dropItemToScene');
-        this.eventDepot.removeListener('equipItem', 'bound equipItem');
 
         this.scene.unregisterEventListeners();
         this.scene.deanimate(() => {
@@ -247,51 +241,11 @@ export class SceneController {
         })
     }
 
-    equipItem(data) {
-
-        let area = data.bodyPart;
-        this.loadFormbyName(data.itemName, (itemGltf) => {
-
-            let item = itemGltf.scene;
-            item.position.set(0,0,0);
-            item.rotation.y = Math.PI;
-            item.scale.copy(new THREE.Vector3( .1,.1,.1 ));
-    
-            if (item.objectName == "torch") {
-    
-                let fireObj = this.getFire();
-
-                // this.fireParams.Torch();
-                fireObj.scale.set(.04, .01, .04);
-                fireObj.translateY(.08);
-                fireObj.translateZ(-.32);
-                fireObj.translateX(.01);
-                fireObj.rotateX(-Math.PI/5);
-                fireObj.rotateZ(-Math.PI/20);
-
-                item.add(fireObj);
-
-                switch (area) {
-                    case "Middle2R_end": 
-                        item.rotation.z = -Math.PI/5;
-                        break;
-                    case "Middle2L_end":
-                        break;
-                    default:
-                }
-
-            } 
-            
-            this.hero.model.getObjectByName(area).add(item);
-            
-        });
-    }
-
     addEventListeners() {
 
         this.eventDepot.addListener('takeItemFromScene', this.takeItemFromScene);
         this.eventDepot.addListener('dropItemToScene', this.dropItemToScene);
-        this.eventDepot.addListener('equipItem', this.equipItem)
+        
     }
 
     /** This method will not set the position of the object3D, nor create a GUI.

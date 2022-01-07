@@ -9,8 +9,8 @@ import { AnimatedForm } from './animated.js'
 
 export class IntelligentForm extends AnimatedForm{
 
-    constructor(template, eventDepot, loader, floorModel) {
-        super(template, eventDepot, loader, floorModel);
+    constructor(template, sceneController) {
+        super(template, sceneController);
 
         // Animation mixer has been added by superclass
 

@@ -14,11 +14,11 @@ var downRaycasterTestLength = 70;
 
 export class StandardForm {
     
-    constructor(template, eventDepot, loader, floorModel) {
+    // floorModel is accepted as an optional param for forms that don't need the sceneController
+    constructor(template, sceneController) {
 
         this.template = template;
-        this.eventDepot = eventDepot;
-        this.floorModel = floorModel;
+        this.sceneController = sceneController;
 
         this.upRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ), 0, upRaycasterTestLength);
         this.downRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, downRaycasterTestLength );
@@ -26,19 +26,13 @@ export class StandardForm {
         this.attributes = this.template.attributes;
         this.model = null;
 
-        switch (loader) {
-            case "gltf":
-            default: 
-                this.loader = new THREE.GLTFLoader();
-                break;
-        }
-
         this.load = this.load.bind(this);
     }
 
+    /** load is for loading the model and animations specifically */
     load(callback) {
         
-        this.loader.load( '/models/3d/gltf/' + this.template.gltf, (gltf) => {
+        this.sceneController.loader.load( '/models/3d/gltf/' + this.template.gltf, (gltf) => {
         
             let model = gltf.scene;
             
@@ -75,13 +69,13 @@ export class StandardForm {
         this.upRaycaster.ray.origin.y = -yOffset;
         
 
-        if (this.upRaycaster.intersectObject(this.floorModel, true)[0]) {
-            let distanceFromBase = this.upRaycaster.intersectObject(this.floorModel, true)[0].distance;
+        if (this.upRaycaster.intersectObject(this.sceneController.floor.model, true)[0]) {
+            let distanceFromBase = this.upRaycaster.intersectObject(this.sceneController.floor.model, true)[0].distance;
 
             this.downRaycaster.ray.origin.copy (this.upRaycaster.ray.origin);
             this.downRaycaster.ray.origin.y += (distanceFromBase + yOffset);
             
-            let distanceFromAbove = this.downRaycaster.intersectObject(this.floorModel, true)[0].distance;
+            let distanceFromAbove = this.downRaycaster.intersectObject(this.sceneController.floor.model, true)[0].distance;
             let elevation = this.downRaycaster.ray.origin.y - distanceFromAbove + 5; 
             return (elevation);
         } else {

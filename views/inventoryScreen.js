@@ -187,6 +187,7 @@ class InventoryScreen {
                         let itemNameToSwap = targetElement.firstElementChild.id;
                         this.eventDepot.fire('unequipItem', ev.target.parentNode.id);
                         this.eventDepot.fire('equipItem', {bodyPart: index, itemName: itemNameToSwap});
+                        
                     }
 
                     this.eventDepot.fire('equipItem', {bodyPart: ev.target.parentNode.id, itemName});

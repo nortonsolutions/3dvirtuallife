@@ -11,9 +11,9 @@ import { IntelligentForm } from './intelligent.js'
  */
 export class Hero extends IntelligentForm {
 
-    constructor(heroTemplate, eventDepot, loader, floorModel) {
+    constructor(heroTemplate, sceneController) {
 
-        super(heroTemplate, eventDepot, loader, floorModel);
+        super(heroTemplate, sceneController);
 
         this.name = heroTemplate.name;
         this.type = heroTemplate.type;
@@ -22,7 +22,7 @@ export class Hero extends IntelligentForm {
         this.inventory = heroTemplate.inventory;
         this.spells = heroTemplate.spells;
         this.equipped = heroTemplate.equipped;
-        this.eventDepot = eventDepot;
+        this.eventDepot = sceneController.eventDepot;
         
         this.selectedObject = null;
 
@@ -38,6 +38,19 @@ export class Hero extends IntelligentForm {
         this.moveRight = false;
 
         this.cacheHero();
+
+    }
+
+    load(callback) {
+
+        super.load(() => {
+            if (this.equipped) {
+                Object.keys(this.equipped).forEach(bodyPart => {
+                    this.equip(bodyPart, this.equipped[bodyPart]);
+                })
+            }
+            callback();
+        })
 
     }
 
@@ -249,8 +262,43 @@ export class Hero extends IntelligentForm {
 
     equip(area, itemName) {
         this.equipped[area] = itemName;
-    }
+        this.sceneController.loadFormbyName(itemName, (itemGltf) => {
 
+            let item = itemGltf.scene;
+            item.position.set(0,0,0);
+            item.rotation.y = Math.PI;
+            item.scale.copy(new THREE.Vector3( .1,.1,.1 ));
+    
+            if (item.objectName == "torch") {
+    
+                let fireObj = this.getFire();
+
+                // this.fireParams.Torch();
+                fireObj.scale.set(.04, .01, .04);
+                fireObj.translateY(.08);
+                fireObj.translateZ(-.32);
+                fireObj.translateX(.01);
+                fireObj.rotateX(-Math.PI/5);
+                fireObj.rotateZ(-Math.PI/20);
+
+                item.add(fireObj);
+
+                switch (area) {
+                    case "Middle2R_end": 
+                        item.rotation.z = -Math.PI/5;
+                        break;
+                    case "Middle2L_end":
+                        break;
+                    default:
+                }
+
+            } 
+            
+            this.model.getObjectByName(area).add(item);
+            
+        });
+    }
+    
     unequip(area) {
         delete this.equipped[area];
         let thisArea = this.model.getObjectByName(area);

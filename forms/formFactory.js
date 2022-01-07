@@ -13,26 +13,26 @@ import { Fire } from './fire.js';
 
 export class FormFactory {
 
-    constructor(eventDepot) {
+    constructor(sceneController) {
         
-        this.eventDepot = eventDepot;
+        this.sceneController = sceneController;
         this.setToRenderDoubleSided = this.setToRenderDoubleSided.bind(this);
     }
 
-    newForm(type, template, floorModel) {
+    newForm(type, template) {
 
         let form = null;
         switch (type) {
             case "hero":
-                form = new Hero(template, this.eventDepot, "gltf", floorModel);
+                form = new Hero(template, this.sceneController);
                 break;
             case "floor":
-                form = new StandardForm(template, this, "gltf", floorModel);
+                form = new StandardForm(template, this.sceneController);
                 this.setToRenderDoubleSided(form);
                 // this.addSconces(this.floor);
                 break;
             default:
-                form = new StandardForm(template, this, "gltf", floorModel);
+                form = new StandardForm(template, this.sceneController);
                 break;
         }
 
