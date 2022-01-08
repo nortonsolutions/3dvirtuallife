@@ -453,6 +453,9 @@ class Scene {
         window.removeEventListener( 'resize', this.onWindowResize, false );
         this.controller.eventDepot.removeListeners('lockControls');
         this.controller.eventDepot.removeListeners('unlockControls');
+        this.controller.eventDepot.removeListeners('setHeroStat');
+        this.controller.eventDepot.removeListeners('setHeroStatMax');
+        this.controller.eventDepot.removeListeners('updateHelper');
     }
 
 }

@@ -1,20 +1,33 @@
 
-import { InventoryScreen } from './inventoryScreen.js'
+import { InventoryScreen } from './inventoryScreen.js';
+import { LoadGameScreen } from './loadGameScreen.js';
 
 class Modal {
 
-    constructor(eventDepot) {
+    constructor(eventDepot, gameAPI) {
 
+        this.gameAPI = gameAPI;
         this.inventoryScreen = new InventoryScreen(eventDepot, this);
+        this.loadGameScreen = new LoadGameScreen(eventDepot, this);
 
+        /** e.g. data: { type: 'loadgame', title: 'Load Game', context: response } */
         eventDepot.addListener('modal', (data) => {
 
             eventDepot.fire('unlockControls', {});
-            var context = this.inventoryScreen.getContext(data.type, 0);
+
+            var context;
+            if (data.type == "inventory" || data.type == "spells") {
+                context = this.inventoryScreen.getContext(data.type, 0);
+            } else {
+                context = data.context;
+            }
             
             this.loadTemplate('modal-body', data.type, context, () => {
-                if (data.type == "inventory" || data.type == "spells") 
-                this.inventoryScreen.addInventoryEvents(data.type);
+                if (data.type == "inventory" || data.type == "spells") {
+                    this.inventoryScreen.addInventoryEvents(data.type);
+                } else if (data.type == 'loadgame') {
+                    this.loadGameScreen.addLoadGameEvents();
+                }
             });
             
             var modal = document.getElementById('myModal');

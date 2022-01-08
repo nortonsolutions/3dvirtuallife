@@ -12,7 +12,7 @@ import { LayoutManager } from './layout/layoutManager.js';
 
 class Game {
 
-    constructor(heroTemplate, eventDepot, loader, floorModel) {
+    constructor(heroTemplate, eventDepot) {
 
         // this.props = props;
         this.heroTemplate = heroTemplate;
@@ -54,66 +54,6 @@ class Game {
     }
 }
 
-/**
-* 
-* Here we keep track of the hero, inventory, saving/loading games, etc.
-* 
-* When a game is saved, the props are saved in the profile,
-* so loading will resume at the same level with the same inventory, etc.
-*/
-class GameAPI {
-    
-    constructor() {}
-    
-    /**
-     * Fresh game props from scratch with only personal details provided.
-     */
-    newHeroTemplate(name,height) {
-        return {
-            name: name,
-            type: "hero",
-            location: { x: 0, y: 0, z: 0 },
-            attributes: {
-                moves: true,
-                animates: true,
-                height: height,
-                length: 20,
-                width: 20,
-                scale: 10,
-                elevation: 0,
-                stats: {
-                    health: "03/05",
-                    mana: "00/00",
-                    strength: "01/01",
-                    agility: "03/03"
-                }
-            },
-            gltf: 'robot.glb',
-            model: null,
-            inventory: [],
-            spells: [],
-            equipped: {}
 
-        }
-    }
 
-    saveGame() {
-        // Post to an API on the server with the game props
-        // to save information in the server filesystem.
-    }
-
-    loadGame() {
-        // Call the server API to load a specific game props. 
-    }
-
-    getSavedGames() {
-        // Call the server API to return a list of the saved games.
-    }
-
-    deleteGame() {
-        // Delete a saved game on the server.
-    }
-
-}
-
-export {Game, GameAPI};
+export { Game };

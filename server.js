@@ -5,6 +5,7 @@
 'use strict';
 
 const express     = require('express');
+const bodyParser  = require('body-parser');
 // const fs          = require('fs');
 
 const apiRoutes                = require('./routes/api.js');
@@ -35,6 +36,9 @@ database(mongoose, (db) => {
     
   app.set("view engine", "hbs");
   app.set('views', __dirname + '/views');
+
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
     
   //For FCC testing purposes
   // fccTestingRoutes(app);

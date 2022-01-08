@@ -4,19 +4,21 @@
 * saving and loading props and hero template from localStorage, starting or joining games.
 */
 import { EventDepot } from '/public/eventDepot.js';
-import { Game, GameAPI } from '/game.js';
+import { Game } from '/game.js';
+import { GameAPI } from './gameAPI.js'
 import { Modal } from '/views/modal.js';
 
 export const app = () => {
 
-    var gameAPI = new GameAPI();
+    var eventDepot = new EventDepot();
+    var gameAPI = new GameAPI(eventDepot);
 
     var game = null;
     var props = { level: 0, layouts: [] }
     var heroTemplate = gameAPI.newHeroTemplate('dave', 20);
 
-    var eventDepot = new EventDepot();
-    var modal = new Modal(eventDepot);
+    
+    var modal = new Modal(eventDepot, gameAPI);
     
     var minimap = false;
 
@@ -62,11 +64,17 @@ export const app = () => {
         Array.from(document.querySelectorAll('.saveGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
+                if (game) {
 
-                // Send the following data to the server for saving
-                console.log(localStorage.getItem('gameProps'));
-                console.log(localStorage.getItem('gameHeroTemplate'));
+                    var gameName;
+                    if (localStorage.getItem('gameName')) {
+                        gameName = localStorage.getItem('gameName');
+                    } else {
+                        gameName = prompt("Please enter saved game name:", "default")
+                    }
 
+                    gameAPI.saveGame(gameName);
+                }
             })
         })
 
@@ -74,9 +82,8 @@ export const app = () => {
             el.addEventListener('click', e => {
                 e.preventDefault();
 
-                // MOCK DATA loading existing game for now, for gameHeroTemplate
-                props = JSON.parse(localStorage.getItem('gameProps'));
-                heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
+                // List the games via the loadgame template, where the game can be selected and loaded
+                gameAPI.listGames();
                 
             })
         })

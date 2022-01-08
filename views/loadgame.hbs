@@ -1,0 +1,16 @@
+<table class="table table-striped table-inverse table-responsive">
+    <thead class="thead-inverse">
+        <tr>
+            <th>Game Name</th>
+        </tr>
+        </thead>
+        <tbody>
+            {{#each this}}
+            <tr>
+                <td scope="row">{{gameName}}</td>
+                <td><button type="button" name="{{gameName}}" id="{{gameName}}" class="btn btn-primary btn-block btn-sm load"><i class="fas fa-box-open"></i></button></td>
+                <td><button type="button" name="{{gameName}}" id="{{gameName}}" class="btn btn-danger btn-block btn-sm delete"><i class="fas fa-minus"></i></button></td>
+            </tr>
+            {{/each}}
+        </tbody>
+</table>

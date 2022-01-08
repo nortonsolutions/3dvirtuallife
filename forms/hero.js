@@ -16,6 +16,7 @@ export class Hero extends IntelligentForm {
         super(template, sceneController);
 
         this.controls = controls;
+        this.name = this.template.name;
         this.inventory = this.template.inventory;
         this.attributes = this.template.attributes;
         this.spells = this.template.spells;
@@ -315,7 +316,7 @@ export class Hero extends IntelligentForm {
 
     equip(area, itemName) {
         this.equipped[area] = itemName;
-        this.sceneController.loadFormbyName(itemName, (item) => {
+        this.sceneController.loadFormbyName(itemName, false, (item) => {
 
             item.model.position.set(0,0,0);
             item.model.rotation.y = Math.PI;
@@ -367,7 +368,6 @@ export class Hero extends IntelligentForm {
             location: this.location,
             attributes: this.attributes,
             gltf: this.template.gltf,
-            model: null,
             inventory: this.inventory,
             spells: this.spells,
             equipped: this.equipped

@@ -68,16 +68,18 @@ export class SceneController {
         });
     }
 
-    addToScene(form) {
+    addToScene(form, addToForms) {
         this.scene.add( form.model );
-        this.forms.push( form );
+        if (addToForms) {
+            this.forms.push( form );
+        }
     }
 
     addFloor(callback) {
 
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
         this.floor.load(() => {
-            this.addToScene(this.floor);
+            this.addToScene(this.floor, false);
             // setTimeout(() => {
                 callback();
             // }, 500);
@@ -124,13 +126,13 @@ export class SceneController {
 
     seedForms(callback) {
         this.layout.items.forEach((item,index) => {
-            this.seedForm(item).then(form => {
+            this.seedForm(item, true).then(form => {
                 this.layout.items[index].uuid = form.model.uuid;
             });
         });
 
         this.layout.structures.forEach((structure, index) => {
-            this.seedForm(structure).then(form => {
+            this.seedForm(structure, true).then(form => {
                 this.layout.structures[index].uuid = form.model.uuid;
             });
         });
@@ -144,7 +146,7 @@ export class SceneController {
     /** 
      * Create 3D representation of each object:
      */ 
-    seedForm(formTemplate) {
+    seedForm(formTemplate, addToForms) {
 
         var form;
         if (formTemplate.attributes.moves) {
@@ -158,7 +160,7 @@ export class SceneController {
         return new Promise((resolve,reject) => {
             form.load(() => {
 
-                this.addToScene(form);
+                this.addToScene(form, addToForms);
                 
                 if (form.objectType != "hero") {
                     this.nonHeroForms.push(form);
@@ -168,11 +170,11 @@ export class SceneController {
                 if (form.attributes.contentItems) {
                     form.attributes.contentItems.forEach(contentItem => {
     
-                        this.loadFormbyName(contentItem, (contentForm) => {
+                        this.loadFormbyName(contentItem, true, (contentForm) => {
                             contentForm.scene.position.x = form.model.position.x;
                             contentForm.scene.position.z = form.model.position.z;
                             contentForm.scene.position.y = form.model.position.y + contentItem.attributes.elevation;
-                            this.addToScene(contentForm);
+                            this.addToScene(contentForm, true);
                         })
                     });
                 }
@@ -245,19 +247,20 @@ export class SceneController {
         this.eventDepot.removeListener('takeItemFromScene', 'bound takeItemFromScene');
         this.eventDepot.removeListener('dropItemToScene', 'bound dropItemToScene');
 
-        this.scene.unregisterEventListeners();
-        this.scene.deanimate(() => {
-
-            this.scene = null;
-            this.forms.forEach(form => {
-                if (form.model.dispose) form.model.dispose();
-            })
-
-            this.hero.stop(() => {
-                this.hero = null;
+        this.hero.stop(() => {
+            // this.hero = null;
+            this.scene.unregisterEventListeners();
+            this.scene.deanimate(() => {
+    
+                // this.scene = null;
+                this.forms.forEach(form => {
+                    if (form.model.dispose) form.model.dispose();
+                })
                 callback();
             });
         });
+
+
 
     }
 
@@ -280,7 +283,7 @@ export class SceneController {
     dropItemToScene(data) {
         
         let itemTemplate = this.getObjectByName(data.itemName);
-        this.seedForm(itemTemplate).then(form => {
+        this.seedForm(itemTemplate, true).then(form => {
 
             form.model.position.copy(this.hero.model.position);
             form.model.position.y = this.hero.determineElevationFromBase();
@@ -297,10 +300,10 @@ export class SceneController {
         
     }
 
-    loadFormbyName(formName, callback) {
+    loadFormbyName(formName, addToForms = true, callback) {
 
         let formTemplate = this.getObjectByName(formName);
-        this.seedForm(formTemplate).then(form => {
+        this.seedForm(formTemplate, addToForms).then(form => {
             callback(form);
         })
     }

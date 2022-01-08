@@ -20,12 +20,12 @@ module.exports = function (app, db) {
     app.route('/save')
         .post((req,res) => {
             let gameName = req.body.gameName;
-            let heroTemplate = req.body.heroTemplate;
-            let props = req.body.props;
+            let heroTemplate = req.body.gameHeroTemplate;
+            let props = req.body.gameProps;
 
             db.models.SavedGame.findOne({ gameName: gameName }, (err,savedGame) => {
                 if (err) {
-                    res.json({error: err.message});
+                   res.json({error: err.message});
                 } else if (savedGame) { // game exists, overwrite
                     savedGame.heroTemplate = heroTemplate;
                     savedGame.props = props;
