@@ -25,11 +25,11 @@ class Game {
             this.eventDepot.fire('unlockControls', {});
             if (this.layoutManager) this.stop(() => {
 
-                let heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
+                this.heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
                 
                 // JIC: update the location to match that specified in the event
-                heroTemplate.location = data.location;
-                heroTemplate.location.x -= 1;
+                this.heroTemplate.location = data.location;
+                this.heroTemplate.location.x -= 1;
                 this.start(data.level);
             });
     
