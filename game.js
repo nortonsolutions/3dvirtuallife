@@ -43,10 +43,7 @@ class Game {
     stop(callback) {
         this.layoutManager.shutdown(() => {
             this.layoutManager = null;
-            this.hero.stop(() => {
-                this.hero = null;
-                callback();
-            });
+            callback();
         });
     }
 

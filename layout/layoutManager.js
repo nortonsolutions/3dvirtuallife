@@ -67,7 +67,7 @@ class LayoutManager {
         });
 
         // data: {uuid: ..., attributes: ...}
-        this.eventDepot.addListener('updateLayoutAttributes', (data) => {
+        this.eventDepot.addListener('updateStructureAttributes', (data) => {
             
             var index = this.layout.structures.findIndex(el => el.uuid == data.uuid);
             if (index == -1) {
@@ -81,7 +81,7 @@ class LayoutManager {
     }
 
     shutdown(callback) {
-        this.eventDepot.removeListeners('updateLayoutAttributes');
+        this.eventDepot.removeListeners('updateStructureAttributes');
         this.eventDepot.removeListeners('removeItemFromLayout');
         this.eventDepot.removeListeners('addItemToLayout');
         this.eventDepot.removeListeners('cacheLayout');

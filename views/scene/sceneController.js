@@ -129,7 +129,12 @@ export class SceneController {
             });
         });
 
-        this.layout.structures.forEach(structure => this.seedForm(structure));
+        this.layout.structures.forEach((structure, index) => {
+            this.seedForm(structure).then(form => {
+                this.layout.structures[index].uuid = form.model.uuid;
+            });
+        });
+
         // this.layout.entities.forEach(entity => this.seedObject3D(entity));
         this.eventDepot.fire('cacheLayout', {});
 
@@ -164,11 +169,9 @@ export class SceneController {
                     form.attributes.contentItems.forEach(contentItem => {
     
                         this.loadFormbyName(contentItem, (contentForm) => {
-    
-                            let model = contentForm.scene;
-                            model.position.x = form.model.position.x;
-                            model.position.z = form.model.position.z;
-                            model.position.y = form.model.position.y + contentItem.attributes.elevation;
+                            contentForm.scene.position.x = form.model.position.x;
+                            contentForm.scene.position.z = form.model.position.z;
+                            contentForm.scene.position.y = form.model.position.y + contentItem.attributes.elevation;
                             this.addToScene(contentForm);
                         })
                     });
@@ -246,10 +249,14 @@ export class SceneController {
         this.scene.deanimate(() => {
 
             this.scene = null;
-            this.objects3D.forEach(obj3D => {
-                obj3D.dispose();
+            this.forms.forEach(form => {
+                if (form.model.dispose) form.model.dispose();
             })
-            callback();
+
+            this.hero.stop(() => {
+                this.hero = null;
+                callback();
+            });
         });
 
     }
@@ -290,27 +297,12 @@ export class SceneController {
         
     }
 
-    /** 
-     * This method will not set the position of the object3D, nor create a GUI.
-     * The return object 'form' will have a model (scene) and animations if applicable.
-     * Only for use with facade items like equipped.  ??
-     */
-    loadFormbyName(objectName, callback) {
+    loadFormbyName(formName, callback) {
 
-        let object = this.getObjectByName(objectName);
-        this.loader.load( '/models/3d/gltf/' + object.gltf, (form) => {
-
-            let model = form.scene;
-            model.objectName = object.name;
-            model.objectType = object.type;
-            model.attributes = object.attributes;
-
-            model.scale.x = object.attributes.scale;
-            model.scale.y = object.attributes.scale;
-            model.scale.z = object.attributes.scale;
-
+        let formTemplate = this.getObjectByName(formName);
+        this.seedForm(formTemplate).then(form => {
             callback(form);
-        });
+        })
     }
 
     getFire(params) {

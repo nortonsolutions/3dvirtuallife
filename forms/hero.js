@@ -45,6 +45,7 @@ export class Hero extends IntelligentForm {
             /** For the hero, the controls obj IS the model, which contains the gltf model */
             let modelCopy = this.model;
             modelCopy.rotation.y = Math.PI;
+            modelCopy.position.set(0,0,0); // hero model is always centered in the controls
 
             this.model = this.controls;
             this.model.add( modelCopy );
@@ -69,9 +70,18 @@ export class Hero extends IntelligentForm {
     }
 
     cacheHero() {
-
+        if (this.model) this.updateHeroLocationFromPosition();
         localStorage.setItem('gameHeroTemplate', JSON.stringify(this.returnTemplate()));
 
+    }
+
+    // Calculate hero location using grid coordinates
+    updateHeroLocationFromPosition() {
+
+        this.location.x = this.model.position.x / multiplier,
+        this.location.y = this.model.position.y / multiplier,
+        this.location.z = this.model.position.z / multiplier
+        
     }
 
     addEventListeners() {
@@ -305,12 +315,11 @@ export class Hero extends IntelligentForm {
 
     equip(area, itemName) {
         this.equipped[area] = itemName;
-        this.sceneController.loadFormbyName(itemName, (itemGltf) => {
+        this.sceneController.loadFormbyName(itemName, (item) => {
 
-            let item = itemGltf.scene;
-            item.position.set(0,0,0);
-            item.rotation.y = Math.PI;
-            item.scale.copy(new THREE.Vector3( .1,.1,.1 ));
+            item.model.position.set(0,0,0);
+            item.model.rotation.y = Math.PI;
+            item.model.scale.copy(new THREE.Vector3( .1,.1,.1 ));
     
             if (item.objectName == "torch") {
     
@@ -324,11 +333,11 @@ export class Hero extends IntelligentForm {
                 fireObj.rotateX(-Math.PI/5);
                 fireObj.rotateZ(-Math.PI/20);
 
-                item.add(fireObj);
+                item.model.add(fireObj);
 
                 switch (area) {
                     case "Middle2R_end": 
-                        item.rotation.z = -Math.PI/5;
+                        item.model.rotation.z = -Math.PI/5;
                         break;
                     case "Middle2L_end":
                         break;
@@ -337,7 +346,7 @@ export class Hero extends IntelligentForm {
 
             } 
             
-            this.model.getObjectByName(area).add(item);
+            this.model.getObjectByName(area).add(item.model);
             
         });
     }
@@ -380,18 +389,6 @@ export class Hero extends IntelligentForm {
 
         this.eventDepot.fire('showHeroStats', {});
         
-    }
-
-    // Calculate hero location using grid coordinates
-    updateHeroLocationFromPosition() {
-
-        let location = {
-            x: this.controller.position.x / multplier,
-            y: this.controller.position.y / multplier,
-            z: this.controller.position.z / multplier
-        }
-        this.eventDepot.fire('updateHeroLocation', { location, offset: false });
-
     }
 
     move(otherForms, delta) {
