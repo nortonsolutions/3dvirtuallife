@@ -47,7 +47,7 @@ module.exports = function (app, db) {
 
     app.route('/delete')
         .post((req,res) => {
-            db.models.SavedGame.remove({_id: req.body._id}, (err,body) => {
+            db.models.SavedGame.remove({gameName: req.body.gameName}, (err,body) => {
                 res.json(err? {error: err.message} : {success: "removed"});
             })
         })
@@ -55,7 +55,16 @@ module.exports = function (app, db) {
     app.route('/list')
         .get((req,res) => {
             db.models.SavedGame.find({}, (err,savedGames) => {
-                res.json(err? {error: err.message} : savedGames);
+
+                let listOfGames = savedGames.map(el => {
+                    return {
+                        gameName: el.gameName,
+                        heroName: JSON.parse(el.heroTemplate).name,
+                        level: JSON.parse(el.props).level
+                    }
+                })
+
+                res.json(err? {error: err.message} : listOfGames);
             });
         })
 

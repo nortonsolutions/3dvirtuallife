@@ -289,7 +289,7 @@ main {
     to {opacity: 1}
 }
 
-.noClick {
+.noClick, svg {
     pointer-events: none !important;
 }
 

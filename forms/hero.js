@@ -247,7 +247,7 @@ export class Hero extends IntelligentForm {
         this.eventDepot.removeListeners('mouse0click');
         this.eventDepot.removeListeners('jump');
         this.eventDepot.removeListeners('halt');
-        this.dispose(this.model);
+        // this.dispose(this.model);
         callback();
     }
 

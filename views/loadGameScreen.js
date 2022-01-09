@@ -1,9 +1,8 @@
 export class LoadGameScreen {
 
     constructor(eventDepot, modal) {
-        this.eventDepot = eventDepot;
         this.modal = modal;
-
+        this.eventDepot = eventDepot;
         this.refresh = this.refresh.bind(this);
     }
 
@@ -12,7 +11,8 @@ export class LoadGameScreen {
             el.addEventListener('click', e => {
                 e.preventDefault();
                 let gameName = e.target.id;
-                // this.modal.gameAPI is available
+                this.modal.gameAPI.loadGame(gameName);
+                this.modal.closeModal();
             })
         })
 
@@ -20,8 +20,9 @@ export class LoadGameScreen {
             el.addEventListener('click', e => {
                 e.preventDefault();
                 let gameName = e.target.id;
-                this.modal.gameAPI.deleteGame(gameName);
-                this.refresh;
+                this.modal.gameAPI.deleteGame(gameName, () => {
+                    this.refresh;
+                });
             })
         })
     }

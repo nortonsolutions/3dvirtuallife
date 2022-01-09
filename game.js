@@ -21,29 +21,24 @@ class Game {
         this.stop = this.stop.bind(this);
         this.start = this.start.bind(this);
 
-        eventDepot.addListener('loadLevel', (data) => {
+        this.eventDepot.addListener('loadLevel', (data) => {
             this.eventDepot.fire('unlockControls', {});
             if (this.layoutManager) this.stop(() => {
 
                 this.heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
-                
-                // JIC: update the location to match that specified in the event
-                this.heroTemplate.location = data.location;
+                if (data.location) this.heroTemplate.location = data.location;
+
                 this.heroTemplate.location.x -= 1;
                 this.start(data.level);
             });
     
-        });
-
-        eventDepot.addListener('saveLocalStorage', () => {
-            saveLocalStorage();
         });
     }
 
     stop(callback) {
         this.layoutManager.shutdown(() => {
             this.layoutManager = null;
-            callback();
+            if (callback) callback();
         });
     }
 

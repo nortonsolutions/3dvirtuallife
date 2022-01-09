@@ -73,14 +73,23 @@ export class GameAPI {
 
     /** load gameName, gameProps, and gameHeroTemplate into localStorage, then launch game */
     loadGame(gameName) {
-        // props = JSON.parse(localStorage.getItem('gameProps'));
-        // heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
-        // Load specific game by name from server.
+        handleGet('/load/' + gameName, response => {
+
+            let props = JSON.parse(response).props;
+            let heroTemplate = JSON.parse(response).heroTemplate;
+
+            localStorage.setItem('gameName', gameName);
+            localStorage.setItem('gameProps', props);
+            localStorage.setItem('gameHeroTemplate', heroTemplate);
+
+            this.eventDepot.fire('startGame', { heroTemplate: JSON.parse(heroTemplate), props: JSON.parse(props) })
+        })
     }
 
-
-    deleteGame(gameName) {
-        // Delete a saved game on the server.
+    deleteGame(gameName, callback) {
+        handlePost('/delete', { gameName }, response => {
+            callback();
+        })
     }
 
 }

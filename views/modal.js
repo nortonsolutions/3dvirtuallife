@@ -7,8 +7,11 @@ class Modal {
     constructor(eventDepot, gameAPI) {
 
         this.gameAPI = gameAPI;
+        this.eventDepot = eventDepot;
         this.inventoryScreen = new InventoryScreen(eventDepot, this);
         this.loadGameScreen = new LoadGameScreen(eventDepot, this);
+
+        this.closeModal = this.closeModal.bind(this);
 
         /** e.g. data: { type: 'loadgame', title: 'Load Game', context: response } */
         eventDepot.addListener('modal', (data) => {
@@ -36,21 +39,22 @@ class Modal {
         
             modal.style.display = "block";
         
-            function escape() {
-                modal.style.display = "none";
-                eventDepot.fire('lockControls', {});
+            closer.onclick = () => {
+                this.closeModal();
             }
         
-            closer.onclick = function() {
-                escape();
-            }
-        
-            window.onclick = function(event) {
+            window.onclick = (event) => {
                 if (event.target == modal) {
-                    escape();
+                    this.closeModal();
                 }
             }
         })
+    }
+
+    closeModal = () => {
+        var modal = document.getElementById('myModal');
+        modal.style.display = "none";
+        this.eventDepot.fire('lockControls', {});
     }
 
     loadTemplate = (elementId, template, data, callback) => {

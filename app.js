@@ -17,13 +17,11 @@ export const app = () => {
     var props = { level: 0, layouts: [] }
     var heroTemplate = gameAPI.newHeroTemplate('dave', 20);
 
-    
     var modal = new Modal(eventDepot, gameAPI);
-    
     var minimap = false;
 
-    const addEventListeners = () => {
-        
+    const addEventDepotListeners = () => {
+
         eventDepot.addListener('showHeroStats', () => {
             document.getElementById('heroStats').classList.remove('d-none');
         });
@@ -42,15 +40,34 @@ export const app = () => {
             document.getElementById('minimap').style.display = minimap? 'block' : 'none';
         });
 
+        eventDepot.addListener('startGame', (data) => {
+            eventDepot.fire('unlockControls', {});
+            startGame(data.heroTemplate, data.props);
+        })
+
+    }
+    
+    const removeEventDepotListeners = () => {
+
+        eventDepot.removeListeners('showHeroStats');
+        eventDepot.removeListeners('showDescription');
+        eventDepot.removeListeners('hideDescription');
+        eventDepot.removeListeners('minimap');
+        eventDepot.removeListeners('startGame');
+        
+    }
+
+    const addDocumentEventListeners = () => {
+        
         document.querySelector('.inventoryLink').addEventListener('click', e => {
             eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
             e.preventDefault();
         })
 
-        Array.from(document.querySelectorAll('.startGame')).forEach(el => {
+        Array.from(document.querySelectorAll('.newGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
-                startGame();
+                startGame(heroTemplate, props, eventDepot);
             })
         })
 
@@ -78,31 +95,39 @@ export const app = () => {
             })
         })
 
+        // List the games via the loadgame template, where the game can be selected and loaded
         Array.from(document.querySelectorAll('.loadGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
-
-                // List the games via the loadgame template, where the game can be selected and loaded
                 gameAPI.listGames();
-                
             })
         })
 
         Array.from(document.querySelectorAll('.quitGame')).forEach(el => {
             el.addEventListener('click', e => {
+                localStorage.clear();
+                if (game) game.stop();
+                window.location = '/';
                 e.preventDefault();
-
             })
         })
+
     }
 
-    addEventListeners();
+    addDocumentEventListeners();
+    addEventDepotListeners();
 
-    const startGame = () => {
+    const startGame = (heroTemplate, props) => {
         
-        if (game && game.layoutManager) game.stop();
-        game = new Game(heroTemplate, eventDepot);
-        game.start(props.level);
+        if (game && game.layoutManager) {
+            game.stop(() => {
+                game = new Game(heroTemplate, eventDepot);
+                game.start(props.level);
+            });
+        } else {
+            game = new Game(heroTemplate, eventDepot);
+            game.start(props.level);
+        }
 
     }
 }
