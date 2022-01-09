@@ -79,7 +79,7 @@ export class SceneController {
 
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
         this.floor.load(() => {
-            this.addToScene(this.floor, false);
+            this.addToScene(this.floor, true);
             // setTimeout(() => {
                 callback();
             // }, 500);

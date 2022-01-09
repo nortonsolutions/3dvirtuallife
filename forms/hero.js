@@ -237,17 +237,20 @@ export class Hero extends IntelligentForm {
     stop(callback) {
         
         this.eventDepot.removeListeners('updateHeroLocation');
+        this.eventDepot.removeListeners('halt');
         this.eventDepot.removeListeners('swapInventoryPositions');
         this.eventDepot.removeListeners('unequipItem');
         this.eventDepot.removeListeners('equipItem');
         this.eventDepot.removeListeners('placeItem');
         this.eventDepot.removeListeners('takeItemFromScene');
         this.eventDepot.removeListeners('removeItem');
+        this.eventDepot.removeListeners('setHeroStat');
+        this.eventDepot.removeListeners('setHeroStatMax');
         this.eventDepot.removeListeners('dropItemToScene');
         this.eventDepot.removeListeners('mouse0click');
+        this.eventDepot.removeListeners('unlockControls');
         this.eventDepot.removeListeners('jump');
-        this.eventDepot.removeListeners('halt');
-        // this.dispose(this.model);
+        this.dispose(this.model);
         callback();
     }
 
@@ -259,8 +262,6 @@ export class Hero extends IntelligentForm {
         return max;
     }
     
-
-
     addToInventory(itemName, desiredIndex) {
 
         var quantity;

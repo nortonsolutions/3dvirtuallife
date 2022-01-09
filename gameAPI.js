@@ -14,35 +14,6 @@ export class GameAPI {
     /**
      * Fresh game props from scratch with only personal details provided.
      */
-    newHeroTemplate(name,height) {
-        return {
-            name: name,
-            type: "hero",
-            location: { x: 0, y: 0, z: 0 },
-            attributes: {
-                moves: true,
-                animates: true,
-                height: height,
-                length: 20,
-                width: 20,
-                scale: 10,
-                elevation: 0,
-                stats: {
-                    health: "03/05",
-                    mana: "00/00",
-                    strength: "01/01",
-                    agility: "03/03"
-                }
-            },
-            gltf: 'robot.glb',
-            model: null,
-            inventory: [],
-            spells: [],
-            equipped: {}
-
-        }
-    }
-
 
     /** Post to /save with the gameProps, etc. to save information in the server db */
     saveGame(gameName) {
@@ -82,7 +53,7 @@ export class GameAPI {
             localStorage.setItem('gameProps', props);
             localStorage.setItem('gameHeroTemplate', heroTemplate);
 
-            this.eventDepot.fire('startGame', { heroTemplate: JSON.parse(heroTemplate), props: JSON.parse(props) })
+            this.eventDepot.fire('startGame', { heroTemplate: JSON.parse(heroTemplate), props: JSON.parse(props) });
         })
     }
 

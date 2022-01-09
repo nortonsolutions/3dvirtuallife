@@ -4,23 +4,19 @@
 * saving and loading props and hero template from localStorage, starting or joining games.
 */
 import { EventDepot } from '/public/eventDepot.js';
-import { Game } from '/game.js';
+import { Game, newHeroTemplate } from '/game.js';
 import { GameAPI } from './gameAPI.js'
 import { Modal } from '/views/modal.js';
 
 export const app = () => {
 
-    var eventDepot = new EventDepot();
-    var gameAPI = new GameAPI(eventDepot);
-
     var game = null;
     var props = { level: 0, layouts: [] }
-    var heroTemplate = gameAPI.newHeroTemplate('dave', 20);
-
-    var modal = new Modal(eventDepot, gameAPI);
+    var heroTemplate = newHeroTemplate('dave', 20);
     var minimap = false;
+    var eventDepot, modal, gameAPI;
 
-    const addEventDepotListeners = () => {
+    const addEventDepotListeners = (eventDepot) => {
 
         eventDepot.addListener('showHeroStats', () => {
             document.getElementById('heroStats').classList.remove('d-none');
@@ -46,16 +42,6 @@ export const app = () => {
         })
 
     }
-    
-    const removeEventDepotListeners = () => {
-
-        eventDepot.removeListeners('showHeroStats');
-        eventDepot.removeListeners('showDescription');
-        eventDepot.removeListeners('hideDescription');
-        eventDepot.removeListeners('minimap');
-        eventDepot.removeListeners('startGame');
-        
-    }
 
     const addDocumentEventListeners = () => {
         
@@ -67,7 +53,7 @@ export const app = () => {
         Array.from(document.querySelectorAll('.newGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
-                startGame(heroTemplate, props, eventDepot);
+                startGame(heroTemplate, props);
             })
         })
 
@@ -111,23 +97,21 @@ export const app = () => {
                 e.preventDefault();
             })
         })
-
     }
 
     addDocumentEventListeners();
-    addEventDepotListeners();
+    
 
     const startGame = (heroTemplate, props) => {
         
-        if (game && game.layoutManager) {
-            game.stop(() => {
-                game = new Game(heroTemplate, eventDepot);
-                game.start(props.level);
-            });
-        } else {
-            game = new Game(heroTemplate, eventDepot);
-            game.start(props.level);
-        }
+        eventDepot = new EventDepot();
+        addEventDepotListeners(eventDepot);
 
+        gameAPI = new GameAPI(eventDepot);
+        modal = new Modal(eventDepot, gameAPI);
+
+        if (game) game.stop();
+        game = new Game(heroTemplate, eventDepot);
+        game.start(props.level);
     }
 }
