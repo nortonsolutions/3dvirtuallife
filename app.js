@@ -14,7 +14,11 @@ export const app = () => {
     var props = { level: 0, layouts: [] }
     var heroTemplate = newHeroTemplate('dave', 20);
     var minimap = false;
-    var eventDepot, modal, gameAPI;
+    var eventDepot = new EventDepot();
+    
+
+    var gameAPI = new GameAPI(eventDepot);
+    var modal = new Modal(eventDepot, gameAPI);
 
     const addEventDepotListeners = (eventDepot) => {
 
@@ -100,9 +104,11 @@ export const app = () => {
     }
 
     addDocumentEventListeners();
-    
+    addEventDepotListeners(eventDepot);
 
     const startGame = (heroTemplate, props) => {
+        
+        eventDepot = null; gameAPI = null; modal = null;
         
         eventDepot = new EventDepot();
         addEventDepotListeners(eventDepot);
