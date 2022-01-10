@@ -38,8 +38,6 @@ export class SceneController {
 
         this.fireParams = params;
 
-
-        // To be removed:
         this.sprites = [];
 
         // Bindings:
@@ -79,6 +77,9 @@ export class SceneController {
 
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
         this.floor.load(() => {
+
+            this.formFactory.addSconces(this.floor.model);
+            
             this.addToScene(this.floor, true);
             // setTimeout(() => {
                 callback();
@@ -170,10 +171,10 @@ export class SceneController {
                 if (form.attributes.contentItems) {
                     form.attributes.contentItems.forEach(contentItem => {
     
-                        this.loadFormbyName(contentItem, true, (contentForm) => {
-                            contentForm.scene.position.x = form.model.position.x;
-                            contentForm.scene.position.z = form.model.position.z;
-                            contentForm.scene.position.y = form.model.position.y + contentItem.attributes.elevation;
+                        this.loadFormbyName(contentItem.name, true, (contentForm) => {
+                            contentForm.model.position.x = form.model.position.x;
+                            contentForm.model.position.z = form.model.position.z;
+                            contentForm.model.position.y = form.model.position.y + contentItem.attributes.elevation;
                             this.addToScene(contentForm, true);
                         })
                     });
@@ -331,48 +332,4 @@ export class SceneController {
     }
 
 
-    getSprite(name, spriteNumber, frames) {
-        
-        let spriteMap = new THREE.TextureLoader().load( '/models/png/' + name + '.png' );
-        // How much a single repetition of the texture is offset from the beginning
-        spriteMap.offset = {x: 1 / frames * spriteNumber, y: 0};
-        // How many times the texture is repeated across the surface
-        spriteMap.repeat = {x: 1 / frames, y: 1};
-
-        var spriteMaterial = new THREE.SpriteMaterial({
-            opacity: 1,
-            transparent: true,
-            map: spriteMap,
-            rotation: Math.PI
-        });
-
-        var sprite = new THREE.Sprite(spriteMaterial);
-        this.sprites.push({ sprite, frames });
-        return sprite;
-    }
-
-    /** Position of the model should be set before animating */
-    createGUI(gltf) {
-        this.scene.createGUI( model, gltf.animations, model.uuid );
-    }
-
-    addSconces = (object) => {
-        if (/sconce/i.test(object.name)) {
-
-            // let fireObj = this.getFire();
-            // this.fireParams.Torch();
-
-            let fireObj = this.getSprite("flame", 0, 40);
-            fireObj.scale.set(.3, .4, .3);
-            fireObj.translateY(.15);
-            object.add(fireObj);
-
-        } else {
-            if (object.children) {
-                object.children.forEach(el => {
-                    this.addSconces(el);
-                })
-            }
-        }
-    }
 }

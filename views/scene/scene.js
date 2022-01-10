@@ -190,22 +190,22 @@ class Scene {
 
             case 38: // up
             case 87: // w
-                this.controller.hero.moveForward = false;
+                if (this.controller.hero) this.controller.hero.moveForward = false;
                 break;
 
             case 37: // left
             case 65: // a
-                this.controller.hero.moveLeft = false;
+                if (this.controller.hero) this.controller.hero.moveLeft = false;
                 break;
 
             case 40: // down
             case 83: // s
-                this.controller.hero.moveBackward = false;
+                if (this.controller.hero) this.controller.hero.moveBackward = false;
                 break;
 
             case 39: // right
             case 68: // d
-                this.controller.hero.moveRight = false;
+                if (this.controller.hero) this.controller.hero.moveRight = false;
                 break;
 
         }
@@ -399,7 +399,7 @@ class Scene {
                 this.controller.handleMovement(this.delta);
                 // this.controller.handleEntityMovement(this.delta);
                 // this.controller.handleMixers(this.delta);
-                // this.handleSprites();
+                this.handleSprites();
 
                 if (this.controller.backgroundMesh) this.controller.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
     
