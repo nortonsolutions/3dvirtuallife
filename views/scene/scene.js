@@ -75,30 +75,8 @@ class Scene {
     addControls() {
         this.controls = new THREE.PointerLockControls( this.camera );
 
-        this.rendererMinimap = new THREE.WebGLRenderer( { antialias: true } );
-        document.getElementById('minimap').appendChild( this.rendererMinimap.domElement );
-        this.cameraMinimap = new THREE.PerspectiveCamera( 45, 1, 1, cameraMinimapReach );
-        this.cameraMinimap.position.set( 0, cameraMinimapElevationDefault, 0);
-        this.cameraMinimap.rotation.set( -Math.PI / 2, 0, 0 );
-        this.controls.getObject().add(this.cameraMinimap);
-
-
-        let compassTemplate = {
-            gltf: "arrow.gltf",
-            attributes: {
-                scale: 100
-            }
-        }
-
-        // this.compass = this.controller.formFactory.newForm(null, compassTemplate, this.controller.floor.model);
-        // this.compass.load(() => {
-        //     this.compass.model.children[0].material.side = THREE.FrontSide;
-        //     this.compass.model.position.set( 0, cameraMinimapElevationDefault/2, -cameraMinimapElevationDefault/10);
-        //     this.controls.getObject().add(this.compass.model);
-        // });
+        this.addMinimap();
         
-
-
         this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault);
         this.scene.add( this.controls.getObject() );
     
@@ -138,6 +116,30 @@ class Scene {
         if (this.controller.layout.terrain.fog) this.scene.fog = new THREE.Fog( this.controller.layout.terrain.fogColor, 900, cameraReach );
     }
 
+    addMinimap() {
+
+        this.rendererMinimap = new THREE.WebGLRenderer( { antialias: true } );
+        document.getElementById('minimap').appendChild( this.rendererMinimap.domElement );
+        this.cameraMinimap = new THREE.PerspectiveCamera( 45, 1, 1, cameraMinimapReach );
+        this.cameraMinimap.position.set( 0, cameraMinimapElevationDefault, 0);
+        this.cameraMinimap.rotation.set( -Math.PI / 2, 0, 0 );
+        this.controls.getObject().add(this.cameraMinimap);
+
+        let compassTemplate = {
+            gltf: "arrow.gltf",
+            attributes: {
+                scale: 100
+            }
+        }
+
+        this.compass = this.controller.formFactory.newForm("compass", compassTemplate);
+        this.compass.load(() => {
+            this.compass.model.children[0].material.side = THREE.FrontSide;
+            this.compass.model.position.set( 0, cameraMinimapElevationDefault/2, -cameraMinimapElevationDefault/10);
+            this.controls.getObject().add(this.compass.model);
+        });
+
+    }
 
     onKeyDown = ( event ) => {
     
@@ -145,22 +147,22 @@ class Scene {
 
             case 38: // up
             case 87: // w
-                this.controller.hero.moveForward = true;
+                if (this.controller.hero) this.controller.hero.moveForward = true;
                 break;
 
             case 37: // left
             case 65: // a
-                this.controller.hero.moveLeft = true;
+                if (this.controller.hero) this.controller.hero.moveLeft = true;
                 break;
 
             case 40: // down
             case 83: // s
-                this.controller.hero.moveBackward = true;
+                if (this.controller.hero) this.controller.hero.moveBackward = true;
                 break;
 
             case 39: // right
             case 68: // d
-                this.controller.hero.moveRight = true;
+                if (this.controller.hero) this.controller.hero.moveRight = true;
                 break;
 
             case 32: // space
@@ -219,8 +221,6 @@ class Scene {
         this.scene.add( this.helper );
 
     }
-
-
 
     onMouseClick = (e) => {
         // console.log(`Controls object:`);
@@ -341,10 +341,6 @@ class Scene {
         this.renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight) );
     }
 
-    getMovementRay(origin, direction) {
-        return new THREE.Raycaster( origin, direction, 0, 10 );
-    }
-
     handleAutoZoom = (otherModels) => {
 
         this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
@@ -413,7 +409,7 @@ class Scene {
                 if (minimap) {
 
                     this.rendererMinimap.render(this.scene, this.cameraMinimap);
-                    if (this.compass) this.compass.lookAt( DUENORTH );
+                    if (this.compass) this.compass.model.lookAt( DUENORTH );
             }
     
     

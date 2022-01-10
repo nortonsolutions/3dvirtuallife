@@ -20,10 +20,9 @@ var params = {
 
 };
 
-class Fire extends StandardForm {
+class Fire {
 
     constructor() {
-        super();
 
         this.plane = new THREE.PlaneBufferGeometry( 5, 20 );
         this.fire = new THREE.Fire( this.plane, {
