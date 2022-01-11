@@ -28,10 +28,13 @@ export class SceneController {
         this.loader = new THREE.GLTFLoader();
 
         this.forms = [];
-        // this.nonHeroForms = [];
-        // this.nonHeroModels = []; // this.forms.filter(el => el.objectType != "hero").map(el => el.model);
 
+        // Structure models tracked for basic collisions
+        this.structureModels = [];
 
+        // Entities tracked for combat/convo/collision
+        this.entities = [];
+        
         this.scene = null;
         this.floor = null;
 
@@ -42,7 +45,7 @@ export class SceneController {
         this.deanimateScene = this.deanimateScene.bind(this);
         this.takeItemFromScene = this.takeItemFromScene.bind(this);
         this.dropItemToScene = this.dropItemToScene.bind(this);
-        this.seedForms = this.seedForms.bind(this);
+        this.seedFormsAll = this.seedFormsAll.bind(this);
         
         this.addEventListeners();
     }
@@ -54,25 +57,27 @@ export class SceneController {
             this.addFloor(() => {
                 this.addLights();
                 this.addHero(() => {
-                    this.seedForms(() => {
+                    this.seedFormsAll().then(layouts => {
+                        this.eventDepot.fire('formsFinished', layouts);
                         this.scene.animate();
-                    });
+                    })
                 });
             });
             
         });
     }
 
-    addToScene(form, addToForms) {
+    addToScene(form) {
         
-        this.scene.add( form.model );
-        if (addToForms) {
-            this.forms.push( form );
+        /* Hero is special case already added to scene via controls */
+        if (form.objectType != "hero") this.scene.add( form.model );
 
-            if (form.objectType != "hero") {
-                this.nonHeroForms.push(form);
-                this.nonHeroModels.push(form.model);
-            }
+        this.forms.push( form );
+
+        if (form.objectType == "hero" || form.objectType == "friendly" || form.objectType == "beast") {
+            this.entities.push( form );
+        } else if (form.objectType == "floor" || form.objectType == "structure") {
+            this.structureModels.push ( form.model );
         }
     }
 
@@ -83,7 +88,7 @@ export class SceneController {
 
             this.formFactory.addSconces(this.floor.model);
 
-            this.addToScene(this.floor, true);
+            this.addToScene(this.floor);
             // setTimeout(() => {
                 callback();
             // }, 500);
@@ -112,7 +117,7 @@ export class SceneController {
         
         this.hero.load(() => {
 
-            this.forms.push( this.hero );
+            this.addToScene( this.hero );
 
             this.eventDepot.fire('halt', {});
             this.eventDepot.fire('updateHeroLocation', { location: this.hero.location, offset: true });
@@ -124,29 +129,41 @@ export class SceneController {
         })
     }
 
-    seedForms(callback) {
-        this.layout.items.forEach((item,index) => {
-            this.seedForm(item, true).then(form => {
-                this.layout.items[index].uuid = form.model.uuid;
-            });
-        });
+    seedFormsAll() {
 
-        this.layout.structures.forEach((structure, index) => {
-            this.seedForm(structure, true).then(form => {
-                this.layout.structures[index].uuid = form.model.uuid;
-            });
-        });
+        var promiseArray = [];
+        let items = this.seedForms("items");
+        let structures = this.seedForms("structures");
+        let entities = this.seedForms("entities");
+        
+        promiseArray.push(items);
+        promiseArray.push(structures);
+        promiseArray.push(entities);
 
-        // this.layout.entities.forEach(entity => this.seedObject3D(entity));
-        this.eventDepot.fire('cacheLayout', {});
+        return Promise.all(promiseArray)
+    
+    }
 
-        callback();
+    seedForms(type) {
+        return new Promise((resolve, reject) => {
+
+            let remaining = this.layout[type].length;
+            for (let index = 0; index < this.layout[type].length; index++) {
+                this.seedForm(this.layout[type][index]).then(form => {
+                    this.layout[type][index].uuid = form.model.uuid;
+
+                    remaining--;
+                    if (remaining == 0) resolve(this.layout[type])
+
+                });
+            }
+        })
     }
 
     /** 
-     * Create 3D representation of each object:
+     * Load 3D model of each form and add to scene.
      */ 
-    seedForm(formTemplate, addToForms) {
+    seedForm(formTemplate) {
 
         var form;
         if (formTemplate.attributes.moves) {
@@ -160,16 +177,16 @@ export class SceneController {
         return new Promise((resolve,reject) => {
             form.load(() => {
 
-                this.addToScene(form, addToForms);
+                this.addToScene(form);
     
                 if (form.attributes.contentItems) {
                     form.attributes.contentItems.forEach(contentItem => {
     
-                        this.loadFormbyName(contentItem.name, true, (contentForm) => {
+                        this.loadFormbyName(contentItem.name, (contentForm) => {
                             contentForm.model.position.x = form.model.position.x;
                             contentForm.model.position.z = form.model.position.z;
                             contentForm.model.position.y = form.model.position.y + contentItem.attributes.elevation;
-                            this.addToScene(contentForm, true);
+                            this.addToScene(contentForm);
                         })
                     });
                 }
@@ -184,14 +201,12 @@ export class SceneController {
 
     handleMovement(delta) {
 
-        this.hero.move(this.nonHeroForms, delta);
+        this.hero.move(delta);
         this.hero.animate(delta);
 
         this.forms.forEach(form => {
             if (form.attributes.moves) {
-
-                let otherForms = this.forms.filter(el => el != form);
-                form.move(otherForms, delta);
+                form.move(delta);
             }
 
             if (form.attributes.animates) {
@@ -208,7 +223,7 @@ export class SceneController {
             this.overheadPointLight.translateZ(-80);
         }
 
-        this.scene.handleAutoZoom(this.nonHeroModels);
+        this.scene.handleAutoZoom();
     }
 
     deanimateScene(callback) {
@@ -269,10 +284,10 @@ export class SceneController {
         
     }
 
-    loadFormbyName(formName, addToForms = true, callback) {
+    loadFormbyName(formName, callback) {
 
         let formTemplate = this.getObjectByName(formName);
-        this.seedForm(formTemplate, addToForms).then(form => {
+        this.seedForm(formTemplate).then(form => {
             callback(form);
         })
     }

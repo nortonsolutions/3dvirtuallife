@@ -323,7 +323,7 @@ export class Hero extends IntelligentForm {
 
     equip(area, itemName) {
         this.equipped[area] = itemName;
-        this.sceneController.loadFormbyName(itemName, false, (item) => {
+        this.sceneController.loadFormbyName(itemName, (item) => {
 
             item.model.position.set(0,0,0);
             item.model.rotation.y = Math.PI;
@@ -398,7 +398,7 @@ export class Hero extends IntelligentForm {
         
     }
 
-    identifySelectedObject(otherForms) {
+    identifySelectedForm() {
 
         this.proximityLight.rotation.copy(this.model.rotation);
         this.proximityLight.position.copy(this.model.position);
@@ -407,7 +407,7 @@ export class Hero extends IntelligentForm {
 
         let closest = Infinity;
 
-        otherForms.forEach(o => {
+        this.sceneController.forms.forEach(o => {
             let distance = o.model.position.distanceTo(this.proximityLight.position);
             if (distance <= 50 && distance < closest) {
                 // If the object is unlocked, exclude to allow selecting the contents
@@ -426,10 +426,8 @@ export class Hero extends IntelligentForm {
 
     }
 
-    move(otherForms, delta) {
+    move(delta) {
         
-        let otherModels = otherForms.map(el => el.model);
-
         // INERTIA
         this.velocity.x -= this.velocity.x * 10.0 * delta;
         this.velocity.z -= this.velocity.z * 10.0 * delta;
@@ -447,10 +445,10 @@ export class Hero extends IntelligentForm {
         this.movementRaycaster.ray.origin.copy( this.model.position );
         this.rotation.copy(this.model.rotation);
 
-        super.move(otherModels, delta);
+        super.move(delta);
 
         // entity.translateY( this.mixers[uniqueId].velocity.y * delta );
-        if (this.setElevation( otherModels ) == -1) {
+        if (this.setElevation() == -1) {
 
             this.model.translateX( -this.velocity.x * delta );
             this.model.translateY( -this.velocity.y * delta );
@@ -477,6 +475,6 @@ export class Hero extends IntelligentForm {
             }
         }
 
-        this.identifySelectedObject(otherForms);
+        this.identifySelectedForm();
     }
 }

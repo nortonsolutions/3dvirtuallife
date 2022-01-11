@@ -341,7 +341,7 @@ class Scene {
         this.renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight) );
     }
 
-    handleAutoZoom = (otherModels) => {
+    handleAutoZoom = () => {
 
         this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
         this.cameraBackray.ray.origin.y += this.controller.hero.attributes.height;
@@ -353,7 +353,7 @@ class Scene {
         this.cameraBackray.ray.direction.y = -cameraDirection.y + 0.4
         this.cameraBackray.ray.direction.z = -cameraDirection.z
 
-        let backrayIntersections = this.cameraBackray.intersectObjects(otherModels, true);
+        let backrayIntersections = this.cameraBackray.intersectObjects(this.controller.structureModels, true);
 
         if (backrayIntersections[0]) {
             console.log(`Backray: ${backrayIntersections[0].distance}`);

@@ -33,7 +33,7 @@ export class IntelligentForm extends AnimatedForm{
      * This function will move an entity from one location to another.
      * Direction is relative to the entity in question
      */
-    move(otherModels, delta) {
+    move(delta) {
         
         let worldDirection = new THREE.Vector3().copy(this.direction).applyEuler( this.rotation );
         this.movementRaycaster.ray.direction.x = worldDirection.x; // -worldDirection.x;
@@ -65,7 +65,7 @@ export class IntelligentForm extends AnimatedForm{
         // mRaycasterR.ray.direction.z = worldDirectionR.z;
 
         // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
-        let fIntersects = this.movementRaycaster.intersectObjects(otherModels, true);
+        let fIntersects = this.movementRaycaster.intersectObjects(this.sceneController.structureModels, true);
         // let rIntersects = mRaycasterR.intersectObjects(this.objects3D, true).filter(el => getRootObject3D(el.object) != entity);
         // let lIntersects = mRaycasterL.intersectObjects(this.objects3D, true).filter(el => getRootObject3D(el.object) != entity);
 
@@ -105,14 +105,14 @@ export class IntelligentForm extends AnimatedForm{
         }
     }
 
-    setElevation(otherModels) {
+    setElevation() {
         
         let downRayOriginHeight = this.model.position.y + 30;
 
         this.downRaycaster.ray.origin.copy(this.model.position);
         this.downRaycaster.ray.origin.y = downRayOriginHeight;
 
-        let downwardIntersections = this.downRaycaster.intersectObjects( otherModels, true );
+        let downwardIntersections = this.downRaycaster.intersectObjects( this.sceneController.structureModels, true );
         if (downwardIntersections[0]) { 
             var topOfObject = downRayOriginHeight - downwardIntersections[0].distance + 2;
             if (this.model.position.y <= topOfObject) {
