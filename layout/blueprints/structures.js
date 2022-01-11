@@ -106,7 +106,7 @@ export const Structures = {
             key: 'keyToChest',
             unlocked: false,
             contentItems: [
-                {...Items.bagOfGems, location: { x: 0, y: 30, z: 0 }}
+                {...Items.bagOfGems }
             ]
         }
     }

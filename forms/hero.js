@@ -408,13 +408,17 @@ export class Hero extends IntelligentForm {
 
         this.sceneController.forms.forEach(o => {
             let distance = o.model.position.distanceTo(this.proximityLight.position);
+
+            if (o.attributes.contained) distance += 20;
+            
             if (distance <= 50 && distance < closest) {
-                // If the object is unlocked, exclude to allow selecting the contents
-                if (!o.attributes.contentItems || (o.attributes.contentItems && !o.attributes.unlocked))  {
+                
+                if (!o.attributes.contentItems || (o.attributes.contentItems && !o.attributes.unlocked)) {
                     closest = distance;
                     this.selectedObject = o;
                     this.sceneController.eventDepot.fire('showDescription', { objectType: o.objectType, objectName: o.objectName }); 
                 }
+                    
             }
         })
 

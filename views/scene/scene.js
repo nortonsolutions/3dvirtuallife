@@ -77,7 +77,7 @@ class Scene {
 
         this.addMinimap();
         
-        this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault);
+        this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault + 230);
         this.scene.add( this.controls.getObject() );
     
         document.addEventListener( 'keydown', this.onKeyDown, false );
@@ -350,7 +350,7 @@ class Scene {
         let cameraDirection = this.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
 
         this.cameraBackray.ray.direction.x = -cameraDirection.x
-        this.cameraBackray.ray.direction.y = -cameraDirection.y + 0.4
+        this.cameraBackray.ray.direction.y = -cameraDirection.y + 0.2
         this.cameraBackray.ray.direction.z = -cameraDirection.z
 
         let backrayIntersections = this.cameraBackray.intersectObjects(this.controller.structureModels, true);
@@ -359,7 +359,7 @@ class Scene {
             console.log(`Backray: ${backrayIntersections[0].distance}`);
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
-                this.camera.position.z -= cameraDistanceDefault / 30;
+                this.camera.position.z = distance -20; // -= cameraDistanceDefault / 30;
                 if (this.camera.position.y > cameraElevationDefault + this.controller.hero.attributes.height) this.camera.position.y -= cameraElevationDefault / 30;
             }
         } else {

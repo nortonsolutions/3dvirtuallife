@@ -45,7 +45,7 @@ export class SceneController {
         this.deanimateScene = this.deanimateScene.bind(this);
         this.takeItemFromScene = this.takeItemFromScene.bind(this);
         this.dropItemToScene = this.dropItemToScene.bind(this);
-        this.seedFormsAll = this.seedFormsAll.bind(this);
+        this.seedForms = this.seedForms.bind(this);
         
         this.addEventListeners();
     }
@@ -57,13 +57,11 @@ export class SceneController {
             this.addFloor(() => {
                 this.addLights();
                 this.addHero(() => {
-                    this.seedFormsAll().then(layouts => {
-                        this.eventDepot.fire('formsFinished', layouts);
+                    this.seedForms(() => {
                         this.scene.animate();
-                    })
+                    });
                 });
             });
-            
         });
     }
 
@@ -91,7 +89,7 @@ export class SceneController {
             this.addToScene(this.floor);
             // setTimeout(() => {
                 callback();
-            // }, 500);
+            // }, 10);
         });
     }
 
@@ -129,39 +127,31 @@ export class SceneController {
         })
     }
 
-    seedFormsAll() {
+    seedForms(callback) {
+        this.layout.items.forEach((item,index) => {
+            this.seedForm(item, true).then(form => {
+                this.layout.items[index].uuid = form.model.uuid;
+            });
+        });
 
-        var promiseArray = [];
-        let items = this.seedForms("items");
-        let structures = this.seedForms("structures");
-        let entities = this.seedForms("entities");
-        
-        promiseArray.push(items);
-        promiseArray.push(structures);
-        promiseArray.push(entities);
+        this.layout.structures.forEach((structure, index) => {
+            this.seedForm(structure, true).then(form => {
+                this.layout.structures[index].uuid = form.model.uuid;
+            });
+        });
 
-        return Promise.all(promiseArray);
-    
-    }
+        this.layout.entities.forEach((entity, index) => {
+            this.seedForm(entity, true).then(form => {
+                this.layout.entities[index].uuid = form.model.uuid;
+            });
+        });
 
-    seedForms(type) {
-        return new Promise((resolve, reject) => {
-
-            let remaining = this.layout[type].length;
-            for (let index = 0; index < this.layout[type].length; index++) {
-                this.seedForm(this.layout[type][index]).then(form => {
-                    this.layout[type][index].uuid = form.model.uuid;
-
-                    remaining--;
-                    if (remaining == 0) resolve(this.layout[type])
-
-                });
-            }
-        })
+        this.eventDepot.fire('cacheLayout', {});
+        callback();
     }
 
     /** 
-     * Load 3D model of each form and add to scene.
+     * Load model of each form and add to scene.
      */ 
     seedForm(formTemplate) {
 
@@ -181,17 +171,22 @@ export class SceneController {
     
                 if (form.attributes.contentItems) {
                     form.attributes.contentItems.forEach(contentItem => {
-    
+                        contentItem.location = { x: 0, y: 30, z: 0 };
                         this.loadFormbyName(contentItem.name, (contentForm) => {
+
                             contentForm.model.position.x = form.model.position.x;
                             contentForm.model.position.z = form.model.position.z;
                             contentForm.model.position.y = form.model.position.y + contentItem.attributes.elevation;
+                            contentForm.attributes.contained = true;
                             this.addToScene(contentForm);
                         })
+                        resolve(form);
+
                     });
+                } else {
+                    resolve(form);
                 }
     
-                resolve(form);
             });
                 
         })
@@ -201,9 +196,9 @@ export class SceneController {
 
     handleMovement(delta) {
 
-        this.hero.move(delta);
-        this.hero.animate(delta);
-
+        if (this.hero) this.hero.move(delta);
+        if (this.hero) this.hero.animate(delta);
+        
         this.forms.forEach(form => {
             if (form.attributes.moves) {
                 form.move(delta);
@@ -223,7 +218,7 @@ export class SceneController {
             this.overheadPointLight.translateZ(-80);
         }
 
-        this.scene.handleAutoZoom();
+        if (this.scene) this.scene.handleAutoZoom();
     }
 
     deanimateScene(callback) {
@@ -231,21 +226,22 @@ export class SceneController {
         this.eventDepot.removeListener('takeItemFromScene', 'bound takeItemFromScene');
         this.eventDepot.removeListener('dropItemToScene', 'bound dropItemToScene');
 
-        this.hero.stop(() => {
-            // this.hero = null;
-            this.scene.unregisterEventListeners();
-            this.scene.deanimate(() => {
-    
-                // this.scene = null;
-                this.forms.forEach(form => {
-                    if (form.model.dispose) form.model.dispose();
-                })
-                callback();
-            });
+        if (this.hero) this.hero.stop(() => {
+            this.hero = null;
         });
 
+        if (this.scene) {
+            this.scene.unregisterEventListeners();
+            this.scene.deanimate(() => {
+                this.scene = null;
+            });
+        }
 
+        if (this.forms) this.forms.forEach(form => {
+            if (form.model.dispose) form.model.dispose();
+        })
 
+        callback();
     }
 
     getObjectByName(name) {
