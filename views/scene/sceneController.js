@@ -14,8 +14,6 @@ import { FormFactory } from '/forms/formFactory.js';
  *  
  */
 
-import { Fire, params } from '/forms/fire.js' 
-
 export class SceneController {
 
     constructor(heroTemplate, layout, eventDepot, allObjects) {
@@ -30,13 +28,12 @@ export class SceneController {
         this.loader = new THREE.GLTFLoader();
 
         this.forms = [];
-        this.nonHeroForms = [];
-        this.nonHeroModels = []; // this.forms.filter(el => el.objectType != "hero").map(el => el.model);
+        // this.nonHeroForms = [];
+        // this.nonHeroModels = []; // this.forms.filter(el => el.objectType != "hero").map(el => el.model);
+
 
         this.scene = null;
         this.floor = null;
-
-        this.fireParams = params;
 
         this.sprites = [];
 
@@ -67,9 +64,15 @@ export class SceneController {
     }
 
     addToScene(form, addToForms) {
+        
         this.scene.add( form.model );
         if (addToForms) {
             this.forms.push( form );
+
+            if (form.objectType != "hero") {
+                this.nonHeroForms.push(form);
+                this.nonHeroModels.push(form.model);
+            }
         }
     }
 
@@ -79,7 +82,7 @@ export class SceneController {
         this.floor.load(() => {
 
             this.formFactory.addSconces(this.floor.model);
-            
+
             this.addToScene(this.floor, true);
             // setTimeout(() => {
                 callback();
@@ -101,10 +104,6 @@ export class SceneController {
             this.scene.add( this.overheadPointLight );
         }
 
-        // Proximity Light is used for object selection/identification
-        this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 30 );
-        this.proximityLight.position.set( 0, 0, 0 );
-        this.scene.add( this.proximityLight );
     }
 
     addHero(callback) {
@@ -162,11 +161,6 @@ export class SceneController {
             form.load(() => {
 
                 this.addToScene(form, addToForms);
-                
-                if (form.objectType != "hero") {
-                    this.nonHeroForms.push(form);
-                    this.nonHeroModels.push(form.model);
-                }
     
                 if (form.attributes.contentItems) {
                     form.attributes.contentItems.forEach(contentItem => {
@@ -189,6 +183,10 @@ export class SceneController {
 
 
     handleMovement(delta) {
+
+        this.hero.move(this.nonHeroForms, delta);
+        this.hero.animate(delta);
+
         this.forms.forEach(form => {
             if (form.attributes.moves) {
 
@@ -202,45 +200,15 @@ export class SceneController {
             
         })
 
-        this.identifySelectedObject(this.scene.controls.getObject());
-
-        this.nonHeroModels = this.forms.filter(el => el.objectType != "hero").map(el => el.model);
-        this.scene.handleAutoZoom(this.nonHeroModels);
-    }
-
-    identifySelectedObject(controlsObject) {
-
         if (this.layout.terrain.overheadPointLight) {
+            let controlsObject = this.scene.controls.getObject();
             this.overheadPointLight.position.copy(controlsObject.position);
             this.overheadPointLight.rotation.copy(controlsObject.rotation);
             this.overheadPointLight.position.y = controlsObject.position.y + 60;
             this.overheadPointLight.translateZ(-80);
         }
 
-        this.proximityLight.rotation.copy(controlsObject.rotation);
-        this.proximityLight.position.copy(controlsObject.position);
-        this.proximityLight.translateZ(-40);
-        this.proximityLight.translateY(40);
-
-        let closest = Infinity;
-
-        this.forms.forEach(o => {
-            let distance = o.model.position.distanceTo(this.proximityLight.position);
-            if (distance <= 50 && distance < closest) {
-                // If the object is unlocked, exclude to allow selecting the contents
-                if (!o.attributes.contentItems || (o.attributes.contentItems && !o.attributes.unlocked))  {
-                    closest = distance;
-                    this.hero.selectedObject = o;
-                    this.eventDepot.fire('showDescription', { objectType: getObjectType(o), objectName: getObjectName(o) }); 
-                }
-            }
-        })
-
-        if (closest > 50) {
-            this.hero.selectedObject = null;
-            this.eventDepot.fire('hideDescription', {}); 
-        }
-
+        this.scene.handleAutoZoom(this.nonHeroModels);
     }
 
     deanimateScene(callback) {
@@ -308,28 +276,5 @@ export class SceneController {
             callback(form);
         })
     }
-
-    getFire(params) {
-
-        if (!params) params = this.fireParams;
-
-        let fireObj = new THREE.Group;
-
-        let fire = new Fire();
-        fire.single();
-        fire.updateAll(params);
-        
-        let fire2 = new Fire();
-        fire2.single();
-        fire2.updateAll(params);
-
-        fire2.fire.rotation.y = Math.PI/2;
-
-        fireObj.add( fire.fire );
-        fireObj.add( fire2.fire );
-
-        return fireObj;
-    }
-
 
 }

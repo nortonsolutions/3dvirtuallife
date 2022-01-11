@@ -34,6 +34,11 @@ export class Hero extends IntelligentForm {
         this.moveLeft = false;
         this.moveRight = false;
 
+        // // Proximity Light is used for object selection/identification
+        this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 30 );
+        // this.proximityLight.position.set( 0, 0, 0 );
+        
+
         this.cacheHero();
 
     }
@@ -50,6 +55,7 @@ export class Hero extends IntelligentForm {
 
             this.model = this.controls;
             this.model.add( modelCopy );
+            this.model.add( this.proximityLight );
 
             if (this.template.location) {
                 this.model.position.x = this.template.location.x * multiplier;
@@ -87,9 +93,9 @@ export class Hero extends IntelligentForm {
 
     addEventListeners() {
 
-        this.eventDepot = this.sceneController.eventDepot;
+        
 
-        this.eventDepot.addListener('updateHeroLocation', data => {
+        this.sceneController.eventDepot.addListener('updateHeroLocation', data => {
 
             let { x, y, z } = data.location;
         
@@ -105,7 +111,7 @@ export class Hero extends IntelligentForm {
 
         })
 
-        this.eventDepot.addListener('halt', () => {
+        this.sceneController.eventDepot.addListener('halt', () => {
 
             this.velocity.x = 0;
             this.velocity.z = 0;
@@ -117,47 +123,47 @@ export class Hero extends IntelligentForm {
 
         })
 
-        this.eventDepot.addListener('swapInventoryPositions', (data) => {
+        this.sceneController.eventDepot.addListener('swapInventoryPositions', (data) => {
             this.swapInventoryPositions(data.first, data.second);
             this.cacheHero();
         });
 
-        this.eventDepot.addListener('unequipItem', (data) => {
+        this.sceneController.eventDepot.addListener('unequipItem', (data) => {
             this.unequip(data);
             this.cacheHero();
         });
 
-        this.eventDepot.addListener('equipItem', (data) => {
+        this.sceneController.eventDepot.addListener('equipItem', (data) => {
             this.equip(data.bodyPart, data.itemName);
             this.cacheHero();
         });
 
-        this.eventDepot.addListener('placeItem', (data) => {
+        this.sceneController.eventDepot.addListener('placeItem', (data) => {
             this.addToInventory(data.itemName, data.desiredIndex);
             this.cacheHero();
         });
 
-        this.eventDepot.addListener('takeItemFromScene', (data) => {
+        this.sceneController.eventDepot.addListener('takeItemFromScene', (data) => {
             this.addToInventory(data.itemName);
             this.cacheHero();
         });
 
-        this.eventDepot.addListener('removeItem', (itemName) => {
+        this.sceneController.eventDepot.addListener('removeItem', (itemName) => {
             this.removeFromInventory(itemName);
             this.cacheHero();
         });
 
-        this.eventDepot.addListener('setHeroStat', (data) => {
+        this.sceneController.eventDepot.addListener('setHeroStat', (data) => {
             this.attributes.stats[data.type] = data.points + this.attributes.stats[data.type].substring(2);
             this.cacheHero();
         })
 
-        this.eventDepot.addListener('setHeroStatMax', (data) => {
+        this.sceneController.eventDepot.addListener('setHeroStatMax', (data) => {
             this.attributes.stats[data.type] = this.attributes.stats[data.type].substring(0,3) + data.points;
             this.cacheHero();
         })
 
-        this.eventDepot.addListener('dropItemToScene', (data) => {
+        this.sceneController.eventDepot.addListener('dropItemToScene', (data) => {
             
             if (data.source.length < 3) {  // inventory
                 this.removeFromInventory(data.itemName);
@@ -167,20 +173,20 @@ export class Hero extends IntelligentForm {
             this.cacheHero();
         });
 
-        this.eventDepot.addListener('mouse0click', () => {
+        this.sceneController.eventDepot.addListener('mouse0click', () => {
 
             if (this.selectedObject) {
 
                 let objectType = this.selectedObject.objectType;
                 
                 if (objectType == "item") {
-                    this.eventDepot.fire('takeItemFromScene', {itemName: this.selectedObject.objectName, uuid: this.selectedObject.model.uuid});
+                    this.sceneController.eventDepot.fire('takeItemFromScene', {itemName: this.selectedObject.objectName, uuid: this.selectedObject.model.uuid});
 
                 } else if (objectType == "friendly") {
                     
                     // TODO: conversation
-                    this.eventDepot.fire('unlockControls', {});
-                    this.eventDepot.fire('modal', { name: objectName });
+                    this.sceneController.eventDepot.fire('unlockControls', {});
+                    this.sceneController.eventDepot.fire('modal', { name: objectName });
                 
                 } else if (objectType == "beast") {
 
@@ -205,14 +211,14 @@ export class Hero extends IntelligentForm {
             }   
         })
 
-        this.eventDepot.addListener('unlockControls', () => {
+        this.sceneController.eventDepot.addListener('unlockControls', () => {
             this.moveForward = false;
             this.moveBackward = false;
             this.moveLeft = false;
             this.moveRight = false;
         })
 
-        this.eventDepot.addListener('jump', () => {
+        this.sceneController.eventDepot.addListener('jump', () => {
             if ( this.canJump === true ) {
                 this.velocity.y += 350;
                 this.fadeToAction('Jump', 0.2)
@@ -236,20 +242,20 @@ export class Hero extends IntelligentForm {
 
     stop(callback) {
         
-        this.eventDepot.removeListeners('updateHeroLocation');
-        this.eventDepot.removeListeners('halt');
-        this.eventDepot.removeListeners('swapInventoryPositions');
-        this.eventDepot.removeListeners('unequipItem');
-        this.eventDepot.removeListeners('equipItem');
-        this.eventDepot.removeListeners('placeItem');
-        this.eventDepot.removeListeners('takeItemFromScene');
-        this.eventDepot.removeListeners('removeItem');
-        this.eventDepot.removeListeners('setHeroStat');
-        this.eventDepot.removeListeners('setHeroStatMax');
-        this.eventDepot.removeListeners('dropItemToScene');
-        this.eventDepot.removeListeners('mouse0click');
-        this.eventDepot.removeListeners('unlockControls');
-        this.eventDepot.removeListeners('jump');
+        this.sceneController.eventDepot.removeListeners('updateHeroLocation');
+        this.sceneController.eventDepot.removeListeners('halt');
+        this.sceneController.eventDepot.removeListeners('swapInventoryPositions');
+        this.sceneController.eventDepot.removeListeners('unequipItem');
+        this.sceneController.eventDepot.removeListeners('equipItem');
+        this.sceneController.eventDepot.removeListeners('placeItem');
+        this.sceneController.eventDepot.removeListeners('takeItemFromScene');
+        this.sceneController.eventDepot.removeListeners('removeItem');
+        this.sceneController.eventDepot.removeListeners('setHeroStat');
+        this.sceneController.eventDepot.removeListeners('setHeroStatMax');
+        this.sceneController.eventDepot.removeListeners('dropItemToScene');
+        this.sceneController.eventDepot.removeListeners('mouse0click');
+        this.sceneController.eventDepot.removeListeners('unlockControls');
+        this.sceneController.eventDepot.removeListeners('jump');
         this.dispose(this.model);
         callback();
     }
@@ -323,9 +329,9 @@ export class Hero extends IntelligentForm {
             item.model.rotation.y = Math.PI;
             item.model.scale.copy(new THREE.Vector3( .1,.1,.1 ));
     
-            if (item.objectName == "torch") {
+            if (itemName == "torch") {
     
-                let fireObj = this.getFire();
+                let fireObj = this.sceneController.formFactory.getFire();
 
                 // this.fireParams.Torch();
                 fireObj.scale.set(.04, .01, .04);
@@ -383,13 +389,41 @@ export class Hero extends IntelligentForm {
             let cur = points[0];
             let max = points[1];
 
-            this.eventDepot.fire('setHeroStatMax', { type: stat, points: max});
-            this.eventDepot.fire('setHeroStat', { type: stat, points: cur});
+            this.sceneController.eventDepot.fire('setHeroStatMax', { type: stat, points: max});
+            this.sceneController.eventDepot.fire('setHeroStat', { type: stat, points: cur});
 
         })
 
-        this.eventDepot.fire('showHeroStats', {});
+        this.sceneController.eventDepot.fire('showHeroStats', {});
         
+    }
+
+    identifySelectedObject(otherForms) {
+
+        this.proximityLight.rotation.copy(this.model.rotation);
+        this.proximityLight.position.copy(this.model.position);
+        this.proximityLight.translateZ(-40);
+        this.proximityLight.translateY(40);
+
+        let closest = Infinity;
+
+        otherForms.forEach(o => {
+            let distance = o.model.position.distanceTo(this.proximityLight.position);
+            if (distance <= 50 && distance < closest) {
+                // If the object is unlocked, exclude to allow selecting the contents
+                if (!o.attributes.contentItems || (o.attributes.contentItems && !o.attributes.unlocked))  {
+                    closest = distance;
+                    this.selectedObject = o;
+                    this.sceneController.eventDepot.fire('showDescription', { objectType: o.objectType, objectName: o.objectName }); 
+                }
+            }
+        })
+
+        if (closest > 50) {
+            this.selectedObject = null;
+            this.sceneController.eventDepot.fire('hideDescription', {}); 
+        }
+
     }
 
     move(otherForms, delta) {
@@ -431,7 +465,7 @@ export class Hero extends IntelligentForm {
         if (this.standingUpon && this.standingUpon.attributes.routeTo && typeof this.standingUpon.attributes.routeTo.level == "number") {
             if (this.standingUpon.attributes.unlocked) {
                 
-                this.eventDepot.fire('cacheLayout', {});
+                this.sceneController.eventDepot.fire('cacheLayout', {});
 
                 let loadData = {
 
@@ -439,8 +473,10 @@ export class Hero extends IntelligentForm {
                     location: this.standingUpon.attributes.routeTo.location,
                 }
 
-                this.eventDepot.fire('loadLevel', loadData);
+                this.sceneController.eventDepot.fire('loadLevel', loadData);
             }
         }
+
+        this.identifySelectedObject(otherForms);
     }
 }
