@@ -140,7 +140,7 @@ export class SceneController {
         promiseArray.push(structures);
         promiseArray.push(entities);
 
-        return Promise.all(promiseArray)
+        return Promise.all(promiseArray);
     
     }
 

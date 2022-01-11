@@ -7,7 +7,7 @@ export const Entities = {
         attributes: {
             moves: true,
             animates: true,
-            height: 20,
+            height: 30,
             length: 20,
             width: 20,
             elevation: 0,
@@ -28,7 +28,7 @@ export const Entities = {
         attributes: {
             moves: true,
             animates: true,
-            height: 20,
+            height: 10,
             length: 80,
             width: 20,
             elevation: 0,
@@ -49,7 +49,7 @@ export const Entities = {
         attributes: {
             moves: true,
             animates: true,
-            height: 20,
+            height: 30,
             length: 20,
             width: 20,
             elevation: 0,
@@ -58,7 +58,7 @@ export const Entities = {
             offers: [],
             accepts: [],
             stats: {
-                agility: "01/01"
+                agility: "02/02"
             }
         }
     }

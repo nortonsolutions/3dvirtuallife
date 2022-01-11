@@ -43,7 +43,6 @@ export class Hero extends IntelligentForm {
 
     }
 
-    /** For the hero, the load method is completely overridden, no super.load() call */
     load(callback) {
 
         super.load(() => {

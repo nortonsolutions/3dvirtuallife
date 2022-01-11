@@ -28,18 +28,18 @@ export const levels = [
 
         },
         items: [
-            Items.keyToShed,
-            Items.smallSword,
-            Items.redpotion
+            // Items.keyToShed,
+            // Items.smallSword,
+            // Items.redpotion
         ],
         structures: [
-            Structures.shed,
-            Structures.rock1,
-            Structures.rock1,
+            // Structures.shed,
+            // Structures.rock1,
+            // Structures.rock1,
             Structures.grate
         ],
         entities: [
-            Entities.john,
+            // Entities.john,
             // Entities.evilOne,
             // Entities.evilOne,
             // Entities.rat
