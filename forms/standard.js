@@ -120,7 +120,7 @@ export class StandardForm {
         if (!root) root = this.model;
         if (typeof root.castShadow == "boolean") {
             // console.log((root.name));
-            if (root.name.match(new RegExp('pointlight|torch|tree|torso|head|table|house|roof', 'i'))) {  //
+            if (root.name.match(new RegExp('pointlight|torch|torso|head|table|house', 'i'))) {  //
                 root.castShadow = true;
 
                 let showShadowCamera = false;
@@ -128,11 +128,11 @@ export class StandardForm {
 
                     // root.decay = 2;
                     // // root.intensity = 10;
-                    root.distance = 1200;
+                    root.distance = 600;
 
                     root.shadow.bias = - 0.005;  
                     root.shadow.camera.fov = 70;
-                    root.shadow.camera.far = 1400;
+                    root.shadow.camera.far = 600;
                     
                     if (showShadowCamera) {
                         var shadowCameraHelper = new THREE.CameraHelper( root.shadow.camera );

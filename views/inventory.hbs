@@ -29,46 +29,84 @@
     </div>
 
     <div class="col-3 charGrid py-1">
-        <div id="head" class="body one tooltipper dragSpot"></div>
-        <div id="body" class="body two tooltipper dragSpot"></div>
-        <div id="Middle2R_end" class="body three tooltipper dragSpot">
+        <div id="head" class="body bodyPart one tooltipper dragSpot"></div>
+        <div id="body" class="body bodyPart two tooltipper dragSpot"></div>
+        <div id="Middle2R_end" class="body bodyPart three tooltipper dragSpot">
             {{#if equipped.Middle2R_end}}
                 <img id="{{equipped.Middle2R_end.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.Middle2R_end.image}}" quant="{{equipped.Middle2R_end.name}}quant" describedBy="{{equipped.Middle2R_end.name}}desc">
                 <span id="{{equipped.Middle2R_end.name}}desc" class="tooltippertext noClick">{{equipped.Middle2R_end.description}}</span>
                 <span id="{{equipped.Middle2R_end.name}}quant" class="noClick">1</span>
             {{/if}}
         </div>
-        <div id="Middle2L_end" class="body four tooltipper dragSpot">
+        <div id="Middle2L_end" class="body bodyPart four tooltipper dragSpot">
             {{#if equipped.Middle2L_end}}
                 <img id="{{equipped.Middle2L_end.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.Middle2L_end.image}}" quant="{{equipped.Middle2L_end.name}}quant" describedBy="{{equipped.Middle2L_end.name}}desc">
                 <span id="{{equipped.Middle2L_end.name}}desc" class="tooltippertext noClick">{{equipped.Middle2L_end.description}}</span>
                 <span id="{{equipped.Middle2L_end.name}}quant" class="noClick">1</span>
             {{/if}}
         </div>
-        <div id="special" class="body five tooltipper dragSpot"></div>
-        <div id="feet" class="body six tooltipper dragSpot"></div>
+        <div id="special" class="body bodyPart five tooltipper dragSpot"></div>
+        <div id="feet" class="body bodyPart six tooltipper dragSpot"></div>
         <div id="drop" class="seven dropOnly"></div>
     </div>
 
     <div class="col-3 spellGrid py-1 mx-0">
-        <div id="f1" class="equipped tooltipper dragSpot">F1</div>
-        <div id="f2" class="equipped tooltipper dragSpot"></div>
-        <div id="f3" class="equipped tooltipper dragSpot">
-            {{#if equipped.f3}}
-                <img id="{{equipped.f3}}" class="draggable" draggable="true" src="/models/png/{{equipped.f3.image}}" quant="{{equipped.f3.name}}quant" describedBy="{{equipped.f3.name}}desc">
-                <span id="{{equipped.f3}}desc" class="tooltippertext noClick">{{equipped.f3.description}}</span>
+        <div id="f1key" class="body fKey tooltipper dragSpot">
+            {{#if equipped.f1key}}
+                <img id="{{equipped.f1key.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.f1key.image}}" quant="{{equipped.f1key.name}}quant" describedBy="{{equipped.f1key.name}}desc">
+                <span id="{{equipped.f1key.name}}desc" class="tooltippertext noClick">{{equipped.f1key.description}}</span>
             {{/if}}
+            <div class="overlay noClick">F1</div>
         </div>
-        <div id="f4" class="equipped tooltipper dragSpot">
-            {{#if equipped.f4}}
-                <img id="{{equipped.f4}}" class="draggable" draggable="true" src="/models/png/{{equipped.f4.image}}" quant="{{equipped.f4.name}}quant" describedBy="{{equipped.f4.name}}desc">
-                <span id="{{equipped.f4}}desc" class="tooltippertext noClick">{{equipped.f4.description}}</span>
+        <div id="f2key" class="body fKey tooltipper dragSpot">
+            {{#if equipped.f2key}}
+                <img id="{{equipped.f2key.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.f2key.image}}" quant="{{equipped.f2key.name}}quant" describedBy="{{equipped.f2key.name}}desc">
+                <span id="{{equipped.f2key.name}}desc" class="tooltippertext noClick">{{equipped.f2key.description}}</span>
             {{/if}}
+            <div class="overlay noClick">F2</div>            
         </div>
-        <div id="f5" class="equipped tooltipper dragSpot"></div>
-        <div id="f6" class="equipped tooltipper dragSpot"></div>
-        <div id="f7" class="equipped tooltipper dragSpot"></div>
-        <div id="f8" class="equipped tooltipper dragSpot"></div>
+        <div id="f3key" class="body fKey tooltipper dragSpot">
+            {{#if equipped.f3key}}
+                <img id="{{equipped.f3key.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.f3key.image}}" quant="{{equipped.f3key.name}}quant" describedBy="{{equipped.f3key.name}}desc">
+                <span id="{{equipped.f3key.name}}desc" class="tooltippertext noClick">{{equipped.f3key.description}}</span>
+            {{/if}}
+            <div class="overlay noClick">F3</div>
+        </div>
+        <div id="f4key" class="body fKey tooltipper dragSpot">
+            {{#if equipped.f4key}}
+                <img id="{{equipped.f4key.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.f4key.image}}" quant="{{equipped.f4key.name}}quant" describedBy="{{equipped.f4key.name}}desc">
+                <span id="{{equipped.f4key.name}}desc" class="tooltippertext noClick">{{equipped.f4key.description}}</span>
+            {{/if}}
+            <div class="overlay noClick">F4</div>
+        </div>
+        <div id="f5key" class="body fKey tooltipper dragSpot">
+            {{#if equipped.f5key}}
+                <img id="{{equipped.f5key.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.f5key.image}}" quant="{{equipped.f5key.name}}quant" describedBy="{{equipped.f5key.name}}desc">
+                <span id="{{equipped.f5key.name}}desc" class="tooltippertext noClick">{{equipped.f5key.description}}</span>
+            {{/if}}
+            <div class="overlay noClick">F5</div>            
+        </div>
+        <div id="f6key" class="body fKey tooltipper dragSpot">
+            {{#if equipped.f6key}}
+                <img id="{{equipped.f6key.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.f6key.image}}" quant="{{equipped.f6key.name}}quant" describedBy="{{equipped.f6key.name}}desc">
+                <span id="{{equipped.f6key.name}}desc" class="tooltippertext noClick">{{equipped.f6key.description}}</span>
+            {{/if}}
+            <div class="overlay noClick">F6</div>            
+        </div>
+        <div id="f7key" class="body fKey tooltipper dragSpot">
+            {{#if equipped.f7key}}
+                <img id="{{equipped.f7key.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.f7key.image}}" quant="{{equipped.f7key.name}}quant" describedBy="{{equipped.f7key.name}}desc">
+                <span id="{{equipped.f7key.name}}desc" class="tooltippertext noClick">{{equipped.f7key.description}}</span>
+            {{/if}}
+            <div class="overlay noClick">F7</div>            
+        </div>
+        <div id="f8key" class="body fKey tooltipper dragSpot">
+            {{#if equipped.f8key}}
+                <img id="{{equipped.f8key.name}}" class="draggable" draggable="true" src="/models/png/{{equipped.f8key.image}}" quant="{{equipped.f8key.name}}quant" describedBy="{{equipped.f8key.name}}desc">
+                <span id="{{equipped.f8key.name}}desc" class="tooltippertext noClick">{{equipped.f8key.description}}</span>
+            {{/if}}
+            <div class="overlay noClick">F8</div>            
+        </div>
     </div>
 
 

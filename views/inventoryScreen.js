@@ -74,14 +74,12 @@ class InventoryScreen {
         
         Object.keys(hero.equipped).forEach(bodyPart => {
             
-            if (bodyPart[0] != "f") {
-                let objectName = hero.equipped[bodyPart];
-                context.equipped[bodyPart] = {
-                    name: objectName,
-                    description: gameObjects[objectName].description,
-                    image: gameObjects[objectName].image
-                };
-            }
+            let objectName = hero.equipped[bodyPart];
+            context.equipped[bodyPart] = {
+                name: objectName,
+                description: gameObjects[objectName].description,
+                image: gameObjects[objectName].image
+            };
         });
 
         for (let index = startingIndex; index < startingIndex + inventoryPageSize; index++) {
@@ -153,49 +151,55 @@ class InventoryScreen {
             // var quantId = data[2]; // id of quantity element
             var index = data[3];  // inventory # ... or bodyPart by name
             
-            if (index.length < 3) { // source is inventory
+            if (itemName.match(/potion|spell/i) && Array.from(targetElement.classList).includes('bodyPart')) {
+                alert('Potions and spells can only be equipped on the F-keys');
+            } else {
+
+                if (index.length < 3) { // source is inventory
                 
-                if (! Array.from(targetElement.classList).includes('body')) { // To another slot
-
-                    this.eventDepot.fire('swapInventoryPositions', {first: index, second: targetElement.id});
+                    if (! Array.from(targetElement.classList).includes('body')) { // To another slot
     
-                } else { 
-
-                    if (targetElement.firstElementChild) {
-                        let itemNameToSwap = targetElement.firstElementChild.id;
-                        this.eventDepot.fire('unequipItem', targetElement.id);
-                        this.eventDepot.fire('placeItem', {itemName: itemNameToSwap, desiredIndex: index});
+                        this.eventDepot.fire('swapInventoryPositions', {first: index, second: targetElement.id});
+        
+                    } else { 
+    
+                        if (targetElement.firstElementChild && targetElement.firstElementChild.tagName != "DIV") {
+                            let itemNameToSwap = targetElement.firstElementChild.id;
+                            this.eventDepot.fire('unequipItem', targetElement.id);
+                            this.eventDepot.fire('placeItem', {itemName: itemNameToSwap, desiredIndex: index});
+                        }
+                        this.eventDepot.fire('removeItem', itemName)
+                        this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName});
+    
+                    } 
+        
+                } else { // source is body part
+        
+                    if (! Array.from(targetElement.classList).includes('body')) { // back to inventory
+        
+                        this.eventDepot.fire('unequipItem', index);
+                        this.eventDepot.fire('placeItem', {itemName, desiredIndex: targetElement.id});
+        
+                    } else { // body part to body part
+        
+                        this.eventDepot.fire('unequipItem', index);
+    
+                        if (targetElement.firstElementChild && targetElement.firstElementChild.tagName != "DIV") {
+    
+                            let itemNameToSwap = targetElement.firstElementChild.id;
+                            this.eventDepot.fire('unequipItem', ev.target.parentNode.id);
+                            this.eventDepot.fire('equipItem', {bodyPart: index, itemName: itemNameToSwap});
+                            
+                        }
+    
+                        this.eventDepot.fire('equipItem', {bodyPart: ev.target.id, itemName});
                     }
-                    this.eventDepot.fire('removeItem', itemName)
-                    this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName});
-
-                } 
-    
-            } else { // source is body part
-    
-                if (! Array.from(targetElement.classList).includes('body')) { // back to inventory
-    
-                    this.eventDepot.fire('unequipItem', index);
-                    this.eventDepot.fire('placeItem', {itemName, desiredIndex: targetElement.id});
-    
-                } else { // body part to body part
-    
-                    this.eventDepot.fire('unequipItem', index);
-
-                    if (targetElement.firstElementChild) {
-
-                        let itemNameToSwap = targetElement.firstElementChild.id;
-                        this.eventDepot.fire('unequipItem', ev.target.parentNode.id);
-                        this.eventDepot.fire('equipItem', {bodyPart: index, itemName: itemNameToSwap});
-                        
-                    }
-
-                    this.eventDepot.fire('equipItem', {bodyPart: ev.target.parentNode.id, itemName});
+        
                 }
-    
+                
+                this.refresh();
             }
-            
-            this.refresh();
+
         }
     
         const dropOnly = (ev) => {

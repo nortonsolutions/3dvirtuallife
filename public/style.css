@@ -36,6 +36,17 @@ img {
     
 }
 
+.body {
+    position: relative;
+}
+
+.overlay {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
 
 .dragSpot {
     border: 1px black dotted;
@@ -304,4 +315,14 @@ main {
 
 .btn-standard {
     width: 40px;
+}
+
+#hotkeys {
+    position: fixed;
+    left: 0;
+    top: 50px;
+    height: 100vh;
+    width: 50px;
+    background-color: white;
+
 }

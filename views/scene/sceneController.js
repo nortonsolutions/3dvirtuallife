@@ -87,6 +87,9 @@ export class SceneController {
         this.floor.load(() => {
 
             this.formFactory.addSconces(this.floor.model);
+            if (this.layout.terrain.attributes.borderTrees) {
+                this.formFactory.addBorderTrees(this.floor.model);
+            }
 
             this.addToScene(this.floor);
             // setTimeout(() => {
@@ -128,36 +131,10 @@ export class SceneController {
         }
 
         if (this.layout.terrain.overheadPointLight) {
-            this.overheadPointLight = new THREE.PointLight( 0xf37509, 15, 350, 3 );
+            this.overheadPointLight = new THREE.PointLight( 0xf37509, 5, 350, 3 );
             this.overheadPointLight.position.set( 0, 0, 0 );
             this.scene.add( this.overheadPointLight );
         }
-
-        var sphereGeometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
-        var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
-        var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
-        sphere.castShadow = true; //default is false
-        sphere.receiveShadow = false; //default
-        sphere.scale.set(5,5,5);
-        sphere.translateY(40);
-        sphere.translateX(-400);
-
-        this.scene.add( sphere );
-
-        //Create a plane that receives shadows (but does not cast them)
-        var planeGeometry = new THREE.PlaneBufferGeometry( 20, 20, 32, 32 );
-        var planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
-        planeMaterial.side = THREE.DoubleSide;
-        var plane = new THREE.Mesh( planeGeometry, planeMaterial );
-        plane.receiveShadow = true;
-
-        plane.scale.set(10,10,10);
-        plane.translateY(10);
-        plane.translateX(-400);
-        plane.rotateX(Math.PI/2);
-        this.scene.add( plane );
-
-
     }
 
     addHero(callback) {

@@ -358,17 +358,21 @@ export class Hero extends IntelligentForm {
 
             } 
             
-            this.model.getObjectByName(area).add(item.model);
+            if (! area.match('key')) this.model.getObjectByName(area).add(item.model);
             
         });
     }
     
     unequip(area) {
         delete this.equipped[area];
-        let thisArea = this.model.getObjectByName(area);
-        thisArea.children.forEach(child => {
-            thisArea.remove(child);
-        })
+        
+        if (! area.match("key")) {
+            let thisArea = this.model.getObjectByName(area);
+            thisArea.children.forEach(child => {
+                thisArea.remove(child);
+            })
+    
+        }
     }
 
     returnTemplate() {

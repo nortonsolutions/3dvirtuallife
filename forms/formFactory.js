@@ -52,6 +52,13 @@ export class FormFactory {
 
     }
 
+    addBorderTrees = (model) => {
+        
+        let regex = new RegExp('null', 'i');
+        this.addSpritesRecursive('aspen1', 1, 5, .1, false, model, regex);
+
+    }
+
     /** Scan down the model for any part that matches regex */
     addSpritesRecursive = (name, frames, scale, elevation, flip, model, regex) => {
         

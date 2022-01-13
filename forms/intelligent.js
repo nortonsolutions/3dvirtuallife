@@ -44,9 +44,9 @@ export class IntelligentForm extends AnimatedForm{
     getBoundingSphereHandR(el) {
         // if (el.geometry)
 
-        let temp = this.model.getObjectByName('HandR'); // .children[1];
+        // let temp = this.model.getObjectByName('HandR'); // .children[1];
         // temp.computeBoundingSphere();
-        console.log("Test")
+        // console.log("Test")
 
     }
 
@@ -106,7 +106,7 @@ export class IntelligentForm extends AnimatedForm{
             // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
             let fIntersects = this.movementRaycaster.intersectObjects(this.sceneController.structureModels, true);
             
-            if (fIntersects.length == 0) { // Nothing is in the front, so move forward at given velocity
+            if (fIntersects.length == 0 || (fIntersects[0] && fIntersects[0].object.type == "Sprite")) { // Nothing is in the front, so move forward at given velocity
                 
                 this.model.translateX( this.velocity.x * delta );
                 this.model.translateY( this.velocity.y * delta );
@@ -117,6 +117,8 @@ export class IntelligentForm extends AnimatedForm{
                 if (this.objectType != "hero") {
                     this.model.translateX( -this.velocity.x * delta );
                     this.model.translateZ( -this.velocity.z * delta );
+                } else {
+                    console.dir(fIntersects[0]);
                 }
                 this.velocity.x = 0;
                 this.velocity.y = 0;

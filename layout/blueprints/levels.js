@@ -24,7 +24,8 @@ export const levels = [
             sunLight: true,
             overheadPointLight: false,
             attributes: {
-                scale: 100
+                scale: 100,
+                borderTrees: true
             }
 
         },
@@ -60,7 +61,7 @@ export const levels = [
             fogColor: 'black',
             hemisphereLight: false,
             sunLight: false,
-            overheadPointLight: false,
+            overheadPointLight: true,
             attributes: {
                 scale: 100
             }
