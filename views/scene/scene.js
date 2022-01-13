@@ -58,8 +58,11 @@ class Scene {
         
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
         this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.setPixelRatio( window.devicePixelRatio );
         this.renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
+        // this.renderer.gammaInput = true;
+        // this.renderer.gammaOutput = true;
 
         this.stats = new Stats();
         document.body.appendChild( this.stats.dom );
@@ -113,7 +116,7 @@ class Scene {
             this.scene.background = BLACK;
         }
 
-        if (this.controller.layout.terrain.fog) this.scene.fog = new THREE.Fog( this.controller.layout.terrain.fogColor, 900, cameraReach );
+        if (this.controller.layout.terrain.fog) this.scene.fog = new THREE.Fog( this.controller.layout.terrain.fogColor, 700, cameraReach );
     }
 
     addMinimap() {

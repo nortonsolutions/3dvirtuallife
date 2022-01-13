@@ -60,6 +60,7 @@ export class StandardForm {
             } else { // floor is the only form without location
                 this.setToRenderDoubleSided();
                 this.setToReceiveShadow();
+                
             }
 
             this.setToCastShadows();
@@ -117,7 +118,7 @@ export class StandardForm {
 
     setToCastShadows(root) {
         if (!root) root = this.model;
-        if (root.castShadow) root.castShadow = true;
+        if (typeof root.receiveShadow == "boolean") root.castShadow = true;
 
         if (root.children) {
             root.children.forEach(e => this.setToCastShadows(e)); 
@@ -134,7 +135,6 @@ export class StandardForm {
         if (root.children) {
             root.children.forEach(e => this.setToReceiveShadow(e)); 
         }
-        
     }
 
     updateAttributes(payload) {

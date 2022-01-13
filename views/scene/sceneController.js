@@ -97,21 +97,41 @@ export class SceneController {
 
     addLights() {
 
-        if (this.layout.terrain.hemisphereLight) {
-            // var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
-            var light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 2 );
-			light.position.set( 0, 1500, 1000 );
-            light.castShadow = true;
-            // light.position.set( 0.5, 1, 0.75 );
-            // light.position.set( 0, 1, 0 );
-            light.target.position.set( 0, 0, 0 ); 	
-            this.scene.add( light );
+        // if (this.layout.terrain.hemisphereLight) {
+        //     // var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
+        //     var light = new THREE.DirectionalLight( 0xffffff, 1 );
+        //     light.position.set( 0, 1, 0 );
+        //     // light.position.set( 0.5, 1, 0.75 );
+        //     // light.position.set( 0, 1, 0 );
+        //     // light.target.position.set( 0, 0, 0 ); 	
+        //     this.scene.add( light );
 
-            //Set up shadow properties for the light
-            light.shadow.mapSize.width = 2000;  // default
-            light.shadow.mapSize.height = 2000; // default
-            light.shadow.camera.near = 0.5;    // default
-            light.shadow.camera.far = 1000;     // default
+        if (this.layout.terrain.sunLight) {
+            
+            var shadowConfig = {
+
+                shadowCameraVisible: false,
+                shadowCameraNear: 750,
+                shadowCameraFar: 4000,
+                shadowCameraFov: 90,
+                shadowBias: - 0.005
+    
+            };
+
+            var sunLight = new THREE.SpotLight( 0xffffff, 1.1, 0, Math.PI / 2 );
+            sunLight.position.set( 500, 800, 500);
+
+            sunLight.castShadow = true;
+
+            sunLight.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( shadowConfig.shadowCameraFov, 1, shadowConfig.shadowCameraNear, shadowConfig.shadowCameraFar ) );
+            sunLight.shadow.bias = shadowConfig.shadowBias;
+
+            this.scene.add (sunLight );
+
+            var shadowCameraHelper = new THREE.CameraHelper( sunLight.shadow.camera );
+            shadowCameraHelper.visible = shadowConfig.shadowCameraVisible;
+            
+            this.scene.add( shadowCameraHelper );
         }
 
         if (this.layout.terrain.overheadPointLight) {
@@ -126,8 +146,8 @@ export class SceneController {
         sphere.castShadow = true; //default is false
         sphere.receiveShadow = false; //default
         sphere.scale.set(5,5,5);
-        sphere.translateY(60);
-        sphere.translateX(400);
+        sphere.translateY(40);
+        sphere.translateX(-400);
 
         this.scene.add( sphere );
 
@@ -140,7 +160,7 @@ export class SceneController {
 
         plane.scale.set(10,10,10);
         plane.translateY(10);
-        plane.translateX(400);
+        plane.translateX(-400);
         plane.rotateX(Math.PI/2);
         this.scene.add( plane );
 

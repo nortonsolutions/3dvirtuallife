@@ -21,6 +21,7 @@ export const levels = [
             fog: true,
             fogColor: 'white',
             hemisphereLight: true,
+            sunLight: true,
             overheadPointLight: false,
             attributes: {
                 scale: 100
@@ -58,6 +59,7 @@ export const levels = [
             fog: true,
             fogColor: 'black',
             hemisphereLight: false,
+            sunLight: false,
             overheadPointLight: true,
             attributes: {
                 scale: 100
@@ -97,6 +99,7 @@ export const levels = [
             fog: true,
             fogColor: 'black',
             hemisphereLight: false,
+            sunLight: false,
             overheadPointLight: true,
             attributes: {
                 scale: 100
