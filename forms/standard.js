@@ -118,7 +118,31 @@ export class StandardForm {
 
     setToCastShadows(root) {
         if (!root) root = this.model;
-        if (typeof root.receiveShadow == "boolean") root.castShadow = true;
+        if (typeof root.castShadow == "boolean") {
+            // console.log((root.name));
+            if (root.name.match(new RegExp('pointlight|torch|tree|torso|head|table|house|roof', 'i'))) {  //
+                root.castShadow = true;
+
+                let showShadowCamera = false;
+                if (root.shadow) {
+
+                    // root.decay = 2;
+                    // // root.intensity = 10;
+                    root.distance = 1200;
+
+                    root.shadow.bias = - 0.005;  
+                    root.shadow.camera.fov = 70;
+                    root.shadow.camera.far = 1400;
+                    
+                    if (showShadowCamera) {
+                        var shadowCameraHelper = new THREE.CameraHelper( root.shadow.camera );
+                        shadowCameraHelper.visible = true;
+                        this.sceneController.scene.add( shadowCameraHelper );
+                    }
+
+                };
+            }
+        }
 
         if (root.children) {
             root.children.forEach(e => this.setToCastShadows(e)); 

@@ -97,15 +97,6 @@ export class SceneController {
 
     addLights() {
 
-        // if (this.layout.terrain.hemisphereLight) {
-        //     // var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
-        //     var light = new THREE.DirectionalLight( 0xffffff, 1 );
-        //     light.position.set( 0, 1, 0 );
-        //     // light.position.set( 0.5, 1, 0.75 );
-        //     // light.position.set( 0, 1, 0 );
-        //     // light.target.position.set( 0, 0, 0 ); 	
-        //     this.scene.add( light );
-
         if (this.layout.terrain.sunLight) {
             
             var shadowConfig = {
@@ -114,7 +105,7 @@ export class SceneController {
                 shadowCameraNear: 750,
                 shadowCameraFar: 4000,
                 shadowCameraFov: 90,
-                shadowBias: - 0.005
+                shadowBias: - 0.008
     
             };
 
@@ -128,10 +119,12 @@ export class SceneController {
 
             this.scene.add (sunLight );
 
-            var shadowCameraHelper = new THREE.CameraHelper( sunLight.shadow.camera );
-            shadowCameraHelper.visible = shadowConfig.shadowCameraVisible;
-            
-            this.scene.add( shadowCameraHelper );
+            if (shadowConfig.shadowCameraVisible) {
+                var shadowCameraHelper = new THREE.CameraHelper( sunLight.shadow.camera );
+                shadowCameraHelper.visible = shadowConfig.shadowCameraVisible;
+
+                this.scene.add( shadowCameraHelper );
+            }
         }
 
         if (this.layout.terrain.overheadPointLight) {
@@ -276,7 +269,8 @@ export class SceneController {
             this.overheadPointLight.translateZ(-80);
         }
 
-        if (this.scene) this.scene.handleAutoZoom();
+        if (this.hero && this.scene) this.scene.handleAutoZoom();
+
     }
 
     deanimateScene(callback) {
@@ -291,7 +285,6 @@ export class SceneController {
         if (this.scene) {
             this.scene.unregisterEventListeners();
             this.scene.deanimate(() => {
-                this.scene = null;
             });
         }
 

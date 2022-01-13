@@ -11,7 +11,7 @@ export const Structures = {
         attributes: {
             animates: false,
             scale: 100,
-            elevation: 0
+            elevation: -6
         }
     
     },

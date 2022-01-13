@@ -38,20 +38,22 @@ export class ArtificialForm extends IntelligentForm{
 
             super.move(delta);
 
+            if (this.sceneController.hero && this.sceneController.hero.model) {
+                let d = this.distanceToHero();
 
-            let d = this.distanceToHero();
-
-            if (this.objectType == "beast" && this.sceneController.hero.alive) {
-                if (d < 60) {
-                    this.faceHero();
-                    this.attackHero();
-                    this.stopAndBackup(delta);
-
-                } else if (d < 500) {
-                    this.faceHero();
-                    this.moveTowardHero(delta);
+                if (this.objectType == "beast" && this.sceneController.hero.alive) {
+                    if (d < 60) {
+                        this.faceHero();
+                        this.attackHero();
+                        this.stopAndBackup(delta);
+    
+                    } else if (d < 500) {
+                        this.faceHero();
+                        this.moveTowardHero(delta);
+                    } 
                 } 
-            } 
+            }
+
 
             // Set elevation last
             if (this.setElevation() == -1) {
@@ -85,7 +87,11 @@ export class ArtificialForm extends IntelligentForm{
 
     attackHero() {
         
-        this.fadeToAction("Punch", 0.2);
+        if (this.objectName.match(new RegExp('rat', 'i'))) {
+            this.fadeToAction("Attack", 0.2);
+        } else {
+            this.fadeToAction("Punch", 0.2);
+        }
 
         let chanceToHit = this.getStat('agility') / 100;
         if (this.sceneController.hero.getStat('health') > 0 && Math.random() < chanceToHit) {

@@ -72,7 +72,10 @@ class Scene {
         this.addEventListeners();
         this.addHelper();
 
-        if (callback) callback();
+        if (callback) setTimeout(() => {
+            callback();
+        }, 200);
+        
     }
 
     addControls() {
@@ -234,31 +237,35 @@ class Scene {
     }
 
     onMouseDown = (e) => {
+        if (this.controller.hero) {
 
-        switch (e.button) {
+            switch (e.button) {
 
-            case 0:
-                this.controller.eventDepot.fire('mouse0click', {});
-                break;
-            case 1:
-                break;
-            case 2:
-                this.controller.hero.moveForward = true;
-                break;
+                case 0:
+                    this.controller.eventDepot.fire('mouse0click', {});
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    this.controller.hero.moveForward = true;
+                    break;
+            }
         }
     }
 
     onMouseUp = (e) => {
-        switch (e.button) {
+        if (this.controller.hero) {
+            switch (e.button) {
 
-            case 0:
-                // this.helper.visible = false;
-                break;
-            case 1:
-                break;
-            case 2:
-                this.controller.hero.moveForward = false;
-                break;
+                case 0:
+                    // this.helper.visible = false;
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    this.controller.hero.moveForward = false;
+                    break;
+            }
         }
     }
 
@@ -421,7 +428,6 @@ class Scene {
         } else {
             cancelAnimationFrame( this.requestAnimationFrameID );
             this.dispose(this.scene);
-            this.scene = null;
         }
 
     }
