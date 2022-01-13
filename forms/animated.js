@@ -78,7 +78,7 @@ export class AnimatedForm extends StandardForm{
         // console.log(`previous: ${this.previousActionName}, active: ${this.activeActionName}, new: ${actionName}`)
         if ( this.activeActionName !== actionName ) {
 
-            
+            if (this.objectType == "hero") console.log(`New action: ${actionName}, previous: ${this.previousActionName}`)
             let newAction = this.actions[ actionName ];
 
             this.previousActionName = this.activeActionName;

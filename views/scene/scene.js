@@ -47,17 +47,17 @@ class Scene {
     }
 
     init(callback) {
+        this.scene = new THREE.Scene();
 
         navbarHeight = 0; // document.querySelector('.navbar').clientHeight;
-    
+        
         this.camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, cameraReach );
 
         // 20 should match this.hero.attributes.height?
         this.camera.position.set( 0, cameraElevationDefault + 20, cameraDistanceDefault );
         
-        this.scene = new THREE.Scene();
-
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+        this.renderer.shadowMap.enabled = true;
         this.renderer.setPixelRatio( window.devicePixelRatio );
         this.renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
 
@@ -356,7 +356,7 @@ class Scene {
         let backrayIntersections = this.cameraBackray.intersectObjects(this.controller.structureModels, true);
 
         if (backrayIntersections[0]) {
-            console.log(`Backray: ${backrayIntersections[0].distance}`);
+            // console.log(`Backray: ${backrayIntersections[0].distance}`);
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
                 this.camera.position.z = distance -20; // -= cameraDistanceDefault / 30;

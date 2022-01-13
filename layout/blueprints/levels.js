@@ -41,8 +41,7 @@ export const levels = [
         entities: [
             Entities.john,
             Entities.evilOne,
-            Entities.evilOne,
-            Entities.rat
+            Entities.evilOne
         ]
     },
     {

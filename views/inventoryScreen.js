@@ -227,21 +227,25 @@ class InventoryScreen {
             d.addEventListener('dragover', allowDrop);
         });
     
-        document.getElementById('backPage').addEventListener('click', e => {
-            this.pageNumber--;
-            let context = this.getContext(this.type, this.pageNumber);
-            this.modal.loadTemplate('modal-body', this.type, context, () => {
-                this.addInventoryEvents(this.type);
-            });
-        })
-    
-        document.getElementById('nextPage').addEventListener('click', e => {
-            this.pageNumber++;
-            let context = this.getContext(this.type, this.pageNumber);
-            this.modal.loadTemplate('modal-body', this.type, context, () => {
-                this.addInventoryEvents(this.type);
-            });
-        })
+        if (document.getElementById('backPage')) {
+            document.getElementById('backPage').addEventListener('click', e => {
+                this.pageNumber--;
+                let context = this.getContext(this.type, this.pageNumber);
+                this.modal.loadTemplate('modal-body', this.type, context, () => {
+                    this.addInventoryEvents(this.type);
+                });
+            })
+        }
+
+        if (document.getElementById('backPage')) {
+            document.getElementById('nextPage').addEventListener('click', e => {
+                this.pageNumber++;
+                let context = this.getContext(this.type, this.pageNumber);
+                this.modal.loadTemplate('modal-body', this.type, context, () => {
+                    this.addInventoryEvents(this.type);
+                });
+            })
+        }
     
     }
 

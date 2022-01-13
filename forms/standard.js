@@ -50,6 +50,7 @@ export class StandardForm {
 
             this.model = model;
             this.animations = gltf.animations;
+           
 
             if (this.template.location) {
                 this.model.position.x = this.template.location.x * multiplier;
@@ -58,8 +59,11 @@ export class StandardForm {
 
             } else { // floor is the only form without location
                 this.setToRenderDoubleSided();
+                this.setToReceiveShadow();
             }
 
+            this.setToCastShadows();
+            
             callback();
 
         }, undefined, function ( error ) {
@@ -109,6 +113,28 @@ export class StandardForm {
         if (root.children) {
             root.children.forEach(e => this.setToRenderDoubleSided(e)); 
         }
+    }
+
+    setToCastShadows(root) {
+        if (!root) root = this.model;
+        if (root.castShadow) root.castShadow = true;
+
+        if (root.children) {
+            root.children.forEach(e => this.setToCastShadows(e)); 
+        }
+    }
+
+    setToReceiveShadow(root) {
+        if (!root) root = this.model;
+        if (typeof root.receiveShadow == "boolean") {
+            root.receiveShadow = true;
+            
+        }
+
+        if (root.children) {
+            root.children.forEach(e => this.setToReceiveShadow(e)); 
+        }
+        
     }
 
     updateAttributes(payload) {

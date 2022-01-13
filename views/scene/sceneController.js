@@ -79,6 +79,8 @@ export class SceneController {
         }
     }
 
+
+
     addFloor(callback) {
 
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
@@ -96,9 +98,20 @@ export class SceneController {
     addLights() {
 
         if (this.layout.terrain.hemisphereLight) {
-            var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
-            light.position.set( 0.5, 1, 0.75 );
+            // var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, .75 );
+            var light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 2 );
+			light.position.set( 0, 1500, 1000 );
+            light.castShadow = true;
+            // light.position.set( 0.5, 1, 0.75 );
+            // light.position.set( 0, 1, 0 );
+            light.target.position.set( 0, 0, 0 ); 	
             this.scene.add( light );
+
+            //Set up shadow properties for the light
+            light.shadow.mapSize.width = 2000;  // default
+            light.shadow.mapSize.height = 2000; // default
+            light.shadow.camera.near = 0.5;    // default
+            light.shadow.camera.far = 1000;     // default
         }
 
         if (this.layout.terrain.overheadPointLight) {
@@ -106,6 +119,31 @@ export class SceneController {
             this.overheadPointLight.position.set( 0, 0, 0 );
             this.scene.add( this.overheadPointLight );
         }
+
+        var sphereGeometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
+        var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+        var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+        sphere.castShadow = true; //default is false
+        sphere.receiveShadow = false; //default
+        sphere.scale.set(5,5,5);
+        sphere.translateY(60);
+        sphere.translateX(400);
+
+        this.scene.add( sphere );
+
+        //Create a plane that receives shadows (but does not cast them)
+        var planeGeometry = new THREE.PlaneBufferGeometry( 20, 20, 32, 32 );
+        var planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
+        planeMaterial.side = THREE.DoubleSide;
+        var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+        plane.receiveShadow = true;
+
+        plane.scale.set(10,10,10);
+        plane.translateY(10);
+        plane.translateX(400);
+        plane.rotateX(Math.PI/2);
+        this.scene.add( plane );
+
 
     }
 
@@ -257,6 +295,20 @@ export class SceneController {
         });
 
         this.eventDepot.fire('removeItemFromLayout', data.uuid);
+    }
+
+    removeEntityFromScene(form) {
+        
+        /* Hero is special case already added to scene via controls */
+        if (form.objectType != "hero") this.scene.add( form.model );
+
+        this.forms.push( form );
+
+        if (form.objectType == "hero" || form.objectType == "friendly" || form.objectType == "beast") {
+            this.entities.push( form );
+        } else if (form.objectType == "floor" || form.objectType == "structure") {
+            this.structureModels.push ( form.model );
+        }
     }
 
     /** data: {location ..., itemName..., } */

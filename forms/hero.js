@@ -53,6 +53,8 @@ export class Hero extends IntelligentForm {
             modelCopy.position.set(0,0,0); // hero model is always centered in the controls
 
             this.model = this.controls;
+
+            this.setToCastShadows();
             this.model.add( modelCopy );
             this.model.add( this.proximityLight );
 
@@ -74,6 +76,8 @@ export class Hero extends IntelligentForm {
             console.error( error );
         });
     }
+
+
 
     cacheHero() {
         if (this.model) this.updateHeroLocationFromPosition();
@@ -174,7 +178,7 @@ export class Hero extends IntelligentForm {
 
         this.sceneController.eventDepot.addListener('mouse0click', () => {
 
-            if (this.selectedObject) {
+            if (this.alive && this.selectedObject) {
 
                 let objectType = this.selectedObject.objectType;
                 
@@ -191,6 +195,7 @@ export class Hero extends IntelligentForm {
 
                     // TODO: combat
                     this.fadeToAction("Punch", 0.2)
+                    this.selectedObject.changeStat('health', -1);
 
                 } else if (objectType == "structure") {
                     
@@ -410,7 +415,7 @@ export class Hero extends IntelligentForm {
             let distance = o.model.position.distanceTo(this.proximityLight.position);
 
             if (o.attributes.contained) distance += 20;
-            
+
             if (distance <= 50 && distance < closest) {
                 
                 if (!o.attributes.contentItems || (o.attributes.contentItems && !o.attributes.unlocked)) {
@@ -430,54 +435,58 @@ export class Hero extends IntelligentForm {
     }
 
     move(delta) {
-        
-        // INERTIA
-        this.velocity.x -= this.velocity.x * 10.0 * delta;
-        this.velocity.z -= this.velocity.z * 10.0 * delta;
-        this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+        if (this.alive) {
 
-        this.direction.z = Number( this.moveBackward ) - Number( this.moveForward );
-        this.direction.x = Number( this.moveRight ) - Number( this.moveLeft );
-        this.direction.normalize(); // this ensures consistent movements in all directions
-        
-        let agility = this.attributes.stats.agility.substring(0,2);
+            // INERTIA
+            this.velocity.x -= this.velocity.x * 10.0 * delta;
+            this.velocity.z -= this.velocity.z * 10.0 * delta;
+            this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
-        if ( this.moveForward || this.moveBackward ) this.velocity.z += this.direction.z * 1000.0 * agility * delta;
-        if ( this.moveLeft || this.moveRight ) this.velocity.x += this.direction.x * 1000.0 * agility * delta;
+            this.direction.z = Number( this.moveBackward ) - Number( this.moveForward );
+            this.direction.x = Number( this.moveRight ) - Number( this.moveLeft );
+            this.direction.normalize(); // this ensures consistent movements in all directions
+            
+            let agility = this.attributes.stats.agility.substring(0,2);
 
-        this.movementRaycaster.ray.origin.copy( this.model.position );
-        this.rotation.copy(this.model.rotation);
+            if ( this.moveForward || this.moveBackward ) this.velocity.z += this.direction.z * 1000.0 * agility * delta;
+            if ( this.moveLeft || this.moveRight ) this.velocity.x += this.direction.x * 1000.0 * agility * delta;
 
-        super.move(delta);
+            this.movementRaycaster.ray.origin.copy( this.model.position );
+            this.rotation.copy(this.model.rotation);
 
-        // entity.translateY( this.mixers[uniqueId].velocity.y * delta );
-        if (this.setElevation() == -1) {
+            super.move(delta);
 
-            this.model.translateX( -this.velocity.x * delta );
-            this.model.translateY( -this.velocity.y * delta );
-            this.model.translateZ( -this.velocity.z * delta );
+            // entity.translateY( this.mixers[uniqueId].velocity.y * delta );
+            if (this.setElevation() == -1) {
 
-            this.velocity.x = 0;
-            this.velocity.y = 0;
-            this.velocity.z = 0;
+                this.model.translateX( -this.velocity.x * delta );
+                this.model.translateY( -this.velocity.y * delta );
+                this.model.translateZ( -this.velocity.z * delta );
 
-        };
-        
-        if (this.standingUpon && this.standingUpon.attributes.routeTo && typeof this.standingUpon.attributes.routeTo.level == "number") {
-            if (this.standingUpon.attributes.unlocked) {
-                
-                this.sceneController.eventDepot.fire('cacheLayout', {});
+                this.velocity.x = 0;
+                this.velocity.y = 0;
+                this.velocity.z = 0;
 
-                let loadData = {
+            };
+            
+            if (this.standingUpon && this.standingUpon.attributes.routeTo && typeof this.standingUpon.attributes.routeTo.level == "number") {
+                if (this.standingUpon.attributes.unlocked) {
+                    
+                    this.sceneController.eventDepot.fire('cacheLayout', {});
 
-                    level: this.standingUpon.attributes.routeTo.level,
-                    location: this.standingUpon.attributes.routeTo.location,
+                    let loadData = {
+
+                        level: this.standingUpon.attributes.routeTo.level,
+                        location: this.standingUpon.attributes.routeTo.location,
+                    }
+
+                    this.sceneController.eventDepot.fire('loadLevel', loadData);
                 }
-
-                this.sceneController.eventDepot.fire('loadLevel', loadData);
             }
+
+            this.identifySelectedForm();
         }
 
-        this.identifySelectedForm();
     }
+
 }
