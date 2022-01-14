@@ -46,7 +46,7 @@ export const Items = {
             animates: false,
             scale: 5,
             elevation: 10,
-            mana: 2
+            effect: "mana/+2"
         }
     },
     greenpotion: {
@@ -59,7 +59,7 @@ export const Items = {
             animates: false,
             scale: 5,
             elevation: 10,
-            damage: 2
+            effect: "damage/-2"
         }
     },
     redpotion: {
@@ -72,7 +72,7 @@ export const Items = {
             animates: false,
             scale: 5,
             elevation: 10,
-            health: 2
+            effect: "health/+2"
         }
     },
     smallSword: {

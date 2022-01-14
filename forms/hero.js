@@ -96,7 +96,48 @@ export class Hero extends IntelligentForm {
 
     addEventListeners() {
 
-        
+        this.sceneController.eventDepot.addListener('hotkey', (data) => { // key = number, i.e. 1 => equipped.f1key
+
+            // Item or spell use
+            let keyString = 'f' + data.key + 'key';
+            let itemName = this.equipped[keyString];
+
+            let item = JSON.parse(localStorage.getItem('gameObjects'))[itemName];
+
+            let itemType = item.type;
+
+            // Using this will diminish the item quantity in inventory for items, or mana for spells
+            if (itemType == "item") {
+
+                // What is the item effect?
+                let [stat, change] = item.attributes.effect.split("/");
+
+                switch (stat) {
+                    case "health":
+                    case "mana": 
+                        this.fadeToAction("ThumbsUp", 0.2); // TODO: Use sprites to spritz things up
+                        this.changeStat(stat, change);
+                        break;
+
+                    case "damage":
+                        this.fadeToAction("Yes", 0.2);
+                        if (this.selectedObject.changeStat("health", change) <= 0) {
+                            this.fadeToAction("Dance", 0.2);
+                        }
+                        break;
+                }
+
+                if (this.removeFromInventory(itemName) == 0) this.unequip(keyString);
+                this.cacheHero();
+            
+            } else { 
+
+
+
+            }
+
+
+        })
 
         this.sceneController.eventDepot.addListener('updateHeroLocation', data => {
 
@@ -195,7 +236,13 @@ export class Hero extends IntelligentForm {
 
                     // TODO: combat
                     this.fadeToAction("Punch", 0.2)
-                    this.selectedObject.changeStat('health', -1);
+
+                    let chanceToHit = this.getStat('agility') / 100;
+                    if (this.selectedObject.getStat('health') > 0 && Math.random() < chanceToHit) {
+                        if (this.selectedObject.changeStat('health', -1) <= 0) {
+                            this.fadeToAction("Dance", 0.2);
+                        };
+                    }
 
                 } else if (objectType == "structure") {
                     

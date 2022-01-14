@@ -171,8 +171,10 @@ export class IntelligentForm extends AnimatedForm{
         }
     }
 
+    /** returns the new value */
     changeStat(stat, change) {
 
+        change = Number(change);
         let cur = Number(this.attributes.stats[stat].substring(0,2));
         let max = this.attributes.stats[stat].substring(3);
         let newvalue = 0;
@@ -198,12 +200,11 @@ export class IntelligentForm extends AnimatedForm{
 
         this.attributes.stats[stat] = Number(newvalue).toLocaleString('en-US',{minimumIntegerDigits:2}) + "/" + max;
 
-
-
         if (this.objectType == "hero") {
             this.updateHeroStats();
         }
 
+        return newvalue;
     }
 
     getStat(stat) {
