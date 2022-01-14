@@ -170,7 +170,7 @@ class InventoryScreen {
                         }
                         this.eventDepot.fire('removeItem', itemName)
                         this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName});
-    
+
                     } 
         
                 } else { // source is body part
@@ -241,7 +241,7 @@ class InventoryScreen {
             })
         }
 
-        if (document.getElementById('backPage')) {
+        if (document.getElementById('nextPage')) {
             document.getElementById('nextPage').addEventListener('click', e => {
                 this.pageNumber++;
                 let context = this.getContext(this.type, this.pageNumber);

@@ -1,6 +1,6 @@
 
 
-var cameraReach = 1200;
+var cameraReach = 1400;
 var cameraDistanceDefault = 200;
 var cameraElevationDefault = 40;
 
@@ -14,7 +14,7 @@ var BLACK = new THREE.Color('black');
 
 var navbarHeight;
 
-var minimap = false;
+var minimap = false, sidebar = false;
 
 /**
  * The Scene has graphical display (THREE.js), animates using requestAnimationFrame,
@@ -105,7 +105,7 @@ class Scene {
         if (this.background && this.background.length > 0) {
 
             // simplistic equirectangular mapping to the inverse of a sphere geometry:
-            var geometry = new THREE.SphereBufferGeometry(cameraReach - 250);
+            var geometry = new THREE.SphereBufferGeometry(cameraReach - 200);
             geometry.scale (-1,1,1);
 
             var material = new THREE.MeshBasicMaterial( {
@@ -187,6 +187,13 @@ class Scene {
             case 77: // m
                 minimap = !minimap;
                 this.controller.eventDepot.fire('minimap', {});
+                break;
+
+            case 72: // h
+                sidebar = !sidebar;
+               
+                if (sidebar) this.controller.eventDepot.fire('refreshSidebar', { equipped: this.controller.hero.equipped });
+                this.controller.eventDepot.fire('toggleSidebar', { show: sidebar });
                 break;
 
             case 49: // 1

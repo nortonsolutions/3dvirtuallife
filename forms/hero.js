@@ -358,7 +358,11 @@ export class Hero extends IntelligentForm {
 
             } 
             
-            if (! area.match('key')) this.model.getObjectByName(area).add(item.model);
+            if (area.match('key')) {
+                this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
+            } else {
+                this.model.getObjectByName(area).add(item.model);
+            }
             
         });
     }
@@ -366,7 +370,9 @@ export class Hero extends IntelligentForm {
     unequip(area) {
         delete this.equipped[area];
         
-        if (! area.match("key")) {
+        if (area.match('key')) {
+            this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
+        } else {
             let thisArea = this.model.getObjectByName(area);
             thisArea.children.forEach(child => {
                 thisArea.remove(child);

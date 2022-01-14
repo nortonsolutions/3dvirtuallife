@@ -7,6 +7,7 @@ import { EventDepot } from '/public/eventDepot.js';
 import { Game, newHeroTemplate } from '/game.js';
 import { GameAPI } from './gameAPI.js'
 import { Modal } from '/views/modal.js';
+import { Sidebar } from '/views/sidebar.js';
 
 export const app = () => {
 
@@ -19,6 +20,7 @@ export const app = () => {
 
     var gameAPI = new GameAPI(eventDepot);
     var modal = new Modal(eventDepot, gameAPI);
+    var sidebar = new Sidebar(eventDepot); // hotkeys
 
     const addEventDepotListeners = (eventDepot) => {
 
@@ -108,13 +110,14 @@ export const app = () => {
 
     const startGame = (heroTemplate, props) => {
         
-        eventDepot = null; gameAPI = null; modal = null;
+        eventDepot = null; gameAPI = null; modal = null; sidebar = null;
         
         eventDepot = new EventDepot();
         addEventDepotListeners(eventDepot);
 
         gameAPI = new GameAPI(eventDepot);
         modal = new Modal(eventDepot, gameAPI);
+        sidebar = new Sidebar(eventDepot);
 
         if (game) game.stop();
         game = new Game(heroTemplate, eventDepot);
