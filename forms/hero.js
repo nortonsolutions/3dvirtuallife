@@ -102,41 +102,38 @@ export class Hero extends IntelligentForm {
             let keyString = 'f' + data.key + 'key';
             let itemName = this.equipped[keyString];
 
-            let item = JSON.parse(localStorage.getItem('gameObjects'))[itemName];
+            if (itemName) {
+                let item = JSON.parse(localStorage.getItem('gameObjects'))[itemName];
 
-            let itemType = item.type;
-
-            // Using this will diminish the item quantity in inventory for items, or mana for spells
-            if (itemType == "item") {
-
-                // What is the item effect?
-                let [stat, change] = item.attributes.effect.split("/");
-
-                switch (stat) {
-                    case "health":
-                    case "mana": 
-                        this.fadeToAction("ThumbsUp", 0.2); // TODO: Use sprites to spritz things up
-                        this.changeStat(stat, change);
-                        break;
-
-                    case "damage":
-                        this.fadeToAction("Yes", 0.2);
-                        if (this.selectedObject.changeStat("health", change) <= 0) {
-                            this.fadeToAction("Dance", 0.2);
-                        }
-                        break;
+                let itemType = item.type;
+    
+                // Using this will diminish the item quantity in inventory for items, or mana for spells
+                if (itemType == "item") {
+    
+                    // What is the item effect?
+                    let [stat, change] = item.attributes.effect.split("/");
+    
+                    switch (stat) {
+                        case "health":
+                        case "mana": 
+                            this.fadeToAction("ThumbsUp", 0.2); // TODO: Use sprites to spritz things up
+                            this.changeStat(stat, change);
+                            break;
+    
+                        case "damage":
+                            this.fadeToAction("Yes", 0.2);
+                            if (this.selectedObject.changeStat("health", change) <= 0) {
+                                this.fadeToAction("Dance", 0.2);
+                            }
+                            break;
+                    }
+    
+                    if (this.removeFromInventory(itemName) == -1) this.unequip(keyString);
+                    this.cacheHero();
+                
+                } else { 
                 }
-
-                if (this.removeFromInventory(itemName) == 0) this.unequip(keyString);
-                this.cacheHero();
-            
-            } else { 
-
-
-
             }
-
-
         })
 
         this.sceneController.eventDepot.addListener('updateHeroLocation', data => {
@@ -351,14 +348,16 @@ export class Hero extends IntelligentForm {
         let index = this.inventory.findIndex(el => {
             return el != undefined && el.itemName == itemName
         });
-        
-        if (this.inventory[index].quantity > 1) {
-            this.inventory[index].quantity--;
-            return this.inventory[index].quantity;
-        } else {
-            this.inventory[index] = null;
-            return 0;
-        }
+
+        if (index != -1) {
+            if (this.inventory[index].quantity > 1) {
+                this.inventory[index].quantity--;
+                return this.inventory[index].quantity;
+            } else {
+                this.inventory[index] = null;
+                return 0;
+            }
+        } else return -1;
     }
 
     swapInventoryPositions(first,second) {

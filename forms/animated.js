@@ -16,6 +16,7 @@ export class AnimatedForm extends StandardForm{
         this.states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
         this.emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
+        this.currentlyFadingToAction = false;
     }
     
     load(callback) {
@@ -58,7 +59,7 @@ export class AnimatedForm extends StandardForm{
     }
 
     animate(delta) {
-        if (this.attributes.moves) {
+        if (this.alive && this.attributes.moves) {
             this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
             if (this.absVelocity < .1 && (this.activeActionName == 'Walking' || this.activeActionName == 'Running')) {
@@ -68,6 +69,8 @@ export class AnimatedForm extends StandardForm{
             } else if (this.absVelocity >= 199 && this.activeActionName == 'Walking') {
                 this.fadeToAction( 'Running', 0.2);
             }
+        } else {
+            this.fadeToAction('Death', 0.2);
         }
 
         this.mixer.update( delta );
@@ -76,8 +79,10 @@ export class AnimatedForm extends StandardForm{
     fadeToAction( actionName, duration ) {
         
         // console.log(`previous: ${this.previousActionName}, active: ${this.activeActionName}, new: ${actionName}`)
-        if ( this.activeActionName !== actionName ) {
-
+        if ( ! this.currentlyFadingToAction && this.activeActionName !== actionName ) {
+            
+            this.currentlyFadingToAction = true;
+            
             if (this.objectType == "hero") console.log(`New action: ${actionName}, previous: ${this.previousActionName}`)
             let newAction = this.actions[ actionName ];
 
@@ -96,12 +101,15 @@ export class AnimatedForm extends StandardForm{
                 .play();
 
             const restoreState = () => {
+                this.currentlyFadingToAction = false;
                 this.mixer.removeEventListener('finished', restoreState );
                 this.fadeToAction( this.previousActionName, 0.1 );
             }
 
             if (this.emotes.includes(actionName)) {
                 this.mixer.addEventListener( 'finished', restoreState );
+            } else {
+                this.currentlyFadingToAction = false;
             }
         }
     }
