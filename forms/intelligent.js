@@ -165,9 +165,20 @@ export class IntelligentForm extends AnimatedForm{
                 this.model.position.x = shiftTowardCenter(this.model.position.x);
                 this.model.position.z = shiftTowardCenter(this.model.position.z);
                 return -1;
-            } else {
+            } else if ((this.model.position.y - newYposition) < this.attributes.height) {
                 this.model.position.y = newYposition;
             }
+
+            // let newYposition = this.determineElevationFromBase();
+            // while (newYposition == -1) {
+            //     this.model.position.x = shiftTowardCenter(this.model.position.x);
+            //     this.model.position.z = shiftTowardCenter(this.model.position.z);
+            //     newYposition = this.determineElevationFromBase();
+            // } 
+
+            // this.model.position.y = newYposition + this.attributes.elevation;
+
+
         }
     }
 

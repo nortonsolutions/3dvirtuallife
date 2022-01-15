@@ -57,6 +57,15 @@ export class StandardForm {
                 this.model.position.z = this.template.location.z * multiplier;
                 this.model.position.y = this.determineElevationFromBase() + this.attributes.elevation;
 
+                // let newYposition = this.determineElevationFromBase();
+                // while (newYposition == -1) {
+                //     this.model.position.x = shiftTowardCenter(this.model.position.x);
+                //     this.model.position.z = shiftTowardCenter(this.model.position.z);
+                //     newYposition = this.determineElevationFromBase();
+                // } 
+
+                // this.model.position.y = newYposition + this.attributes.elevation;
+
             } else { // floor is the only form without location
                 this.setToRenderDoubleSided();
                 this.setToReceiveShadow();
