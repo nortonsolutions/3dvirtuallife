@@ -1,7 +1,7 @@
 export const Spells = {
-    spell_heal: {
-        name: 'spell_heal',
-        gltf: 'spell_heal.gltf',
+    heal: {
+        name: 'heal',
+        gltf: 'heal.gltf',
         image: 'bagOfGems.png',
         description: 'A spell to increase health',
         type: 'item',

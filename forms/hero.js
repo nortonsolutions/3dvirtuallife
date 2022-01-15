@@ -393,27 +393,7 @@ export class Hero extends IntelligentForm {
             item.model.scale.copy(new THREE.Vector3( .1,.1,.1 ));
     
             if (itemName == "torch") {
-    
-                let fireObj = this.sceneController.formFactory.getFire();
-
-                // this.fireParams.Torch();
-                fireObj.scale.set(.04, .01, .04);
-                fireObj.translateY(.08);
-                fireObj.translateZ(-.32);
-                fireObj.translateX(.01);
-                fireObj.rotateX(-Math.PI/5);
-                fireObj.rotateZ(-Math.PI/20);
-
-                item.model.add(fireObj);
-
-                switch (area) {
-                    case "Middle2R_end": 
-                        item.model.rotation.z = -Math.PI/5;
-                        break;
-                    case "Middle2L_end":
-                        break;
-                    default:
-                }
+                this.sceneController.formFactory.addTorchLight(item.model);
             } 
 
             // Apply effects of items if applied to body parts (non 'key' positions)
@@ -430,6 +410,7 @@ export class Hero extends IntelligentForm {
                         this.changeStat(stat, change, true);
                         break;
                     case "light":
+                        this.sceneController.overheadPointLight.intensity += 10;
                         break;
                 }
             }
@@ -437,13 +418,20 @@ export class Hero extends IntelligentForm {
             if (area.match('key')) {
                 this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
             } else {
+                // this.model.getObjectByName("Middle2R").add(item.model);
                 this.model.getObjectByName(area).add(item.model);
+                console.log("test")
             }
             
         });
     }
     
     unequip(area) {
+
+        // Which item is being unequipped?
+        let itemName = this.equipped[area];
+
+
         delete this.equipped[area];
         
         if (area.match('key')) {

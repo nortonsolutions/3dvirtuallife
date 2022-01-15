@@ -168,22 +168,11 @@ export class IntelligentForm extends AnimatedForm{
             } else if ((this.model.position.y - newYposition) < this.attributes.height) {
                 this.model.position.y = newYposition;
             }
-
-            // let newYposition = this.determineElevationFromBase();
-            // while (newYposition == -1) {
-            //     this.model.position.x = shiftTowardCenter(this.model.position.x);
-            //     this.model.position.z = shiftTowardCenter(this.model.position.z);
-            //     newYposition = this.determineElevationFromBase();
-            // } 
-
-            // this.model.position.y = newYposition + this.attributes.elevation;
-
-
         }
     }
 
     /** returns the new value */
-    changeStat(stat, change, changeMax = false) {
+    changeStat(stat, change, changeMax = false, temporary = false) {
 
         console.log(`Entering changeStat for ${this.objectName}`);
         change = Number(change);

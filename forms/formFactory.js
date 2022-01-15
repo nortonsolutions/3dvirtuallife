@@ -86,6 +86,19 @@ export class FormFactory {
         }
     }
 
+    addTorchLight = (model) => {
+        
+        let spriteForm = new SpriteForm('flame', 40, true);
+        let sprite = spriteForm.getSprite();
+        sprite.scale.set(.05, .1, .05);
+        sprite.translateZ(-.32);
+        // sprite.translateY();
+
+        model.add(sprite);
+        this.sceneController.sprites.push({ sprite, frames: spriteForm.getFrames() });
+
+    }
+
     getFire(params) {
 
         if (!params) params = this.fireParams;

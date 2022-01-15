@@ -81,7 +81,7 @@ export class AnimatedForm extends StandardForm{
     fadeToAction( actionName, duration ) {
         
         // console.log(`previous: ${this.previousActionName}, active: ${this.activeActionName}, new: ${actionName}`)
-        if ( ! this.currentlyFadingToAction && this.activeActionName !== actionName ) {
+        if ( ! this.currentlyFadingToAction && this.activeActionName !== actionName ) { // 
             
             this.currentlyFadingToAction = true;
             
@@ -93,7 +93,7 @@ export class AnimatedForm extends StandardForm{
             this.activeActionName = actionName;
             this.activeAction = newAction;
 
-            this.previousAction.fadeOut( duration );
+            if (this.previousAction) this.previousAction.fadeOut( duration );
 
             if (this.activeAction) {
                 this.activeAction

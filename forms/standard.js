@@ -29,7 +29,7 @@ export class StandardForm {
         
         this.model = null;
 
-        this.setToRenderDoubleSided = this.setToRenderDoubleSided.bind(this);
+        this.setRoofToSingleSided = this.setRoofToSingleSided.bind(this);
         this.load = this.load.bind(this);
     }
 
@@ -66,9 +66,9 @@ export class StandardForm {
 
                 // this.model.position.y = newYposition + this.attributes.elevation;
 
-            } else { // floor is the only form without location
-                this.setToRenderDoubleSided();
-                this.setToReceiveShadow();
+            } else if (this.objectName == "floor") { // floor is the only form without location
+                this.setRoofToSingleSided();
+                this.setFloorToReceiveShadow();
                 
             }
 
@@ -109,19 +109,15 @@ export class StandardForm {
 
     }
     
-    setToRenderDoubleSided(root) {
+    setRoofToSingleSided(root) {
 
         if (!root) root = this.model;
-        if (root.material) {
-            if (root.material.name != "Roof") { 
-                root.material.side = THREE.DoubleSide;
-            } else {
+        if (root.material && root.material.name == "Roof") { 
                 root.material.side = THREE.FrontSide;
-            }
         }
 
         if (root.children) {
-            root.children.forEach(e => this.setToRenderDoubleSided(e)); 
+            root.children.forEach(e => this.setRoofToSingleSided(e)); 
         }
     }
 
@@ -129,7 +125,7 @@ export class StandardForm {
         if (!root) root = this.model;
         if (typeof root.castShadow == "boolean") {
             // console.log((root.name));
-            if (root.name.match(new RegExp('pointlight|torch|torso|head|table|house', 'i'))) {  //
+            if (root.name.match(new RegExp('pointlight|torch|torso|head|table|house|body', 'i'))) {  //
                 root.castShadow = true;
 
                 let showShadowCamera = false;
@@ -158,17 +154,10 @@ export class StandardForm {
         }
     }
 
-    setToReceiveShadow(root) {
-        if (!root) root = this.model;
-        if (typeof root.receiveShadow == "boolean") {
-            root.receiveShadow = true;
-            
-        }
-
-        if (root.children) {
-            root.children.forEach(e => this.setToReceiveShadow(e)); 
-        }
+    setFloorToReceiveShadow() {
+        this.model.getObjectByName("Floor").receiveShadow = true;
     }
+
 
     updateAttributes(payload) {
         this.attributes = {...this.attributes, ...payload};
