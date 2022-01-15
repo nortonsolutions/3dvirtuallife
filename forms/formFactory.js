@@ -59,6 +59,11 @@ export class FormFactory {
 
     }
 
+    addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false) => {
+        let regex = new RegExp(regexString, 'i');
+        this.addSpritesRecursive(name, frames, scale, elevation, flip, model, regex);
+    }
+
     /** Scan down the model for any part that matches regex */
     addSpritesRecursive = (name, frames, scale, elevation, flip, model, regex) => {
         

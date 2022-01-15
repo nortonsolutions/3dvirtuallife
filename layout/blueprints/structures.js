@@ -11,7 +11,15 @@ export const Structures = {
         attributes: {
             animates: false,
             scale: 100,
-            elevation: -6
+            elevation: -6,
+            sprites: [{ 
+                name: "Fount",
+                regex: "fount",
+                frames: 10,
+                scale: 5,
+                elevation: 1,
+                flip: true
+            }]
         }
     
     },

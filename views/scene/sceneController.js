@@ -195,8 +195,14 @@ export class SceneController {
         return new Promise((resolve,reject) => {
             form.load(() => {
 
+                if (form.attributes.sprites) {
+                    form.attributes.sprites.forEach(spriteConfig => {
+                        this.formFactory.addSpritesGeneric(form.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip);
+                    })
+                }
+
                 this.addToScene(form);
-    
+
                 if (form.attributes.contentItems) {
                     form.attributes.contentItems.forEach(contentItem => {
                         contentItem.location = { x: 0, y: 30, z: 0 };
