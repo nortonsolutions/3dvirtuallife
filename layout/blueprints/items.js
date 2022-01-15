@@ -85,7 +85,8 @@ export const Items = {
             equippable: ['handR', 'handL'],
             animates: false,
             scale: 100,
-            elevation: 20
+            elevation: 20,
+            effect: "strength/+2"
         } 
     },
     torch: {
@@ -98,7 +99,8 @@ export const Items = {
             equippable: ['handR', 'handL'],
             animates: false,
             scale: 100,
-            elevation: 5
+            elevation: 5,
+            effect: "light/+2"
         } 
     },
     mace: {
@@ -111,7 +113,8 @@ export const Items = {
             equippable: ['handR', 'handL'],
             animates: false,
             scale: 100,
-            elevation: 0
+            elevation: 0,
+            effect: "strength/+2"
         } 
     },
     crystalBall: {
@@ -123,7 +126,8 @@ export const Items = {
         attributes: {
             animates: false,
             scale: 50,
-            elevation: 30
+            elevation: 30,
+            effect: "mana/+2"
         }
     },
 

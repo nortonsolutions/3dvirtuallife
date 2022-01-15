@@ -93,35 +93,39 @@ export class AnimatedForm extends StandardForm{
 
             this.previousAction.fadeOut( duration );
 
-            this.activeAction
-                .reset()
-                .setEffectiveTimeScale( 1 )
-                .setEffectiveWeight( 1 )
-                .fadeIn( duration )
-                .play();
+            if (this.activeAction) {
+                this.activeAction
+                    .reset()
+                    .setEffectiveTimeScale( 1 )
+                    .setEffectiveWeight( 1 )
+                    .fadeIn( duration )
+                    .play();
 
-            const restoreState = () => {
-                this.currentlyFadingToAction = false;
-                this.mixer.removeEventListener('finished', restoreState );
-                this.fadeToAction( this.previousActionName, 0.1 );
-            }
+                const restoreState = () => {
+                    this.currentlyFadingToAction = false;
+                    this.mixer.removeEventListener('finished', restoreState );
+                    this.fadeToAction( this.previousActionName, 0.1 );
+                }
 
-            if (this.emotes.includes(actionName)) {
-                this.mixer.addEventListener( 'finished', restoreState );
-            } else {
-                this.currentlyFadingToAction = false;
+                if (this.emotes.includes(actionName)) {
+                    this.mixer.addEventListener( 'finished', restoreState );
+                } else {
+                    this.currentlyFadingToAction = false;
+                }
             }
         }
     }
 
     runActiveAction(duration) {
 
-        this.activeAction
-            .reset()
-            .setEffectiveTimeScale( 1 )
-            .setEffectiveWeight( 1 )
-            .fadeIn( duration )
-            .play();
+        if (this.activeAction) {
+            this.activeAction
+                .reset()
+                .setEffectiveTimeScale( 1 )
+                .setEffectiveWeight( 1 )
+                .fadeIn( duration )
+                .play();
+        }
     }
 
 }

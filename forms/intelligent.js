@@ -172,12 +172,15 @@ export class IntelligentForm extends AnimatedForm{
     }
 
     /** returns the new value */
-    changeStat(stat, change) {
+    changeStat(stat, change, changeMax = false) {
 
         change = Number(change);
-        let cur = Number(this.attributes.stats[stat].substring(0,2));
-        let max = this.attributes.stats[stat].substring(3);
+        let currentStat = this.attributes.stats[stat].split('/');
+        let cur = Number(currentStat[0]);
+        let max = Number(currentStat[1]);
         let newvalue = 0;
+
+        if (changeMax) max = max + change;
 
         if (change > 0) {
             this.fadeToAction("Yes", 0.2);

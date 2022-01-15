@@ -227,16 +227,18 @@ export class Hero extends IntelligentForm {
                     
                     // TODO: conversation
                     this.sceneController.eventDepot.fire('unlockControls', {});
-                    this.sceneController.eventDepot.fire('modal', { name: objectName });
+                    this.sceneController.eventDepot.fire('modal', { name: this.selectedObject.objectName });
                 
                 } else if (objectType == "beast") {
 
                     // TODO: combat
                     this.fadeToAction("Punch", 0.2)
 
-                    let chanceToHit = this.getStat('agility') / 100;
+                    let chanceToHit = this.getStat('agility') / 10;
+                    let hitPointReduction = getRndInteger(0,this.getStat('strength'));
+
                     if (this.selectedObject.getStat('health') > 0 && Math.random() < chanceToHit) {
-                        if (this.selectedObject.changeStat('health', -1) <= 0) {
+                        if (this.selectedObject.changeStat('health', -hitPointReduction) <= 0) {
                             this.fadeToAction("Dance", 0.2);
                         };
                     }
@@ -401,8 +403,25 @@ export class Hero extends IntelligentForm {
                         break;
                     default:
                 }
-
             } 
+
+            // Apply effects of items
+            if (item.attributes.effect) {
+                
+                // What is the item effect?
+                let stat = item.attributes.effect.split("/")[0];
+                let change = Number(item.attributes.effect.split("/")[1]);
+
+                switch (stat) {
+                    case "health":
+                    case "mana":
+                    case "strength": 
+                        this.changeStat(stat, change, true);
+                        break;
+                    case "light":
+                        break;
+                }
+            }
             
             if (area.match('key')) {
                 this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
