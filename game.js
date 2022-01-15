@@ -70,11 +70,12 @@ function newHeroTemplate(name,height) {
             width: 20,
             scale: 10,
             elevation: 0,
+            experience: 0,
             stats: {
                 health: "03/05",
                 mana: "00/00",
                 strength: "01/01",
-                agility: "03/03"
+                agility: "03/03",
             }
         },
         gltf: 'robot.glb',

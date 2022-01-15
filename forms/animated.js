@@ -83,7 +83,7 @@ export class AnimatedForm extends StandardForm{
             
             this.currentlyFadingToAction = true;
             
-            if (this.objectType == "hero") console.log(`New action: ${actionName}, previous: ${this.previousActionName}`)
+            // if (this.objectType == "hero") console.log(`New action: ${actionName}, previous: ${this.previousActionName}`)
             let newAction = this.actions[ actionName ];
 
             this.previousActionName = this.activeActionName;

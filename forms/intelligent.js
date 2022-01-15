@@ -118,7 +118,7 @@ export class IntelligentForm extends AnimatedForm{
                     this.model.translateX( -this.velocity.x * delta );
                     this.model.translateZ( -this.velocity.z * delta );
                 } else {
-                    console.dir(fIntersects[0]);
+                    // console.dir(fIntersects[0]);
                 }
                 this.velocity.x = 0;
                 this.velocity.y = 0;
@@ -158,7 +158,7 @@ export class IntelligentForm extends AnimatedForm{
         } else {
 
             this.standingUpon = null;
-            
+
             let newYposition = this.determineElevationFromBase();
 
             if (newYposition == -1) { 
@@ -174,6 +174,7 @@ export class IntelligentForm extends AnimatedForm{
     /** returns the new value */
     changeStat(stat, change, changeMax = false) {
 
+        console.log(`Entering changeStat for ${this.objectName}`);
         change = Number(change);
         let currentStat = this.attributes.stats[stat].split('/');
         let cur = Number(currentStat[0]);
@@ -183,7 +184,7 @@ export class IntelligentForm extends AnimatedForm{
         if (changeMax) max = max + change;
 
         if (change > 0) {
-            this.fadeToAction("Yes", 0.2);
+            this.fadeToAction("Yes", 0.2); 
             // this.fadeToAction("ThumbsUp", 0.2);
             newvalue = Math.min(max, cur + change);
         } else {
@@ -207,6 +208,9 @@ export class IntelligentForm extends AnimatedForm{
             this.updateHeroStats();
         }
 
+        this.sceneController.eventDepot.fire('statusUpdate', { 
+            message: `${this.objectName} ${stat} stat updated: ${this.attributes.stats[stat]}` 
+        }); 
         return newvalue;
     }
 

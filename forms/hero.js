@@ -237,8 +237,19 @@ export class Hero extends IntelligentForm {
                     let chanceToHit = this.getStat('agility') / 10;
                     let hitPointReduction = getRandomArbitrary(0,this.getStat('strength'));
 
+
                     if (this.selectedObject.getStat('health') > 0 && Math.random() < chanceToHit) {
+
+                        this.sceneController.eventDepot.fire('statusUpdate', { 
+                            message: `${this.selectedObject.objectName} has ${this.selectedObject.getStat('health')} hit points` 
+                        }); 
+
                         if (this.selectedObject.changeStat('health', -hitPointReduction) <= 0) {
+
+                            this.attributes.experience += hitPointReduction;
+                            this.sceneController.eventDepot.fire('statusUpdate', { 
+                                message: `${this.selectedObject.objectName} killed for ${hitPointReduction} experience points` 
+                            }); 
                             this.fadeToAction("Dance", 0.2);
                         };
                     }
@@ -405,8 +416,8 @@ export class Hero extends IntelligentForm {
                 }
             } 
 
-            // Apply effects of items
-            if (item.attributes.effect) {
+            // Apply effects of items if applied to body parts (non 'key' positions)
+            if (!(/key/.test(area)) && item.attributes.effect) {
                 
                 // What is the item effect?
                 let stat = item.attributes.effect.split("/")[0];
@@ -465,8 +476,8 @@ export class Hero extends IntelligentForm {
         Object.keys(this.attributes.stats).forEach(stat => {
             
             let points = this.attributes.stats[stat].split('/')
-            let cur = points[0];
-            let max = points[1];
+            let cur = Number(points[0]);
+            let max = Number(points[1]);
 
             this.sceneController.eventDepot.fire('setHeroStatMax', { type: stat, points: max});
             this.sceneController.eventDepot.fire('setHeroStat', { type: stat, points: cur});

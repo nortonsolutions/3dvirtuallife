@@ -34,7 +34,7 @@ class EventDepot {
     /* Listener function must be named */
     removeListener(eventName, uniqueId) {
         this.eventRegistry[eventName] = this.eventRegistry[eventName].filter(el => el.name != uniqueId);
-        console.dir(this.eventRegistry[eventName]);
+        // console.dir(this.eventRegistry[eventName]);
     }
 }
 

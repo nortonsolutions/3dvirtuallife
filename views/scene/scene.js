@@ -251,8 +251,8 @@ class Scene {
         // console.log(`Controls object:`);
         // console.dir(this.controls.getObject().position);
 
-        console.log(`Objects3D object:`);
-        console.dir(this.controller.objects3D);
+        // console.log(`Objects3D object:`);
+        // console.dir(this.controller.objects3D);
     }
 
     onMouseDown = (e) => {
@@ -385,7 +385,8 @@ class Scene {
         let backrayIntersections = this.cameraBackray.intersectObjects(this.controller.structureModels, true);
 
         if (backrayIntersections[0]) {
-            // console.log(`Backray: ${backrayIntersections[0].distance}`);
+            // console.log("backray intersection:")
+            // console.dir(backrayIntersections[0]);
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
                 this.camera.position.z = distance -20; // -= cameraDistanceDefault / 30;

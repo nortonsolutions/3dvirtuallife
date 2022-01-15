@@ -124,7 +124,6 @@ class InventoryScreen {
                 + ev.target.attributes.quant.value + ':' 
                 + ev.target.parentNode.id;
     
-            console.log(textToSend)
             ev.dataTransfer.setData("text", textToSend);
             ev.dataTransfer.setDragImage(new Image(ev.target.src),10,10);
         }

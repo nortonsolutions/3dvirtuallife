@@ -37,6 +37,13 @@ export const app = () => {
             document.getElementById('message').innerHTML = '';
         });
 
+        eventDepot.addListener('statusUpdate', (data) => {
+            document.getElementById('statusUpdates').innerHTML = data.message;
+            setTimeout(() => {
+                document.getElementById('statusUpdates').innerHTML = '';
+            }, 5000);
+        });
+
         eventDepot.addListener('minimap', () => {
             minimap = !minimap;
             document.getElementById('minimap').style.display = minimap? 'block' : 'none';
