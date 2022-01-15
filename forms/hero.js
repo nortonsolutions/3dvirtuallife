@@ -195,12 +195,12 @@ export class Hero extends IntelligentForm {
         });
 
         this.sceneController.eventDepot.addListener('setHeroStat', (data) => {
-            this.attributes.stats[data.type] = data.points + this.attributes.stats[data.type].substring(2);
+            this.attributes.stats[data.type] = data.points + '/' + this.attributes.stats[data.type].split('/')[1];
             this.cacheHero();
         })
 
         this.sceneController.eventDepot.addListener('setHeroStatMax', (data) => {
-            this.attributes.stats[data.type] = this.attributes.stats[data.type].substring(0,3) + data.points;
+            this.attributes.stats[data.type] = this.attributes.stats[data.type].split('/')[0] + '/' + data.points;
             this.cacheHero();
         })
 
@@ -235,7 +235,7 @@ export class Hero extends IntelligentForm {
                     this.fadeToAction("Punch", 0.2)
 
                     let chanceToHit = this.getStat('agility') / 10;
-                    let hitPointReduction = getRndInteger(0,this.getStat('strength'));
+                    let hitPointReduction = getRandomArbitrary(0,this.getStat('strength'));
 
                     if (this.selectedObject.getStat('health') > 0 && Math.random() < chanceToHit) {
                         if (this.selectedObject.changeStat('health', -hitPointReduction) <= 0) {
@@ -521,7 +521,7 @@ export class Hero extends IntelligentForm {
             this.direction.x = Number( this.moveRight ) - Number( this.moveLeft );
             this.direction.normalize(); // this ensures consistent movements in all directions
             
-            let agility = this.attributes.stats.agility.substring(0,2);
+            let agility = this.attributes.stats.agility.split('/')[0];
 
             if ( this.moveForward || this.moveBackward ) this.velocity.z += this.direction.z * 1000.0 * agility * delta;
             if ( this.moveLeft || this.moveRight ) this.velocity.x += this.direction.x * 1000.0 * agility * delta;

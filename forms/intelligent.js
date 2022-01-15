@@ -201,7 +201,7 @@ export class IntelligentForm extends AnimatedForm{
             }
         }
 
-        this.attributes.stats[stat] = Number(newvalue).toLocaleString('en-US',{minimumIntegerDigits:2}) + "/" + max;
+        this.attributes.stats[stat] = Number(newvalue).toFixed(2) + "/" + max; //.toLocaleString('en-US',{minimumIntegerDigits:2})
 
         if (this.objectType == "hero") {
             this.updateHeroStats();
@@ -211,7 +211,7 @@ export class IntelligentForm extends AnimatedForm{
     }
 
     getStat(stat) {
-        return Number(this.attributes.stats[stat].substring(0,2));
+        return Number(this.attributes.stats[stat].split('/')[0]);
     }
 
     death() {

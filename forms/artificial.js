@@ -23,7 +23,7 @@ export class ArtificialForm extends IntelligentForm{
                 this.direction.normalize();
             }
 
-            let agility = this.attributes.stats.agility.substring(0,2);
+            let agility = this.attributes.stats.agility.split('/')[0];
 
             if (Math.random() < .2) { // percentage of moving
                 this.velocity.z += this.direction.z * 1000.0 * agility * delta;
