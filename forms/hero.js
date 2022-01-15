@@ -248,7 +248,7 @@ export class Hero extends IntelligentForm {
 
                             this.attributes.experience += this.selectedObject.getStatMax('health');
                             this.sceneController.eventDepot.fire('statusUpdate', { 
-                                message: `${this.selectedObject.objectName} killed for ${this.selectedObject.getStatMax('health')} experience points` 
+                                message: `${this.selectedObject.objectName} killed for ${this.selectedObject.getStatMax('health')} XP` 
                             }); 
                             this.fadeToAction("Dance", 0.2);
                         };

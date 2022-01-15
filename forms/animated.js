@@ -59,18 +59,20 @@ export class AnimatedForm extends StandardForm{
     }
 
     animate(delta) {
-        if (this.alive && this.attributes.moves) {
-            this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
+        if (this.attributes.moves) {
+            if (this.alive) {
+                this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
-            if (this.absVelocity < .1 && (this.activeActionName == 'Walking' || this.activeActionName == 'Running')) {
-                this.fadeToAction( 'Idle', 0.2);
-            } else if (this.absVelocity >= .1 && this.activeActionName == 'Idle') {
-                this.fadeToAction( 'Walking', 0.2);
-            } else if (this.absVelocity >= 199 && this.activeActionName == 'Walking') {
-                this.fadeToAction( 'Running', 0.2);
+                if (this.absVelocity < .1 && (this.activeActionName == 'Walking' || this.activeActionName == 'Running')) {
+                    this.fadeToAction( 'Idle', 0.2);
+                } else if (this.absVelocity >= .1 && this.activeActionName == 'Idle') {
+                    this.fadeToAction( 'Walking', 0.2);
+                } else if (this.absVelocity >= 199 && this.activeActionName == 'Walking') {
+                    this.fadeToAction( 'Running', 0.2);
+                }
+            } else {
+                this.fadeToAction('Death', 0.2);
             }
-        } else {
-            this.fadeToAction('Death', 0.2);
         }
 
         this.mixer.update( delta );
