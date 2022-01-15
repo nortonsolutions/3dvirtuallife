@@ -40,7 +40,7 @@ export const app = () => {
         eventDepot.addListener('statusUpdate', (data) => {
             document.getElementById('statusUpdates').innerHTML = data.message;
             setTimeout(() => {
-                document.getElementById('statusUpdates').innerHTML = '';
+                // document.getElementById('statusUpdates').innerHTML = '';
             }, 5000);
         });
 

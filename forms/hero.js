@@ -117,12 +117,12 @@ export class Hero extends IntelligentForm {
                         case "health":
                         case "mana": 
                             this.fadeToAction("ThumbsUp", 0.2); // TODO: Use sprites to spritz things up
-                            this.changeStat(stat, change);
+                            this.changeStat(stat, change, false);
                             break;
     
                         case "damage":
                             this.fadeToAction("Yes", 0.2);
-                            if (this.selectedObject.changeStat("health", change) <= 0) {
+                            if (this.selectedObject.changeStat("health", change, false) <= 0) {
                                 this.fadeToAction("Dance", 0.2);
                             }
                             break;
@@ -237,18 +237,18 @@ export class Hero extends IntelligentForm {
                     let chanceToHit = this.getStat('agility') / 10;
                     let hitPointReduction = getRandomArbitrary(0,this.getStat('strength'));
 
+                    // console.dir(this.selectedObject);
+                    if (Math.random() < chanceToHit) {  // this.selectedObject.getStat('health') > 0 &&
 
-                    if (this.selectedObject.getStat('health') > 0 && Math.random() < chanceToHit) {
+                        // this.sceneController.eventDepot.fire('statusUpdate', { 
+                        //     message: `${this.selectedObject.objectName} has ${this.selectedObject.getStat('health')} hit points` 
+                        // }); 
+                        
+                        if (this.selectedObject.changeStat('health', -hitPointReduction, false) <= 0) {
 
-                        this.sceneController.eventDepot.fire('statusUpdate', { 
-                            message: `${this.selectedObject.objectName} has ${this.selectedObject.getStat('health')} hit points` 
-                        }); 
-
-                        if (this.selectedObject.changeStat('health', -hitPointReduction) <= 0) {
-
-                            this.attributes.experience += hitPointReduction;
+                            this.attributes.experience += this.selectedObject.getStatMax('health');
                             this.sceneController.eventDepot.fire('statusUpdate', { 
-                                message: `${this.selectedObject.objectName} killed for ${hitPointReduction} experience points` 
+                                message: `${this.selectedObject.objectName} killed for ${this.selectedObject.getStatMax('health')} experience points` 
                             }); 
                             this.fadeToAction("Dance", 0.2);
                         };
