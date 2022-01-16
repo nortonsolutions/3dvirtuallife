@@ -386,7 +386,7 @@ class Scene {
 
         if (backrayIntersections[0] && backrayIntersections[0].object.type != "Sprite") {
             // console.log("backray intersection:")
-            console.dir(backrayIntersections[0]);
+            // console.dir(backrayIntersections[0]);
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
                 this.camera.position.z = distance -20; // -= cameraDistanceDefault / 30;

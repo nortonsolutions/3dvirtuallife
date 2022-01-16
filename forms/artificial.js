@@ -23,7 +23,7 @@ export class ArtificialForm extends IntelligentForm{
                 this.direction.normalize();
             }
 
-            let agility = this.attributes.stats.agility.split('/')[0];
+            let agility = this.getEffectiveStat('agility');
 
             if (Math.random() < .2) { // percentage of moving
                 this.velocity.z += this.direction.z * 1000.0 * agility * delta;
@@ -93,9 +93,9 @@ export class ArtificialForm extends IntelligentForm{
             this.fadeToAction("Punch", 0.2);
         }
 
-        let chanceToHit = this.getStat('agility') / 100;
-        let hitPointReduction = getRandomArbitrary(0,this.getStat('strength'));
-        if (this.sceneController.hero.getStat('health') > 0 && Math.random() < chanceToHit) {
+        let chanceToHit = this.getEffectiveStat('agility') / 100;
+        let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
+        if (this.sceneController.hero.getEffectiveStat('health') > 0 && Math.random() < chanceToHit) {
             if (this.sceneController.hero.changeStat('health', -hitPointReduction, false) <= 0) {
                 this.fadeToAction("Dance", 0.2);
             };

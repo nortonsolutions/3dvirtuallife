@@ -68,14 +68,14 @@ function newHeroTemplate(name,height) {
             height: height,
             length: 20,
             width: 20,
-            scale: 10,
+            scale: 20,
             elevation: 0,
             experience: 0,
             stats: {
-                health: "03/05",
-                mana: "00/00",
-                strength: "01/01",
-                agility: "03/03",
+                health: "3/5/0",  // min/max/boost
+                mana: "0/0/0",
+                strength: "1/1/0",
+                agility: "3/3/0",
             },
             xpLevels: {
                 health: 0,
@@ -84,7 +84,7 @@ function newHeroTemplate(name,height) {
                 agility: 0,
             }
         },
-        gltf: 'robot.glb',
+        gltf: 'boy.glb',
         model: null,
         inventory: [],
         spells: [],

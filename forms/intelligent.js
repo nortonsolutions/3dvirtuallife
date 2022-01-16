@@ -23,6 +23,11 @@ export class IntelligentForm extends AnimatedForm{
         this.canJump = true;
         this.alive = true;
 
+        this.inventory = this.template.inventory;
+        this.attributes = this.template.attributes;
+        this.spells = this.template.spells;
+        this.equipped = this.template.equipped;
+
         this.movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.length/2 + 45 );
         // this.movementRaycasterR = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.width/2 + 20 )
         // this.movementRaycasterL = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.width/2 + 20 )
@@ -172,9 +177,8 @@ export class IntelligentForm extends AnimatedForm{
     }
 
     /** returns the new value */
-    changeStat(stat, change, changeMax = false, temporary = false) {
+    changeStat(stat, change, changeMax = false) {
 
-        console.log(`Entering changeStat for ${this.objectName}`);
         change = Number(change);
         let currentStat = this.attributes.stats[stat].split('/');
         let cur = Number(currentStat[0]);
@@ -202,10 +206,10 @@ export class IntelligentForm extends AnimatedForm{
             }
         }
 
-        this.attributes.stats[stat] = Number(newvalue).toFixed(2) + "/" + Number(max).toFixed(2); //.toLocaleString('en-US',{minimumIntegerDigits:2})
+        this.attributes.stats[stat] = Number(newvalue).toFixed(2) + "/" + Number(max).toFixed(2) + "/" + this.getStatBoost(stat); //.toLocaleString('en-US',{minimumIntegerDigits:2})
 
         if (this.objectType == "hero") {
-            this.updateHeroStats();
+            this.updateHeroStats(stat);
         }
 
         this.sceneController.eventDepot.fire('statusUpdate', { 
@@ -214,12 +218,38 @@ export class IntelligentForm extends AnimatedForm{
         return newvalue;
     }
 
+
+    changeStatBoost(stat, change) {
+        change = Number(change);
+        let currentBoost = this.getStatBoost(stat);
+
+        this.attributes.stats[stat] = this.getStat(stat) + "/" + this.getStatMax(stat) + "/" + (Number(currentBoost) + Number(change));
+
+        if (this.objectType == "hero") this.updateHeroStats(stat);
+        
+        this.sceneController.eventDepot.fire('statusUpdate', { 
+            message: `${this.objectName} ${stat} stat boosted: ${this.attributes.stats[stat]}` 
+        }); 
+    }
+
+    getStatAll(stat) {
+        return Number(this.attributes.stats[stat]);
+    }
+
     getStat(stat) {
         return Number(this.attributes.stats[stat].split('/')[0]);
     }
 
     getStatMax(stat) {
         return Number(this.attributes.stats[stat].split('/')[1]);
+    }
+
+    getStatBoost(stat) { // statBoost effectively raises the stat for runtime
+        return Number(this.attributes.stats[stat].split('/')[2]);
+    }
+
+    getEffectiveStat(stat) {
+        return this.getStat(stat) + this.getStatBoost(stat);
     }
 
     death() {

@@ -148,7 +148,9 @@ export class SceneController {
             this.eventDepot.fire('halt', {});
             this.eventDepot.fire('updateHeroLocation', { location: this.hero.location, offset: true });
             
-            this.hero.updateHeroStats();
+            Object.keys(this.hero.attributes.stats).forEach(stat => {
+                this.hero.updateHeroStats(stat);
+            })
 
             callback();
 

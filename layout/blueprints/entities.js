@@ -13,10 +13,10 @@ export const Entities = {
             elevation: 0,
             scale: 10,
             stats: {
-                health: "02/02",
-                mana: "00/00",
-                strength: "01/01",
-                agility: "01/01"
+                health: "2/2/0",
+                mana: "0/0/0",
+                strength: "1/1/0",
+                agility: "1/1/0"
             }
         }
     },
@@ -34,16 +34,16 @@ export const Entities = {
             elevation: 0,
             scale: 60,
             stats: {
-                health: "02/02",
-                mana: "00/00",
-                strength: "01/01",
-                agility: "01/02"
+                health: "2/2/0",
+                mana: "0/0/0",
+                strength: "1/1/0",
+                agility: "1/2/0"
             }
         }
     },
     john: {
         name: 'john',
-        gltf: 'robot.glb',
+        gltf: 'boy.glb',
         description: 'Another robot which seems different',
         type: 'friendly',
         attributes: {
@@ -53,12 +53,12 @@ export const Entities = {
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 10,
+            scale: 20,
             conversation: [],
             offers: [],
             accepts: [],
             stats: {
-                agility: "02/02"
+                agility: "2/2/0"
             }
         }
     }

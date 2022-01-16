@@ -46,7 +46,7 @@ export const Items = {
             animates: false,
             scale: 5,
             elevation: 10,
-            effect: "mana/+2"
+            effect: "mana/2"
         }
     },
     greenpotion: {
@@ -72,7 +72,7 @@ export const Items = {
             animates: false,
             scale: 5,
             elevation: 10,
-            effect: "health/+2"
+            effect: "health/2"
         }
     },
     smallSword: {
@@ -86,7 +86,7 @@ export const Items = {
             animates: false,
             scale: 100,
             elevation: 20,
-            effect: "strength/+2"
+            effect: "strength/2"
         } 
     },
     torch: {
@@ -100,7 +100,7 @@ export const Items = {
             animates: false,
             scale: 100,
             elevation: 5,
-            effect: "light/+2"
+            effect: "light/10"
         } 
     },
     mace: {
@@ -114,7 +114,7 @@ export const Items = {
             animates: false,
             scale: 100,
             elevation: 0,
-            effect: "strength/+2"
+            effect: "strength/2"
         } 
     },
     crystalBall: {
@@ -127,7 +127,7 @@ export const Items = {
             animates: false,
             scale: 50,
             elevation: 30,
-            effect: "mana/+2"
+            effect: "mana/2"
         }
     },
 

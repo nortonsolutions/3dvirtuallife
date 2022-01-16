@@ -66,6 +66,7 @@ export class StandardForm {
 
                 // this.model.position.y = newYposition + this.attributes.elevation;
 
+                console.log(`Placing ${this.objectName} @ ${this.model.position.x},${this.model.position.y},${this.model.position.z}` );
             } else if (this.objectName == "floor") { // floor is the only form without location
                 this.setRoofToSingleSided();
                 this.setFloorToReceiveShadow();
@@ -100,11 +101,10 @@ export class StandardForm {
             let elevation = this.downRaycaster.ray.origin.y - distanceFromAbove + 5; 
             return (elevation);
         } else {
-
-            return -1;
             // console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
-            // console.error(this.floor);
-            // console.error(`${name} = ${x},${z}`);
+            // console.error(this.sceneController.floor);
+            // console.error(`${this.objectName} = ${this.model.position.x},${this.model.position.z}`);
+            return -1;
         }
 
     }

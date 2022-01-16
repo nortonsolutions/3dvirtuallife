@@ -17,10 +17,6 @@ export class Hero extends IntelligentForm {
 
         this.controls = controls;
         this.name = this.template.name;
-        this.inventory = this.template.inventory;
-        this.attributes = this.template.attributes;
-        this.spells = this.template.spells;
-        this.equipped = this.template.equipped;
         this.selectedObject = null;
 
         this.addEventListeners = this.addEventListeners.bind(this);
@@ -38,7 +34,6 @@ export class Hero extends IntelligentForm {
         this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 30 );
         // this.proximityLight.position.set( 0, 0, 0 );
         
-
         this.cacheHero();
 
     }
@@ -194,15 +189,15 @@ export class Hero extends IntelligentForm {
             this.cacheHero();
         });
 
-        this.sceneController.eventDepot.addListener('setHeroStat', (data) => {
-            this.attributes.stats[data.type] = data.points + '/' + this.attributes.stats[data.type].split('/')[1];
-            this.cacheHero();
-        })
+        // this.sceneController.eventDepot.addListener('setHeroStat', (data) => {
+        //     this.attributes.stats[data.type] = data.points + '/' + this.attributes.stats[data.type].split('/')[1];
+        //     this.cacheHero();
+        // })
 
-        this.sceneController.eventDepot.addListener('setHeroStatMax', (data) => {
-            this.attributes.stats[data.type] = this.attributes.stats[data.type].split('/')[0] + '/' + data.points;
-            this.cacheHero();
-        })
+        // this.sceneController.eventDepot.addListener('setHeroStatMax', (data) => {
+        //     this.attributes.stats[data.type] = this.attributes.stats[data.type].split('/')[0] + '/' + data.points;
+        //     this.cacheHero();
+        // })
 
         this.sceneController.eventDepot.addListener('dropItemToScene', (data) => {
             
@@ -234,16 +229,12 @@ export class Hero extends IntelligentForm {
                     // TODO: combat
                     this.fadeToAction("Punch", 0.2)
 
-                    let chanceToHit = this.getStat('agility') / 10;
-                    let hitPointReduction = getRandomArbitrary(0,this.getStat('strength'));
+                    let chanceToHit = this.getEffectiveStat('agility') / 10;
+                    let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
 
                     // console.dir(this.selectedObject);
-                    if (Math.random() < chanceToHit) {  // this.selectedObject.getStat('health') > 0 &&
+                    if (Math.random() < chanceToHit) {
 
-                        // this.sceneController.eventDepot.fire('statusUpdate', { 
-                        //     message: `${this.selectedObject.objectName} has ${this.selectedObject.getStat('health')} hit points` 
-                        // }); 
-                        
                         if (this.selectedObject.changeStat('health', -hitPointReduction, false) <= 0) {
 
                             this.attributes.experience += this.selectedObject.getStatMax('health');
@@ -390,14 +381,13 @@ export class Hero extends IntelligentForm {
 
             item.model.position.set(0,0,0);
             item.model.rotation.y = Math.PI;
-            item.model.scale.copy(new THREE.Vector3( .1,.1,.1 ));
+            item.model.scale.copy(new THREE.Vector3( 10,10,10 ));
     
             if (itemName == "torch") {
                 this.sceneController.formFactory.addTorchLight(item.model);
             } 
 
-            // Apply effects of items if applied to body parts (non 'key' positions)
-            if (!(/key/.test(area)) && item.attributes.effect) {
+            if (!(/key/.test(area)) && item.attributes.effect) { // body parts (non 'key' positions)
                 
                 // What is the item effect?
                 let stat = item.attributes.effect.split("/")[0];
@@ -406,8 +396,9 @@ export class Hero extends IntelligentForm {
                 switch (stat) {
                     case "health":
                     case "mana":
-                    case "strength": 
-                        this.changeStat(stat, change, true);
+                    case "strength":
+                    case "dexterity": 
+                        this.changeStatBoost(stat, change);
                         break;
                     case "light":
                         this.sceneController.overheadPointLight.intensity += 10;
@@ -420,7 +411,7 @@ export class Hero extends IntelligentForm {
             } else {
                 // this.model.getObjectByName("Middle2R").add(item.model);
                 this.model.getObjectByName(area).add(item.model);
-                console.log("test")
+                // console.log("test")
             }
             
         });
@@ -428,20 +419,37 @@ export class Hero extends IntelligentForm {
     
     unequip(area) {
 
-        // Which item is being unequipped?
+        // Which item is being unequipped?  
         let itemName = this.equipped[area];
+        let item = JSON.parse(localStorage.getItem('gameObjects'))[itemName];
 
+        // What is the item effect?
+        let stat = item.attributes.effect.split("/")[0];
+        let change = Number(item.attributes.effect.split("/")[1]);
+
+        switch (stat) {
+            case "health":
+            case "mana":
+            case "strength":
+            case "dexterity": 
+                this.changeStatBoost(stat, -change);
+                break;
+            case "light":
+                this.sceneController.overheadPointLight.intensity -= change;
+                break;
+        }
 
         delete this.equipped[area];
         
         if (area.match('key')) {
             this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
         } else {
-            let thisArea = this.model.getObjectByName(area);
-            thisArea.children.forEach(child => {
-                thisArea.remove(child);
-            })
-    
+            // let thisArea = this.model.getObjectByName(area);
+            // thisArea.children.forEach(child => {
+            //     thisArea.remove(child);
+            // })
+            let thisItem = this.model.getObjectByProperty("objectName", itemName);
+            thisItem.parent.remove(thisItem);
         }
     }
 
@@ -459,19 +467,11 @@ export class Hero extends IntelligentForm {
         }
     }
 
-    updateHeroStats = () => {
+    /** updateHeroStats sends hero statistics out; effective is connsidered the stat */
+    updateHeroStats = (stat) => {
 
-        Object.keys(this.attributes.stats).forEach(stat => {
-            
-            let points = this.attributes.stats[stat].split('/')
-            let cur = Number(points[0]);
-            let max = Number(points[1]);
-
-            this.sceneController.eventDepot.fire('setHeroStatMax', { type: stat, points: max});
-            this.sceneController.eventDepot.fire('setHeroStat', { type: stat, points: cur});
-
-        })
-
+        this.sceneController.eventDepot.fire('setHeroStatMax', { type: stat, points: this.getStatMax(stat)});
+        this.sceneController.eventDepot.fire('setHeroStat', { type: stat, points: this.getEffectiveStat(stat)});
         this.sceneController.eventDepot.fire('showHeroStats', {});
         
     }
@@ -520,7 +520,7 @@ export class Hero extends IntelligentForm {
             this.direction.x = Number( this.moveRight ) - Number( this.moveLeft );
             this.direction.normalize(); // this ensures consistent movements in all directions
             
-            let agility = this.attributes.stats.agility.split('/')[0];
+            let agility = this.getEffectiveStat('agility');
 
             if ( this.moveForward || this.moveBackward ) this.velocity.z += this.direction.z * 1000.0 * agility * delta;
             if ( this.moveLeft || this.moveRight ) this.velocity.x += this.direction.x * 1000.0 * agility * delta;
