@@ -9,6 +9,19 @@ export class ArtificialForm extends IntelligentForm{
 
     }
 
+    load(callback) {
+        super.load(() => {
+            switch (this.objectName) {
+                case "evilOne":
+                    this.actions['Idle'].setEffectiveTimeScale(12);
+                    this.actions['Walking'].setEffectiveTimeScale(12);
+                    this.actions['Punch'].setEffectiveTimeScale(12);
+                    break;
+            }
+            if (callback) callback();
+        });
+    }
+
     move(delta) {
 
         if (this.alive) {

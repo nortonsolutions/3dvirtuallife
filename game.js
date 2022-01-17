@@ -68,7 +68,7 @@ function newHeroTemplate(name,height) {
             height: height,
             length: 20,
             width: 20,
-            scale: 20,
+            scale: 10,
             elevation: 0,
             experience: 0,
             stats: {
@@ -84,7 +84,7 @@ function newHeroTemplate(name,height) {
                 agility: 0,
             }
         },
-        gltf: 'boy.glb',
+        gltf: 'robot.glb',
         model: null,
         inventory: [],
         spells: [],

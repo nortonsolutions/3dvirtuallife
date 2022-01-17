@@ -18,7 +18,7 @@ export const Structures = {
                 frames: 10,
                 scale: 5,
                 elevation: 1,
-                flip: true
+                flip: false
             }]
         }
     

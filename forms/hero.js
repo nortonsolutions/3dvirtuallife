@@ -49,7 +49,6 @@ export class Hero extends IntelligentForm {
 
             this.model = this.controls;
 
-            this.setToCastShadows();
             this.model.add( modelCopy );
             this.model.add( this.proximityLight );
 
@@ -381,7 +380,7 @@ export class Hero extends IntelligentForm {
 
             item.model.position.set(0,0,0);
             item.model.rotation.y = Math.PI;
-            item.model.scale.copy(new THREE.Vector3( 10,10,10 ));
+            item.model.scale.copy(new THREE.Vector3( .1,.1,.1 ));
     
             if (itemName == "torch") {
                 this.sceneController.formFactory.addTorchLight(item.model);
@@ -427,18 +426,6 @@ export class Hero extends IntelligentForm {
         let stat = item.attributes.effect.split("/")[0];
         let change = Number(item.attributes.effect.split("/")[1]);
 
-        switch (stat) {
-            case "health":
-            case "mana":
-            case "strength":
-            case "dexterity": 
-                this.changeStatBoost(stat, -change);
-                break;
-            case "light":
-                this.sceneController.overheadPointLight.intensity -= change;
-                break;
-        }
-
         delete this.equipped[area];
         
         if (area.match('key')) {
@@ -450,6 +437,19 @@ export class Hero extends IntelligentForm {
             // })
             let thisItem = this.model.getObjectByProperty("objectName", itemName);
             thisItem.parent.remove(thisItem);
+            this.sceneController.scene.remove(thisItem);
+
+            switch (stat) {
+                case "health":
+                case "mana":
+                case "strength":
+                case "dexterity": 
+                    this.changeStatBoost(stat, -change);
+                    break;
+                case "light":
+                    this.sceneController.overheadPointLight.intensity -= change;
+                    break;
+            }
         }
     }
 
@@ -561,6 +561,18 @@ export class Hero extends IntelligentForm {
             this.identifySelectedForm();
         }
 
+    }
+
+    death() {
+        super.death();
+
+        setTimeout(() => {
+            let thisModel = this.model.getObjectByProperty("objectType", "hero");
+            thisModel.position.copy(this.model.position);
+            this.sceneController.scene.add(thisModel);
+
+        }, 2000);
+        
     }
 
 }

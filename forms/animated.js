@@ -98,8 +98,8 @@ export class AnimatedForm extends StandardForm{
             if (this.activeAction) {
                 this.activeAction
                     .reset()
-                    .setEffectiveTimeScale( 1 )
-                    .setEffectiveWeight( 1 )
+                    // .setEffectiveTimeScale( 1 )
+                    // .setEffectiveWeight( 1 )
                     .fadeIn( duration )
                     .play();
 

@@ -188,7 +188,7 @@ export class IntelligentForm extends AnimatedForm{
         if (changeMax) max = max + change;
 
         if (change > 0) {
-            this.fadeToAction("Yes", 0.2); 
+            // this.fadeToAction("Yes", 0.2); 
             // this.fadeToAction("ThumbsUp", 0.2);
             newvalue = Math.min(max, cur + change);
         } else {
@@ -199,18 +199,16 @@ export class IntelligentForm extends AnimatedForm{
                 if (this.alive && newvalue <= 0) {
                     this.death();
                 } else if (this.alive) {
-                    this.fadeToAction("No", 0.2);
+                    // this.fadeToAction("No", 0.2);
                 } 
             } else {
-                this.fadeToAction("No", 0.2);
+                // this.fadeToAction("No", 0.2);
             }
         }
 
         this.attributes.stats[stat] = Number(newvalue).toFixed(2) + "/" + Number(max).toFixed(2) + "/" + this.getStatBoost(stat); //.toLocaleString('en-US',{minimumIntegerDigits:2})
 
-        if (this.objectType == "hero") {
-            this.updateHeroStats(stat);
-        }
+        if (this.objectType == "hero") this.updateHeroStats(stat);
 
         this.sceneController.eventDepot.fire('statusUpdate', { 
             message: `${this.objectName} ${stat} stat updated: ${this.attributes.stats[stat]}` 
@@ -255,7 +253,6 @@ export class IntelligentForm extends AnimatedForm{
     death() {
         this.alive = false;
         this.fadeToAction("Death", 0.2);
-        // this.sceneController.removeEntityFromScene(this);
     }
 
 }

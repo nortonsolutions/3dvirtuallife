@@ -1,7 +1,7 @@
 export const Entities = {
     evilOne: {
         name: 'evilOne',
-        gltf: 'robot.glb',
+        gltf: 'boy.glb',
         description: 'An autonomous machine with no apparent motive',
         type: 'beast',
         attributes: {
@@ -11,7 +11,7 @@ export const Entities = {
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 10,
+            scale: 20,
             stats: {
                 health: "2/2/0",
                 mana: "0/0/0",
@@ -43,7 +43,7 @@ export const Entities = {
     },
     john: {
         name: 'john',
-        gltf: 'boy.glb',
+        gltf: 'robot.glb',
         description: 'Another robot which seems different',
         type: 'friendly',
         attributes: {
@@ -53,7 +53,7 @@ export const Entities = {
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 20,
+            scale: 10,
             conversation: [],
             offers: [],
             accepts: [],

@@ -112,7 +112,7 @@ export class SceneController {
     
             };
 
-            var sunLight = new THREE.SpotLight( 0xffffff, 1.1, 0, Math.PI / 2 );
+            var sunLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 2 );
             sunLight.position.set( 500, 800, 500);
 
             sunLight.castShadow = true;
@@ -293,20 +293,6 @@ export class SceneController {
         });
 
         this.eventDepot.fire('removeItemFromLayout', data.uuid);
-    }
-
-    removeEntityFromScene(form) {
-        
-        /* Hero is special case already added to scene via controls */
-        if (form.objectType != "hero") this.scene.add( form.model );
-
-        this.forms.push( form );
-
-        if (form.objectType == "hero" || form.objectType == "friendly" || form.objectType == "beast") {
-            this.entities.push( form );
-        } else if (form.objectType == "floor" || form.objectType == "structure") {
-            this.structureModels.push ( form.model );
-        }
     }
 
     /** data: {location ..., itemName..., } */
