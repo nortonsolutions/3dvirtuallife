@@ -30,9 +30,8 @@ export class Hero extends IntelligentForm {
         this.moveLeft = false;
         this.moveRight = false;
 
-        // // Proximity Light is used for object selection/identification
+        // Proximity Light is used for object selection/identification
         this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 30 );
-        // this.proximityLight.position.set( 0, 0, 0 );
         
         this.cacheHero();
 
@@ -121,6 +120,13 @@ export class Hero extends IntelligentForm {
                             }
                             break;
                     }
+
+                    // Sprite effects:
+                    if (item.attributes.sprites) {
+                        item.attributes.sprites.forEach(spriteConfig => {
+                            this.sceneController.formFactory.addSpritesGeneric(this.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
+                        })
+                    }
     
                     if (this.removeFromInventory(itemName) == -1) this.unequip(keyString);
                     this.cacheHero();
@@ -187,16 +193,6 @@ export class Hero extends IntelligentForm {
             this.removeFromInventory(itemName);
             this.cacheHero();
         });
-
-        // this.sceneController.eventDepot.addListener('setHeroStat', (data) => {
-        //     this.attributes.stats[data.type] = data.points + '/' + this.attributes.stats[data.type].split('/')[1];
-        //     this.cacheHero();
-        // })
-
-        // this.sceneController.eventDepot.addListener('setHeroStatMax', (data) => {
-        //     this.attributes.stats[data.type] = this.attributes.stats[data.type].split('/')[0] + '/' + data.points;
-        //     this.cacheHero();
-        // })
 
         this.sceneController.eventDepot.addListener('dropItemToScene', (data) => {
             
@@ -301,8 +297,6 @@ export class Hero extends IntelligentForm {
         this.sceneController.eventDepot.removeListeners('placeItem');
         this.sceneController.eventDepot.removeListeners('takeItemFromScene');
         this.sceneController.eventDepot.removeListeners('removeItem');
-        this.sceneController.eventDepot.removeListeners('setHeroStat');
-        this.sceneController.eventDepot.removeListeners('setHeroStatMax');
         this.sceneController.eventDepot.removeListeners('dropItemToScene');
         this.sceneController.eventDepot.removeListeners('mouse0click');
         this.sceneController.eventDepot.removeListeners('unlockControls');

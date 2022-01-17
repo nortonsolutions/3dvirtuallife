@@ -59,13 +59,19 @@ export class FormFactory {
 
     }
 
-    addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false) => {
-        let regex = new RegExp(regexString, 'i');
-        this.addSpritesRecursive(name, frames, scale, elevation, flip, model, regex);
+    addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false, time) => {
+        
+        if (regexString) {
+            let regex = new RegExp(regexString, 'i');
+            this.addSpritesRecursive(name, frames, scale, elevation, flip, model, regex, time);
+    
+        } else { // No regex, so just add one in the center of the object
+            this.addSpritesSingle(name, frames, scale, elevation, flip, model, time);
+        }
     }
 
     /** Scan down the model for any part that matches regex */
-    addSpritesRecursive = (name, frames, scale, elevation, flip, model, regex) => {
+    addSpritesRecursive = (name, frames, scale, elevation, flip, model, regex, time) => {
         
         if (regex.test(model.name)) {
 
@@ -84,6 +90,23 @@ export class FormFactory {
                 })
             }
         }
+    }
+
+    /** Add a single sprite to the center of the model and display for the given time (seconds) */
+    addSpritesSingle = (name, frames, scale, elevation, flip, model, time) => {
+    
+        let spriteForm = new SpriteForm(name, frames, flip);
+        let sprite = spriteForm.getSprite();
+        sprite.scale.set(scale, scale, scale);
+        sprite.translateY(elevation);
+
+        model.add(sprite);
+        this.sceneController.sprites.push({ sprite, frames: spriteForm.getFrames() });
+
+        setTimeout(() => {
+            model.remove(sprite);
+            this.sceneController.sprites.pop();
+        }, time * 1000);
     }
 
     addTorchLight = (model) => {

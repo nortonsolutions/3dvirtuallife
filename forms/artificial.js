@@ -16,6 +16,7 @@ export class ArtificialForm extends IntelligentForm{
                     this.actions['Idle'].setEffectiveTimeScale(12);
                     this.actions['Walking'].setEffectiveTimeScale(12);
                     this.actions['Punch'].setEffectiveTimeScale(12);
+                    this.actions['Death'].setEffectiveTimeScale(12);
                     break;
             }
             if (callback) callback();

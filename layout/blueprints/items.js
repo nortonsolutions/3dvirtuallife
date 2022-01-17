@@ -72,7 +72,16 @@ export const Items = {
             animates: false,
             scale: 5,
             elevation: 10,
-            effect: "health/2"
+            effect: "health/2",
+            sprites: [{ 
+                name: "Heal",
+                regex: "",
+                frames: 10,
+                scale: 50,
+                elevation: 30,
+                flip: false,
+                time: 3
+            }]
         }
     },
     smallSword: {
