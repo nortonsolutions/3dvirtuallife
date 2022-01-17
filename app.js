@@ -94,7 +94,7 @@ export const app = () => {
             })
         })
 
-        // List the games via the loadgame template, where the game can be selected and loaded
+        // List the games via the loadGame template, where the game can be selected and loaded
         Array.from(document.querySelectorAll('.loadGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();

@@ -194,7 +194,7 @@ export class IntelligentForm extends AnimatedForm{
         } else {
             newvalue = cur + change;
 
-            if (stat == "health") {
+            if (stat == "health") { 
 
                 if (this.alive && newvalue <= 0) {
                     this.death();
@@ -202,7 +202,7 @@ export class IntelligentForm extends AnimatedForm{
                     // this.fadeToAction("No", 0.2);
                 } 
             } else {
-                // this.fadeToAction("No", 0.2);
+                // 
             }
         }
 

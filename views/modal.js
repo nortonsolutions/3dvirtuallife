@@ -1,6 +1,7 @@
 
 import { InventoryScreen } from './inventoryScreen.js';
 import { LoadGameScreen } from './loadGameScreen.js';
+import { LevelUpScreen } from './levelUpScreen.js';
 
 class Modal {
 
@@ -10,26 +11,29 @@ class Modal {
         this.eventDepot = eventDepot;
         this.inventoryScreen = new InventoryScreen(eventDepot, this);
         this.loadGameScreen = new LoadGameScreen(eventDepot, this);
+        this.levelUpScreen = new LevelUpScreen(eventDepot, this);
 
         this.closeModal = this.closeModal.bind(this);
 
-        /** e.g. data: { type: 'loadgame', title: 'Load Game', context: response } */
+        /** e.g. data: { type: 'loadGame', title: 'Load Game', context: response } */
         eventDepot.addListener('modal', (data) => {
 
             eventDepot.fire('unlockControls', {});
 
             var context;
-            if (data.type == "inventory" || data.type == "spells") {
-                context = this.inventoryScreen.getContext(data.type, 0);
+            if (data.type == "inventory") {
+                context = this.inventoryScreen.getContext(0);
             } else {
                 context = data.context;
             }
             
             this.loadTemplate('modal-body', data.type, context, () => {
-                if (data.type == "inventory" || data.type == "spells") {
+                if (data.type == "inventory") {
                     this.inventoryScreen.addInventoryEvents(data.type);
-                } else if (data.type == 'loadgame') {
+                } else if (data.type == 'loadGame') {
                     this.loadGameScreen.addLoadGameEvents();
+                } else if (data.type == 'levelUp') {
+                    this.levelUpScreen.addLevelUpEvents();
                 }
             });
             
@@ -43,12 +47,16 @@ class Modal {
                 this.closeModal();
             }
         
-            window.onclick = (event) => {
-                if (event.target == modal) {
-                    this.closeModal();
-                }
-            }
-        })
+            // window.onclick = (event) => {
+            //     if (event.target == modal) {
+            //         this.closeModal();
+            //     }
+            // }
+        });
+
+        eventDepot.addListener('closeModal', () => {
+            this.closeModal();
+        });
     }
 
     closeModal = () => {

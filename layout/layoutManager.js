@@ -11,6 +11,7 @@ import { Spells } from './blueprints/spells.js';
 import { Items } from './blueprints/items.js';
 import { Entities } from './blueprints/entities.js';
 import { Structures } from './blueprints/structures.js';
+import { xpLevels } from './blueprints/xpLevels.js';
 import { SceneController } from '/scene/sceneController.js'
 
 class LayoutManager {
@@ -25,7 +26,7 @@ class LayoutManager {
         this.allStructures = Structures;
         this.allEntities = Entities;
         this.allSpells = Spells;
-        this.allObjects = {...Items, ...Structures, ...Entities, ...Spells, ...{ floor: { description: "floor"}}};
+        this.allObjects = {...Items, ...Structures, ...Entities, ...Spells, ...{ floor: { description: "floor"}}, ...{ xpLevels } };
 
         localStorage.setItem('gameObjects', JSON.stringify(this.allObjects));
         

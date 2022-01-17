@@ -321,6 +321,10 @@ class Scene {
             }
         })
 
+        this.controller.eventDepot.addListener('updateXP', (data) => {
+            document.getElementById('xp').innerText = data;
+        })
+
         this.controller.eventDepot.addListener('lockControls', () => {
             this.controls.lock();
         })
@@ -481,6 +485,7 @@ class Scene {
         this.controller.eventDepot.removeListeners('setHeroStat');
         this.controller.eventDepot.removeListeners('setHeroStatMax');
         this.controller.eventDepot.removeListeners('updateHelper');
+        this.controller.eventDepot.removeListeners('updateXP');
     }
 
 }

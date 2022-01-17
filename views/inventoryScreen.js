@@ -8,10 +8,11 @@ class InventoryScreen {
         this.eventDepot = eventDepot;
         this.modal = modal;
 
-        this.type = null;
+        this.showInventory = true; // toggle to false for spells display
+
     }
 
-    getSpellsContext = (pageNumber) => {
+    getContext = (pageNumber) => {
 
         this.pageNumber = pageNumber;
         let inventoryPageSize = 12;
@@ -19,55 +20,7 @@ class InventoryScreen {
         // startingIndex will advance by inventoryPageSize for each page
         let startingIndex = this.pageNumber? this.pageNumber * inventoryPageSize: 0;
     
-        var context = { equipped: {}, spells: [], pageNumber: pageNumber };
-        
-        var hero = JSON.parse(localStorage.getItem('gameHeroTemplate'));
-        var gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
-        
-        Object.keys(hero.equipped).forEach(bodyPart => {
-
-            if (bodyPart[0] == "f") { // e.g. 'f1', 'f2', 'f3'....
-                let objectName = hero.equipped[bodyPart];
-                context.equipped[bodyPart] = {
-                    name: objectName,
-                    description: gameObjects[objectName].description,
-                    image: gameObjects[objectName].image
-                };
-            }
-        });
-
-        for (let index = startingIndex; index < startingIndex + inventoryPageSize; index++) {
-            let objectName = hero.spells[index] && hero.spells[index].name ? hero.spells[index].name : undefined;
-            if (!(objectName == undefined)) {
-                context.spells[index] = {
-                    index: index,
-                    name: objectName,
-                    description: gameObjects[objectName].description,
-                    image: gameObjects[objectName].image,
-                };
-            } else {
-                context.spells[index] = {
-                    index: index,
-                    name: '',
-                    description: '',
-                    image: 'blank.PNG',
-                }
-            }
-        }
-
-        this.location = hero.location;
-        return context;
-    }
-
-    getInventoryContext = (pageNumber) => {
-
-        this.pageNumber = pageNumber;
-        let inventoryPageSize = 12;
-
-        // startingIndex will advance by inventoryPageSize for each page
-        let startingIndex = this.pageNumber? this.pageNumber * inventoryPageSize: 0;
-    
-        var context = { equipped: {}, inventory: [], pageNumber: pageNumber };
+        var context = { showInventory: this.showInventory, equipped: {}, inventory: [], pageNumber: pageNumber };
         
         var hero = JSON.parse(localStorage.getItem('gameHeroTemplate'));
         var gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
@@ -82,15 +35,23 @@ class InventoryScreen {
             };
         });
 
+        var inv;
+
+        if (this.showInventory) {
+            inv = hero.inventory;
+        } else {
+            inv = hero.spells;
+        }
+
         for (let index = startingIndex; index < startingIndex + inventoryPageSize; index++) {
-            let objectName = hero.inventory[index] && hero.inventory[index].itemName ? hero.inventory[index].itemName : undefined;
+            let objectName = inv[index] && inv[index].itemName ? inv[index].itemName : undefined;
             if (!(objectName == undefined)) {
                 context.inventory[index] = {
                     index: index,
                     name: objectName,
                     description: gameObjects[objectName].description,
                     image: gameObjects[objectName].image,
-                    quantity: hero.inventory[index].quantity
+                    quantity: hero.inventory[index].quantity? hero.inventory[index].quantity: 1
                 };
             } else {
                 context.inventory[index] = {
@@ -107,9 +68,13 @@ class InventoryScreen {
         return context;
     }
 
-    addInventoryEvents = (type) => {
+    addInventoryEvents = () => {
 
-        this.type = type;
+        document.getElementById('toggleInventory').addEventListener('click', () => {
+            this.showInventory = !this.showInventory;
+            this.pageNumber = 0;
+            this.refresh();
+        })
 
         const allowDrop = (ev) => {
             ev.preventDefault();
@@ -118,7 +83,6 @@ class InventoryScreen {
     
         const drag = (ev) => {
     
-            // let quantity = Array.from(ev.target.parentNode.classList).includes('body')? 1 : ;
             var textToSend = ev.target.id + ':' 
                 + ev.target.attributes.describedBy.value + ':' 
                 + ev.target.attributes.quant.value + ':' 
@@ -150,8 +114,8 @@ class InventoryScreen {
             // var quantId = data[2]; // id of quantity element
             var index = data[3];  // inventory # ... or bodyPart by name
             
-            if (itemName.match(/potion|spell/i) && Array.from(targetElement.classList).includes('bodyPart')) {
-                alert('Potions and spells can only be equipped on the F-keys');
+            if (itemName.match(/redpotion|bluepotion|spell/i) && Array.from(targetElement.classList).includes('bodyPart')) {
+                alert('This can only be equipped on the F-keys');
             } else {
 
                 if (index.length < 3) { // source is inventory
@@ -233,9 +197,9 @@ class InventoryScreen {
         if (document.getElementById('backPage')) {
             document.getElementById('backPage').addEventListener('click', e => {
                 this.pageNumber--;
-                let context = this.getContext(this.type, this.pageNumber);
-                this.modal.loadTemplate('modal-body', this.type, context, () => {
-                    this.addInventoryEvents(this.type);
+                let context = this.getContext(this.pageNumber);
+                this.modal.loadTemplate('modal-body', "inventory", context, () => {
+                    this.addInventoryEvents();
                 });
             })
         }
@@ -243,35 +207,19 @@ class InventoryScreen {
         if (document.getElementById('nextPage')) {
             document.getElementById('nextPage').addEventListener('click', e => {
                 this.pageNumber++;
-                let context = this.getContext(this.type, this.pageNumber);
-                this.modal.loadTemplate('modal-body', this.type, context, () => {
-                    this.addInventoryEvents(this.type);
+                let context = this.getContext(this.pageNumber);
+                this.modal.loadTemplate('modal-body', "inventory", context, () => {
+                    this.addInventoryEvents();
                 });
             })
         }
     
     }
 
-    getContext = (type, page) => {
-        let context;
-        switch (type) {
-            case 'inventory': 
-                context = this.getInventoryContext(page);
-                break;
-
-            case 'spells': 
-                context = this.getSpellsContext(page);
-                break;
-                                
-            default:
-        }
-        return context;
-    }
-
     refresh = () => {
-        let context = this.getContext(this.type, this.pageNumber);
-        this.modal.loadTemplate('modal-body', this.type, context, () => {
-            this.addInventoryEvents(this.type);
+        let context = this.getContext(this.pageNumber);
+        this.modal.loadTemplate('modal-body', "inventory", context, () => {
+            this.addInventoryEvents();
         });
     }
 

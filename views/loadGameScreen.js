@@ -29,7 +29,7 @@ export class LoadGameScreen {
 
     refresh() {
         handleGet('/list', response => {
-            this.modal.loadTemplate('modal-body', 'loadgame', response, () => {
+            this.modal.loadTemplate('modal-body', 'loadGame', response, () => {
                 this.addLoadGameEvents();
             });
         });

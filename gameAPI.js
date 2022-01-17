@@ -37,8 +37,8 @@ export class GameAPI {
 
     listGames() {
         handleGet('/list', response => {
-            // Launch the loadgame template with the list of games
-            this.eventDepot.fire('modal', { type: 'loadgame', title: 'Load Game', context: JSON.parse(response) });
+            // Launch the loadGame template with the list of games
+            this.eventDepot.fire('modal', { type: 'loadGame', title: 'Load Game', context: JSON.parse(response) });
         })
     }
 

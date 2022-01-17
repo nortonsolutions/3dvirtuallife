@@ -2,22 +2,23 @@
 
     <div class="col-6 p-1">
         <div class="row mx-0 d-flex justify-content-center">
-            {{#each inventory}}
 
-            <div class="col-xs-1-12">
-                <div class="card">
-                <div class="card-body tooltipper dragSpot" id={{index}}>
-                        {{#if name}}
-                        <img id="{{name}}" class="draggable" draggable="true" src="/models/png/{{image}}" quant="{{name}}quant" describedBy="{{name}}desc">
-                        <span id="{{name}}desc" class="tooltippertext noClick">{{description}}</span>
-                        <span id="{{name}}quant" class="noClick">{{quantity}}</span>
 
-                        {{/if}}
+                {{#each inventory}}
+
+                <div class="col-xs-1-12">
+                    <div class="card">
+                    <div class="card-body tooltipper dragSpot" id={{index}}>
+                            {{#if name}}
+                            <img id="{{name}}" class="draggable" draggable="true" src="/models/png/{{image}}" quant="{{name}}quant" describedBy="{{name}}desc">
+                            <span id="{{name}}desc" class="tooltippertext noClick">{{description}}</span>
+                            {{#if showInventory}}<span id="{{name}}quant" class="noClick">{{quantity}}</span>{{/if}}
+
+                            {{/if}}
+                    </div>
+                    </div>
                 </div>
-                </div>
-            </div>
-            {{/each}}
-
+                {{/each}}
             
         </div>
 
@@ -25,6 +26,11 @@
             <div class="col-4 text-center">page {{pageNumber}}</div>
             <div class="col-2">{{#if pageNumber}}<button id="backPage" type="button" class="btn btn-primary btn-standard mx-1">-</button>{{/if}}</div>
             <div class="col-2"><button type="button" id="nextPage" class="btn btn-primary btn-standard mr-1">+</button></div>
+            <div class="col-4">
+                <button type="button" id="toggleInventory" class="btn btn-primary btn-standard">
+                {{#if showInventory}}<i class="fas fa-toggle-off"></i>{{else}}<i class="fas fa-toggle-on"></i>{{/if}}
+                </button>
+            </div>
         </div>
     </div>
 

@@ -242,9 +242,8 @@ main {
     position: fixed; /* Stay in place */
     z-index: 1000; /* Sit on top */
     left: 50%;
-    top: 100px;
+    top: 56px;
     width: 100%; /* Full width */
-    max-width: 700px;
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(0,0,0); /* Fallback color */
@@ -260,9 +259,11 @@ main {
 /* Modal Content */
 .modal-content {
     position: fixed;
+    margin: auto;
     bottom: 0;
     background-color: #fefefe;
     width: 100%;
+    max-width: 800px;
     -webkit-animation-name: slideIn;
     -webkit-animation-duration: 0.4s;
     animation-name: slideIn;

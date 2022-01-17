@@ -58,6 +58,11 @@ export class Hero extends IntelligentForm {
             }
 
             if (this.equipped) {
+                // Reduce cached boosts to zero before re-equipping
+                Object.keys(this.attributes.stats).forEach(stat => {
+                    this.changeStatBoost(stat, -this.getStatBoost(stat));
+                })
+
                 Object.keys(this.equipped).forEach(bodyPart => {
                     this.equip(bodyPart, this.equipped[bodyPart]);
                 })
@@ -115,9 +120,23 @@ export class Hero extends IntelligentForm {
     
                         case "damage":
                             this.fadeToAction("Yes", 0.2);
-                            if (this.selectedObject.changeStat("health", change, false) <= 0) {
-                                this.fadeToAction("Dance", 0.2);
+                                
+                            if (item.attributes.range) { // general attack against all in range
+                                let entitiesInRange = this.sceneController.allEntitiesInRange(item.attributes.range, this.model.position);
+                                entitiesInRange.forEach(entity => {
+                                    if (entity.changeStat("health", change, false) <= 0) {
+                                        // this.fadeToAction("Dance", 0.2);
+                                    }
+                                })
+
+                            } else { // standard attack upon 'selectedObject'
+
+                                if (this.selectedObject.changeStat("health", change, false) <= 0) {
+                                    this.fadeToAction("Dance", 0.2);
+                                }
+    
                             }
+
                             break;
                     }
 
@@ -221,23 +240,29 @@ export class Hero extends IntelligentForm {
                 
                 } else if (objectType == "beast") {
 
-                    // TODO: combat
-                    this.fadeToAction("Punch", 0.2)
+                    if (this.selectedObject.alive) {
 
-                    let chanceToHit = this.getEffectiveStat('agility') / 10;
-                    let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
+                        this.fadeToAction("Punch", 0.2)
 
-                    // console.dir(this.selectedObject);
-                    if (Math.random() < chanceToHit) {
+                        let chanceToHit = this.getEffectiveStat('agility') / 10;
+                        let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
 
-                        if (this.selectedObject.changeStat('health', -hitPointReduction, false) <= 0) {
+                        // console.dir(this.selectedObject);
+                        if (Math.random() < chanceToHit) {
 
-                            this.attributes.experience += this.selectedObject.getStatMax('health');
-                            this.sceneController.eventDepot.fire('statusUpdate', { 
-                                message: `${this.selectedObject.objectName} killed for ${this.selectedObject.getStatMax('health')} XP` 
-                            }); 
-                            this.fadeToAction("Dance", 0.2);
-                        };
+                            if (this.selectedObject.changeStat('health', -hitPointReduction, false) <= 0) {
+
+                                this.attributes.experience += this.selectedObject.getStatMax('health');
+
+                                if (this.levelUpEligibility().length > 0) {
+                                    this.sceneController.eventDepot.fire('modal', { type: 'levelUp', title: 'Level Up', context: this.levelUpEligibility() });
+                                }
+
+                                this.sceneController.eventDepot.fire('updateXP', this.attributes.experience); 
+
+                                this.fadeToAction("Dance", 0.2);
+                            };
+                        }
                     }
 
                 } else if (objectType == "structure") {
@@ -273,6 +298,27 @@ export class Hero extends IntelligentForm {
             this.canJump = false;
             this.justJumped = true;
         })
+
+        // data: { category, nextLevel }
+        this.sceneController.eventDepot.addListener('levelUp', (data) => {
+            this.attributes.xpLevels[data.category] = data.nextLevel;
+            this.sceneController.eventDepot.fire('statusUpdate', { message: `Advanced in ${data.category} to level ${data.nextLevel}`});
+            
+            // Lookup up xpLevels in gameObjects, then apply the effect:
+            let effect = JSON.parse(localStorage.getItem('gameObjects')).xpLevels[data.category][data.nextLevel].effect;
+            let spell = JSON.parse(localStorage.getItem('gameObjects')).xpLevels[data.category][data.nextLevel].spell;
+
+            if (effect) {
+                let [stat, change] = effect.split("/");
+                this.changeStat(stat, change, true);
+            }
+
+            if (spell) {
+                this.grantSpell(spell);
+            }
+
+            this.cacheHero();
+        })
     }
 
     dispose(item) {
@@ -301,6 +347,7 @@ export class Hero extends IntelligentForm {
         this.sceneController.eventDepot.removeListeners('mouse0click');
         this.sceneController.eventDepot.removeListeners('unlockControls');
         this.sceneController.eventDepot.removeListeners('jump');
+        this.sceneController.eventDepot.removeListeners('levelUp');
         this.dispose(this.model);
         callback();
     }
@@ -428,10 +475,10 @@ export class Hero extends IntelligentForm {
             // let thisArea = this.model.getObjectByName(area);
             // thisArea.children.forEach(child => {
             //     thisArea.remove(child);
-            // })
+            // })s
             let thisItem = this.model.getObjectByProperty("objectName", itemName);
             thisItem.parent.remove(thisItem);
-            this.sceneController.scene.remove(thisItem);
+            this.sceneController.scene.scene.remove(thisItem);
 
             switch (stat) {
                 case "health":
@@ -567,6 +614,39 @@ export class Hero extends IntelligentForm {
 
         }, 2000);
         
+    }
+
+    /** returns the new value */
+    changeStat(stat, change, changeMax = false) {
+
+        super.changeStat(stat, change, changeMax);
+
+        if (change < 0) {
+            this.fadeToAction("No", 0.2);
+        } else {
+            this.fadeToAction("Yes", 0.2);
+        }
+    }
+
+    levelUpEligibility() {
+        // Formula for each level up: 2^x
+        let eligibility = [];
+        Object.keys(this.attributes.xpLevels).forEach(category => {
+            let nextLevel = this.attributes.xpLevels[category] + 1;
+            let reqPoints = Math.pow(2, nextLevel);
+            if (this.attributes.experience >= reqPoints) eligibility.push({
+                category,
+                nextLevel
+            });
+        })
+        return eligibility;
+    }
+
+    grantSpell(spellName) {
+        let spell = JSON.parse(localStorage.getItem('gameObjects'))[spellName];
+        this.spells.push({
+            itemName: spell.name
+        });
     }
 
 }

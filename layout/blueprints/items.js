@@ -46,7 +46,16 @@ export const Items = {
             animates: false,
             scale: 5,
             elevation: 10,
-            effect: "mana/2"
+            effect: "mana/2",
+            sprites: [{ 
+                name: "heal",
+                regex: "",
+                frames: 10,
+                scale: 50,
+                elevation: 30,
+                flip: false,
+                time: 3
+            }]
         }
     },
     greenpotion: {
@@ -59,7 +68,17 @@ export const Items = {
             animates: false,
             scale: 5,
             elevation: 10,
-            effect: "damage/-2"
+            effect: "damage/-3",
+            range: 100,
+            sprites: [{ 
+                name: "greenExplosion",
+                regex: "",
+                frames: 10,
+                scale: 300,
+                elevation: 30,
+                flip: false,
+                time: 3
+            }]
         }
     },
     redpotion: {
