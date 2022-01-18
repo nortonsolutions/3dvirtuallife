@@ -26,7 +26,7 @@ class Sidebar {
         
         Object.keys(data.equipped).forEach(key => {
             
-            let objectName = data.equipped[key];
+            let objectName = data.equipped[key][0];
             context.equipped[key] = {
                 name: objectName,
                 description: gameObjects[objectName].description,

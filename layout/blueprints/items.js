@@ -66,7 +66,7 @@ export const Items = {
         type: 'item',
         attributes: {
             animates: false,
-            projectile: true,
+            throwable: true,
             scale: 5,
             elevation: 10,
             effect: "damage/-3",

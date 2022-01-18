@@ -9,10 +9,12 @@ class InventoryScreen {
         this.modal = modal;
 
         this.showInventory = true; // toggle to false for spells display
-
+        this.gameObjects = [];
     }
 
     getContext = (pageNumber) => {
+
+        if (this.gameObjects.length == 0) this.gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
 
         this.pageNumber = pageNumber;
         let inventoryPageSize = 12;
@@ -23,15 +25,15 @@ class InventoryScreen {
         var context = { showInventory: this.showInventory, equipped: {}, inventory: [], pageNumber: pageNumber };
         
         var hero = JSON.parse(localStorage.getItem('gameHeroTemplate'));
-        var gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
+        
         
         Object.keys(hero.equipped).forEach(bodyPart => {
             
-            let objectName = hero.equipped[bodyPart];
+            let objectName = hero.equipped[bodyPart][0];
             context.equipped[bodyPart] = {
                 name: objectName,
-                description: gameObjects[objectName].description,
-                image: gameObjects[objectName].image
+                description: this.gameObjects[objectName].description,
+                image: this.gameObjects[objectName].image
             };
         });
 
@@ -49,8 +51,8 @@ class InventoryScreen {
                 context.inventory[index] = {
                     index: index,
                     name: objectName,
-                    description: gameObjects[objectName].description,
-                    image: gameObjects[objectName].image,
+                    description: this.gameObjects[objectName].description,
+                    image: this.gameObjects[objectName].image,
                     quantity: inv[index].quantity? inv[index].quantity: 1
                 };
             } else {
@@ -136,7 +138,7 @@ class InventoryScreen {
                             this.eventDepot.fire('placeItem', {itemName: itemNameToSwap, desiredIndex: index});
                         }
                         this.eventDepot.fire('removeItem', itemName)
-                        this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName});
+                        this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName, throwable: this.isItemThrowable(itemName) });
 
                     } 
         
@@ -158,11 +160,11 @@ class InventoryScreen {
     
                             let itemNameToSwap = targetElement.firstElementChild.id;
                             this.eventDepot.fire('unequipItem', ev.target.parentNode.id);
-                            this.eventDepot.fire('equipItem', {bodyPart: index, itemName: itemNameToSwap});
+                            this.eventDepot.fire('equipItem', {bodyPart: index, itemName: itemNameToSwap, throwable: this.isItemThrowable(itemNameToSwap)});
                             
                         }
     
-                        this.eventDepot.fire('equipItem', {bodyPart: ev.target.id, itemName});
+                        this.eventDepot.fire('equipItem', {bodyPart: ev.target.id, itemName, throwable: this.isItemThrowable(itemName) });
                     }
         
                 }
@@ -228,6 +230,11 @@ class InventoryScreen {
         this.modal.loadTemplate('modal-body', "inventory", context, () => {
             this.addInventoryEvents();
         });
+    }
+
+    isItemThrowable(itemName) {
+        if (this.gameObjects.length == 0) this.gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
+        return (this.gameObjects[itemName].attributes.throwable);
     }
 
 }

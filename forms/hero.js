@@ -64,7 +64,7 @@ export class Hero extends IntelligentForm {
                 })
 
                 Object.keys(this.equipped).forEach(bodyPart => {
-                    this.equip(bodyPart, this.equipped[bodyPart]);
+                    this.equip(bodyPart, this.equipped[bodyPart][0], this.equipped[bodyPart][1]); // bodyPart, itemName, throwable
                 })
             }
 
@@ -98,7 +98,7 @@ export class Hero extends IntelligentForm {
 
             // Item or spell use
             let keyString = 'f' + data.key + 'key';
-            let itemName = this.equipped[keyString];
+            let itemName = this.equipped[keyString][0];
 
             if (itemName) {
                 let item = JSON.parse(localStorage.getItem('gameObjects'))[itemName];
@@ -194,7 +194,7 @@ export class Hero extends IntelligentForm {
         });
 
         this.sceneController.eventDepot.addListener('equipItem', (data) => {
-            this.equip(data.bodyPart, data.itemName);
+            this.equip(data.bodyPart, data.itemName, data.throwable);
             this.cacheHero();
         });
 
@@ -225,62 +225,69 @@ export class Hero extends IntelligentForm {
 
         this.sceneController.eventDepot.addListener('mouse0click', () => {
 
-            if (this.alive && this.selectedObject) {
+            if (this.alive) {
 
-                let objectType = this.selectedObject.objectType;
-                
-                if (objectType == "item") {
-                    this.sceneController.eventDepot.fire('takeItemFromScene', {itemName: this.selectedObject.objectName, uuid: this.selectedObject.model.uuid});
+                if (Object.values(this.equipped).map(el => el[1]).includes(true)) { // first handle throwable weapons in hand
 
-                } else if (objectType == "friendly") {
+                } else if (this.selectedObject) {
+
+                    let objectType = this.selectedObject.objectType;
                     
-                    // TODO: conversation
-                    this.sceneController.eventDepot.fire('unlockControls', {});
-                    this.sceneController.eventDepot.fire('modal', { name: this.selectedObject.objectName });
-                
-                } else if (objectType == "beast") {
-
-                    if (this.selectedObject.alive) {
-
-                        this.fadeToAction("Punch", 0.2)
-
-                        let chanceToHit = this.getEffectiveStat('agility') / 10;
-                        let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
-
-                        // console.dir(this.selectedObject);
-                        if (Math.random() < chanceToHit) {
-
-                            if (this.selectedObject.changeStat('health', -hitPointReduction, false) <= 0) {
-
-                                this.attributes.experience += this.selectedObject.getStatMax('health');
-
-                                if (this.levelUpEligibility().length > 0) {
-                                    this.sceneController.eventDepot.fire('modal', { type: 'levelUp', title: 'Level Up', context: this.levelUpEligibility() });
-                                }
-
-                                this.sceneController.eventDepot.fire('updateXP', this.attributes.experience); 
-
-                                this.fadeToAction("Dance", 0.2);
-                            };
+                    if (objectType == "item") {
+                        this.sceneController.eventDepot.fire('takeItemFromScene', {itemName: this.selectedObject.objectName, uuid: this.selectedObject.model.uuid});
+    
+                    } else if (objectType == "friendly") {
+                        
+                        // TODO: conversation
+                        this.sceneController.eventDepot.fire('unlockControls', {});
+                        this.sceneController.eventDepot.fire('modal', { name: this.selectedObject.objectName });
+                    
+                    } else if (objectType == "beast") {
+    
+                        if (this.selectedObject.alive) {
+    
+                            this.fadeToAction("Punch", 0.2)
+    
+                            let chanceToHit = this.getEffectiveStat('agility') / 10;
+                            let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
+    
+                            // console.dir(this.selectedObject);
+                            if (Math.random() < chanceToHit) {
+    
+                                if (this.selectedObject.changeStat('health', -hitPointReduction, false) <= 0) {
+    
+                                    this.attributes.experience += this.selectedObject.getStatMax('health');
+    
+                                    if (this.levelUpEligibility().length > 0) {
+                                        this.sceneController.eventDepot.fire('modal', { type: 'levelUp', title: 'Level Up', context: this.levelUpEligibility() });
+                                    }
+    
+                                    this.sceneController.eventDepot.fire('updateXP', this.attributes.experience); 
+    
+                                    this.fadeToAction("Dance", 0.2);
+                                };
+                            }
                         }
-                    }
-
-                } else if (objectType == "structure") {
-                    
-                    var accessible = this.selectedObject.attributes.key ? 
-                        this.inventory.map(el => {
-                            return el? el.itemName: null;
-                        }).includes(this.selectedObject.attributes.key) :
-                        true;
-                    
-                    if (accessible) {
-                        this.selectedObject.updateAttributes({unlocked: true});
-                        if (this.selectedObject.activeAction) {
-                            this.selectedObject.runActiveAction(0.2);
+    
+                    } else if (objectType == "structure") {
+                        
+                        var accessible = this.selectedObject.attributes.key ? 
+                            this.inventory.map(el => {
+                                return el? el.itemName: null;
+                            }).includes(this.selectedObject.attributes.key) :
+                            true;
+                        
+                        if (accessible) {
+                            this.selectedObject.updateAttributes({unlocked: true});
+                            if (this.selectedObject.activeAction) {
+                                this.selectedObject.runActiveAction(0.2);
+                            }
                         }
                     }
                 }
-            }   
+
+
+            }
         })
 
         this.sceneController.eventDepot.addListener('unlockControls', () => {
@@ -415,9 +422,9 @@ export class Hero extends IntelligentForm {
         return this.inventory;
     }
 
-    equip(area, itemName) {
-        this.equipped[area] = itemName;
-
+    equip(area, itemName, throwable = false) {
+        this.equipped[area] = [itemName,throwable];
+        
         if (area.match('key')) {
             this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
         } else {
@@ -425,12 +432,12 @@ export class Hero extends IntelligentForm {
 
                 item.model.position.set(0,0,0);
                 item.model.rotation.y = Math.PI;
-                item.model.scale.copy(new THREE.Vector3( .1,.1,.1 ));
-        
+                item.model.scale.copy(new THREE.Vector3( .1,.1,.1 )); // add configuration to items; equippedScale?
+
                 if (itemName == "torch") {
                     this.sceneController.formFactory.addTorchLight(item.model);
                 } 
-    
+
                 if (item.attributes.effect) { // body parts (non 'key' positions)
                     
                     // What is the item effect?
@@ -461,7 +468,7 @@ export class Hero extends IntelligentForm {
     unequip(area) {
         
         // Which item is being unequipped?  
-        let itemName = this.equipped[area];
+        let itemName = this.equipped[area][0];
         
 
         delete this.equipped[area];
