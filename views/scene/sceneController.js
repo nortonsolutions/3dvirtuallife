@@ -39,6 +39,7 @@ export class SceneController {
         this.floor = null;
 
         this.sprites = [];
+        this.projectiles = [];
 
         // Bindings:
         this.addEventListeners = this.addEventListeners.bind(this);
@@ -78,8 +79,6 @@ export class SceneController {
             this.structureModels.push ( form.model );
         }
     }
-
-
 
     addFloor(callback) {
 
@@ -332,6 +331,21 @@ export class SceneController {
             }
         })
         return response;
+    }
+
+    addToProjectiles(item) {
+
+        // Starting direction
+        let direction = this.scene.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
+        direction.y += item.attributes.throwableAttributes.pitch;
+        
+        this.projectiles.push( {
+            item,
+            direction,
+            velocity: new THREE.Vector3(),
+            distanceTraveled: 0
+        } );
+        this.scene.add( item.model );
     }
 
 }

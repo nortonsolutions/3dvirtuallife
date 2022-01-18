@@ -67,9 +67,16 @@ export const Items = {
         attributes: {
             animates: false,
             throwable: true,
+            throwableAttributes: {
+                pitch: .9, // angle up (percentage of 90 degrees)
+                weight: 30, // lbs
+                distance: 350, // px
+                speed: 3 // 1 = full walking speed
+            },
             scale: 5,
+            equippedScale: 0.005,
             elevation: 10,
-            effect: "damage/-3",
+            effect: "health/-3",
             range: 100,
             sprites: [{ 
                 name: "greenExplosion",
@@ -78,7 +85,7 @@ export const Items = {
                 scale: 300,
                 elevation: 30,
                 flip: false,
-                time: 3
+                time: 1
             }]
         }
     },
@@ -118,11 +125,25 @@ export const Items = {
             effect: "strength/2"
         } 
     },
-    busterSword: {
-        name: 'busterSword',
-        gltf: 'busterSword.glb',
-        image: 'busterSword.png',
+    busterblade: {
+        name: 'busterblade',
+        gltf: 'busterblade.glb',
+        image: 'busterblade.png',
         description: 'A buster blade',
+        type: 'item',
+        attributes: {
+            equippable: ['handR', 'handL'],
+            animates: false,
+            scale: 100,
+            elevation: 20,
+            effect: "strength/2"
+        } 
+    },
+    busterbuckler: {
+        name: 'busterbuckler',
+        gltf: 'busterbuckler.glb',
+        image: 'busterbuckler.png',
+        description: 'A buster buckler',
         type: 'item',
         attributes: {
             equippable: ['handR', 'handL'],

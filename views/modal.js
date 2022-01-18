@@ -57,6 +57,15 @@ class Modal {
         eventDepot.addListener('closeModal', () => {
             this.closeModal();
         });
+
+        eventDepot.addListener('disableCloser', () => {
+            document.getElementsByClassName("close")[0].classList.add('d-none');
+        })
+
+        eventDepot.addListener('enableCloser', () => {
+            document.getElementsByClassName("close")[0].classList.remove('d-none');
+        })
+
     }
 
     closeModal = () => {

@@ -173,6 +173,7 @@ img {
     z-index: 10;
     color: white;
     font-size: 20px;
+    width: 15%;
 }
 
 canvas { 

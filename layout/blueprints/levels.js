@@ -32,10 +32,11 @@ export const levels = [
         items: [
             Items.keyToShed,
             Items.smallSword,
-            {...Items.busterSword, location: { x: 0, y: 0, z: 0 }},
+            {...Items.busterblade, location: { x: 0, y: 0, z: 0 }},
             Items.redpotion,
             Items.greenpotion,
-            Items.bluepotion
+            Items.bluepotion,
+            Items.busterbuckler
         ],
         structures: [
             Structures.shed,

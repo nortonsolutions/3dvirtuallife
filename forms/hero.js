@@ -24,6 +24,7 @@ export class Hero extends IntelligentForm {
 
         // Actually just a starting/saved location
         this.location = this.template.location? this.template.location : { x: 0, y: 0, z: 0 };
+        this.gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
 
         this.moveForward = false;
         this.moveBackward = false;
@@ -101,7 +102,7 @@ export class Hero extends IntelligentForm {
             let itemName = this.equipped[keyString][0];
 
             if (itemName) {
-                let item = JSON.parse(localStorage.getItem('gameObjects'))[itemName];
+                let item = this.gameObjects[itemName];
 
                 let itemType = item.type;
     
@@ -112,26 +113,26 @@ export class Hero extends IntelligentForm {
                     let [stat, change] = item.attributes.effect.split("/");
     
                     switch (stat) {
-                        case "health":
+
                         case "mana": 
                             this.fadeToAction("ThumbsUp", 0.2); // TODO: Use sprites to spritz things up
                             this.changeStat(stat, change, false);
                             break;
     
-                        case "damage":
+                        case "health":
                             this.fadeToAction("Yes", 0.2);
                                 
                             if (item.attributes.range) { // general attack against all in range
                                 let entitiesInRange = this.sceneController.allEntitiesInRange(item.attributes.range, this.model.position);
                                 entitiesInRange.forEach(entity => {
-                                    if (entity.changeStat("health", change, false) <= 0) {
+                                    if (entity.changeStat(stat, change, false) <= 0) {
                                         // this.fadeToAction("Dance", 0.2);
                                     }
                                 })
 
                             } else { // standard attack upon 'selectedObject'
 
-                                if (this.selectedObject.changeStat("health", change, false) <= 0) {
+                                if (this.selectedObject.changeStat(stat, change, false) <= 0) {
                                     this.fadeToAction("Dance", 0.2);
                                 }
     
@@ -227,9 +228,16 @@ export class Hero extends IntelligentForm {
 
             if (this.alive) {
 
-                if (Object.values(this.equipped).map(el => el[1]).includes(true)) { // first handle throwable weapons in hand
-
-                } else if (this.selectedObject) {
+                Object.entries(this.equipped).forEach(([key,value]) => {
+                    if (key.indexOf('key') == -1) { // for body parts only (non-hotkey equipped)
+                        let [item,throwable] = value;
+                        if (throwable) {
+                            this.launch(item);
+                        }
+                    }
+                })
+                
+                if (this.selectedObject) {
 
                     let objectType = this.selectedObject.objectType;
                     
@@ -260,6 +268,7 @@ export class Hero extends IntelligentForm {
     
                                     if (this.levelUpEligibility().length > 0) {
                                         this.sceneController.eventDepot.fire('modal', { type: 'levelUp', title: 'Level Up', context: this.levelUpEligibility() });
+                                        this.sceneController.eventDepot.fire('disableCloser', {});
                                     }
     
                                     this.sceneController.eventDepot.fire('updateXP', this.attributes.experience); 
@@ -312,8 +321,8 @@ export class Hero extends IntelligentForm {
             this.sceneController.eventDepot.fire('statusUpdate', { message: `Advanced in ${data.category} to level ${data.nextLevel}`});
             
             // Lookup up xpLevels in gameObjects, then apply the effect:
-            let effect = JSON.parse(localStorage.getItem('gameObjects')).xpLevels[data.category][data.nextLevel].effect;
-            let spell = JSON.parse(localStorage.getItem('gameObjects')).xpLevels[data.category][data.nextLevel].spell;
+            let effect = this.gameObjects.xpLevels[data.category][data.nextLevel].effect;
+            let spell = this.gameObjects.xpLevels[data.category][data.nextLevel].spell;
 
             if (effect) {
                 let [stat, change] = effect.split("/");
@@ -432,7 +441,9 @@ export class Hero extends IntelligentForm {
 
                 item.model.position.set(0,0,0);
                 item.model.rotation.y = Math.PI;
-                item.model.scale.copy(new THREE.Vector3( .1,.1,.1 )); // add configuration to items; equippedScale?
+
+                let scale = item.attributes.equippedScale? item.attributes.equippedScale: 0.1;
+                item.model.scale.copy(new THREE.Vector3( scale, scale, scale ));
 
                 if (itemName == "torch") {
                     this.sceneController.formFactory.addTorchLight(item.model);
@@ -477,7 +488,7 @@ export class Hero extends IntelligentForm {
             this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
         } else {
             
-            let item = JSON.parse(localStorage.getItem('gameObjects'))[itemName];
+            let item = this.gameObjects[itemName];
 
             let thisItem = this.model.getObjectByProperty("objectName", itemName);
             thisItem.parent.remove(thisItem);
@@ -545,7 +556,6 @@ export class Hero extends IntelligentForm {
                     this.selectedObject = o;
                     this.sceneController.eventDepot.fire('showDescription', { objectType: o.objectType, objectName: o.objectName }); 
                 }
-                    
             }
         })
 
@@ -650,9 +660,30 @@ export class Hero extends IntelligentForm {
     }
 
     grantSpell(spellName) {
-        let spell = JSON.parse(localStorage.getItem('gameObjects'))[spellName];
+        let spell = this.gameObjects[spellName];
         this.spells.push({
             itemName: spell.name
+        });
+    }
+
+    /** 
+     * launch is used for throwables, like greenpotion, arrows, spells, etc.
+     * Every throwable item has specific properties including quantity,
+     * raised pitch, and weight (which affects how the trajectory declines).
+     * 
+     * Throwing an item affects inventory similarly to using a hotkey potion,
+     * pulling from inventory until the last item is used (or all mana is used).
+     */
+    launch(itemName) {
+
+        // load the object model to the scene, copy the position/rotation of hero,
+        this.sceneController.loadFormbyName(itemName, (item) => {
+
+            item.model.position.copy(this.model.position);
+            item.model.rotation.copy(this.model.rotation);
+            item.model.position.y += this.attributes.height;
+            this.sceneController.addToProjectiles(item);
+
         });
     }
 

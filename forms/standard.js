@@ -64,7 +64,7 @@ export class StandardForm {
                 
             }
 
-            this.setToCastShadows();
+            // this.setToCastShadows();
             
             callback();
 

@@ -416,6 +416,75 @@ class Scene {
         }
     }
 
+    handleAction(projectile, entitiesInRange) {
+
+        // Sprite effects:
+        if (projectile.item.attributes.sprites) {
+            projectile.item.attributes.sprites.forEach(spriteConfig => {
+                this.controller.formFactory.addSpritesGeneric(projectile.item.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
+                entitiesInRange.forEach(entity => {
+                    this.controller.formFactory.addSpritesGeneric(entity.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
+                })
+            })
+            setTimeout(() => {
+                this.scene.remove(projectile);
+            }, projectile.item.attributes.sprites[0].time * 1000);
+        }
+
+        let [stat, change] = projectile.item.attributes.effect.split("/");
+
+        //Cause effects:
+        entitiesInRange.forEach(entity => {
+            if (entity.changeStat(stat, change, false) <= 0) {
+                // this.fadeToAction("Dance", 0.2);
+            }
+        })
+    }
+
+    handleProjectiles(delta) {
+        
+        // Handle action and filter out projectiles that have run their course
+        
+        this.controller.projectiles.filter(el => el.distanceTraveled != -1).forEach(projectile => {
+            this.handleAction(projectile, []);
+        })
+        
+        this.controller.projectiles = this.controller.projectiles.filter(el => el.distanceTraveled != -1);
+
+        this.controller.projectiles.forEach(projectile => {
+
+            if (projectile.distanceTraveled == 0) { // first iteration, set velocitiess
+
+                projectile.velocity.y = (projectile.direction.y) * 100;
+                projectile.velocity.z = projectile.item.attributes.throwableAttributes.speed * 1000;
+                
+            } else { // subsequent iterations
+
+                // INERTIA/GRAVITY
+                projectile.velocity.z -= projectile.velocity.z * 10.0 * delta;
+                projectile.velocity.y -= 9.8 * projectile.item.attributes.throwableAttributes.weight * delta;
+            }
+
+            projectile.item.model.translateY( projectile.velocity.y * delta );
+            projectile.item.model.translateZ( -projectile.velocity.z * delta );
+
+            let entitiesInRange = this.controller.allEntitiesInRange(20, projectile.item.model.position);
+
+            if (entitiesInRange.length > 0) {
+                this.handleAction(projectile, entitiesInRange);
+                this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
+            }
+
+            projectile.distanceTraveled += (Math.abs(projectile.velocity.z * delta) + Math.abs(projectile.velocity.y * delta));
+
+            let maxDistance = projectile.item.attributes.throwableAttributes.distance;
+
+            if (projectile.distanceTraveled > maxDistance) {
+                projectile.distanceTraveled = -1;
+            }
+        })
+    }
+
     animate() {
         
         this.requestAnimationFrameID = requestAnimationFrame( this.animate );
@@ -430,6 +499,7 @@ class Scene {
                 // this.controller.handleEntityMovement(this.delta);
                 // this.controller.handleMixers(this.delta);
                 this.handleSprites();
+                this.handleProjectiles(this.delta);
 
                 if (this.controller.backgroundMesh) this.controller.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
     
