@@ -66,6 +66,7 @@ export const Items = {
         type: 'item',
         attributes: {
             animates: false,
+            projectile: true,
             scale: 5,
             elevation: 10,
             effect: "damage/-3",
@@ -108,6 +109,20 @@ export const Items = {
         gltf: 'broadsword.glb',
         image: 'broadsword.png',
         description: 'A metallic blade, strong yet flexible',
+        type: 'item',
+        attributes: {
+            equippable: ['handR', 'handL'],
+            animates: false,
+            scale: 100,
+            elevation: 20,
+            effect: "strength/2"
+        } 
+    },
+    busterSword: {
+        name: 'busterSword',
+        gltf: 'busterSword.glb',
+        image: 'busterSword.png',
+        description: 'A buster blade',
         type: 'item',
         attributes: {
             equippable: ['handR', 'handL'],

@@ -12,7 +12,7 @@ export const xpLevels = {
     mana: {
         1: {
             effect: "mana/2",
-            spell: "heal"
+            spell: "healSpell"
         },
         2: {
             effect: "mana/2",

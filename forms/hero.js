@@ -417,68 +417,68 @@ export class Hero extends IntelligentForm {
 
     equip(area, itemName) {
         this.equipped[area] = itemName;
-        this.sceneController.loadFormbyName(itemName, (item) => {
 
-            item.model.position.set(0,0,0);
-            item.model.rotation.y = Math.PI;
-            item.model.scale.copy(new THREE.Vector3( .1,.1,.1 ));
+        if (area.match('key')) {
+            this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
+        } else {
+            this.sceneController.loadFormbyName(itemName, (item) => {
+
+                item.model.position.set(0,0,0);
+                item.model.rotation.y = Math.PI;
+                item.model.scale.copy(new THREE.Vector3( .1,.1,.1 ));
+        
+                if (itemName == "torch") {
+                    this.sceneController.formFactory.addTorchLight(item.model);
+                } 
     
-            if (itemName == "torch") {
-                this.sceneController.formFactory.addTorchLight(item.model);
-            } 
-
-            if (!(/key/.test(area)) && item.attributes.effect) { // body parts (non 'key' positions)
-                
-                // What is the item effect?
-                let stat = item.attributes.effect.split("/")[0];
-                let change = Number(item.attributes.effect.split("/")[1]);
-
-                switch (stat) {
-                    case "health":
-                    case "mana":
-                    case "strength":
-                    case "dexterity": 
-                        this.changeStatBoost(stat, change);
-                        break;
-                    case "light":
-                        this.sceneController.overheadPointLight.intensity += 10;
-                        break;
+                if (item.attributes.effect) { // body parts (non 'key' positions)
+                    
+                    // What is the item effect?
+                    let stat = item.attributes.effect.split("/")[0];
+                    let change = Number(item.attributes.effect.split("/")[1]);
+    
+                    switch (stat) {
+                        case "health":
+                        case "mana":
+                        case "strength":
+                        case "dexterity": 
+                            this.changeStatBoost(stat, change);
+                            break;
+                        case "light":
+                            this.sceneController.overheadPointLight.intensity += 10;
+                            break;
+                    }
                 }
-            }
-            
-            if (area.match('key')) {
-                this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
-            } else {
-                // this.model.getObjectByName("Middle2R").add(item.model);
+                
+
                 this.model.getObjectByName(area).add(item.model);
-                // console.log("test")
-            }
-            
-        });
+                
+            });
+        }
+
     }
     
     unequip(area) {
-
+        
         // Which item is being unequipped?  
         let itemName = this.equipped[area];
-        let item = JSON.parse(localStorage.getItem('gameObjects'))[itemName];
-
-        // What is the item effect?
-        let stat = item.attributes.effect.split("/")[0];
-        let change = Number(item.attributes.effect.split("/")[1]);
+        
 
         delete this.equipped[area];
         
         if (area.match('key')) {
             this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
         } else {
-            // let thisArea = this.model.getObjectByName(area);
-            // thisArea.children.forEach(child => {
-            //     thisArea.remove(child);
-            // })s
+            
+            let item = JSON.parse(localStorage.getItem('gameObjects'))[itemName];
+
             let thisItem = this.model.getObjectByProperty("objectName", itemName);
             thisItem.parent.remove(thisItem);
             this.sceneController.scene.scene.remove(thisItem);
+
+            // What is the item effect?
+            let stat = item.attributes.effect.split("/")[0];
+            let change = Number(item.attributes.effect.split("/")[1]);
 
             switch (stat) {
                 case "health":

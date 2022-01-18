@@ -32,6 +32,7 @@ export const levels = [
         items: [
             Items.keyToShed,
             Items.smallSword,
+            {...Items.busterSword, location: { x: 0, y: 0, z: 0 }},
             Items.redpotion,
             Items.greenpotion,
             Items.bluepotion
@@ -45,7 +46,7 @@ export const levels = [
         entities: [
             Entities.john,
             Entities.evilOne,
-            Entities.evilOne
+            // Entities.evilOne
         ]
     },
     {

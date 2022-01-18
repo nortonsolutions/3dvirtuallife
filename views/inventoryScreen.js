@@ -51,7 +51,7 @@ class InventoryScreen {
                     name: objectName,
                     description: gameObjects[objectName].description,
                     image: gameObjects[objectName].image,
-                    quantity: hero.inventory[index].quantity? hero.inventory[index].quantity: 1
+                    quantity: inv[index].quantity? inv[index].quantity: 1
                 };
             } else {
                 context.inventory[index] = {
@@ -114,8 +114,12 @@ class InventoryScreen {
             // var quantId = data[2]; // id of quantity element
             var index = data[3];  // inventory # ... or bodyPart by name
             
-            if (itemName.match(/redpotion|bluepotion|spell/i) && Array.from(targetElement.classList).includes('bodyPart')) {
-                alert('This can only be equipped on the F-keys');
+            if (itemName.match(/key/i) && Array.from(targetElement.classList).includes('body')){
+                alert('Keys cannot be equipped.');
+            } else if (itemName.match(/redpotion|bluepotion|spell/i) && Array.from(targetElement.classList).includes('bodyPart')) {
+                alert('This can only be equipped on the hotkeys, 1-8.');
+            } else if (!itemName.match(/potion|spell/i) && Array.from(targetElement.classList).includes('fKey')){
+                alert('This can only be equipped on the body.');
             } else {
 
                 if (index.length < 3) { // source is inventory
@@ -124,9 +128,9 @@ class InventoryScreen {
     
                         this.eventDepot.fire('swapInventoryPositions', {first: index, second: targetElement.id});
         
-                    } else { 
+                    } else { // to body part or hotkey
     
-                        if (targetElement.firstElementChild && targetElement.firstElementChild.tagName != "DIV") {
+                        if (targetElement.firstElementChild && !Array.from(targetElement.firstElementChild.classList).includes('overlay')) {
                             let itemNameToSwap = targetElement.firstElementChild.id;
                             this.eventDepot.fire('unequipItem', targetElement.id);
                             this.eventDepot.fire('placeItem', {itemName: itemNameToSwap, desiredIndex: index});
@@ -136,18 +140,21 @@ class InventoryScreen {
 
                     } 
         
-                } else { // source is body part
+                } else { // source is body part or hotkey
         
                     if (! Array.from(targetElement.classList).includes('body')) { // back to inventory
         
                         this.eventDepot.fire('unequipItem', index);
-                        this.eventDepot.fire('placeItem', {itemName, desiredIndex: targetElement.id});
+
+                        if (!itemName.match(/spell/i)) {
+                            this.eventDepot.fire('placeItem', {itemName, desiredIndex: targetElement.id});
+                        } 
         
-                    } else { // body part to body part
+                    } else { // to another body part or hotkey
         
                         this.eventDepot.fire('unequipItem', index);
     
-                        if (targetElement.firstElementChild && targetElement.firstElementChild.tagName != "DIV") {
+                        if (targetElement.firstElementChild && !Array.from(targetElement.firstElementChild.classList).includes('overlay')) {
     
                             let itemNameToSwap = targetElement.firstElementChild.id;
                             this.eventDepot.fire('unequipItem', ev.target.parentNode.id);

@@ -124,7 +124,7 @@ export class StandardForm {
 
                     // root.decay = 2;
                     // // root.intensity = 10;
-                    root.distance = 600;
+                    // root.distance = 600;
 
                     root.shadow.bias = - 0.005;  
                     root.shadow.camera.fov = 70;
