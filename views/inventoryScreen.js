@@ -21,19 +21,46 @@ class InventoryScreen {
 
         // startingIndex will advance by inventoryPageSize for each page
         let startingIndex = this.pageNumber? this.pageNumber * inventoryPageSize: 0;
+
+        var bodyParts = [['head','one'],['torso','two'],['Middle2R','three'],['Middle2L','four'],['special','five'],['feet','six']];
+        var hotKeys = ['f1key','f2key','f3key','f4key','f5key','f6key','f7key','f8key']
     
-        var context = { showInventory: this.showInventory, equipped: {}, inventory: [], pageNumber: pageNumber };
+        var context = { showInventory: this.showInventory, equippedBodyParts: {}, equippedHotKeys: {}, inventory: [], pageNumber };
         
         var hero = JSON.parse(localStorage.getItem('gameHeroTemplate'));
         
-        
-        Object.keys(hero.equipped).forEach(bodyPart => {
+        /** 
+         * Sample of hero.equipped:
+         * {"f1key":["redpotion",false],"Middle2L":["smallSword",false],"Middle2R":["greenpotion",true]}
+         * 
+         * The first value for each key is the itemName, and the second is the throwable boolean.
+         */
+
+        bodyParts.forEach(bodyPart => { // bodyPart: [bodyPart, gridNumber]
             
-            let objectName = hero.equipped[bodyPart][0];
-            context.equipped[bodyPart] = {
+            let objectName = hero.equipped[bodyPart[0]] ? hero.equipped[bodyPart[0]][0] : null;
+            context.equippedBodyParts[bodyPart[0]] = objectName ? {
                 name: objectName,
                 description: this.gameObjects[objectName].description,
-                image: this.gameObjects[objectName].image
+                image: this.gameObjects[objectName].image,
+                gridNumber: bodyPart[1]
+            } : {
+                name: null,
+                gridNumber: bodyPart[1]
+            };
+        });
+
+        hotKeys.forEach(hotkey => {
+            
+            let objectName = hero.equipped[hotkey] ? hero.equipped[hotkey][0] : null;
+            context.equippedHotKeys[hotkey] = objectName ? {
+                name: objectName,
+                description: this.gameObjects[objectName].description,
+                image: this.gameObjects[objectName].image,
+                overlay: hotkey.substring(1,2)
+            } : {
+                name: null,
+                overlay: hotkey.substring(1,2)
             };
         });
 

@@ -122,7 +122,21 @@ export const Items = {
             animates: false,
             scale: 100,
             elevation: 20,
-            effect: "strength/2"
+            effect: "strength/1"
+        } 
+    },
+    armor: {
+        name: 'armor',
+        gltf: 'armor.glb',
+        image: 'armor.png',
+        description: 'Heavy-duty armor',
+        type: 'item',
+        attributes: {
+            equippable: ['torso'],
+            animates: false,
+            scale: 100,
+            elevation: 20,
+            effect: "defense/2"
         } 
     },
     busterblade: {
@@ -188,6 +202,7 @@ export const Items = {
         description: 'A gleaming ball of crystal',
         type: 'item',
         attributes: {
+            equippable: ['special'],
             animates: false,
             scale: 50,
             elevation: 30,
