@@ -136,7 +136,7 @@ export const Items = {
             animates: false,
             scale: 100,
             elevation: 20,
-            effect: "defense/2"
+            effect: "defense/1"
         } 
     },
     busterblade: {
@@ -164,7 +164,7 @@ export const Items = {
             animates: false,
             scale: 100,
             elevation: 20,
-            effect: "strength/2"
+            effect: "defense/1"
         } 
     },
     torch: {
@@ -178,7 +178,7 @@ export const Items = {
             animates: false,
             scale: 100,
             elevation: 5,
-            effect: "light/10"
+            effect: "light/15"
         } 
     },
     mace: {

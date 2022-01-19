@@ -76,12 +76,14 @@ function newHeroTemplate(name,height) {
                 mana: "0/0/0",
                 strength: "1/1/0",
                 agility: "3/3/0",
+                defense: "0/0/0"
             },
             xpLevels: {
                 health: 0,
                 mana: 0,
                 strength: 0,
                 agility: 0,
+                defense: 0
             }
         },
         gltf: 'robot.glb',

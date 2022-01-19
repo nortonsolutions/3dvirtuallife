@@ -18,5 +18,26 @@ export const Spells = {
                 time: 1
             }]
         }
+    },
+    poisonSpell: {
+        name: 'poisonSpell',
+        gltf: 'greenpotion.glb',
+        image: 'spell_poison.png',
+        description: 'A spell to inflict poisonous damage',
+        type: 'spell',
+        attributes: {
+            manaCost: 1,
+            effect: "damage/-3",
+            range: 40,
+            sprites: [{ 
+                name: "greenExplosion",
+                regex: "",
+                frames: 10,
+                scale: 300,
+                elevation: 30,
+                flip: false,
+                time: 1
+            }]
+        }
     }
 }

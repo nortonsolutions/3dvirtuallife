@@ -106,7 +106,7 @@ export class Hero extends IntelligentForm {
                 let itemType = item.type;
     
                 if (itemType == "spell" && this.getStat("mana") < item.attributes.manaCost) return;
-                 
+
                 // Using this will diminish the item quantity in inventory for items, or mana for spells
                 if (itemType == "item" || itemType == "spell") {
     
@@ -326,8 +326,8 @@ export class Hero extends IntelligentForm {
             this.sceneController.eventDepot.fire('statusUpdate', { message: `Advanced in ${data.category} to level ${data.nextLevel}`});
             
             // Lookup up xpLevels in gameObjects, then apply the effect:
-            let effect = this.gameObjects.xpLevels[data.category][data.nextLevel].effect;
-            let spell = this.gameObjects.xpLevels[data.category][data.nextLevel].spell;
+            let effect = this.gameObjects.xpLevels[data.category][data.nextLevel]? this.gameObjects.xpLevels[data.category][data.nextLevel].effect : `${data.category}/1`;
+            let spell = this.gameObjects.xpLevels[data.category][data.nextLevel]? this.gameObjects.xpLevels[data.category][data.nextLevel].spell : null;
 
             if (effect) {
                 let [stat, change] = effect.split("/");
@@ -468,7 +468,8 @@ export class Hero extends IntelligentForm {
                         case "health":
                         case "mana":
                         case "strength":
-                        case "dexterity": 
+                        case "agility":
+                        case "defense": 
                             this.changeStatBoost(stat, change);
                             break;
                         case "light":
@@ -478,7 +479,7 @@ export class Hero extends IntelligentForm {
                 }
                 
 
-                this.model.getObjectByName(area).add(item.model);
+                if (area != "special") this.model.getObjectByName(area).add(item.model);
                 
             });
         }
@@ -487,9 +488,7 @@ export class Hero extends IntelligentForm {
     
     unequip(area) {
         
-        // Which item is being unequipped?  
         let itemName = this.equipped[area][0];
-        
 
         delete this.equipped[area];
         
@@ -497,26 +496,30 @@ export class Hero extends IntelligentForm {
             this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
         } else {
             
+
             let item = this.gameObjects[itemName];
 
-            let thisItem = this.model.getObjectByProperty("objectName", itemName);
-            thisItem.parent.remove(thisItem);
-            this.sceneController.scene.scene.remove(thisItem);
+            if (area != "special") { // special = no model to remove
+                let thisItem = this.model.getObjectByProperty("objectName", itemName);
+                thisItem.parent.remove(thisItem);
+                this.sceneController.scene.scene.remove(thisItem);
+            }
 
-            // What is the item effect?
-            let stat = item.attributes.effect.split("/")[0];
-            let change = Number(item.attributes.effect.split("/")[1]);
-
-            switch (stat) {
-                case "health":
-                case "mana":
-                case "strength":
-                case "dexterity": 
-                    this.changeStatBoost(stat, -change);
-                    break;
-                case "light":
-                    this.sceneController.overheadPointLight.intensity -= change;
-                    break;
+            if (item.attributes.effect) {
+                let stat = item.attributes.effect.split("/")[0];
+                let change = Number(item.attributes.effect.split("/")[1]);
+    
+                switch (stat) {
+                    case "health":
+                    case "mana":
+                    case "strength":
+                    case "agility": 
+                        this.changeStatBoost(stat, -change);
+                        break;
+                    case "light":
+                        this.sceneController.overheadPointLight.intensity -= change;
+                        break;
+                }
             }
         }
     }
@@ -658,8 +661,9 @@ export class Hero extends IntelligentForm {
         // Formula for each level up: 2^x
         let eligibility = [];
         Object.keys(this.attributes.xpLevels).forEach(category => {
-            let nextLevel = this.attributes.xpLevels[category] + 1;
+            let nextLevel = Number(this.attributes.xpLevels[category]) + 1;
             let reqPoints = Math.pow(2, nextLevel);
+            console.log(`${category}: ${reqPoints} required for level ${nextLevel}`);
             if (this.attributes.experience >= reqPoints) eligibility.push({
                 category,
                 nextLevel
