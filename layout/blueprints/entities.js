@@ -58,7 +58,10 @@ export const Entities = {
             offers: [],
             accepts: [],
             stats: {
-                agility: "2/2/0"
+                health: "2/2/0",
+                mana: "0/0/0",
+                strength: "1/1/0",
+                agility: "1/2/0"
             }
         }
     }

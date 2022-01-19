@@ -251,7 +251,9 @@ export class IntelligentForm extends AnimatedForm{
     }
 
     death() {
+
         this.alive = false;
+        this.sceneController.entities = this.sceneController.entities.filter(el => el != this);
         this.fadeToAction("Death", 0.2);
     }
 

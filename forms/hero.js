@@ -103,11 +103,12 @@ export class Hero extends IntelligentForm {
 
             if (itemName) {
                 let item = this.gameObjects[itemName];
-
                 let itemType = item.type;
     
+                if (itemType == "spell" && this.getStat("mana") < item.attributes.manaCost) return;
+                 
                 // Using this will diminish the item quantity in inventory for items, or mana for spells
-                if (itemType == "item") {
+                if (itemType == "item" || itemType == "spell") {
     
                     // What is the item effect?
                     let [stat, change] = item.attributes.effect.split("/");
@@ -119,23 +120,36 @@ export class Hero extends IntelligentForm {
                             this.changeStat(stat, change, false);
                             break;
     
+                        case "damage":
+                            this.fadeToAction("Yes", 0.2);
+                            
+                            if (item.attributes.range) { // general attack against all in range
+                                let entitiesInRange = this.sceneController.allEnemiesInRange(item.attributes.range, this.model.position);
+                                entitiesInRange.forEach(entity => {
+                                    this.inflictDamage(entity, change);
+                                })
+
+                            } else { // standard attack upon 'selectedObject'
+                                this.inflictDamage(this.selectedObject, change);
+                            }
+
+                            break;
+
                         case "health":
                             this.fadeToAction("Yes", 0.2);
                                 
-                            if (item.attributes.range) { // general attack against all in range
-                                let entitiesInRange = this.sceneController.allEntitiesInRange(item.attributes.range, this.model.position);
+                            if (item.attributes.range) { // general effect against all in range
+                                let entitiesInRange = this.sceneController.allFriendliesInRange(item.attributes.range, this.model.position);
                                 entitiesInRange.forEach(entity => {
                                     if (entity.changeStat(stat, change, false) <= 0) {
                                         // this.fadeToAction("Dance", 0.2);
                                     }
                                 })
 
-                            } else { // standard attack upon 'selectedObject'
-
-                                if (this.selectedObject.changeStat(stat, change, false) <= 0) {
+                            } else { // standard effect upon self
+                                if (this.changeStat(stat, change, false) <= 0) {
                                     this.fadeToAction("Dance", 0.2);
                                 }
-    
                             }
 
                             break;
@@ -147,12 +161,13 @@ export class Hero extends IntelligentForm {
                             this.sceneController.formFactory.addSpritesGeneric(this.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
                         })
                     }
-    
-                    if (this.removeFromInventory(itemName) == -1) this.unequip(keyString);
-                    this.cacheHero();
-                
-                } else { 
-                }
+                    
+                    if (itemType == "item") {
+                        if (this.removeFromInventory(itemName) == -1) this.unequip(keyString);
+                    } else if (itemType == "spell") {
+                        this.changeStat('mana', -item.attributes.manaCost);
+                    }
+                } 
             }
         })
 
@@ -227,15 +242,6 @@ export class Hero extends IntelligentForm {
         this.sceneController.eventDepot.addListener('mouse0click', () => {
 
             if (this.alive) {
-
-                Object.entries(this.equipped).forEach(([key,value]) => {
-                    if (key.indexOf('key') == -1) { // for body parts only (non-hotkey equipped)
-                        let [item,throwable] = value;
-                        if (throwable) {
-                            this.launch(item);
-                        }
-                    }
-                })
                 
                 if (this.selectedObject) {
 
@@ -261,20 +267,7 @@ export class Hero extends IntelligentForm {
     
                             // console.dir(this.selectedObject);
                             if (Math.random() < chanceToHit) {
-    
-                                if (this.selectedObject.changeStat('health', -hitPointReduction, false) <= 0) {
-    
-                                    this.attributes.experience += this.selectedObject.getStatMax('health');
-    
-                                    if (this.levelUpEligibility().length > 0) {
-                                        this.sceneController.eventDepot.fire('modal', { type: 'levelUp', title: 'Level Up', context: this.levelUpEligibility() });
-                                        this.sceneController.eventDepot.fire('disableCloser', {});
-                                    }
-    
-                                    this.sceneController.eventDepot.fire('updateXP', this.attributes.experience); 
-    
-                                    this.fadeToAction("Dance", 0.2);
-                                };
+                                this.inflictDamage(this.selectedObject, hitPointReduction);
                             }
                         }
     
@@ -294,8 +287,20 @@ export class Hero extends IntelligentForm {
                         }
                     }
                 }
+           }
+        })
 
+        this.sceneController.eventDepot.addListener('mouse1click', () => {
 
+            if (this.alive) {
+                Object.entries(this.equipped).forEach(([bodypart,value]) => {
+                    if (bodypart.indexOf('key') == -1) { // for body parts only (non-hotkey equipped)
+                        let [item,throwable] = value;
+                        if (throwable) {
+                            this.launch(item, bodypart);
+                        }
+                    }
+                })
             }
         })
 
@@ -337,6 +342,9 @@ export class Hero extends IntelligentForm {
         })
     }
 
+
+
+
     dispose(item) {
         if (item.children.length == 0) {
             if (item.dispose) item.dispose();
@@ -361,6 +369,7 @@ export class Hero extends IntelligentForm {
         this.sceneController.eventDepot.removeListeners('removeItem');
         this.sceneController.eventDepot.removeListeners('dropItemToScene');
         this.sceneController.eventDepot.removeListeners('mouse0click');
+        this.sceneController.eventDepot.removeListeners('mouse1click');
         this.sceneController.eventDepot.removeListeners('unlockControls');
         this.sceneController.eventDepot.removeListeners('jump');
         this.sceneController.eventDepot.removeListeners('levelUp');
@@ -449,7 +458,7 @@ export class Hero extends IntelligentForm {
                     this.sceneController.formFactory.addTorchLight(item.model);
                 } 
 
-                if (item.attributes.effect) { // body parts (non 'key' positions)
+                if (item.attributes.effect && !item.attributes.throwable) { // body parts (non 'key' positions)
                     
                     // What is the item effect?
                     let stat = item.attributes.effect.split("/")[0];
@@ -674,7 +683,7 @@ export class Hero extends IntelligentForm {
      * Throwing an item affects inventory similarly to using a hotkey potion,
      * pulling from inventory until the last item is used (or all mana is used).
      */
-    launch(itemName) {
+    launch(itemName, bodypart) {
 
         // load the object model to the scene, copy the position/rotation of hero,
         this.sceneController.loadFormbyName(itemName, (item) => {
@@ -684,7 +693,28 @@ export class Hero extends IntelligentForm {
             item.model.position.y += this.attributes.height;
             this.sceneController.addToProjectiles(item);
 
+            if (this.removeFromInventory(itemName) == -1) this.unequip(bodypart);
+
         });
+    }
+
+    inflictDamage(entity, hitPointReduction) {
+
+        if (entity.changeStat('health', -hitPointReduction, false) <= 0) {
+    
+            this.attributes.experience += entity.getStatMax('health');
+
+            if (this.levelUpEligibility().length > 0) {
+                setTimeout(() => {
+                    this.sceneController.eventDepot.fire('modal', { type: 'levelUp', title: 'Level Up', context: this.levelUpEligibility() });
+                    this.sceneController.eventDepot.fire('disableCloser', {});
+                }, 2000);
+            }
+
+            this.sceneController.eventDepot.fire('updateXP', this.attributes.experience); 
+
+            // this.fadeToAction("Dance", 0.2);
+        };
     }
 
 }

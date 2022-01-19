@@ -74,6 +74,8 @@ class InventoryScreen {
 
         document.getElementById('toggleInventory').addEventListener('click', () => {
             this.showInventory = !this.showInventory;
+
+            document.getElementById('modal-title').innerHTML = this.showInventory? "Inventory" : "Spells";
             this.pageNumber = 0;
             this.refresh();
         })

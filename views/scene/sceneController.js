@@ -323,9 +323,19 @@ export class SceneController {
         })
     }
 
-    allEntitiesInRange(range, position) { 
+    allFriendliesInRange(range, position) { 
         var response = [];
-        this.entities.filter(el => el.objectType != "hero").forEach(entity => {
+        this.entities.filter(el => el.objectType != "beast").forEach(entity => {
+            if (position.distanceTo(entity.model.position) < range) {
+                response.push(entity);
+            }
+        })
+        return response;
+    }
+
+    allEnemiesInRange(range, position) {
+        var response = [];
+        this.entities.filter(el => el.objectType == "beast").forEach(entity => {
             if (position.distanceTo(entity.model.position) < range) {
                 response.push(entity);
             }

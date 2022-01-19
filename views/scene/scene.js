@@ -264,6 +264,7 @@ class Scene {
                     this.controller.eventDepot.fire('mouse0click', {});
                     break;
                 case 1:
+                    this.controller.eventDepot.fire('mouse1click', {});
                     break;
                 case 2:
                     this.controller.hero.moveForward = true;
@@ -416,28 +417,26 @@ class Scene {
         }
     }
 
+    /** Action in this case means distributing damage to enemies */
     handleAction(projectile, entitiesInRange) {
 
         // Sprite effects:
         if (projectile.item.attributes.sprites) {
             projectile.item.attributes.sprites.forEach(spriteConfig => {
-                this.controller.formFactory.addSpritesGeneric(projectile.item.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
+                this.controller.formFactory.addSpritesGeneric(projectile.item.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale/10, spriteConfig.elevation-20, spriteConfig.flip, spriteConfig.time);
                 entitiesInRange.forEach(entity => {
-                    this.controller.formFactory.addSpritesGeneric(entity.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
+                    this.controller.formFactory.addSpritesGeneric(entity.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale/20, spriteConfig.elevation-20, spriteConfig.flip, spriteConfig.time);
                 })
             })
             setTimeout(() => {
-                this.scene.remove(projectile);
-            }, projectile.item.attributes.sprites[0].time * 1000);
+                this.scene.remove(projectile.item.model);
+            }, projectile.item.attributes.sprites[0].time * 100);
         }
 
         let [stat, change] = projectile.item.attributes.effect.split("/");
 
-        //Cause effects:
         entitiesInRange.forEach(entity => {
-            if (entity.changeStat(stat, change, false) <= 0) {
-                // this.fadeToAction("Dance", 0.2);
-            }
+            this.controller.hero.inflictDamage(entity, -change);
         })
     }
 
@@ -445,7 +444,7 @@ class Scene {
         
         // Handle action and filter out projectiles that have run their course
         
-        this.controller.projectiles.filter(el => el.distanceTraveled != -1).forEach(projectile => {
+        this.controller.projectiles.filter(el => el.distanceTraveled == -1).forEach(projectile => {
             this.handleAction(projectile, []);
         })
         
@@ -468,7 +467,7 @@ class Scene {
             projectile.item.model.translateY( projectile.velocity.y * delta );
             projectile.item.model.translateZ( -projectile.velocity.z * delta );
 
-            let entitiesInRange = this.controller.allEntitiesInRange(20, projectile.item.model.position);
+            let entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
 
             if (entitiesInRange.length > 0) {
                 this.handleAction(projectile, entitiesInRange);

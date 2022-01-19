@@ -111,7 +111,7 @@ export class ArtificialForm extends IntelligentForm{
         let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
         if (this.sceneController.hero.getEffectiveStat('health') > 0 && Math.random() < chanceToHit) {
             if (this.sceneController.hero.changeStat('health', -hitPointReduction, false) <= 0) {
-                this.fadeToAction("Dance", 0.2);
+                // this.fadeToAction("Dance", 0.2);
             };
         }
     }

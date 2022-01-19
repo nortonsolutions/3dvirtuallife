@@ -76,8 +76,8 @@ export const Items = {
             scale: 5,
             equippedScale: 0.005,
             elevation: 10,
-            effect: "health/-3",
-            range: 100,
+            effect: "damage/-3",
+            range: 40,
             sprites: [{ 
                 name: "greenExplosion",
                 regex: "",
@@ -107,7 +107,7 @@ export const Items = {
                 scale: 50,
                 elevation: 30,
                 flip: false,
-                time: 3
+                time: 1
             }]
         }
     },
