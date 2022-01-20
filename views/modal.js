@@ -2,6 +2,7 @@
 import { InventoryScreen } from './inventoryScreen.js';
 import { LoadGameScreen } from './loadGameScreen.js';
 import { LevelUpScreen } from './levelUpScreen.js';
+import { DialogScreen } from './dialogScreen.js';
 
 class Modal {
 
@@ -12,6 +13,7 @@ class Modal {
         this.inventoryScreen = new InventoryScreen(eventDepot, this);
         this.loadGameScreen = new LoadGameScreen(eventDepot, this);
         this.levelUpScreen = new LevelUpScreen(eventDepot, this);
+        this.dialogScreen = new DialogScreen(eventDepot, this);
 
         this.closeModal = this.closeModal.bind(this);
 
@@ -22,18 +24,36 @@ class Modal {
 
             var context;
             if (data.type == "inventory") {
+
                 context = this.inventoryScreen.getContext(0);
+
+            } else if (data.type == "dialog") {
+
+                let entity = data.context;
+                this.dialogScreen.setCurrentEntity(entity);
+                context = this.dialogScreen.getContext();
+
             } else {
+
                 context = data.context;
+
             }
             
             this.loadTemplate('modal-body', data.type, context, () => {
-                if (data.type == "inventory") {
-                    this.inventoryScreen.addInventoryEvents(data.type);
-                } else if (data.type == 'loadGame') {
-                    this.loadGameScreen.addLoadGameEvents();
-                } else if (data.type == 'levelUp') {
-                    this.levelUpScreen.addLevelUpEvents();
+
+                switch (data.type) {
+                    case "inventory":
+                        this.inventoryScreen.addInventoryEvents();
+                        break;
+                    case "loadGame": 
+                        this.loadGameScreen.addLoadGameEvents();
+                        break;
+                    case "levelUp":
+                        this.levelUpScreen.addLevelUpEvents();
+                        break;
+                    case "dialog":
+                        this.dialogScreen.addDialogEvents();
+                        break;
                 }
             });
             

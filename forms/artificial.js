@@ -116,4 +116,45 @@ export class ArtificialForm extends IntelligentForm{
         }
     }
 
+    // getConversationState() {
+    //     return [this.attributes.conversation.conversationState, this.attributes.conversation.engagementState];
+    // }
+    
+    // setConversationState(conversationState, engagementState) {
+    //     this.attributes.conversation.conversationState = conversationState;
+    //     if (engagementState) this.attributes.conversation.engagementState = engagementState;
+    // }
+
+    engageConversation() {
+
+        switch (this.attributes.conversation.conversationState) {
+            case "intro": 
+            case "disengaged":
+                this.attributes.conversation.conversationState = "engaged";
+                this.attributes.conversation.engagementState = 0;
+                break;
+            case "engaged":
+                this.attributes.conversation.engagementState++;
+                break;
+        }
+    }
+
+    completeConversation() {
+        this.attributes.conversation.conversationState = "complete";
+        this.attributes.conversation.engagementState = 0;
+    }
+
+    disengageConversation() {
+        this.attributes.conversation.conversationState = "disengaged";
+        this.attributes.conversation.engagementState = 0;
+    }
+
+    getCurrentConversation() {
+        if (this.attributes.conversation.conversationState == "engaged") {
+            return this.attributes.conversation[this.attributes.conversation.conversationState][this.attributes.conversation.engagementState];
+        } else {
+            return this.attributes.conversation[this.attributes.conversation.conversationState];
+        }
+    }
+
 }

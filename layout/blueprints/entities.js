@@ -1,12 +1,12 @@
 import { Items } from './items.js'
 
 let convo = {
-    accept: "Yes, I accept",
-    decline: "No, thank you",
-    engage: "<Engage the conversation>",
-    disengage: "<Disengage the conversation>",
-    wellwish: "Well wishes to you, my friend.",
-    empathize: "<Empathize and ask more>"
+    accept: { text: "Yes, I accept", type: "engage" },
+    decline: { text: "No, thank you", type: "disengage" },
+    engage: { text: "<Engage the conversation>", type: "engage" },
+    disengage: { text: "<Disengage the conversation>", type: "disengage" },
+    wellwish: { text: "Well wishes to you, my friend.", type: "neutral" },
+    empathize: { text: "<Empathize and ask more>", type: "engage" }
 }
 
 export const Entities = {
@@ -59,6 +59,10 @@ export const Entities = {
         gltf: 'robot.glb',
         description: 'Another robot which seems different',
         type: 'friendly',
+        inventory: [
+            {itemName:"armor",quantity:1},
+            {itemName:"bluepotion",quantity:1}
+        ],
         attributes: {
             moves: true,
             animates: true,
@@ -68,6 +72,8 @@ export const Entities = {
             elevation: 0,
             scale: 10,
             conversation: {
+                conversationState: "intro",
+                engagementState: 0,
                 intro: {
                     speech: "Hello there, stranger.", 
                     responses: [convo.engage, convo.disengage]
@@ -83,12 +89,16 @@ export const Entities = {
                     },
                     {
                         speech: "Thank you for your concern, fellow man.  If you could find and return my crystal ball, I will reward your efforts.", 
-                        responses: [convo.disengage]
+                        responses: [convo.disengage],
+                        offers: [{
+                            item: Items.armor,
+                            price: Items.crystalBall
+                        }]
                     }
 
                 ],
                 disengaged: {
-                    speech: "Have a fine day then, stranger.",
+                    speech: "Have a fine day, stranger.",
                     responses: [convo.engage, convo.disengage]
                 },
                 complete: {
@@ -96,12 +106,6 @@ export const Entities = {
                     responses: [convo.wellwish]
                 }
             },
-            conversationState: "intro",
-            engagementState: 0,
-            offers: [{
-                item: Items.armor,
-                price: Items.crystalBall 
-            }],
             stats: {
                 health: "2/2/0",
                 mana: "0/0/0",
