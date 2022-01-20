@@ -147,14 +147,22 @@ export class ArtificialForm extends IntelligentForm{
     disengageConversation() {
         this.attributes.conversation.conversationState = "disengaged";
         this.attributes.conversation.engagementState = 0;
-    }
+    }s
 
     getCurrentConversation() {
-        if (this.attributes.conversation.conversationState == "engaged") {
-            return this.attributes.conversation[this.attributes.conversation.conversationState][this.attributes.conversation.engagementState];
+
+        // If hero meets the 'special condition' then jump straight to it:
+        let special = this.attributes.conversation.conversationState != "complete" && this.attributes.conversation.special;
+        if (special && this.sceneController.hero.inventoryContains(special.condition)) {
+            
+            special.wares = this.inventory;
+            return special;
         } else {
-            return this.attributes.conversation[this.attributes.conversation.conversationState];
+            if (this.attributes.conversation.conversationState == "engaged") {
+                return this.attributes.conversation[this.attributes.conversation.conversationState][this.attributes.conversation.engagementState];
+            } else {
+                return this.attributes.conversation[this.attributes.conversation.conversationState];
+            }
         }
     }
-
 }

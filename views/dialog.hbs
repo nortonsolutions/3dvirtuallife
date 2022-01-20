@@ -1,15 +1,46 @@
-<div class="col">
+    <div class="col">
 
-    <div class="row">
-        <div id="speech" class="col-12">{{speech}}</div>
-    </div>
-    <hr>
-    {{#each responses}}
-    <div class="row">
-        <div id="{{@index}}" class="{{type}} response col-8">
-            {{text}}
+        <div class="row">
+            <div id="speech" class="col-12">{{speech}}</div>
         </div>
-    </div>
-    {{/each}}
+        <hr>
+        {{#if wares}}
 
-</div>
+            <div class="col-6 p-1">
+                <div class="row mx-0 d-flex justify-content-center">
+
+
+                        {{#each inventory}}
+
+                        <div class="col-xs-1-12">
+                            <div class="card">
+                            <div class="card-body tooltipper dragSpot" id={{index}}>
+                                    {{#if name}}
+                                    <img id="{{name}}" class="draggable" draggable="true" src="/models/png/{{image}}" quant="{{name}}quant" describedBy="{{name}}desc">
+                                    <span id="{{name}}desc" class="tooltippertext noClick">{{description}}</span>
+                                    {{#if showInventory}}<span id="{{name}}quant" class="noClick">{{quantity}}</span>{{/if}}
+
+                                    {{/if}}
+                            </div>
+                            </div>
+                        </div>
+                        {{/each}}
+                    
+                </div>
+
+                <div class="row">
+
+                </div>
+            </div>
+
+        <hr>
+        {{/if}}
+        {{#each responses}}
+        <div class="row">
+            <div id="{{@index}}" class="{{type}} response col-8">
+                {{text}}
+            </div>
+        </div>
+        {{/each}}
+
+    </div>

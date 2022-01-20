@@ -145,8 +145,8 @@ class InventoryScreen {
             // var quantId = data[2]; // id of quantity element
             var index = data[3];  // inventory # ... or bodyPart by name
             
-            if (itemName.match(/key/i) && Array.from(targetElement.classList).includes('body')){
-                alert('Keys cannot be equipped.');
+            if (itemName.match(/key|gold/i) && Array.from(targetElement.classList).includes('body')){
+                alert('This cannot be equipped.');
             } else if (itemName.match(/redpotion|bluepotion|spell/i) && Array.from(targetElement.classList).includes('bodyPart')) {
                 alert('This can only be equipped on the hotkeys, 1-8.');
             } else if (!itemName.match(/potion|spell/i) && Array.from(targetElement.classList).includes('fKey')){

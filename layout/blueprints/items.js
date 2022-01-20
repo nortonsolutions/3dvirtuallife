@@ -1,4 +1,67 @@
 export const Items = {
+    gold: {
+        name: 'gold',
+        gltf: 'gold1.glb',
+        image: 'gold.png',
+        description: 'Gold',
+        type: 'item',
+        attributes: {
+            animates: false,
+            scale: 100,
+            elevation: 20
+        }
+    },    gold1: {
+        name: 'gold1',
+        gltf: 'gold1.glb',
+        description: 'One perfect gold coin',
+        type: 'item',
+        attributes: {
+            baseItemName: 'gold',
+            quantity: 1,
+            animates: false,
+            scale: 100,
+            elevation: 20
+        }
+    },
+    gold3: {
+        name: 'gold3',
+        gltf: 'gold3.glb',
+        description: 'Three gold coins',
+        type: 'item',
+        attributes: {
+            baseItemName: 'gold',
+            quantity: 3,
+            animates: false,
+            scale: 100,
+            elevation: 20
+        }
+    },
+    gold10: {
+        name: 'gold10',
+        gltf: 'gold10.glb',
+        description: 'Ten gold coins',
+        type: 'item',
+        attributes: {
+            baseItemName: 'gold',
+            quantity: 10,
+            animates: false,
+            scale: 100,
+            elevation: 20
+        }
+    },
+    gold25: {
+        name: 'gold25',
+        gltf: 'gold25.glb',
+        description: 'Twenty-five gold coins',
+        type: 'item',
+        attributes: {
+            baseItemName: 'gold',
+            quantity: 25,
+            animates: false,
+            scale: 100,
+            elevation: 20
+        }
+    },
     keyToShed: {
         name: 'keyToShed',
         gltf: 'key.gltf',
@@ -30,7 +93,7 @@ export const Items = {
         description: 'A small velvet bag full of gems',
         type: 'item',
         attributes: {
-
+            exchange: 30,
             animates: false,
             scale: 100,
             elevation: 10

@@ -220,7 +220,7 @@ export class Hero extends IntelligentForm {
         });
 
         this.sceneController.eventDepot.addListener('takeItemFromScene', (data) => {
-            this.addToInventory(data.itemName);
+            this.addToInventory(data.itemName, undefined, data.quantity);
             this.cacheHero();
         });
 
@@ -248,7 +248,11 @@ export class Hero extends IntelligentForm {
                     let objectType = this.selectedObject.objectType;
                     
                     if (objectType == "item") {
-                        this.sceneController.eventDepot.fire('takeItemFromScene', {itemName: this.selectedObject.objectName, uuid: this.selectedObject.model.uuid});
+                        this.sceneController.eventDepot.fire('takeItemFromScene', {
+                            itemName: this.selectedObject.attributes.baseItemName? this.selectedObject.attributes.baseItemName : this.selectedObject.objectName, 
+                            quantity: this.selectedObject.attributes.quantity? this.selectedObject.attributes.quantity : 1,
+                            uuid: this.selectedObject.model.uuid
+                        });
     
                     } else if (objectType == "friendly") {
                         
@@ -274,9 +278,7 @@ export class Hero extends IntelligentForm {
                     } else if (objectType == "structure") {
                         
                         var accessible = this.selectedObject.attributes.key ? 
-                            this.inventory.map(el => {
-                                return el? el.itemName: null;
-                            }).includes(this.selectedObject.attributes.key) :
+                            this.inventory.map(el => el? el.itemName: null).includes(this.selectedObject.attributes.key) :
                             true;
                         
                         if (accessible) {

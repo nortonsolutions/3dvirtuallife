@@ -35,8 +35,9 @@ export const levels = [
             {...Items.busterblade, location: { x: 0, y: 0, z: 0 }},
             Items.redpotion,
             Items.greenpotion,
-            Items.bluepotion,
-            Items.busterbuckler
+            // Items.gold3,
+            // Items.crystalBall
+            
         ],
         structures: [
             Structures.shed,
@@ -47,7 +48,7 @@ export const levels = [
         entities: [
             Entities.john,
             Entities.evilOne,
-            // Entities.evilOne
+            Entities.evilOne
         ]
     },
     {
@@ -73,6 +74,8 @@ export const levels = [
         items: [
             Items.bagOfGems,
             Items.mace,
+            Items.bluepotion,
+            Items.busterbuckler,
             {...Items.torch, location: { x: 0, y: 0, z: 0}},
             {...Items.keyToChest, location: { x: 1, y: 0, z: 0 }}
         ],
@@ -83,6 +86,8 @@ export const levels = [
         ],
         entities: [
             Entities.john,
+            Entities.evilOne,
+            Entities.evilOne,
             Entities.evilOne,
             Entities.evilOne,
             Entities.rat,

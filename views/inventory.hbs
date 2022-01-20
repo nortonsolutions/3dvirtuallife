@@ -12,7 +12,7 @@
                             {{#if name}}
                             <img id="{{name}}" class="draggable" draggable="true" src="/models/png/{{image}}" quant="{{name}}quant" describedBy="{{name}}desc">
                             <span id="{{name}}desc" class="tooltippertext noClick">{{description}}</span>
-                            {{#if showInventory}}<span id="{{name}}quant" class="noClick">{{quantity}}</span>{{/if}}
+                            {{#if ../showInventory}}<span id="{{name}}quant" class="noClick">{{quantity}}</span>{{/if}}
 
                             {{/if}}
                     </div>

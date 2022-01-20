@@ -64,6 +64,7 @@ export class StandardForm {
                 
             }
 
+            
             this.setToCastShadows();
             
             callback();
@@ -71,6 +72,19 @@ export class StandardForm {
         }, undefined, function ( error ) {
             console.error( error );
         });
+    }
+
+    computeVertexNormals(el) {
+
+        if (el.geometry) {
+            el.geometry.computeVertexNormals();
+        } 
+        
+        if (el.children) {
+            el.children.forEach(child => {
+                this.computeVertexNormals(child);
+            })
+        }
     }
 
     determineElevationFromBase() {

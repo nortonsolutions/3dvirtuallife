@@ -43,6 +43,7 @@ export class IntelligentForm extends AnimatedForm{
             // this.listGeometries(this.model);
             // this.listPositions(this.model);
             // this.getBoundingSphereHandR(this.model);
+            // this.computeVertexNormals(this.model);
             if (callback) callback();
         })
 
@@ -259,12 +260,12 @@ export class IntelligentForm extends AnimatedForm{
         this.fadeToAction("Death", 0.2);
     }
 
-    addToInventory(itemName, desiredIndex) {
+    addToInventory(itemName, desiredIndex, quantity) {
 
-        var quantity;
+        var newQuantity;
         var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
         if (itemIndex != -1) {
-            quantity = this.inventory[itemIndex].quantity + 1;
+            newQuantity = this.inventory[itemIndex].quantity + quantity;
         } else {
 
             // If desiredIndex is already defined, use the first inventory slot
@@ -272,15 +273,15 @@ export class IntelligentForm extends AnimatedForm{
                 itemIndex = this.firstInventorySlot();
             } else itemIndex = desiredIndex;
 
-            quantity = 1;
+            newQuantity = 1;
         }
 
         this.inventory[itemIndex] = {
             itemName: itemName,
-            quantity: quantity
+            quantity: newQuantity
         }
 
-        return {itemIndex, quantity};
+        return {itemIndex, quantity: newQuantity};
     }
 
     /**
@@ -312,6 +313,14 @@ export class IntelligentForm extends AnimatedForm{
 
     getInventory() {
         return this.inventory;
+    }
+
+    inventoryContains(items) {
+        var found = false;
+        items.forEach(item => {
+            if (this.inventory.map(el => el? el.itemName: null).includes(item)) found = true;
+        })
+        return found;
     }
 
     equip(area, itemName, throwable = false) {
