@@ -151,24 +151,27 @@ export class DialogScreen {
      */
     addTabItem(itemName, price) { // always incremented by one
 
-        let [paymentItem,paymentQuantity] = price.split('/');
-        
-        var paymentItemTotal;
+        let currentNumberCommitted = this.tab.items[itemName]? this.tab.items[itemName] : 0;
+        if (currentNumberCommitted < this.entity.getInventoryQuantity(itemName)) {
 
-        if (this.tab.totalPrice[paymentItem]) { // increment
-            paymentItemTotal  = Number(this.tab.totalPrice[paymentItem]) + Number(paymentQuantity);
-        }  else { // create
-            paymentItemTotal = Number(paymentQuantity);
+            let [paymentItem,paymentQuantity] = price.split('/');
+            
+            var paymentItemTotal;
+
+            if (this.tab.totalPrice[paymentItem]) { // increment
+                paymentItemTotal  = Number(this.tab.totalPrice[paymentItem]) + Number(paymentQuantity);
+            }  else { // create
+                paymentItemTotal = Number(paymentQuantity);
+            }
+
+            if (this.tab.items[itemName]) { // increment
+                this.tab.items[itemName] = Number(this.tab.items[itemName]) + 1;
+            }  else { // create
+                this.tab.items[itemName] = 1
+            }
+
+            this.tab.totalPrice[paymentItem] = paymentItemTotal;
         }
-
-        if (this.tab.items[itemName]) { // increment
-            this.tab.items[itemName] = Number(this.tab.items[itemName]) + 1;
-        }  else { // create
-            this.tab.items[itemName] = 1
-        }
-
-        this.tab.totalPrice[paymentItem] = paymentItemTotal;
-
         return this.tab;
     }
 
@@ -243,10 +246,37 @@ export class DialogScreen {
         if (Object.keys(this.tab.items).length == 0) return false;
 
         let goodDeal = true;
+
+
+        // this.tab.totalPrice and this.payment resemble this: 
+        // {
+        //    "gold": 20,   (payable with items of exchange as well)
+        //    "crystalBall": 1,
+        //    "bagOfGems": 2    (redeemable as gold)
+        // }
+
         Object.keys(this.tab.totalPrice).forEach(itemName => {
-            if (this.payment[itemName] == undefined || this.tab.totalPrice[itemName] > this.payment[itemName]) {
-                goodDeal = false;
+
+            switch (itemName) {
+                case "gold":
+
+                    // check to see if the total gold value of the offer meets the price
+                    var tally = 0;
+                    Object.keys(this.payment).forEach(item => {
+                        let quantity = Number(this.payment[item]);
+                        if (item == "gold") {
+                            tally += quantity;
+                        } else tally += (quantity * this.entity.getGoldValue(item));
+                    })
+                    if (this.tab.totalPrice[itemName] > tally) goodDeal = false;
+                    break;
+
+                default: 
+                    if (this.payment[itemName] == undefined || this.tab.totalPrice[itemName] > this.payment[itemName]) {
+                        goodDeal = false;
+                    }
             }
+
         })
         return goodDeal;
     }

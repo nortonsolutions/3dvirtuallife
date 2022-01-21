@@ -154,9 +154,14 @@ export class ArtificialForm extends IntelligentForm{
         let special = this.attributes.conversation.conversationState != "complete" && this.attributes.conversation.special;
 
         // If special condition is already met and jumpToState is set, set to complete
-        if (special && this.inventoryContainsAll(special.condition)) {
-            this.completeConversation();
+        if (special && this.inventoryContainsAll(special.condition) && this.attributes.conversation.special.jumpToState) {
+            switch (this.attributes.conversation.special.jumpToState) {
+                case "complete": 
+                    this.completeConversation();
+                    break;
+            }
             return this.attributes.conversation[this.attributes.conversation.conversationState];
+
         } else {
             // If hero meets the 'special condition' then jump straight to it:
             if (special && this.sceneController.hero.inventoryContains(special.condition)) {

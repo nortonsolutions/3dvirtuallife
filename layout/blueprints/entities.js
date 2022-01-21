@@ -79,7 +79,6 @@ export const Entities = {
                     condition: ["crystalBall"],
                     speech: 'Ah, you have my crystal ball!  Please take what you will in exchange!',
                     action: "showWares",
-                    responses: [convo.shop],
                     jumpToState: "complete"
                 },
                 intro: {
@@ -136,14 +135,14 @@ export const Entities = {
             width: 20,
             elevation: 0,
             scale: 10,
+            goldValue: 1.1, // Slightly higher value of gold on exchanges
             conversation: {
                 conversationState: "intro",
                 engagementState: 0,
                 special: {
                     condition: ["bagOfGems","gold"],
                     speech: 'Welcome to my shop, my friend.',
-                    action: 'showWares',
-                    responses: [convo.exchange]
+                    action: 'showWares'
                 },
                 intro: {
                     speech: "Hello there, stranger.  Come back when you have something to trade.", 

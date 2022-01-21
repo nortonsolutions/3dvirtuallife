@@ -35,8 +35,13 @@ export const levels = [
             Items.redpotion,
             Items.greenpotion,
             Items.crystalBall,
-            Items.gold3
-            
+            Items.gold3,
+            Items.bagOfGems,
+            Items.bagOfGems,
+            Items.bagOfGems,
+            Items.gold25,
+            Items.gold10,
+            Items.gold3,
         ],
         structures: [
             Structures.shed,

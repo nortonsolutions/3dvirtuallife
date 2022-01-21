@@ -281,7 +281,9 @@ export class IntelligentForm extends AnimatedForm{
         let gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
         let obj = gameObjects[itemName];
         if (obj.attributes.value) {
-            return obj.attributes.value;
+
+            let goldValue = this.attributes.goldValue? this.attributes.goldValue: 1;
+            return Number(obj.attributes.value / goldValue);
         } else return 0;
     }
 
