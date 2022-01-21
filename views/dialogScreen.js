@@ -10,6 +10,87 @@ export class DialogScreen {
         this.payment = { };
         this.acceptDisabled = true;
         this.tempSpeech = null;
+        this.negotiation = false;
+    }
+
+    addDialogEvents() {
+
+        Array.from(document.querySelectorAll('.response')).forEach(el => {
+            el.addEventListener('click', e => {
+                // e.target.id;
+                let responseType = this.getContext().responses[e.target.id].type;
+                switch (responseType) {
+                    case "engage":
+                        this.entity.engageConversation();
+                        break;
+                    case "disengage":
+                        this.entity.disengageConversation();
+                        break;
+                    case "neutral":
+                        break;
+                }
+                this.refresh();
+            })
+        })
+
+        Array.from(document.querySelectorAll('.changeTabItem')).forEach(el => {
+
+            el.addEventListener('click', () => {
+                let [itemName,price] = el.attributes['data-item'].value.split(':');
+                let quantity = Number(el.attributes['data-quantity'].value);
+    
+                if (quantity == "1") { // "1" or "-1"
+                    this.addTabItem(itemName, price);
+                } else {
+                    this.removeTabItem(itemName, price);
+                }
+
+                this.refresh();
+            })
+        })
+
+        Array.from(document.querySelectorAll('.changePaymentItem')).forEach(el => {
+            el.addEventListener('click', () => {
+                let [itemName,price] = el.attributes['data-item'].value.split(':');
+                let quantity = Number(el.attributes['data-quantity'].value);
+    
+                if (quantity == "1") { // "1" or "-1"
+                    this.addPaymentItem(itemName);
+                } else {
+                    this.removePaymentItem(itemName);
+                }
+
+                this.refresh();
+            })
+        })
+
+        Array.from(document.querySelectorAll('.matchTab')).forEach(el => {
+            el.addEventListener('click', e => {
+                this.matchTab();
+                this.refresh();
+            })
+        })
+
+        Array.from(document.querySelectorAll('.acceptDeal')).forEach(el => {
+            el.addEventListener('click', e => {
+
+                var response;
+                if (Array.from(el.classList).includes("disabled")) {
+                    response = "You'll have to do better than that, my friend."
+                } else {
+                    response = this.acceptDeal();
+                }
+
+                this.refresh(response);
+            })
+        })
+
+
+    }
+
+    setCurrentEntities(entity, hero) {
+        this.entity = entity;
+        this.hero = hero;
     }
 
     reset() {
@@ -17,6 +98,33 @@ export class DialogScreen {
         this.tab = { items: {}, totalPrice: {} } ;
         this.payment = { };
         this.tempSpeech = null;
+        this.negotiation = false;
+    }
+
+    refresh = (tempSpeech) => {
+
+        if (tempSpeech) {
+            this.updateSpeech(tempSpeech);
+        } else this.tempSpeech = null;
+
+
+        if (this.negotiation) {
+            if (this.goodDeal()) {
+                this.acceptDisabled = false;
+                this.updateSpeech("This looks like a fair deal!");
+    
+            } else {
+                this.updateSpeech(tempSpeech? tempSpeech: "Make me an offer.");
+                this.acceptDisabled = true;
+            }
+        }
+
+        let context = this.getContext();
+
+        this.modal.loadTemplate('modal-body', "dialog", context, () => {
+            this.addDialogEvents();
+        });
+
     }
 
     updateSpeech(speech) {
@@ -51,14 +159,6 @@ export class DialogScreen {
             paymentItemTotal  = Number(this.tab.totalPrice[paymentItem]) + Number(paymentQuantity);
         }  else { // create
             paymentItemTotal = Number(paymentQuantity);
-        }
-
-        // Don't bother adding if the hero doesn't have it...
-        if (paymentItemTotal > this.hero.getInventoryQuantity(paymentItem)) {
-            this.updateSpeech("Sorry friend.  You don't have enough to pay for this.");
-            return this.tab;
-        } else {
-            this.updateSpeech("Ah yes, what a fine item it is!");
         }
 
         if (this.tab.items[itemName]) { // increment
@@ -138,79 +238,6 @@ export class DialogScreen {
 
     }
 
-    setCurrentEntities(entity, hero) {
-        this.entity = entity;
-        this.hero = hero;
-    }
-
-    addDialogEvents() {
-
-        Array.from(document.querySelectorAll('.response')).forEach(el => {
-            el.addEventListener('click', e => {
-                // e.target.id;
-                let responseType = this.getContext().responses[e.target.id].type;
-                switch (responseType) {
-                    case "engage":
-                        this.entity.engageConversation();
-                        break;
-                    case "disengage":
-                        this.entity.disengageConversation();
-                        break;
-                    case "neutral":
-                        break;
-                }
-                this.refresh();
-            })
-        })
-
-        Array.from(document.querySelectorAll('.changeTabItem')).forEach(el => {
-
-            el.addEventListener('click', () => {
-                let [itemName,price] = el.attributes['data-item'].value.split(':');
-                let quantity = Number(el.attributes['data-quantity'].value);
-    
-                if (quantity == "1") { // "1" or "-1"
-                    this.addTabItem(itemName, price);
-                } else {
-                    this.removeTabItem(itemName, price);
-                }
-
-                this.refresh();
-            })
-        })
-
-        Array.from(document.querySelectorAll('.changePaymentItem')).forEach(el => {
-            el.addEventListener('click', () => {
-                let [itemName,price] = el.attributes['data-item'].value.split(':');
-                let quantity = Number(el.attributes['data-quantity'].value);
-    
-                if (quantity == "1") { // "1" or "-1"
-                    this.addPaymentItem(itemName);
-                } else {
-                    this.removePaymentItem(itemName);
-                }
-
-                this.refresh();
-            })
-        })
-
-        Array.from(document.querySelectorAll('.matchTab')).forEach(el => {
-            el.addEventListener('click', e => {
-                this.matchTab();
-                this.refresh();
-            })
-        })
-
-        Array.from(document.querySelectorAll('.acceptDeal')).forEach(el => {
-            el.addEventListener('click', e => {
-                this.acceptDeal();
-                this.refresh();
-            })
-        })
-
-
-    }
-
     goodDeal() {
 
         if (Object.keys(this.tab.items).length == 0) return false;
@@ -249,7 +276,7 @@ export class DialogScreen {
         this.hero.cacheHero();
         // TODO: Adjust the wants of the entity
         this.reset();
-        this.refresh();
+        return "We have a deal!";
     }
 
     getContext() {
@@ -259,6 +286,7 @@ export class DialogScreen {
 
         if (context.wares) {
 
+            this.negotiation = true;
             var inv = context.wares;
             context.inventory = [];
             context.wants = [];
@@ -317,17 +345,4 @@ export class DialogScreen {
         return context;
     }
 
-    refresh = () => {
-
-        if (this.goodDeal()) {
-            this.acceptDisabled = false;
-        } else this.acceptDisabled = true;
-
-        let context = this.getContext();
-        this.modal.loadTemplate('modal-body', "dialog", context, () => {
-            this.addDialogEvents();
-        });
-
-
-    }
 }

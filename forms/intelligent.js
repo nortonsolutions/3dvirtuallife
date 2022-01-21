@@ -270,9 +270,31 @@ export class IntelligentForm extends AnimatedForm{
 
     getInventoryQuantity(itemName) {
         var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
-        if (itemIndex != -1) {
+        if (itemIndex != -1)
+         {
             return this.inventory[itemIndex].quantity;
         } else return 0;
+    }
+
+    getGoldValue(itemName) {
+
+        let gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
+        let obj = gameObjects[itemName];
+        if (obj.attributes.value) {
+            return obj.attributes.value;
+        } else return 0;
+    }
+
+    getTotalNetWorth() {
+        let worth = 0;
+        this.inventory.forEach(item => {
+            if (item.itemName == "gold") {
+                worth += item.quantity;
+            } else {
+                worth += getGoldValue(item.itemName);
+            }
+        })
+        return worth;
     }
 
     addToInventory(itemName, desiredIndex, quantity) {
@@ -406,8 +428,8 @@ export class IntelligentForm extends AnimatedForm{
             this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
         } else {
             
-
-            let item = this.gameObjects[itemName];
+            let gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
+            let item = gameObjects[itemName];
 
             if (area != "special") { // special = no model to remove
                 let thisItem = this.model.getObjectByProperty("objectName", itemName);
