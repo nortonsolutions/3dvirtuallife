@@ -207,15 +207,19 @@ class InventoryScreen {
             ev.preventDefault();
             let data = ev.dataTransfer.getData("text").split(':');
 
-            let dropData = {
-                itemName: data[0],
-                location: this.location,
-                source: data[3]
+            if (data[0] != "gold") {
+
+                let dropData = {
+                    itemName: data[0],
+                    location: this.location,
+                    source: data[3]
+                }
+    
+                this.eventDepot.fire('dropItemToScene', dropData);
+    
+                this.refresh();
+    
             }
-
-            this.eventDepot.fire('dropItemToScene', dropData);
-
-            this.refresh();
         }
     
         document.querySelectorAll('.draggable').forEach(draggableElement => {

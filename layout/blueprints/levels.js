@@ -32,11 +32,10 @@ export const levels = [
         items: [
             Items.keyToShed,
             Items.smallSword,
-            {...Items.busterblade, location: { x: 0, y: 0, z: 0 }},
             Items.redpotion,
             Items.greenpotion,
-            // Items.gold3,
-            // Items.crystalBall
+            Items.crystalBall,
+            Items.gold3
             
         ],
         structures: [
@@ -48,7 +47,7 @@ export const levels = [
         entities: [
             Entities.john,
             Entities.evilOne,
-            Entities.evilOne
+            Entities.shopkeep
         ]
     },
     {
@@ -77,7 +76,11 @@ export const levels = [
             Items.bluepotion,
             Items.busterbuckler,
             {...Items.torch, location: { x: 0, y: 0, z: 0}},
-            {...Items.keyToChest, location: { x: 1, y: 0, z: 0 }}
+            {...Items.keyToChest, location: { x: 1, y: 0, z: 0 }},
+            Items.gold3,
+            Items.gold25,
+            Items.gold1,
+            Items.gold10
         ],
         structures: [
             {...Structures.ancientChest, location: { x: 0, y: 0, z: -1 }},
@@ -86,7 +89,6 @@ export const levels = [
         ],
         entities: [
             Entities.john,
-            Entities.evilOne,
             Entities.evilOne,
             Entities.evilOne,
             Entities.evilOne,
@@ -116,7 +118,9 @@ export const levels = [
             }
         },
         items: [
-            {...Items.crystalBall, location: { x: 10, y: 0, z: 0 }}
+            {...Items.crystalBall, location: { x: 10, y: 0, z: 0 }},
+            {...Items.busterblade, location: { x: 0, y: 0, z: 0 }},
+            {...Items.gold25, location: { x: 1, y: 0, z: -1 }}
         ],
         structures: [
             Structures.archway1

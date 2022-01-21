@@ -258,7 +258,7 @@ export class Hero extends IntelligentForm {
                         
                         // TODO: conversation
                         this.sceneController.eventDepot.fire('unlockControls', {});
-                        this.sceneController.eventDepot.fire('modal', { type: 'dialog', title: this.selectedObject.objectName, context: this.selectedObject });
+                        this.sceneController.eventDepot.fire('modal', { type: 'dialog', title: this.selectedObject.objectName, entity: this.selectedObject, hero: this });
                     
                     } else if (objectType == "beast") {
     

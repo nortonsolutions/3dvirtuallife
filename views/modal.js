@@ -28,9 +28,8 @@ class Modal {
                 context = this.inventoryScreen.getContext(0);
 
             } else if (data.type == "dialog") {
-
-                let entity = data.context;
-                this.dialogScreen.setCurrentEntity(entity);
+                this.dialogScreen.reset();
+                this.dialogScreen.setCurrentEntities(data.entity, data.hero);
                 context = this.dialogScreen.getContext();
 
             } else {

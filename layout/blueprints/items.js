@@ -6,11 +6,13 @@ export const Items = {
         description: 'Gold',
         type: 'item',
         attributes: {
+            value: 1, // in gold
             animates: false,
             scale: 100,
             elevation: 20
         }
-    },    gold1: {
+    },    
+    gold1: {
         name: 'gold1',
         gltf: 'gold1.glb',
         description: 'One perfect gold coin',
@@ -93,7 +95,7 @@ export const Items = {
         description: 'A small velvet bag full of gems',
         type: 'item',
         attributes: {
-            exchange: 30,
+            value: 30, // in gold
             animates: false,
             scale: 100,
             elevation: 10

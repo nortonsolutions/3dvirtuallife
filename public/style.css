@@ -18,6 +18,10 @@ img {
     padding: 0 !important;
 }
 
+.tallCard {
+    width: 80px  !important;
+}
+
 .charGrid {
     background-image: url('/models/png/hero.png');
     background-size: 100% 100%;

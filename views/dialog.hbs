@@ -3,38 +3,86 @@
         <div class="row">
             <div id="speech" class="col-12">{{speech}}</div>
         </div>
-        <hr>
+        <hr class="m-2">
         {{#if wares}}
-
-            <div class="col-6 p-1">
-                <div class="row mx-0 d-flex justify-content-center">
-
+        <div class="row">
+            
+            <div class="col-6 px-2">
+                <h4>Wares:</h4>
+                <div class="row mx-1">
 
                         {{#each inventory}}
-
-                        <div class="col-xs-1-12">
-                            <div class="card">
+                        <div class="tallCard col-xs-1-12 p-1">
                             <div class="card-body tooltipper dragSpot" id={{index}}>
-                                    {{#if name}}
-                                    <img id="{{name}}" class="draggable" draggable="true" src="/models/png/{{image}}" quant="{{name}}quant" describedBy="{{name}}desc">
-                                    <span id="{{name}}desc" class="tooltippertext noClick">{{description}}</span>
-                                    {{#if showInventory}}<span id="{{name}}quant" class="noClick">{{quantity}}</span>{{/if}}
-
-                                    {{/if}}
-                            </div>
+                                <img id="{{name}}" class="draggable" draggable="true" src="/models/png/{{image}}" quant="{{name}}quant" describedBy="{{name}}desc">
+                                <span id="{{name}}desc" class="tooltippertext noClick">{{description}}</span>
+                                <span id="{{name}}quant" class="noClick small">{{quantity}} for {{priceString}}</span>
+                                <div class="row d-flex justify-content-center mx-0 px-0">
+                                    <div class="col-6 mx-0 px-0"><button type="button" class="btn btn-secondary btn-sm changeTabItem" data-item="{{name}}:{{price}}" data-quantity="1"><i class="fas fa-plus noClick"></i></button></div>
+                                    <div class="col-6 mx-0 px-0"><button type="button" class="btn btn-secondary btn-sm changeTabItem" data-item="{{name}}:{{price}}" data-quantity="-1"><i class="fas fa-minus noClick"></i></button></div>
+                                </div>
                             </div>
                         </div>
                         {{/each}}
                     
                 </div>
-
-                <div class="row">
-
+            </div>
+            <div class="col-6 px-2">
+                <h4>Wants:</h4>
+                <div class="row mx-1">
+                    
+                        {{#each wants}}
+                        <div class="tallCard col-xs-1-12 p-1">
+                            <div class="card-body tooltipper dragSpot" id={{index}}>
+                                <img src="/models/png/{{image}}" quant="{{name}}quant" describedBy="{{name}}desc">
+                                <span id="{{name}}desc" class="tooltippertext noClick">{{description}}</span>
+                                <span id="{{name}}quant" class="noClick small">{{quantity}}</span>
+                                <div class="row d-flex justify-content-center mx-0 px-0">
+                                    <div class="col-6 mx-0 px-0"><button type="button" class="btn btn-secondary btn-sm changePaymentItem" data-item="{{name}}:{{price}}" data-quantity="1"><i class="fas fa-plus noClick"></i></button></div>
+                                    <div class="col-6 mx-0 px-0"><button type="button" class="btn btn-secondary btn-sm changePaymentItem" data-item="{{name}}:{{price}}" data-quantity="-1"><i class="fas fa-minus noClick"></i></button></div>
+                                </div>
+                            </div>
+                        </div>
+                        {{/each}}
                 </div>
             </div>
 
-        <hr>
+        </div>
+        <hr class="m-2">
+        <div class="row">
+            
+            <div class="col-6 px-2">
+            <h4>Tab:</h4>
+                <div class="row mx-1">
+                    <div class="col-3">Items:</div> 
+                    <div class="col-9">
+                    {{#each tab.items}}
+                        <div class="row"><b>{{@key}}</b>: {{this}}</div>
+                    {{/each}}
+                    </div>
+                </div>
+                <div class="row mx-1">
+                    <div class="col-3">Cost:</div>
+                    <div class="col-9">
+                    {{#each tab.totalPrice}}
+                        <div class="row"><b>{{@key}}</b>: {{this}}</div>
+                    {{/each}}
+                    </div> 
+                </div>
+            </div>
+            <div class="col-6 px-2">
+            <h4>Payment:  <button type="button" class="btn btn-secondary btn-sm matchTab">Match</button> <button type="button" id="acceptDeal" class="btn btn-primary btn-sm acceptDeal {{#if acceptDisabled}}disabled{{/if}}">Accept</button></h4>
+                <div class="row mx-1">
+
+                    {{#each payment}}
+                        {{@key}}: {{this}}
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+
         {{/if}}
+
         {{#each responses}}
         <div class="row">
             <div id="{{@index}}" class="{{type}} response col-8">

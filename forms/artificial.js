@@ -147,7 +147,7 @@ export class ArtificialForm extends IntelligentForm{
     disengageConversation() {
         this.attributes.conversation.conversationState = "disengaged";
         this.attributes.conversation.engagementState = 0;
-    }s
+    }
 
     getCurrentConversation() {
 

@@ -43,7 +43,7 @@ export class IntelligentForm extends AnimatedForm{
             // this.listGeometries(this.model);
             // this.listPositions(this.model);
             // this.getBoundingSphereHandR(this.model);
-            // this.computeVertexNormals(this.model);
+            this.computeVertexNormals(this.model);
             if (callback) callback();
         })
 
@@ -260,6 +260,13 @@ export class IntelligentForm extends AnimatedForm{
         this.fadeToAction("Death", 0.2);
     }
 
+    getInventoryQuantity(itemName) {
+        var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
+        if (itemIndex != -1) {
+            return this.inventory[itemIndex].quantity;
+        } else return 0;
+    }
+
     addToInventory(itemName, desiredIndex, quantity) {
 
         var newQuantity;
@@ -273,7 +280,7 @@ export class IntelligentForm extends AnimatedForm{
                 itemIndex = this.firstInventorySlot();
             } else itemIndex = desiredIndex;
 
-            newQuantity = 1;
+            newQuantity = quantity;
         }
 
         this.inventory[itemIndex] = {
