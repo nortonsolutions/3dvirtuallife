@@ -225,7 +225,31 @@ export class DialogScreen {
     }
 
     acceptDeal() { // item exchange
+        Object.keys(this.tab.items).forEach(item => {
+            this.hero.addToInventory(item, 0, this.tab.items[item]);
+        });
 
+        Object.keys(this.payment).forEach(item => {
+            this.entity.addToInventory(item, 0, this.payment[item]);
+        });
+
+        // Removals
+        Object.keys(this.tab.items).forEach(item => {
+            for (let i = 0; i < this.tab.items[item]; i++) {
+                this.entity.removeFromInventory(item);
+            }
+        })
+
+        Object.keys(this.payment).forEach(item => {
+            for (let i = 0; i < this.payment[item]; i++) {
+                this.hero.removeFromInventory(item); 
+            }
+        })
+        
+        this.hero.cacheHero();
+        // TODO: Adjust the wants of the entity
+        this.reset();
+        this.refresh();
     }
 
     getContext() {
@@ -237,30 +261,32 @@ export class DialogScreen {
 
             var inv = context.wares;
             context.inventory = [];
-
-            let wantsPageSize = 2;
             context.wants = [];
 
             for (let index = 0; index < inv.length; index++) {
                 let objectName = inv[index] && inv[index].itemName ? inv[index].itemName : undefined;
 
-                let priceString = null;
-                let [paymentItem,paymentQuantity] = inv[index].price.split('/');
 
-                if (paymentItem == "gold") {
-                    priceString = "$" + paymentQuantity;
-                } else priceString = 'item';
+                if (inv[index] && inv[index].price) { // if the item is valid and has a price
+                    let priceString = null;
 
-                context.inventory[index] = {
-                    index: index,
-                    name: objectName,
-                    description: this.gameObjects[objectName].description,
-                    image: this.gameObjects[objectName].image,
-                    quantity: inv[index].quantity? inv[index].quantity: 1,
-                    price: inv[index].price,
-                    priceString
-                };
 
+                    let [paymentItem,paymentQuantity] = inv[index].price.split('/');
+    
+                    if (paymentItem == "gold") {
+                        priceString = "$" + paymentQuantity;
+                    } else priceString = 'item';
+    
+                    context.inventory[index] = {
+                        index: index,
+                        name: objectName,
+                        description: this.gameObjects[objectName].description,
+                        image: this.gameObjects[objectName].image,
+                        quantity: inv[index].quantity? inv[index].quantity: 1,
+                        price: inv[index].price,
+                        priceString
+                    };
+                }
             }
 
             // look at special conditions to determine wants
@@ -284,7 +310,10 @@ export class DialogScreen {
         context.tab = this.tab;
         context.acceptDisabled = this.acceptDisabled;
 
-        if (this.tempSpeech) context.speech = this.tempSpeech;
+        if (this.tempSpeech) {
+            context.tempSpeech = this.tempSpeech;
+        } else context.tempSpeech = null;
+
         return context;
     }
 

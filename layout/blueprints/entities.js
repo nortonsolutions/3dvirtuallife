@@ -105,7 +105,7 @@ export const Entities = {
                     responses: [convo.engage, convo.disengage]
                 },
                 complete: {
-                    speech: "Most esteemed greetings to you, ", // complete with hero name
+                    speech: "Most esteemed greetings to you, my friend!",
                     responses: [convo.wellwish]
                 }
             },
@@ -147,7 +147,7 @@ export const Entities = {
                 },
                 intro: {
                     speech: "Hello there, stranger.  Come back when you have something to trade.", 
-                    responses: [convo.disengage, convo.wellwish]
+                    responses: [convo.wellwish]
                 }
             },
             stats: {

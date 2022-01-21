@@ -1,7 +1,7 @@
     <div class="col">
 
         <div class="row">
-            <div id="speech" class="col-12">{{speech}}</div>
+            <div id="speech" class="col-12">{{#if tempSpeech}}{{tempSpeech}}{{else}}{{speech}}{{/if}}</div>
         </div>
         <hr class="m-2">
         {{#if wares}}

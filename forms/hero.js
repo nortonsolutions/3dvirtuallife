@@ -379,13 +379,7 @@ export class Hero extends IntelligentForm {
         callback();
     }
 
-    firstInventorySlot() {
-        let max = this.inventory.length;
-        for (let i = 0; i < this.inventory.length; i++ ) {
-            if (!this.inventory[i] || !this.inventory[i].itemName) return i;
-        }
-        return max;
-    }
+
     
     returnTemplate() {
 

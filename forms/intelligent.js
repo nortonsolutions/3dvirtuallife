@@ -260,6 +260,14 @@ export class IntelligentForm extends AnimatedForm{
         this.fadeToAction("Death", 0.2);
     }
 
+    firstInventorySlot() {
+        let max = this.inventory.length;
+        for (let i = 0; i < this.inventory.length; i++ ) {
+            if (!this.inventory[i] || !this.inventory[i].itemName) return i;
+        }
+        return max;
+    }
+
     getInventoryQuantity(itemName) {
         var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
         if (itemIndex != -1) {
@@ -330,6 +338,18 @@ export class IntelligentForm extends AnimatedForm{
         return found;
     }
 
+    inventoryContainsAll(items) {
+        // var found = true;
+
+        for (const item of items) {
+            if (!(this.inventory.map(el => el? el.itemName: null).includes(item))) return false;
+        }
+        // items.forEach(item => {
+            
+        // })
+        return true;
+    }
+
     equip(area, itemName, throwable = false) {
         this.equipped[area] = [itemName,throwable];
         
@@ -363,7 +383,7 @@ export class IntelligentForm extends AnimatedForm{
                             this.changeStatBoost(stat, change);
                             break;
                         case "light":
-                            this.sceneController.overheadPointLight.intensity += 10;
+                            if (this.sceneController.overheadPointLight) this.sceneController.overheadPointLight.intensity += 10;
                             break;
                     }
                 }
@@ -407,7 +427,7 @@ export class IntelligentForm extends AnimatedForm{
                         this.changeStatBoost(stat, -change);
                         break;
                     case "light":
-                        this.sceneController.overheadPointLight.intensity -= change;
+                        if (this.sceneController.overheadPointLight) this.sceneController.overheadPointLight.intensity -= change;
                         break;
                 }
             }
