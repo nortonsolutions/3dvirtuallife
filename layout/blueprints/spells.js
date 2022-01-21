@@ -27,8 +27,8 @@ export const Spells = {
         type: 'spell',
         attributes: {
             manaCost: 1,
-            effect: "damage/-3",
-            range: 40,
+            effect: "damage/3",
+            range: 80,
             sprites: [{ 
                 name: "greenExplosion",
                 regex: "",

@@ -30,7 +30,7 @@ export class IntelligentForm extends AnimatedForm{
         this.spells = this.template.spells;
         this.equipped = this.template.equipped;
 
-        this.movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.length/2 + 45 );
+        this.movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.length/2 + 35 );
         // this.movementRaycasterR = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.width/2 + 20 )
         // this.movementRaycasterL = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.width/2 + 20 )
         
@@ -320,6 +320,7 @@ export class IntelligentForm extends AnimatedForm{
             quantity: newQuantity
         }
 
+        if (this.objectType == "hero") this.cacheHero();
         return {itemIndex, quantity: newQuantity};
     }
 
@@ -332,15 +333,19 @@ export class IntelligentForm extends AnimatedForm{
             return el != undefined && el.itemName == itemName
         });
 
+        var quantityRemaining;
         if (index != -1) {
             if (this.inventory[index].quantity > 1) {
                 this.inventory[index].quantity--;
-                return this.inventory[index].quantity;
+                quantityRemaining = this.inventory[index].quantity;
             } else {
                 this.inventory[index] = null;
-                return 0;
+                quantityRemaining = 0;
             }
-        } else return -1;
+        } else quantityRemaining = -1;
+
+        if (this.objectType == "hero") this.cacheHero();
+        return quantityRemaining;
     }
 
     swapInventoryPositions(first,second) {
@@ -348,6 +353,7 @@ export class IntelligentForm extends AnimatedForm{
         let temp2 = {...this.inventory[second]};
         this.inventory[first] = temp2;
         this.inventory[second] = temp;
+        if (this.objectType == "hero") this.cacheHero();
     }
 
     getInventory() {
@@ -417,6 +423,7 @@ export class IntelligentForm extends AnimatedForm{
                 
             });
         }
+        if (this.objectType == "hero") this.cacheHero();
 
     }
     
@@ -456,6 +463,8 @@ export class IntelligentForm extends AnimatedForm{
                 }
             }
         }
+        if (this.objectType == "hero") this.cacheHero();
+
     }
 
 }

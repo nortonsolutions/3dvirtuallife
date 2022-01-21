@@ -201,32 +201,26 @@ export class Hero extends IntelligentForm {
 
         this.sceneController.eventDepot.addListener('swapInventoryPositions', (data) => {
             this.swapInventoryPositions(data.first, data.second);
-            this.cacheHero();
         });
 
         this.sceneController.eventDepot.addListener('unequipItem', (data) => {
             this.unequip(data);
-            this.cacheHero();
         });
 
         this.sceneController.eventDepot.addListener('equipItem', (data) => {
             this.equip(data.bodyPart, data.itemName, data.throwable);
-            this.cacheHero();
         });
 
         this.sceneController.eventDepot.addListener('placeItem', (data) => {
             this.addToInventory(data.itemName, data.desiredIndex);
-            this.cacheHero();
         });
 
         this.sceneController.eventDepot.addListener('takeItemFromScene', (data) => {
             this.addToInventory(data.itemName, undefined, data.quantity);
-            this.cacheHero();
         });
 
         this.sceneController.eventDepot.addListener('removeItem', (itemName) => {
             this.removeFromInventory(itemName);
-            this.cacheHero();
         });
 
         this.sceneController.eventDepot.addListener('dropItemToScene', (data) => {
@@ -236,7 +230,6 @@ export class Hero extends IntelligentForm {
             } else { // equipped
                 this.unequip(data.source);
             }
-            this.cacheHero();
         });
 
         this.sceneController.eventDepot.addListener('mouse0click', () => {
@@ -515,11 +508,11 @@ export class Hero extends IntelligentForm {
     }
 
     levelUpEligibility() {
-        // Formula for each level up: 2^x
+        // Formula for each level up: 2^x+1
         let eligibility = [];
         Object.keys(this.attributes.xpLevels).forEach(category => {
             let nextLevel = Number(this.attributes.xpLevels[category]) + 1;
-            let reqPoints = Math.pow(2, nextLevel);
+            let reqPoints = Math.pow(2, nextLevel+1);
             console.log(`${category}: ${reqPoints} required for level ${nextLevel}`);
             if (this.attributes.experience >= reqPoints) eligibility.push({
                 category,

@@ -141,7 +141,7 @@ export const Items = {
             scale: 5,
             equippedScale: 0.005,
             elevation: 10,
-            effect: "damage/-3",
+            effect: "damage/3",
             range: 40,
             sprites: [{ 
                 name: "greenExplosion",
@@ -183,7 +183,7 @@ export const Items = {
         description: 'A metallic blade, strong yet flexible',
         type: 'item',
         attributes: {
-            equippable: ['handR', 'handL'],
+            equippable: ['Middle2R', 'Middle2L'],
             animates: false,
             scale: 100,
             elevation: 20,
@@ -197,9 +197,10 @@ export const Items = {
         description: 'Heavy-duty armor',
         type: 'item',
         attributes: {
-            equippable: ['torso'],
+            equippable: ['Torso'],
             animates: false,
             scale: 100,
+            equippedScale: 0.02,
             elevation: 20,
             effect: "defense/1"
         } 
@@ -211,7 +212,7 @@ export const Items = {
         description: 'A buster blade',
         type: 'item',
         attributes: {
-            equippable: ['handR', 'handL'],
+            equippable: ['Middle2R', 'Middle2L'],
             animates: false,
             scale: 100,
             elevation: 20,
@@ -225,7 +226,7 @@ export const Items = {
         description: 'A buster buckler',
         type: 'item',
         attributes: {
-            equippable: ['handR', 'handL'],
+            equippable: ['Middle2R', 'Middle2L'],
             animates: false,
             scale: 100,
             elevation: 20,
@@ -239,7 +240,7 @@ export const Items = {
         description: 'A simple wooden torch',
         type: 'item',
         attributes: {
-            equippable: ['handR', 'handL'],
+            equippable: ['Middle2R', 'Middle2L'],
             animates: false,
             scale: 100,
             elevation: 5,
@@ -253,7 +254,7 @@ export const Items = {
         description: 'A metallic mace',
         type: 'item',
         attributes: {
-            equippable: ['handR', 'handL'],
+            equippable: ['Middle2R', 'Middle2L'],
             animates: false,
             scale: 100,
             elevation: 0,

@@ -436,7 +436,7 @@ class Scene {
         let [stat, change] = projectile.item.attributes.effect.split("/");
 
         entitiesInRange.forEach(entity => {
-            this.controller.hero.inflictDamage(entity, -change);
+            this.controller.hero.inflictDamage(entity, change);
         })
     }
 

@@ -29,7 +29,7 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "1/1/0",
                 agility: "1/1/0",
-                defense: "0/0/0"
+                defense: "1/1/0"
             }
         }
     },
@@ -47,11 +47,11 @@ export const Entities = {
             elevation: 0,
             scale: 60,
             stats: {
-                health: "2/2/0",
+                health: "4/4/0",
                 mana: "0/0/0",
                 strength: "1/1/0",
-                agility: "1/2/0",
-                defense: "0/0/0"
+                agility: "3/3/0",
+                defense: "1/1/0"
             }
         }
     },
