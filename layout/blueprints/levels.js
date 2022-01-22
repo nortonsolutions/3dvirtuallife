@@ -45,7 +45,8 @@ export const levels = [
             Items.gold25,
             Items.gold10,
             Items.gold3,
-            Items.bow
+            Items.bow,
+            {...Items.arrow, location: { x: 0, y: 0, z: 0}}
         ],
         structures: [
             Structures.shed,
@@ -93,7 +94,8 @@ export const levels = [
             Items.gold3,
             Items.gold25,
             Items.gold1,
-            Items.gold10
+            Items.gold10,
+            {...Items.arrow, location: { x: 0, y: 0, z: 0}}
         ],
         structures: [
             {...Structures.ancientChest, location: { x: 0, y: 0, z: -1 }},

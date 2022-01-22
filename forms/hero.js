@@ -283,10 +283,18 @@ export class Hero extends IntelligentForm {
                     }
                 } else { // no selected object; ranged attack (i.e. bow)
                     // this.range
-                    let throws = equippedThrows();
+                    let throws = this.equippedThrows();
                     if (throws.length > 0) {
-                        throws.forEach(item => {
-                            this.launch(item)
+                        throws.forEach(([bodyPart,item]) => {
+
+                            // animate weapon (if applicable) and launch item
+                            let tool = this.animatedSubforms.find(el => el[0] == bodyPart)[1];
+                            if (tool) tool.runActiveAction(2);
+                            this.fadeToAction('ThumbsUp', 0.2);
+                            
+                            setTimeout(() => {
+                                this.launch(item);
+                            }, 500)
                         })
                     }
                 }
@@ -580,10 +588,16 @@ export class Hero extends IntelligentForm {
     }
 
     equippedThrows() {
-        throws = [];
-        for (const item of [this.equipped.Middle2R[2],this.equipped.Middle2L[2]]) {
-            if (item) throws.push(item);
+
+        var throws = [];
+        if (this.equipped.Middle2R && this.equipped.Middle2R[2]) {
+            throws.push(['Middle2R', this.equipped.Middle2R[2]]);
         }
+
+        if (this.equipped.Middle2L && this.equipped.Middle2L[2]) {
+            throws.push(['Middle2L', this.equipped.Middle2L[2]]);
+        }
+
         return throws;
     }
 }

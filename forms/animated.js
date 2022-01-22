@@ -17,6 +17,8 @@ export class AnimatedForm extends StandardForm{
         this.emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
         this.currentlyFadingToAction = false;
+
+        this.animatedSubforms = [];
     }
     
     load(callback) {
@@ -54,7 +56,7 @@ export class AnimatedForm extends StandardForm{
             this.previousAction = null;
     
             if (this.attributes.unlocked == undefined || this.attributes.unlocked) {
-                this.activeAction.play();
+                if (this.activeAction) this.activeAction.play();
             }
 
             callback();

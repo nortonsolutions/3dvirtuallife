@@ -134,8 +134,8 @@ export const Items = {
             throwable: true,
             throwableAttributes: {
                 pitch: .9, // angle up (percentage of 90 degrees)
-                weight: 30, // lbs
-                distance: 350, // px
+                weight: 2, // lbs
+                distance: 600, // px
                 speed: 3 // 1 = full walking speed
             },
             scale: 5,
@@ -215,11 +215,9 @@ export const Items = {
             equippable: ['Middle2R', 'Middle2L'],
             animates: true,
             defaultAction: "ArmatureAction",
-            scale: 100,
-            elevation: 20,
             throwable: false,
             throws: "arrow",
-            scale: 5,
+            scale: 10,
             equippedScale: 0.005,
             elevation: 10,
             effect: "strenth/1",
@@ -232,20 +230,20 @@ export const Items = {
         description: 'A buster arrow',
         type: 'item',
         attributes: {
-            scale: 100,
-            elevation: 20,
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 200,
+            equippedScale: 0.2,
             throwable: true,
             throwableAttributes: {
-                pitch: .9, // angle up (percentage of 90 degrees)
-                weight: 10, // lbs
-                distance: 1000, // px
-                speed: 6 // 1 = full walking speed
+                pitch: .7, // angle up (percentage of 90 degrees)
+                weight: 1, // lbs
+                distance: 1200, // px
+                speed: 3 // 1 = full walking speed
             },
-            scale: 5,
-            equippedScale: 0.005,
             elevation: 10,
             effect: "damage/5",
-            range: 10
+            range: 20
         }         
     },
     busterblade: {

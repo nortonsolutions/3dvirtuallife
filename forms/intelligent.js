@@ -421,6 +421,11 @@ export class IntelligentForm extends AnimatedForm{
 
                 if (area != "special") this.model.getObjectByName(area).add(item.model);
                 
+                if (item.attributes.animates) {
+
+                    this.animatedSubforms.push([area,item]);
+                }
+
             });
         }
         if (this.objectType == "hero") this.cacheHero();
@@ -462,9 +467,25 @@ export class IntelligentForm extends AnimatedForm{
                         break;
                 }
             }
+
+            if (item.attributes.animates) {
+                this.animatedSubforms = this.animatedSubforms.filter(el => { el[0] != area });
+            }
         }
+
         if (this.objectType == "hero") this.cacheHero();
 
     }
+
+    // getEquippedFormByBodyPart(bodyPart) {
+
+    //     // look up in forms by uuid since various entities will have same bodypart names
+    //     let uuid = this.model.find(el => { return el.objectName == this.equipped[bodyPart][0] }).uuid;
+    //     return this.sceneController.forms.find(el => { return el.model.uuid == uuid })
+     
+    //     // should every entity have its own registry of animated forms to process?
+    // }
+
+
 
 }

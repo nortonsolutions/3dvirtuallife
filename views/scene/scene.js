@@ -444,6 +444,8 @@ class Scene {
         entitiesInRange.forEach(entity => {
             this.controller.hero.inflictDamage(entity, change);
         })
+
+        if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
     }
 
     handleProjectiles(delta) {
@@ -460,14 +462,14 @@ class Scene {
 
             if (projectile.distanceTraveled == 0) { // first iteration, set velocitiess
 
-                projectile.velocity.y = (projectile.direction.y) * 100;
-                projectile.velocity.z = projectile.item.attributes.throwableAttributes.speed * 1000;
+                projectile.velocity.y = (projectile.direction.y) * 500;
+                projectile.velocity.z = projectile.item.attributes.throwableAttributes.speed * 500;
                 
             } else { // subsequent iterations
 
                 // INERTIA/GRAVITY
-                projectile.velocity.z -= projectile.velocity.z * 10.0 * delta;
-                projectile.velocity.y -= 9.8 * projectile.item.attributes.throwableAttributes.weight * delta;
+                projectile.velocity.z -= projectile.velocity.z * delta;
+                projectile.velocity.y -= 9.8 * projectile.item.attributes.throwableAttributes.weight * 100 * delta;
             }
 
             projectile.item.model.translateY( projectile.velocity.y * delta );
@@ -484,9 +486,12 @@ class Scene {
 
             let maxDistance = projectile.item.attributes.throwableAttributes.distance;
 
+            console.log(`traveled: ${projectile.distanceTraveled}, position: ${projectile.item.model.position.x}, ${projectile.item.model.position.y},${projectile.item.model.position.z }`);
             if (projectile.distanceTraveled > maxDistance) {
                 projectile.distanceTraveled = -1;
             }
+
+            
         })
     }
 

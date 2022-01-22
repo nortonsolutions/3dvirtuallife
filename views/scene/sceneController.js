@@ -344,7 +344,15 @@ export class SceneController {
     allEnemiesInRange(range, position) {
         var response = [];
         this.entities.filter(el => el.objectType == "beast").forEach(entity => {
-            if (position.distanceTo(entity.model.position) < range) {
+            console.log(`distanceTo ${entity.objectName} is ${position.distanceTo(entity.model.position)}`);
+            
+            // apply height
+            let enemyPosition = new THREE.Vector3();
+            enemyPosition.copy(entity.model.position);
+            enemyPosition.y += entity.attributes.height;
+            
+            if (position.distanceTo(enemyPosition) < range) {
+                console.log(`in range`)
                 response.push(entity);
             }
         })
