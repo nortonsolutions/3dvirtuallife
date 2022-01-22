@@ -94,15 +94,14 @@ export class SceneController {
 
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
         this.floor.load(() => {
-
-            this.formFactory.addSconces(this.floor.model);
+            this.formFactory.addSconces(this.scene, this.floor.model);
             if (this.layout.terrain.attributes.borderTrees) {
-                this.formFactory.addBorderTrees(this.floor.model);
+                this.formFactory.addBorderTrees(this.scene, this.floor.model);
             }
             this.addToScene(this.floor);
-            // setTimeout(() => {
+            setTimeout(() => {
                 callback();
-            // }, 10);
+            }, 500);
         });
     }
 

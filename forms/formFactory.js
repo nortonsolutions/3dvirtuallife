@@ -49,18 +49,18 @@ export class FormFactory {
         return form;
     }
 
-    addSconces = (model) => {
+    addSconces = (scene, model) => {
 
         let regex = new RegExp('sconce', 'i');
-        this.addSpritesRecursive('flame', 40, .25, .1, true, model, regex);
+        this.addSpritesRecursive('flame', 40, .25, .1, true, model, regex, null, scene, true);
 
     }
 
-    addBorderTrees = (model) => {
+    addBorderTrees = (scene, model) => {
         
         let regex = new RegExp('null', 'i');
         let treeTypes = ['aspen1','pine1','pine2','maple1','tree1'];
-        this.addSpritesRecursive(treeTypes, 1, 5, .1, false, model, regex);
+        this.addSpritesRecursive(treeTypes, 1, 500, 200, false, model, regex, null, scene, false);
 
     }
 
@@ -78,8 +78,10 @@ export class FormFactory {
     /** 
      * Scan down the model for any part that matches regex;
      * the first param may optionally be an array for random selection.
+     * 
+     * If the scene is provided, the sprites will be added to the scene, not the model.
      */
-    addSpritesRecursive = (name, frames, scale, elevation, flip, model, regex) => {
+    addSpritesRecursive = (name, frames, scale, elevation, flip, model, regex, time, scene, animates) => {
         
         if (regex.test(model.name)) {
 
@@ -91,15 +93,24 @@ export class FormFactory {
             let spriteForm = new SpriteForm(itemName, frames, flip);
             let sprite = spriteForm.getSprite();
             sprite.scale.set(scale, scale, scale);
-            sprite.translateY(elevation);
 
-            model.add(sprite);
-            this.sceneController.sprites.push({ sprite, frames: spriteForm.getFrames() });
+            if (!scene) {
+                sprite.translateY(elevation);
+                model.add(sprite);
+            } else {
+                sprite.position.x = model.position.x * multiplier;
+                sprite.position.z = model.position.z * multiplier;
+                sprite.position.y = model.position.y * multiplier;
+                sprite.translateY(elevation);
+                scene.scene.add(sprite);
+            }
+
+            if (animates) this.sceneController.sprites.push({ sprite, frames: spriteForm.getFrames() });
 
         } else {
             if (model.children) {
                 model.children.forEach(m => {
-                    this.addSpritesRecursive(name, frames, scale, elevation, flip, m, regex);
+                    this.addSpritesRecursive(name, frames, scale, elevation, flip, m, regex, time, scene, animates);
                 })
             }
         }

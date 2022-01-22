@@ -74,8 +74,8 @@ export const levels = [
             attributes: {
                 scale: 100,
                 light: {
-                    sunLight: true,
-                    overheadPointLight: false,
+                    sunLight: false,
+                    overheadPointLight: true,
                 },
                 fog: {
                     color: 'black',
