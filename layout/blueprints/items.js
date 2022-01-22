@@ -246,6 +246,19 @@ export const Items = {
             range: 20
         }         
     },
+    arrow25: {
+        name: 'arrow25',
+        gltf: 'arrow.glb',
+        description: 'Twenty-five arrows',
+        type: 'item',
+        attributes: {
+            baseItemName: 'arrow',
+            quantity: 25,
+            animates: false,
+            scale: 200,
+            elevation: 10
+        }
+    },
     busterblade: {
         name: 'busterblade',
         gltf: 'busterblade.glb',

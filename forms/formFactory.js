@@ -49,10 +49,10 @@ export class FormFactory {
         return form;
     }
 
-    addSconces = (scene, model) => {
+    addSconces = (model) => {
 
         let regex = new RegExp('sconce', 'i');
-        this.addSpritesRecursive('flame', 40, .25, .1, true, model, regex, null, scene, true);
+        this.addSpritesRecursive('flame', 40, .25, .1, true, model, regex, true);
 
     }
 
@@ -60,15 +60,15 @@ export class FormFactory {
         
         let regex = new RegExp('null', 'i');
         let treeTypes = ['aspen1','pine1','pine2','maple1','tree1'];
-        this.addSpritesRecursive(treeTypes, 1, 500, 200, false, model, regex, null, scene, false);
+        this.addSpritesRecursive(treeTypes, 1, 500, 200, false, model, regex, false, scene);
 
     }
 
-    addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false, time) => {
+    addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false, time, animates = true) => {
         
         if (regexString) {
             let regex = new RegExp(regexString, 'i');
-            this.addSpritesRecursive(name, frames, scale, elevation, flip, model, regex, time);
+            this.addSpritesRecursive(name, frames, scale, elevation, flip, model, regex, animates);
     
         } else { // No regex, so just add one in the center of the object
             this.addSpritesSingle(name, frames, scale, elevation, flip, model, time);
@@ -81,7 +81,7 @@ export class FormFactory {
      * 
      * If the scene is provided, the sprites will be added to the scene, not the model.
      */
-    addSpritesRecursive = (name, frames, scale, elevation, flip, model, regex, time, scene, animates) => {
+    addSpritesRecursive = (name, frames, scale, elevation, flip, model, regex, animates = true, scene = null) => {
         
         if (regex.test(model.name)) {
 
@@ -110,7 +110,7 @@ export class FormFactory {
         } else {
             if (model.children) {
                 model.children.forEach(m => {
-                    this.addSpritesRecursive(name, frames, scale, elevation, flip, m, regex, time, scene, animates);
+                    this.addSpritesRecursive(name, frames, scale, elevation, flip, m, regex, animates, scene);
                 })
             }
         }

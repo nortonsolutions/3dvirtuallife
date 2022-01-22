@@ -423,7 +423,7 @@ class Scene {
         }
     }
 
-    /** Action in this case means distributing damage to enemies */
+    /** Distribute damage to enemies, make item disappear or fall to ground */
     handleAction(projectile, entitiesInRange) {
 
         // Sprite effects:
@@ -445,7 +445,11 @@ class Scene {
             this.controller.hero.inflictDamage(entity, change);
         })
 
-        if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
+        if (Math.random() < 0.5) {
+            if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
+        } else {  // put the item on the ground for retrieval
+            projectile.item.model.position.y = projectile.item.determineElevationFromBase() + projectile.item.attributes.elevation;
+        }
     }
 
     handleProjectiles(delta) {

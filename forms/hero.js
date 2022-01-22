@@ -281,37 +281,38 @@ export class Hero extends IntelligentForm {
                             }
                         }
                     }
-                } else { // no selected object; ranged attack (i.e. bow)
-                    // this.range
-                    let throws = this.equippedThrows();
-                    if (throws.length > 0) {
-                        throws.forEach(([bodyPart,item]) => {
-
-                            // animate weapon (if applicable) and launch item
-                            let tool = this.animatedSubforms.find(el => el[0] == bodyPart)[1];
-                            if (tool) tool.runActiveAction(2);
-                            this.fadeToAction('ThumbsUp', 0.2);
-                            
-                            setTimeout(() => {
-                                this.launch(item);
-                            }, 500)
-                        })
-                    }
-                }
+                } 
            }
         })
 
         this.sceneController.eventDepot.addListener('mouse1click', () => {
 
             if (this.alive) {
-                Object.entries(this.equipped).forEach(([bodypart,value]) => {
-                    if (bodypart.indexOf('key') == -1) { // for body parts only (non-hotkey equipped)
-                        let [item,throwable] = value;
-                        if (throwable) {
-                            this.launch(item, bodypart);
+
+                let throws = this.equippedThrows();
+                if (throws.length > 0) {
+                    throws.forEach(([bodyPart,item]) => {
+
+                        // animate weapon (if applicable) and launch item
+                        let tool = this.animatedSubforms.find(el => el[0] == bodyPart)[1];
+                        if (tool) tool.runActiveAction(2);
+                        this.fadeToAction('ThumbsUp', 0.2);
+                        
+                        setTimeout(() => {
+                            this.launch(item, null, [bodyPart, tool.objectName]);
+                        }, 500)
+                    })
+                } else {
+                    Object.entries(this.equipped).forEach(([bodyPart,value]) => {
+                        if (bodyPart.indexOf('key') == -1) { // for body parts only (non-hotkey equipped)
+                            let [item,throwable] = value;
+                            if (throwable) {
+                                this.launch(item, bodyPart);
+                            }
                         }
-                    }
-                })
+                    })
+    
+                }
             }
         })
 
@@ -553,19 +554,32 @@ export class Hero extends IntelligentForm {
      * Throwing an item affects inventory similarly to using a hotkey potion,
      * pulling from inventory until the last item is used (or all mana is used).
      */
-    launch(itemName, bodypart) {
+    launch(itemName, bodyPart = null, [parentBodyPart, parentItemName] = []) {
 
-        // load the object model to the scene, copy the position/rotation of hero,
-        this.sceneController.loadFormbyName(itemName, (item) => {
+        // If this is a child item, check inventory first and bail if needed
+        if (parentBodyPart && this.getInventoryQuantity(itemName) == 0) {
+            this.unequip(parentBodyPart);
+            this.addToInventory(parentItemName, 0, 1);
+        } else {
+            // load the object model to the scene, copy the position/rotation of hero,
+            this.sceneController.loadFormbyName(itemName, (item) => {
 
-            item.model.position.copy(this.model.position);
-            item.model.rotation.copy(this.model.rotation);
-            item.model.position.y += this.attributes.height;
-            this.sceneController.addToProjectiles(item);
+                item.model.position.copy(this.model.position);
+                item.model.rotation.copy(this.model.rotation);
+                item.model.position.y += this.attributes.height;
+                this.sceneController.addToProjectiles(item);
 
-            if (bodypart && this.removeFromInventory(itemName) == -1) this.unequip(bodypart);
+                if (bodyPart || parentBodyPart) { // remove from inventory, unequip when out
+                    if (this.removeFromInventory(itemName) == -1) {
+                        this.unequip(parentBodyPart? parentBodyPart : bodyPart);
 
-        });
+                        // re-equip parent item to inventory if applicable
+                        if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
+                    }
+                }
+            });
+
+        }
     }
 
     inflictDamage(entity, hitPointReduction) {

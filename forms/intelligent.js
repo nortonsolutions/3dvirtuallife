@@ -434,46 +434,50 @@ export class IntelligentForm extends AnimatedForm{
     
     unequip(area) {
         
-        let itemName = this.equipped[area][0];
+        if (this.equipped[area]) {
+            let itemName = this.equipped[area][0];
 
-        delete this.equipped[area];
-        
-        if (area.match('key')) {
-            this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
-        } else {
+            delete this.equipped[area];
             
-            let gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
-            let item = gameObjects[itemName];
-
-            if (area != "special") { // special = no model to remove
-                let thisItem = this.model.getObjectByProperty("objectName", itemName);
-                thisItem.parent.remove(thisItem);
-                this.sceneController.scene.scene.remove(thisItem);
-            }
-
-            if (item.attributes.effect) {
-                let stat = item.attributes.effect.split("/")[0];
-                let change = Number(item.attributes.effect.split("/")[1]);
+            if (area.match('key')) {
+                this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
+            } else {
+                
+                let gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
+                let item = gameObjects[itemName];
     
-                switch (stat) {
-                    case "health":
-                    case "mana":
-                    case "strength":
-                    case "agility": 
-                        this.changeStatBoost(stat, -change);
-                        break;
-                    case "light":
-                        if (this.sceneController.overheadPointLight) this.sceneController.overheadPointLight.intensity -= change;
-                        break;
+                if (area != "special") { // special = no model to remove
+                    let thisItem = this.model.getObjectByProperty("objectName", itemName);
+                    thisItem.parent.remove(thisItem);
+                    this.sceneController.scene.scene.remove(thisItem);
+                }
+    
+                if (item.attributes.effect) {
+                    let stat = item.attributes.effect.split("/")[0];
+                    let change = Number(item.attributes.effect.split("/")[1]);
+        
+                    switch (stat) {
+                        case "health":
+                        case "mana":
+                        case "strength":
+                        case "agility": 
+                            this.changeStatBoost(stat, -change);
+                            break;
+                        case "light":
+                            if (this.sceneController.overheadPointLight) this.sceneController.overheadPointLight.intensity -= change;
+                            break;
+                    }
+                }
+    
+                if (item.attributes.animates) {
+                    this.animatedSubforms = this.animatedSubforms.filter(el => { el[0] != area });
                 }
             }
-
-            if (item.attributes.animates) {
-                this.animatedSubforms = this.animatedSubforms.filter(el => { el[0] != area });
-            }
+    
+            if (this.objectType == "hero") this.cacheHero();
+    
+    
         }
-
-        if (this.objectType == "hero") this.cacheHero();
 
     }
 
