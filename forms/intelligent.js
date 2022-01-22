@@ -380,8 +380,8 @@ export class IntelligentForm extends AnimatedForm{
         return true;
     }
 
-    equip(area, itemName, throwable = false) {
-        this.equipped[area] = [itemName,throwable];
+    equip(area, itemName, throwable = false, throws = null) {
+        this.equipped[area] = [itemName,throwable,throws];
         
         if (area.match('key')) {
             this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });

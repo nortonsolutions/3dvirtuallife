@@ -119,7 +119,13 @@ class Scene {
             this.scene.background = BLACK;
         }
 
-        if (this.controller.layout.terrain.fog) this.scene.fog = new THREE.Fog( this.controller.layout.terrain.fogColor, 700, cameraReach );
+        if (this.controller.layout.terrain.attributes.fog) {
+            this.scene.fog = new THREE.Fog( 
+                this.controller.layout.terrain.attributes.fog.color, 
+                700/(this.controller.layout.terrain.attributes.fog.density? 
+                    this.controller.layout.terrain.attributes.fog.density : 1), 
+                cameraReach );
+        }
     }
 
     addMinimap() {
@@ -249,7 +255,7 @@ class Scene {
 
     onMouseClick = (e) => {
         // console.log(`Controls object:`);
-        // console.dir(this.controls.getObject().position);
+        console.dir(this.controls.getObject().position);
 
         // console.log(`Objects3D object:`);
         // console.dir(this.controller.objects3D);

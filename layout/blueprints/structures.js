@@ -41,6 +41,21 @@ export const Structures = {
     
     },
 
+    swampPortal: {
+        name: 'swampPortal',
+        gltf: 'grate.gltf',
+        description: 'Portal to swamp',
+        type: 'structure',
+        location: { x: 18.5, y: 0, z: -6.5},
+        attributes: {
+            animates: false,
+            scale: 100,
+            elevation: 0,
+            unlocked: true,
+            routeTo: { level: 3, location: { x: 0, y: 0, z: 0 } },
+        }
+    },
+
     archway0: {
         name: 'archway0',
         gltf: 'archway.gltf',

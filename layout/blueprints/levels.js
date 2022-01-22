@@ -18,14 +18,17 @@ export const levels = [
             type: 'floor',
             description: 'valley',
             gltf: 'valley.glb',
-            fog: true,
-            fogColor: 'white',
-            hemisphereLight: true,
-            sunLight: true,
-            overheadPointLight: false,
             attributes: {
                 scale: 100,
-                borderTrees: true
+                borderTrees: true,
+                light: {
+                    sunLight: true,
+                    overheadPointLight: false,
+                },
+                fog: {
+                    color: 'white',
+                    density: 1
+                }
             }
 
         },
@@ -42,12 +45,14 @@ export const levels = [
             Items.gold25,
             Items.gold10,
             Items.gold3,
+            Items.bow
         ],
         structures: [
             Structures.shed,
             Structures.rock1,
             Structures.rock1,
-            Structures.grate
+            Structures.grate,
+            Structures.swampPortal
         ],
         entities: [
             Entities.john,
@@ -66,13 +71,16 @@ export const levels = [
             type: 'floor',
             description: 'dungeon',
             gltf: 'dungeon.glb',
-            fog: true,
-            fogColor: 'black',
-            hemisphereLight: false,
-            sunLight: false,
-            overheadPointLight: true,
             attributes: {
-                scale: 100
+                scale: 100,
+                light: {
+                    sunLight: true,
+                    overheadPointLight: false,
+                },
+                fog: {
+                    color: 'black',
+                    density: 1
+                }
             }
         },
         items: [
@@ -90,7 +98,7 @@ export const levels = [
         structures: [
             {...Structures.ancientChest, location: { x: 0, y: 0, z: -1 }},
             Structures.archway0,
-            Structures.archway2,
+            Structures.archway2
         ],
         entities: [
             Entities.john,
@@ -113,13 +121,16 @@ export const levels = [
             type: 'floor',
             description: 'catacomb',
             gltf: 'catacomb.glb',
-            fog: true,
-            fogColor: 'black',
-            hemisphereLight: false,
-            sunLight: false,
-            overheadPointLight: true,
             attributes: {
-                scale: 100
+                scale: 100,
+                light: {
+                    sunLight: false,
+                    overheadPointLight: true,
+                },
+                fog: {
+                    color: 'black',
+                    density: 1
+                }
             }
         },
         items: [
@@ -133,8 +144,45 @@ export const levels = [
         entities: [
             {...Entities.rat, location: { x: 10, y: 0, z: 0 }}
         ]
+    },
+    {
+        level: 3,
+        width: 26, //26
+        length: 26, //26
+        name: "In the swamp",
+        background: 'clouds.png',
+        terrain: {
+            name: 'floor',
+            type: 'floor',
+            description: 'swamp',
+            gltf: 'swamp.glb',
+            attributes: {
+                scale: 100,
+                borderTrees: true,
+                light: {
+                    sunLight: true,
+                    overheadPointLight: false,
+                },
+                fog: {
+                    color: 'darkgreen',
+                    density: 2
+                },
+                water: {
+                    elevation: 0,
+                    color: "green",
+                    gltf: 'water.glb',
+                    scale: 100
+                }
+            }
+        },
+        items: [
+
+        ],
+        structures: [
+        ],
+        entities: [
+
+        ]
     }
  
-
-
 ]

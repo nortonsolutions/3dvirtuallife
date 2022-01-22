@@ -4,8 +4,9 @@ import { AnimatedForm } from './animated.js';
 import { StandardForm } from './standard.js';
 import { SpriteForm } from './sprite.js';
 import { Fire, params } from './fire.js';
+import { WaterForm } from './water.js';
 
-/**
+/**s
  * The FormFactory will provide objects based on templates
  * for the SceneController, to be modeled and used in the
  * scene.
@@ -37,6 +38,9 @@ export class FormFactory {
             case "animated":
                 form = new AnimatedForm(template, this.sceneController);
                 break;
+            case "water":
+                form = new WaterForm(template, this.sceneController);
+                break;
             default:
                 form = new StandardForm(template, this.sceneController);
                 break;
@@ -55,7 +59,8 @@ export class FormFactory {
     addBorderTrees = (model) => {
         
         let regex = new RegExp('null', 'i');
-        this.addSpritesRecursive('aspen1', 1, 5, .1, false, model, regex);
+        let treeTypes = ['aspen1','pine1','pine2','maple1','tree1'];
+        this.addSpritesRecursive(treeTypes, 1, 5, .1, false, model, regex);
 
     }
 
@@ -70,12 +75,20 @@ export class FormFactory {
         }
     }
 
-    /** Scan down the model for any part that matches regex */
-    addSpritesRecursive = (name, frames, scale, elevation, flip, model, regex, time) => {
+    /** 
+     * Scan down the model for any part that matches regex;
+     * the first param may optionally be an array for random selection.
+     */
+    addSpritesRecursive = (name, frames, scale, elevation, flip, model, regex) => {
         
         if (regex.test(model.name)) {
 
-            let spriteForm = new SpriteForm(name, frames, flip);
+            var itemName;
+            if (typeof name == 'object') {
+                itemName = name[getRndInteger(0,name.length-1)];
+            } else itemName = name;
+
+            let spriteForm = new SpriteForm(itemName, frames, flip);
             let sprite = spriteForm.getSprite();
             sprite.scale.set(scale, scale, scale);
             sprite.translateY(elevation);

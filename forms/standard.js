@@ -14,7 +14,6 @@ var downRaycasterTestLength = 70;
 
 export class StandardForm {
     
-    // floorModel is accepted as an optional param for forms that don't need the sceneController
     constructor(template, sceneController) {
 
         this.template = template;
@@ -58,12 +57,12 @@ export class StandardForm {
                 this.model.position.y = this.determineElevationFromBase() + this.attributes.elevation;
 
                 console.log(`Placing ${this.objectName} @ ${this.model.position.x},${this.model.position.y},${this.model.position.z}` );
+            
             } else if (this.objectName == "floor") { // floor is the only form without location
                 this.setRoofToSingleSided();
                 this.setFloorToReceiveShadow();
                 
             }
-
             
             this.setToCastShadows();
             

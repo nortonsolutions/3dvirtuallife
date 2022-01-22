@@ -38,13 +38,17 @@ export class AnimatedForm extends StandardForm{
                     action.clampWhenFinished = true;
                     action.loop = THREE.LoopPingPong;
                     action.repetitions = 1;
+                } else if (this.model.objectType=='item') {
+                    action.clampWhenFinished = true;
+                    action.loop = THREE.LoopPingPong;
+                    action.repetitions = 1;
                 }
     
                 this.actions[ animation.name ] = action;
     
             });
     
-            this.activeActionName = 'Idle';
+            this.activeActionName = 'Idle'; // Default for intelligent/walking beings
             this.activeAction = this.actions[ firstAnimationName ];
             this.previousActionName = '';
             this.previousAction = null;
@@ -59,6 +63,10 @@ export class AnimatedForm extends StandardForm{
     }
 
     animate(delta) {
+
+        if (this.objectName == "bow") {
+            // console.log(`test`);
+        }
         if (this.attributes.moves) {
             if (this.alive) {
                 this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));

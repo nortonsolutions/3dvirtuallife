@@ -167,7 +167,7 @@ class InventoryScreen {
                             this.eventDepot.fire('placeItem', {itemName: itemNameToSwap, desiredIndex: index});
                         }
                         this.eventDepot.fire('removeItem', itemName)
-                        this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName, throwable: this.isItemThrowable(itemName) });
+                        this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName, throwable: this.isItemThrowable(itemName), throws: this.itemThrows(itemName) });
 
                     } 
         
@@ -189,11 +189,11 @@ class InventoryScreen {
     
                             let itemNameToSwap = targetElement.firstElementChild.id;
                             this.eventDepot.fire('unequipItem', ev.target.parentNode.id);
-                            this.eventDepot.fire('equipItem', {bodyPart: index, itemName: itemNameToSwap, throwable: this.isItemThrowable(itemNameToSwap)});
+                            this.eventDepot.fire('equipItem', {bodyPart: index, itemName: itemNameToSwap, throwable: this.isItemThrowable(itemNameToSwap), throws: this.itemThrows(itemNameToSwap)});
                             
                         }
     
-                        this.eventDepot.fire('equipItem', {bodyPart: ev.target.id, itemName, throwable: this.isItemThrowable(itemName) });
+                        this.eventDepot.fire('equipItem', {bodyPart: ev.target.id, itemName, throwable: this.isItemThrowable(itemName), throws: this.itemThrows(itemName) });
                     }
         
                 }
@@ -268,6 +268,11 @@ class InventoryScreen {
     isItemThrowable(itemName) {
         if (this.gameObjects.length == 0) this.gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
         return (this.gameObjects[itemName].attributes.throwable);
+    }
+
+    itemThrows(itemName) {
+        if (this.gameObjects.length == 0) this.gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
+        return (this.gameObjects[itemName].attributes.throws);
     }
 
 }

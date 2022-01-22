@@ -65,7 +65,7 @@ export class Hero extends IntelligentForm {
                 })
 
                 Object.keys(this.equipped).forEach(bodyPart => {
-                    this.equip(bodyPart, this.equipped[bodyPart][0], this.equipped[bodyPart][1]); // bodyPart, itemName, throwable
+                    this.equip(bodyPart, this.equipped[bodyPart][0], this.equipped[bodyPart][1], this.equipped[bodyPart][2]); // bodyPart, itemName, throwable
                 })
             }
 
@@ -208,7 +208,7 @@ export class Hero extends IntelligentForm {
         });
 
         this.sceneController.eventDepot.addListener('equipItem', (data) => {
-            this.equip(data.bodyPart, data.itemName, data.throwable);
+            this.equip(data.bodyPart, data.itemName, data.throwable, data.throws);
         });
 
         this.sceneController.eventDepot.addListener('placeItem', (data) => {
@@ -280,6 +280,14 @@ export class Hero extends IntelligentForm {
                                 this.selectedObject.runActiveAction(0.2);
                             }
                         }
+                    }
+                } else { // no selected object; ranged attack (i.e. bow)
+                    // this.range
+                    let throws = equippedThrows();
+                    if (throws.length > 0) {
+                        throws.forEach(item => {
+                            this.launch(item)
+                        })
                     }
                 }
            }
@@ -547,7 +555,7 @@ export class Hero extends IntelligentForm {
             item.model.position.y += this.attributes.height;
             this.sceneController.addToProjectiles(item);
 
-            if (this.removeFromInventory(itemName) == -1) this.unequip(bodypart);
+            if (bodypart && this.removeFromInventory(itemName) == -1) this.unequip(bodypart);
 
         });
     }
@@ -571,4 +579,11 @@ export class Hero extends IntelligentForm {
         };
     }
 
+    equippedThrows() {
+        throws = [];
+        for (const item of [this.equipped.Middle2R[2],this.equipped.Middle2L[2]]) {
+            if (item) throws.push(item);
+        }
+        return throws;
+    }
 }

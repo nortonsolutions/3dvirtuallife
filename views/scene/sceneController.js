@@ -56,6 +56,7 @@ export class SceneController {
         this.scene = new Scene(this);
         this.scene.init(() => {
             this.addFloor(() => {
+                this.addWater();
                 this.addLights();
                 this.addHero(() => {
                     this.seedForms(() => {
@@ -66,12 +67,21 @@ export class SceneController {
         });
     }
 
-    addToScene(form) {
+    addWater() {
+        if (this.layout.terrain.attributes.water) {
+            this.water = this.formFactory.newForm("water", this.layout.terrain.attributes.water);
+            this.water.load(() => {
+                this.addToScene(this.water, false);
+            });
+        }
+    }
+
+    addToScene(form, addToForms = true) {
         
         /* Hero is special case already added to scene via controls */
         if (form.objectType != "hero") this.scene.add( form.model );
 
-        this.forms.push( form );
+        if (addToForms) this.forms.push( form );
 
         if (form.objectType == "hero" || form.objectType == "friendly" || form.objectType == "beast") {
             this.entities.push( form );
@@ -89,7 +99,6 @@ export class SceneController {
             if (this.layout.terrain.attributes.borderTrees) {
                 this.formFactory.addBorderTrees(this.floor.model);
             }
-
             this.addToScene(this.floor);
             // setTimeout(() => {
                 callback();
@@ -99,7 +108,7 @@ export class SceneController {
 
     addLights() {
 
-        if (this.layout.terrain.sunLight) {
+        if (this.layout.terrain.attributes.light.sunLight) {
             
             var shadowConfig = {
 
@@ -129,7 +138,7 @@ export class SceneController {
             }
         }
 
-        if (this.layout.terrain.overheadPointLight) {
+        if (this.layout.terrain.attributes.light.overheadPointLight) {
             this.overheadPointLight = new THREE.PointLight( 0xf37509, 5, 350, 3 );
             this.overheadPointLight.position.set( 0, 0, 0 );
             this.scene.add( this.overheadPointLight );
@@ -245,7 +254,7 @@ export class SceneController {
             
         })
 
-        if (this.layout.terrain.overheadPointLight) {
+        if (this.overheadPointLight) {
             let controlsObject = this.scene.controls.getObject();
             this.overheadPointLight.position.copy(controlsObject.position);
             this.overheadPointLight.rotation.copy(controlsObject.rotation);
