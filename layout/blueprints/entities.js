@@ -30,7 +30,8 @@ export const Entities = {
                 strength: "1/1/0",
                 agility: "1/1/0",
                 defense: "1/1/0"
-            }
+            },
+            grants: ["gold3"]
         }
     },
     rat: {
@@ -52,7 +53,31 @@ export const Entities = {
                 strength: "2/2/0",
                 agility: "3/3/0",
                 defense: "1/1/0"
-            }
+            },
+            grants: ["gold10"]
+        }
+    },
+    spiderQueen: {
+        name: 'spiderQueen',
+        gltf: 'spiderQueen.glb',
+        description: 'A deadly spider queen',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 50,
+            length: 80,
+            width: 80,
+            elevation: 0,
+            scale: 100,
+            stats: {
+                health: "10/10/0",
+                mana: "0/0/0",
+                strength: "4/4/0",
+                agility: "3/3/0",
+                defense: "2/2/0"
+            },
+            grants: ["keyToChest2"]
         }
     },
     john: {

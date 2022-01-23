@@ -158,6 +158,7 @@ export class Hero extends IntelligentForm {
                     // Sprite effects:
                     if (item.attributes.sprites) {
                         item.attributes.sprites.forEach(spriteConfig => {
+                            // addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false, time, animates = true) 
                             this.sceneController.formFactory.addSpritesGeneric(this.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
                         })
                     }

@@ -429,6 +429,7 @@ class Scene {
         // Sprite effects:
         if (projectile.item.attributes.sprites) {
             projectile.item.attributes.sprites.forEach(spriteConfig => {
+                // addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false, time, animates = true) 
                 this.controller.formFactory.addSpritesGeneric(projectile.item.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale/10, spriteConfig.elevation-20, spriteConfig.flip, spriteConfig.time);
                 entitiesInRange.forEach(entity => {
                     this.controller.formFactory.addSpritesGeneric(entity.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale/20, spriteConfig.elevation-20, spriteConfig.flip, spriteConfig.time);
@@ -436,7 +437,7 @@ class Scene {
             })
             setTimeout(() => {
                 this.scene.remove(projectile.item.model);
-            }, projectile.item.attributes.sprites[0].time * 100);
+            }, projectile.item.attributes.sprites[0].time * 500);
         }
 
         let [stat, change] = projectile.item.attributes.effect.split("/");
@@ -491,7 +492,7 @@ class Scene {
             let maxDistance = projectile.item.attributes.throwableAttributes.distance;
 
             console.log(`traveled: ${projectile.distanceTraveled}, position: ${projectile.item.model.position.x}, ${projectile.item.model.position.y},${projectile.item.model.position.z }`);
-            if (projectile.distanceTraveled > maxDistance) {
+            if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= 0) {
                 projectile.distanceTraveled = -1;
             }
 

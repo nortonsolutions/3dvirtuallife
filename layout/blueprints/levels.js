@@ -139,7 +139,9 @@ export const levels = [
             {...Items.gold25, location: { x: 1, y: 0, z: -1 }}
         ],
         structures: [
-            Structures.archway1
+            Structures.archway1,
+            {...Structures.ancientChest2, location: { x: 10, y: 0, z: -1 }},
+
         ],
         entities: [
             {...Entities.rat, location: { x: 10, y: 0, z: 0 }}
@@ -179,6 +181,7 @@ export const levels = [
 
         ],
         structures: [
+            Structures.swampToValley
         ],
         entities: [
 

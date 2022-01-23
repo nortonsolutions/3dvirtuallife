@@ -257,7 +257,17 @@ export class IntelligentForm extends AnimatedForm{
 
         this.alive = false;
         this.sceneController.entities = this.sceneController.entities.filter(el => el != this);
-        this.fadeToAction("Death", 0.2);
+        // this.fadeToAction("Death", 0.2);
+
+        if (this.attributes.grants) {
+            this.attributes.grants.forEach(itemName => {
+                // load the object model to the scene, copy the position/rotation of hero,
+                this.sceneController.loadFormbyName(itemName, (item) => {
+                    item.model.position.copy(this.model.position);
+                    item.model.position.y = this.determineElevationFromBase();
+                });
+            })
+        }
     }
 
     firstInventorySlot() {

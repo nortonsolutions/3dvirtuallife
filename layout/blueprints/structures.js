@@ -46,13 +46,30 @@ export const Structures = {
         gltf: 'grate.gltf',
         description: 'Portal to swamp',
         type: 'structure',
-        location: { x: 18.5, y: 0, z: -6.5},
+        location: { x: 19.5, y: 0, z: -6.5},
         attributes: {
+            visible: false,
             animates: false,
-            scale: 100,
-            elevation: 0,
+            scale: 200,
+            elevation: -20,
             unlocked: true,
-            routeTo: { level: 3, location: { x: 0, y: 0, z: 0 } },
+            routeTo: { level: 3, location: { x: -19.5, y: 0, z: -6.5 } },
+        }
+    },
+    
+    swampToValley: {
+        name: 'swampToValley',
+        gltf: 'grate.gltf',
+        description: 'Swamp to Valley',
+        type: 'structure',
+        location: { x: -21.5, y: 0, z: -6.5},
+        attributes: {
+            visible: false,
+            animates: false,
+            scale: 200,
+            elevation: -20,
+            unlocked: true,
+            routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } },
         }
     },
 
@@ -130,6 +147,24 @@ export const Structures = {
             unlocked: false,
             contentItems: [
                 {...Items.bagOfGems }
+            ]
+        }
+    },
+
+    ancientChest2: {
+        name: 'ancientChest2',
+        gltf: 'chest.glb',
+        description: 'An old but sturdy wooden chest',
+        type: 'structure',
+
+        attributes: {
+            scale: 60,
+            elevation: 0,
+            animates: true,
+            key: 'keyToChest2',
+            unlocked: false,
+            contentItems: [
+                {...Items.crystalBall }
             ]
         }
     }

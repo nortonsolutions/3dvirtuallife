@@ -367,6 +367,7 @@ export class DialogScreen {
         context.payment = this.payment;
         context.tab = this.tab;
         context.acceptDisabled = this.acceptDisabled;
+        context.goldExchange = Math.floor(this.entity.getGoldValue('bagOfGems'));
 
         if (this.tempSpeech) {
             context.tempSpeech = this.tempSpeech;

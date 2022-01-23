@@ -88,6 +88,18 @@ export const Items = {
             elevation: 10
         }
     },
+    keyToChest2: {
+        name: 'keyToChest',
+        gltf: 'key.gltf',
+        image: 'keyGolden.png',
+        description: 'A small golden key',
+        type: 'item',
+        attributes: {
+            animates: false,
+            scale: 50,
+            elevation: 10
+        }
+    },
     bagOfGems: {
         name: 'bagOfGems',
         gltf: 'bagOfGems.glb',
@@ -133,10 +145,10 @@ export const Items = {
             animates: false,
             throwable: true,
             throwableAttributes: {
-                pitch: .9, // angle up (percentage of 90 degrees)
+                pitch: .7, // angle up (percentage of 90 degrees)
                 weight: 2, // lbs
-                distance: 600, // px
-                speed: 3 // 1 = full walking speed
+                distance: 700, // px
+                speed: 4 // 1 = full walking speed
             },
             scale: 5,
             equippedScale: 0.005,
@@ -217,10 +229,10 @@ export const Items = {
             defaultAction: "ArmatureAction",
             throwable: false,
             throws: "arrow",
-            scale: 10,
-            equippedScale: 0.005,
-            elevation: 10,
-            effect: "strenth/1",
+            scale: 200,
+            equippedScale: .2,
+            elevation: 20,
+            effect: "strength/1",
         } 
     },
     arrow: {
@@ -232,14 +244,14 @@ export const Items = {
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
-            scale: 200,
-            equippedScale: 0.2,
+            scale: 250,
+            equippedScale: 0.3,
             throwable: true,
             throwableAttributes: {
-                pitch: .7, // angle up (percentage of 90 degrees)
+                pitch: .5, // angle up (percentage of 90 degrees)
                 weight: 1, // lbs
                 distance: 1200, // px
-                speed: 3 // 1 = full walking speed
+                speed: 4 // 1 = full walking speed
             },
             elevation: 10,
             effect: "damage/5",
