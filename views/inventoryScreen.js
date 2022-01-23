@@ -145,13 +145,7 @@ class InventoryScreen {
             // var quantId = data[2]; // id of quantity element
             var index = data[3];  // inventory # ... or bodyPart by name
             
-            if (itemName.match(/key|gold/i) && Array.from(targetElement.classList).includes('body')){
-                alert('This cannot be equipped.');
-            } else if (itemName.match(/redpotion|bluepotion|spell/i) && Array.from(targetElement.classList).includes('bodyPart')) {
-                alert('This can only be equipped on the hotkeys, 1-8.');
-            } else if (!itemName.match(/potion|spell/i) && Array.from(targetElement.classList).includes('fKey')){
-                alert('This can only be equipped on the body.');
-            } else {
+            if (this.validTarget(itemName, targetElement)) {
 
                 if (index.length < 3) { // source is inventory
                 
@@ -183,17 +177,25 @@ class InventoryScreen {
         
                     } else { // to another body part or hotkey
         
-                        this.eventDepot.fire('unequipItem', index);
-    
+        
                         if (targetElement.firstElementChild && !Array.from(targetElement.firstElementChild.classList).includes('overlay')) {
-    
+
                             let itemNameToSwap = targetElement.firstElementChild.id;
-                            this.eventDepot.fire('unequipItem', ev.target.parentNode.id);
-                            this.eventDepot.fire('equipItem', {bodyPart: index, itemName: itemNameToSwap, throwable: this.isItemThrowable(itemNameToSwap), throws: this.itemThrows(itemNameToSwap)});
+                            let targetElementToSwap = document.getElementById(index);
+                            if (this.validTarget(itemNameToSwap, targetElementToSwap) && this.validTarget(itemName, targetElement)) {
                             
+                                this.eventDepot.fire('unequipItem', index);
+                                this.eventDepot.fire('unequipItem', ev.target.parentNode.id);
+                                this.eventDepot.fire('equipItem', {bodyPart: index, itemName: itemNameToSwap, throwable: this.isItemThrowable(itemNameToSwap), throws: this.itemThrows(itemNameToSwap)});
+                                this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName, throwable: this.isItemThrowable(itemName), throws: this.itemThrows(itemName) });        
+                            }
+
+                        } else {
+                            this.eventDepot.fire('unequipItem', index);
+                            this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName, throwable: this.isItemThrowable(itemName), throws: this.itemThrows(itemName) });        
                         }
-    
-                        this.eventDepot.fire('equipItem', {bodyPart: ev.target.id, itemName, throwable: this.isItemThrowable(itemName), throws: this.itemThrows(itemName) });
+                        
+
                     }
         
                 }
@@ -256,6 +258,19 @@ class InventoryScreen {
             })
         }
     
+    }
+
+    validTarget = (itemName, targetElement) => {
+        if (itemName.match(/key|gold/i) && Array.from(targetElement.classList).includes('body')) {
+            alert(`${itemName} cannot be equipped.`);
+            return false;
+        } else if (/redpotion|bluepotion|spell/i.test(itemName) && Array.from(targetElement.classList).includes('bodyPart')) {
+            alert(`${itemName} can only be equipped on the hotkeys, 1-8.`);
+            return false;
+        } else if (!/potion|spell/i.test(itemName) && Array.from(targetElement.classList).includes('fKey')){
+            alert(`${itemName} can only be equipped on the body.`);
+            return false;
+        } else return true;
     }
 
     refresh = () => {
