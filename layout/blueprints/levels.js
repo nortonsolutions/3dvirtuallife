@@ -44,7 +44,8 @@ export const levels = [
             Items.gold10,
             Items.gold3,
             Items.bow,
-            {...Items.arrow25, location: { x: 0, y: 0, z: 0}}
+            Items.arrow25,
+            Items.orb
         ],
         structures: [
             Structures.shed,

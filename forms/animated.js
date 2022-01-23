@@ -40,10 +40,14 @@ export class AnimatedForm extends StandardForm{
                     action.clampWhenFinished = true;
                     action.loop = THREE.LoopPingPong;
                     action.repetitions = 1;
-                } else if (this.model.objectType=='item') {
+                } else if (this.model.objectType=='item' && (!this.attributes.animatesRecurring)) {
                     action.clampWhenFinished = true;
                     action.loop = THREE.LoopPingPong;
                     action.repetitions = 1;
+                } else if (this.model.objectType=='item' && this.attributes.animatesRecurring) {
+                    console.log("test")
+                    this.model.children[1].material.opacity = 0.5;
+
                 }
     
                 this.actions[ animation.name ] = action;

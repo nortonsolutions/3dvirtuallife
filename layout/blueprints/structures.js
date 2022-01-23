@@ -53,7 +53,7 @@ export const Structures = {
             scale: 200,
             elevation: -20,
             unlocked: true,
-            routeTo: { level: 3, location: { x: -19.5, y: 0, z: -6.5 } },
+            routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } },
         }
     },
     
@@ -164,7 +164,7 @@ export const Structures = {
             key: 'keyToChest2',
             unlocked: false,
             contentItems: [
-                {...Items.crystalBall }
+                {...Items.orb }
             ]
         }
     }

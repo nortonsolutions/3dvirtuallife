@@ -59,7 +59,7 @@ export const Entities = {
     },
     spiderQueen: {
         name: 'spiderQueen',
-        gltf: 'spiderQueen.glb',
+        gltf: 'rat.glb',
         description: 'A deadly spider queen',
         type: 'beast',
         attributes: {

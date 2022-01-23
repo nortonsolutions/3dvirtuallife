@@ -302,7 +302,7 @@ export const Items = {
     torch: {
         name: 'torch',
         gltf: 'torch.glb',
-        image: 'broadsword.png',
+        image: 'torch.png',
         description: 'A simple wooden torch',
         type: 'item',
         attributes: {
@@ -341,7 +341,19 @@ export const Items = {
             effect: "mana/2"
         }
     },
-
-
-
+    orb: {
+        name: 'orb',
+        gltf: 'orb.glb',
+        image: 'orb.png',
+        description: 'Gyrating elements in a sphere',
+        type: 'item',
+        attributes: {
+            equippable: ['special'],
+            animates: true,
+            scale: 50,
+            elevation: 30,
+            effect: "mana/2",
+            animatesRecurring: true
+        }
+    }
 }

@@ -69,6 +69,7 @@ export class SceneController {
 
     addWater() {
         if (this.layout.terrain.attributes.water) {
+            this.waterElevation = this.layout.terrain.attributes.water.elevation;
             this.water = this.formFactory.newForm("water", this.layout.terrain.attributes.water);
             this.water.load(() => {
                 this.addToScene(this.water, false);

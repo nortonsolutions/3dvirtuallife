@@ -98,7 +98,19 @@ export class IntelligentForm extends AnimatedForm{
             this.movementRaycaster.ray.direction.x = worldDirection.x; // -worldDirection.x;
             this.movementRaycaster.ray.direction.z = worldDirection.z; // -worldDirection.z;
             this.movementRaycaster.ray.origin.y += this.attributes.height;
+            
+            if (typeof this.sceneController.waterElevation == "number") {
+                
+                if (this.model.position.y < this.sceneController.waterElevation) {
+                    let distanceBelowWater = Math.abs(this.sceneController.waterElevation - this.model.position.y);
+                    this.velocity.x *= Math.min((100-(distanceBelowWater*3))/100,.05);
+                    this.velocity.y *= Math.min((100-(distanceBelowWater*3))/100,.05);
+                    this.velocity.z *= Math.min((100-(distanceBelowWater*3))/100,.05);
+                }
     
+            }
+
+
             // Essentially set Lx = -wDz and Lz = wDx, then Rx = wDz and Rz = -wDx
             // let worldDirectionL = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, -Math.PI/2, 0, 'YXZ' ));
             // let worldDirectionR = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, Math.PI/2, 0, 'YXZ' ));
