@@ -2,29 +2,57 @@
 
 export class WaterForm {
 
-    constructor(template, sceneController) {
+    constructor(template, sceneController, useTHREE) {
         this.template = template;
         this.sceneController = sceneController;
+        this.useTHREE = useTHREE;
+        
     }
 
     load(callback) {
         this.sceneController.loader.load( '/models/3d/gltf/' + this.template.gltf, (gltf) => {
         
-            let model = gltf.scene;
-            
-            model.objectName = 'water';
-            model.objectType = 'water';
+            if (this.useTHREE == "Water") {
 
-            model.scale.x = this.template.scale;
-            model.scale.y = this.template.scale;
-            model.scale.z = this.template.scale;
+                var params = {
+                    color: '#ffffff',
+                    scale: 4,
+                    flowX: .1,
+                    flowY: .1
+                };
 
-            this.model = model;
+                //var waterGeometry = gltf.scene.children[0].geometry;
+                var waterGeometry = new THREE.PlaneBufferGeometry( 44, 44 );
+                let water = new THREE.Water( waterGeometry, {
+                    color: params.color,
+                    scale: params.scale,
+                    flowDirection: new THREE.Vector2( params.flowX, params.flowY ),
+                    textureWidth: 1024,
+                    textureHeight: 1024
+                } );
+        
+    
+                water.rotation.x = - Math.PI / 2;
+                this.model = water;
+
+            } else {
+
+                this.model = gltf.scene;
+                this.model.receiveShadow = true;
+
+            }
+
+            this.model.scale.x = this.template.scale;
+            this.model.scale.y = this.template.scale;
+            this.model.scale.z = this.template.scale;
+            this.model.objectName = 'water';
+            this.model.objectType = 'water';
+
+
+
             this.animations = gltf.animations;
            
             this.model.position.y = this.template.elevation;
-            this.model.receiveShadow = true;
-            
             callback();
 
         }, undefined, function ( error ) {

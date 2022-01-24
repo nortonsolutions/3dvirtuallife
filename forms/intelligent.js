@@ -103,9 +103,9 @@ export class IntelligentForm extends AnimatedForm{
                 
                 if (this.model.position.y < this.sceneController.waterElevation) {
                     let distanceBelowWater = Math.abs(this.sceneController.waterElevation - this.model.position.y);
-                    this.velocity.x *= Math.min((100-(distanceBelowWater*3))/100,.05);
-                    this.velocity.y *= Math.min((100-(distanceBelowWater*3))/100,.05);
-                    this.velocity.z *= Math.min((100-(distanceBelowWater*3))/100,.05);
+                    this.velocity.x *= Math.max((100-(distanceBelowWater*3))/100,.005);
+                    this.velocity.y *= Math.max((100-(distanceBelowWater*3))/100,.005);
+                    this.velocity.z *= Math.max((100-(distanceBelowWater*3))/100,.005);
                 }
     
             }
@@ -502,16 +502,5 @@ export class IntelligentForm extends AnimatedForm{
         }
 
     }
-
-    // getEquippedFormByBodyPart(bodyPart) {
-
-    //     // look up in forms by uuid since various entities will have same bodypart names
-    //     let uuid = this.model.find(el => { return el.objectName == this.equipped[bodyPart][0] }).uuid;
-    //     return this.sceneController.forms.find(el => { return el.model.uuid == uuid })
-     
-    //     // should every entity have its own registry of animated forms to process?
-    // }
-
-
 
 }

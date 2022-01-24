@@ -9,8 +9,8 @@ export const levels = [
 
     {
         level: 0,
-        width: 6, //26
-        length: 6, //26
+        width: 26, //26
+        length: 26, //26
         name: "In the valley of mist",
         background: 'clouds.png',
         terrain: {
@@ -40,12 +40,11 @@ export const levels = [
             Items.crystalBall,
             Items.gold3,
             Items.bagOfGems,
-            Items.gold25,
-            Items.gold10,
-            Items.gold3,
             Items.bow,
             Items.arrow25,
-            Items.orb
+            Items.orb,
+            Items.helmet
+
         ],
         structures: [
             Structures.shed,

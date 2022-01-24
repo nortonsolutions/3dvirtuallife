@@ -217,6 +217,21 @@ export const Items = {
             effect: "defense/1"
         } 
     },
+    helmet: {
+        name: 'helmet',
+        gltf: 'helmet.glb',
+        image: 'helmet.png',
+        description: 'Heavy-duty armor',
+        type: 'item',
+        attributes: {
+            equippable: ['Head_end'],
+            animates: false,
+            scale: 40,
+            equippedScale: .035,
+            elevation: 20,
+            effect: "defense/1"
+        } 
+    },
     bow: {
         name: 'bow',
         gltf: 'bow.glb',

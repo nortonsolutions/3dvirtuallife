@@ -27,8 +27,8 @@ export const Entities = {
             stats: {
                 health: "2/2/0",
                 mana: "0/0/0",
-                strength: "1/1/0",
-                agility: "1/1/0",
+                strength: "2/2/0",
+                agility: "2/2/0",
                 defense: "1/1/0"
             },
             grants: ["gold3"]

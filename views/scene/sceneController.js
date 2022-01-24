@@ -41,6 +41,9 @@ export class SceneController {
         this.sprites = [];
         this.projectiles = [];
 
+        this.clock = new THREE.Clock();
+        this.refractor = null;
+
         // Bindings:
         this.addEventListeners = this.addEventListeners.bind(this);
         this.deanimateScene = this.deanimateScene.bind(this);
@@ -56,24 +59,29 @@ export class SceneController {
         this.scene = new Scene(this);
         this.scene.init(() => {
             this.addFloor(() => {
-                this.addWater();
-                this.addLights();
-                this.addHero(() => {
-                    this.seedForms(() => {
-                        this.scene.animate();
+                this.addWater(() => {
+                    this.addLights();
+                    this.addHero(() => {
+                        this.seedForms(() => {
+                            this.scene.animate();
+                        });
                     });
                 });
             });
         });
     }
 
-    addWater() {
+    addWater(callback) {
         if (this.layout.terrain.attributes.water) {
+            this.refractor = null;
             this.waterElevation = this.layout.terrain.attributes.water.elevation;
             this.water = this.formFactory.newForm("water", this.layout.terrain.attributes.water);
             this.water.load(() => {
                 this.addToScene(this.water, false);
+                callback();
             });
+        } else {
+            callback();
         }
     }
 
@@ -251,8 +259,12 @@ export class SceneController {
             if (form.attributes.animates) {
                 form.animate(delta);
             }
-            
+    
         })
+
+        if (this.refractor) {
+            this.refractor.material.uniforms[ "time" ].value += this.clock.getDelta();
+        }
 
         if (this.overheadPointLight) {
             let controlsObject = this.scene.controls.getObject();

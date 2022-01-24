@@ -26,7 +26,7 @@ class Scene {
 
     constructor(controller) {
 
-
+        
         this.prevTime = performance.now();
 
         // SceneController has access to layoutManager, which has levelBuilder
@@ -109,7 +109,7 @@ class Scene {
             geometry.scale (-1,1,1);
 
             var material = new THREE.MeshBasicMaterial( {
-                map: new THREE.TextureLoader().load("/models/textures/" + this.background)
+                map: new THREE.TextureLoader().load("/textures/" + this.background)
             });
 
             this.backgroundMesh = new THREE.Mesh(geometry, material)
@@ -523,6 +523,8 @@ class Scene {
             } else {
                 this.prevTime = performance.now();
             }
+
+            
             this.renderer.render( this.scene, this.camera );
     
                 if (minimap) {
