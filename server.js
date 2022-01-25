@@ -18,6 +18,7 @@ const mongoose                 = require('mongoose');
 // var fccTestingRoutes  = require('./routes/fcctesting.js');
 const runner                   = require('./test-runner');
 const database                 = require('./database.js');
+const socket                   = require('socket.io');
 
 const app = express();
 
@@ -53,7 +54,7 @@ database(mongoose, (db) => {
   });
     
   //Start our server and tests!
-  app.listen(process.env.PORT || 3001, function () {
+  var server = app.listen(process.env.PORT || 3001, function () {
     console.log("Listening on port " + process.env.PORT);
     if(process.env.NODE_ENV==='test') {
       console.log('Running Tests...');
@@ -68,6 +69,13 @@ database(mongoose, (db) => {
       }, 1500);
     }
   });
+
+  // Socket setup
+  var io = socket(server);
+
+  io.on('connection', (socket) => {
+    console.log(`Made socket connection - ${socket.id}`);
+  })
 
 })
 

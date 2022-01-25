@@ -342,6 +342,16 @@ main {
     height: 100vh;
     width: 70px;
     background-color: white;
+}
+
+#chatbar {
+    display: none;
+    flex-direction: row;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100vw;
+    background-color: white;
 
 }
 

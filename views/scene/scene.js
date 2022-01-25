@@ -14,7 +14,7 @@ var BLACK = new THREE.Color('black');
 
 var navbarHeight;
 
-var minimap = false, sidebar = false;
+var minimap = false, sidebar = false, chatbar = false;
 
 /**
  * The Scene has graphical display (THREE.js), animates using requestAnimationFrame,
@@ -26,7 +26,7 @@ class Scene {
 
     constructor(controller) {
 
-        
+
         this.prevTime = performance.now();
 
         // SceneController has access to layoutManager, which has levelBuilder
@@ -85,7 +85,8 @@ class Scene {
         
         this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault + 230);
         this.scene.add( this.controls.getObject() );
-    
+
+        document.addEventListener( 'keydown', this.onF8, false );
         document.addEventListener( 'keydown', this.onKeyDown, false );
         document.addEventListener( 'keyup', this.onKeyUp, false );
     }
@@ -153,6 +154,16 @@ class Scene {
 
     }
 
+    /** Separate keyhandling for F8 because it controls other keyhandler */
+    onF8 = ( event ) => {
+
+        if (event.keyCode == 119) {  //F8
+            chatbar = !chatbar;
+            this.controller.eventDepot.fire('toggleChatbar', { show: chatbar });
+        }
+    }
+
+
     onKeyDown = ( event ) => {
     
         switch ( event.keyCode ) {
@@ -201,7 +212,6 @@ class Scene {
                 if (sidebar) this.controller.eventDepot.fire('refreshSidebar', { equipped: this.controller.hero.equipped });
                 this.controller.eventDepot.fire('toggleSidebar', { show: sidebar });
                 break;
-
             case 49: // 1
             case 50:
             case 51:
@@ -344,7 +354,14 @@ class Scene {
             this.helper.position.copy(data.position);
             this.helper.material.color = data.color;
         })
-        
+
+        this.controller.eventDepot.addListener('disableKeyDownListener', () => {
+            document.removeEventListener( 'keydown', this.onKeyDown, false );
+        })
+
+        this.controller.eventDepot.addListener('enableKeyDownListener', () => {
+            document.addEventListener( 'keydown', this.onKeyDown, false );
+        })
 
         this.instructions.addEventListener( 'click', () => {
 
@@ -370,7 +387,7 @@ class Scene {
             document.removeEventListener( 'click', this.onMouseClick, false );
 
         } );
-        
+
         main.appendChild(this.renderer.domElement);
         window.addEventListener( 'resize', this.onWindowResize, false );
     }
@@ -565,6 +582,7 @@ class Scene {
         if (this.instructions) this.instructions.removeEventListener( 'click', this.controls.lock, false );
         
         document.removeEventListener( 'keydown', this.onKeyDown, false );
+        document.removeEventListener( 'keydown', this.onF8, false );
         document.removeEventListener( 'keyup', this.onKeyUp, false );
         window.removeEventListener( 'resize', this.onWindowResize, false );
         this.controller.eventDepot.removeListeners('lockControls');

@@ -9,8 +9,8 @@ export const levels = [
 
     {
         level: 0,
-        width: 26, //26
-        length: 26, //26
+        width: 6, //26
+        length: 6, //26
         name: "In the valley of mist",
         background: 'clouds.png',
         terrain: {
