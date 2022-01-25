@@ -3,6 +3,7 @@ class Chatbar {
     constructor(eventDepot, socket) {
         
         this.chatbarElement = document.getElementById('chatbar');
+        
         this.eventDepot = eventDepot;
         this.socket = socket;
 
@@ -15,20 +16,27 @@ class Chatbar {
     addEventListeners() {
 
         this.socket.on('chat', (data) => {
+
+            let chatOutput = document.getElementById('chatOutput');
             // append chat message to chatOutput div
             let newMessage = document.createElement('span');
             newMessage.innerText = data.playerName + ': ' + data.message + '\n';
-            document.getElementById('chatOutput').append(newMessage);
+            chatOutput.append(newMessage);
+
+            if (chatOutput.childElementCount > 5) chatOutput.removeChild(chatOutput.firstChild);
         })
 
         this.eventDepot.addListener('toggleChatbar', data => {
-            this.chatbarElement.style.display = data.show? 'flex' : 'none';
+            
 
             if (data.show) {
                 this.eventDepot.fire('disableKeyDownListener', {});
                 this.refreshChatbar(data);
+
+                
             } else { 
                 this.eventDepot.fire('enableKeyDownListener', {});
+                document.getElementById('chatInput').style.display = data.show? 'flex' : 'none';
             }
         })
 
@@ -41,22 +49,26 @@ class Chatbar {
     refreshChatbar = (data) => {
         // set context data and call loadTemplate
         this.loadTemplate(data, () => {
+            document.getElementById('chatInput').style.display = data.show? 'flex' : 'none';
             document.getElementById('chatMessage').focus();
             this.addChatMessageListeners();
+
         });
     }
 
     /** These listeners are active when the chatbar is visible */
     addChatMessageListeners = () => {
 
+        document.getElementById('chatMessage').addEventListener('keydown', this.submitOnEnter);
+
         document.getElementById('chatSend').addEventListener('click', () => {
-            let message = document.getElementById('chatMessage').value;
-            this.socket.emit('chat', { message })
+            this.submitMessage(document.getElementById('chatMessage').value);
         });
 
         document.getElementById('chatSendCoordinates').addEventListener('click', () => {
             querySC('getHeroCoordinates', this.eventDepot, {}).then(coordinates => {
                 this.socket.emit('chat', { message: `x: ${coordinates.x}, z: ${coordinates.z}` });
+                document.getElementById('chatMessage').focus();
             });
         })
 
@@ -77,7 +89,7 @@ class Chatbar {
         });
 
         document.getElementById('chatMessage').addEventListener('focus', () => {
-            this.eventDepot.fire('disableKeyDownListener', {});  
+            this.eventDepot.fire('disableKeyDownListener', {});
         });
 
         document.getElementById('chatMessage').addEventListener('blur', () => {
@@ -92,6 +104,16 @@ class Chatbar {
             this.chatbarElement.innerHTML = template(data);
             if (callback) callback();
         });
+    }
+
+    submitOnEnter = (event) => {
+        if (event.keyCode == 13) this.submitMessage(document.getElementById('chatMessage').value);
+    }
+
+    submitMessage(message) {
+        this.socket.emit('chat', { message })
+        document.getElementById('chatMessage').value = "";
+        document.getElementById('chatMessage').focus();
     }
 
 }

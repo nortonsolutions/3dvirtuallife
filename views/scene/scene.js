@@ -157,9 +157,9 @@ class Scene {
     /** Separate keyhandling for F8 because it controls other keyhandler */
     onF8 = ( event ) => {
 
-        if (event.keyCode == 119) {  //F8
+        if (event.keyCode == 119 || (event.altKey && event.keyCode == 84)) {  //F8 or Alt-T
             chatbar = !chatbar;
-            this.controller.eventDepot.fire('toggleChatbar', { show: chatbar });
+            this.controller.eventDepot.fire('toggleChatbar', { show: chatbar }); 
         }
     }
 
