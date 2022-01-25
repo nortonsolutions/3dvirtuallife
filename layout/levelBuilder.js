@@ -33,10 +33,13 @@ class LevelBuilder {
     }
 
     mapItemToLocation = (item) => {
-        return {
-            ...item,
+        let newItem = {
+            name: item.name,
             location: item.location? item.location : this.randomUniqueLocation()
         }
+
+        if (item.attributes) newItem.attributes = item.attributes;
+        return newItem;
     }
 
     randomLocation() {

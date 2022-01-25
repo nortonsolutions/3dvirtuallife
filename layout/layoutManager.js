@@ -56,7 +56,8 @@ class LayoutManager {
         });
 
         this.eventDepot.addListener('addItemToLayout', (data) => {
-            let item = this.allItems[data.itemName];
+            let item = {};
+            item.name = this.allItems[data.itemName].name;
             item.location = data.location;
             item.uuid = data.uuid;
             this.layout.items.push(item);

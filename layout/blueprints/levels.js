@@ -1,9 +1,6 @@
 /**
  * LevelBuilder will keep track of layouts by level
  */
-import {Entities} from './entities.js';
-import {Items} from './items.js';
-import {Structures} from './structures.js';
 
 export const levels = [
 
@@ -30,33 +27,38 @@ export const levels = [
                     density: 1
                 }
             }
-
         },
         items: [
-            Items.keyToShed,
-            Items.smallSword,
-            Items.redpotion,
-            Items.greenpotion,
-            Items.crystalBall,
-            Items.gold3,
-            Items.bagOfGems,
-            Items.bow,
-            Items.arrow25,
-            Items.orb,
-            Items.helmet
+            { name: "keyToShed" },
+            { name: "smallSword" },
+            { name: "redpotion" },
+            { name: "greenpotion" },
+            { name: "crystalBall" },
+            { name: "gold3" },
+            { name: "bagOfGems" },
+            { name: "bow" },
+            { name: "arrow25" },
+            { name: "orb" },
+            { name: "helmet" }
 
         ],
         structures: [
-            Structures.shed,
-            Structures.rock1,
-            Structures.rock1,
-            Structures.grate,
-            Structures.swampPortal
+            { name: "shed", location: { x: 0, y: 0, z: 0} },
+            { name: "rock1" },
+            { name: "rock1" },
+            { 
+                name: "grate", location: { x: 3, y: 0, z: 4}, 
+                attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } 
+            },
+            { 
+                name: "portal", location: { x: 19.5, y: 0, z: -6.5}, 
+                attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            }
         ],
         entities: [
-            Entities.john,
-            Entities.evilOne,
-            Entities.shopkeep
+            { name: "john" },
+            { name: "evilOne" },
+            { name: "shopkeep" }
         ]
     },
     {
@@ -83,30 +85,39 @@ export const levels = [
             }
         },
         items: [
-            Items.bagOfGems,
-            Items.mace,
-            Items.bluepotion,
-            Items.busterbuckler,
-            {...Items.torch, location: { x: 0, y: 0, z: 0}},
-            {...Items.keyToChest, location: { x: 1, y: 0, z: 0 }},
-            Items.gold3,
-            Items.gold25,
-            Items.gold1,
-            Items.gold10,
-            {...Items.arrow, location: { x: 0, y: 0, z: 0}}
+            { name: "bagOfGems" },
+            { name: "mace" },
+            { name: "bluepotion" },
+            { name: "busterbuckler" },
+            { name: "torch", location: { x: 0, y: 0, z: 0}},
+            { name: "keyToChest", location: { x: 1, y: 0, z: 0 }},
+            { name: "gold3" },
+            { name: "gold25" },
+            { name: "gold1" },
+            { name: "gold10" },
+            { name: "arrow", location: { x: 0, y: 0, z: 0}}
         ],
         structures: [
-            {...Structures.ancientChest, location: { x: 0, y: 0, z: -1 }},
-            Structures.archway0,
-            Structures.archway2
+            { 
+                name: "ancientChest", location: { x: 0, y: 0, z: -1 },
+                attributes: { key: 'keyToChest', contentItems: [ "bagOfGems" ] }
+            },
+            { 
+                name: "archway", location: { x: 16, y: 0, z: 4 },
+                attributes: { routeTo: { level: 0, location: { x: 3, y: 0, z: 4} } } 
+            },
+            { 
+                name: "archway", location: { x: 16, y: 0, z: -4 },
+                attributes: { routeTo: { level: 2, location: { x: 0, y: 0, z: 0} } } 
+            }
         ],
         entities: [
-            Entities.john,
-            Entities.evilOne,
-            Entities.evilOne,
-            Entities.evilOne,
-            Entities.rat,
-            Entities.rat
+            { name: "john" },
+            { name: "evilOne" },
+            { name: "evilOne" },
+            { name: "evilOne" },
+            { name: "rat" },
+            { name: "rat" }
 
         ]
     },
@@ -134,17 +145,23 @@ export const levels = [
             }
         },
         items: [
-            {...Items.crystalBall, location: { x: 10, y: 0, z: 0 }},
-            {...Items.busterblade, location: { x: 0, y: 0, z: 0 }},
-            {...Items.gold25, location: { x: 1, y: 0, z: -1 }}
+            { name: "crystalBall", location: { x: 10, y: 0, z: 0 }},
+            { name: "busterblade", location: { x: 0, y: 0, z: 0 }},
+            { name: "gold25", location: { x: 1, y: 0, z: -1 }}
         ],
         structures: [
-            Structures.archway1,
-            {...Structures.ancientChest2, location: { x: 10, y: 0, z: -1 }},
+            { 
+                name: "archway", location: { x: 1, y: 0, z: 0},
+                attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: -4 } } }
+            },
+            { 
+                name: "ancientChest", location: { x: 10, y: 0, z: -1 },
+                attributes: { key: 'keyToChest2', contentItems: [ "orb" ] }
+            }
 
         ],
         entities: [
-            {...Entities.rat, location: { x: 10, y: 0, z: 0 }}
+            { name: "rat", location: { x: 10, y: 0, z: 0 }}
         ]
     },
     {
@@ -181,7 +198,10 @@ export const levels = [
 
         ],
         structures: [
-            Structures.swampToValley
+            { 
+                name: "portal", location: { x: -21.5, y: 0, z: -6.5},
+                attributes: { routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } 
+            }
         ],
         entities: [
 

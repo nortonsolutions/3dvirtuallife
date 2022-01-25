@@ -174,19 +174,28 @@ export class SceneController {
     }
 
     seedForms(callback) {
-        this.layout.items.forEach((item,index) => {
+        this.layout.items.forEach(({name,location,attributes},index) => {
+            let item = this.getObjectByName(name);
+            if (location) item.location = location;
+            if (attributes) item.attributes = {...item.attributes, ...attributes};
             this.seedForm(item, true).then(form => {
                 this.layout.items[index].uuid = form.model.uuid;
             });
         });
 
-        this.layout.structures.forEach((structure, index) => {
+        this.layout.structures.forEach(({name,location,attributes}, index) => {
+            let structure = this.getObjectByName(name);
+            if (location) structure.location = location;
+            if (attributes) structure.attributes = {...structure.attributes, ...attributes};
             this.seedForm(structure, true).then(form => {
                 this.layout.structures[index].uuid = form.model.uuid;
             });
         });
 
-        this.layout.entities.forEach((entity, index) => {
+        this.layout.entities.forEach(({name,location,attributes}, index) => {
+            let entity = this.getObjectByName(name);
+            if (location) entity.location = location;
+            if (attributes) entity.attributes = {...entity.attributes, ...attributes};
             this.seedForm(entity, true).then(form => {
                 this.layout.entities[index].uuid = form.model.uuid;
             });
@@ -222,8 +231,9 @@ export class SceneController {
                 this.addToScene(form);
 
                 if (form.attributes.contentItems) {
-                    form.attributes.contentItems.forEach(contentItem => {
-                        contentItem.location = { x: 0, y: 30, z: 0 };
+                    form.attributes.contentItems.forEach(contentItemName => {
+                        let contentItem = this.getObjectByName(contentItemName);
+                        contentItem.location = { x: 0, y: 20, z: 0 };
                         this.loadFormbyName(contentItem.name, (contentForm) => {
 
                             contentForm.model.position.x = form.model.position.x;

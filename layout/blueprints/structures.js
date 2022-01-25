@@ -7,7 +7,6 @@ export const Structures = {
         gltf: 'sceneHouse.glb',
         description: 'Wooden Shed with a locked door',
         type: 'structure',
-        location: { x: 0, y: 0, z: 0},
         attributes: {
             animates: false,
             scale: 100,
@@ -29,93 +28,39 @@ export const Structures = {
         gltf: 'grate.gltf',
         description: 'Locked rusty iron grate',
         type: 'structure',
-        location: { x: 3, y: 0, z: 4},
         attributes: {
             animates: true,
             key: 'keyToShed',
             scale: 100,
             elevation: 0,
             unlocked: false,
-            routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } },
         }
     
     },
 
-    swampPortal: {
+    portal: {
         name: 'swampPortal',
         gltf: 'grate.gltf',
         description: 'Portal to swamp',
         type: 'structure',
-        location: { x: 19.5, y: 0, z: -6.5},
         attributes: {
             visible: false,
             animates: false,
             scale: 200,
             elevation: -20,
             unlocked: true,
-            routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } },
         }
     },
     
-    swampToValley: {
-        name: 'swampToValley',
-        gltf: 'grate.gltf',
-        description: 'Swamp to Valley',
-        type: 'structure',
-        location: { x: -21.5, y: 0, z: -6.5},
-        attributes: {
-            visible: false,
-            animates: false,
-            scale: 200,
-            elevation: -20,
-            unlocked: true,
-            routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } },
-        }
-    },
-
-    archway0: {
-        name: 'archway0',
+    archway: {
+        name: 'archway',
         gltf: 'archway.gltf',
-        description: 'Dark gothic archway leading outside',
+        description: 'Dark gothic archway',
         type: 'structure',
-        location: { x: 16, y: 0, z: 4 },
         attributes: {
             animates: false,
             scale: 100,
             elevation: 1,
-            routeTo: { level: 0, location: { x: 3, y: 0, z: 4} },
-            unlocked: true
-        }
-    
-    },
-
-    archway1: {
-        name: 'archway1',
-        gltf: 'archway.gltf',
-        description: 'Dark gothic archway leading upstairs',
-        type: 'structure',
-        location: { x: 1, y: 0, z: 0},
-        attributes: {
-            animates: false,
-            scale: 100,
-            elevation: 1,
-            routeTo: { level: 1, location: { x: 16, y: 0, z: -4 } },
-            unlocked: true
-        }
-    
-    },
-
-    archway2: {
-        name: 'archway2',
-        gltf: 'archway.gltf',
-        description: 'Archway leading to dark catacomb',
-        type: 'structure',
-        location: { x: 16, y: 0, z: -4 },
-        attributes: {
-            animates: false,
-            scale: 100,
-            elevation: 1,
-            routeTo: { level: 2, location: { x: 0, y: 0, z: 0} },
             unlocked: true
         }
     
@@ -138,34 +83,11 @@ export const Structures = {
         gltf: 'chest.glb',
         description: 'An old but sturdy wooden chest',
         type: 'structure',
-
         attributes: {
             scale: 60,
             elevation: 0,
             animates: true,
-            key: 'keyToChest',
             unlocked: false,
-            contentItems: [
-                {...Items.bagOfGems }
-            ]
-        }
-    },
-
-    ancientChest2: {
-        name: 'ancientChest2',
-        gltf: 'chest.glb',
-        description: 'An old but sturdy wooden chest',
-        type: 'structure',
-
-        attributes: {
-            scale: 60,
-            elevation: 0,
-            animates: true,
-            key: 'keyToChest2',
-            unlocked: false,
-            contentItems: [
-                {...Items.orb }
-            ]
         }
     }
 }
