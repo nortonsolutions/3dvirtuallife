@@ -17,12 +17,12 @@ export const app = () => {
     var heroTemplate = newHeroTemplate('dave', 20);
     var minimap = false;
     var eventDepot = new EventDepot();
-    
+    var socket = null;
+    var chatbar = null;
 
     var gameAPI = new GameAPI(eventDepot);
     var modal = new Modal(eventDepot, gameAPI);
     var sidebar = new Sidebar(eventDepot); // hotkeys
-    var chatbar = new Chatbar(eventDepot);
 
     const addEventDepotListeners = (eventDepot) => {
 
@@ -119,21 +119,25 @@ export const app = () => {
 
     const startGame = (heroTemplate, props) => {
         
-        eventDepot = null; gameAPI = null; modal = null; sidebar = null; chatbar = null;
+        if (socket) socket.disconnect('http://192.168.109.2:3001');
+
+        eventDepot = null; gameAPI = null; modal = null; sidebar = null; chatbar = null; socket = null;
         
         eventDepot = new EventDepot();
         addEventDepotListeners(eventDepot);
+        
+        socket = io.connect('http://192.168.109.2:3001');
+        socket.emit('introduce', { name: heroTemplate.name });
 
         gameAPI = new GameAPI(eventDepot);
         modal = new Modal(eventDepot, gameAPI);
         sidebar = new Sidebar(eventDepot);
-        chatbar = new Chatbar(eventDepot);
+        chatbar = new Chatbar(eventDepot, socket);
 
         if (game) game.stop();
         game = new Game(heroTemplate, eventDepot);
         game.start(props.level);
     }
 
-    // socket IO client-side testing
-    var socket = io.connect('http://localhost:3001')
+
 }

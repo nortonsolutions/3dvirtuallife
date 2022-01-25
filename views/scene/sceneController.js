@@ -334,6 +334,24 @@ export class SceneController {
         this.eventDepot.addListener('takeItemFromScene', this.takeItemFromScene);
         this.eventDepot.addListener('dropItemToScene', this.dropItemToScene);
         
+        this.eventDepot.addListener('querySC', (data) => {
+        
+            let {key, queryName, args} = data;
+            let response = null;
+        
+            switch (queryName) {
+                case 'getHeroCoordinates':
+                    response = { 
+                        x: this.hero.model.position.x.toFixed(2),
+                        y: this.hero.model.position.y.toFixed(2),
+                        z: this.hero.model.position.z.toFixed(2)
+                    }
+                    break;
+            }
+            
+            this.eventDepot.fire('SCResponse' + key, response);
+        })
+
     }
 
     loadFormbyName(formName, callback) {

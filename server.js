@@ -75,6 +75,19 @@ database(mongoose, (db) => {
 
   io.on('connection', (socket) => {
     console.log(`Made socket connection - ${socket.id}`);
+
+    var playerName = null;
+
+    // CHAT messages:
+    socket.on('chat', (data) => {
+      // update shared layout and send out to all subscribers
+      io.sockets.emit('chat', {...data, playerName});
+    })
+    
+    socket.on('introduce', (data) => {
+      playerName = data.name; 
+    });
+
   })
 
 })
