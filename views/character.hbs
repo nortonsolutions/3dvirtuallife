@@ -1,0 +1,42 @@
+<div class="row py-3">
+
+    <div class="col-4">
+
+        <div class="row justify-content-center">
+            <img class="maxHeight240 m-auto" src="/models/png/{{model.png}}" alt="">
+
+        </div>
+        <div class="row justify-content-center">
+            <button id="back" type="button" class="btn btn-primary btn-standard">-</button>
+            <button id="next" type="button" class="btn btn-primary btn-standard">+</button>
+        </div>
+    </div>
+
+    <div class="col-4">
+        <div class="row">Type: {{model.type}}</div>
+        <div class="row pt-3">
+            {{model.description}}
+        </div>
+
+    </div>
+    <div class="col-4">
+        <form>
+            <div class="row">
+               <div class="col-6 px-0"><label for="name">Name:</label></div>
+               <div class="col-3 px-0"><label for="height">Height:</label></div>
+            </div>
+            <div class="row">
+               <input type="text" class="form-control col-6" name="name" id="name" placeholder="Name..." value="Dave">
+               <input type="number" class="form-control col-4" name="height" id="height" placeholder="20" step="1" min="18" max="99" value="20">
+            </div>
+
+            <div class="row">
+                <button id="startGame" type="submit" class="btn btn-primary btn-wide">Start</button>
+                <button id="joinGame" type="submit" class="btn btn-primary btn-wide">Join</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+

@@ -197,10 +197,6 @@ class Scene {
                 this.controller.eventDepot.fire('halt', {});
                 break;
                 
-            case 82: // r
-                this.controller.eventDepot.fire('modal', { type: 'spells', title: 'Spells' });
-                break;
-
             case 77: // m
                 minimap = !minimap;
                 this.controller.eventDepot.fire('minimap', {});
@@ -474,47 +470,47 @@ class Scene {
         
         // Handle action and filter out projectiles that have run their course
         
-        this.controller.projectiles.filter(el => el.distanceTraveled == -1).forEach(projectile => {
-            this.handleAction(projectile, []);
-        })
-        
-        this.controller.projectiles = this.controller.projectiles.filter(el => el.distanceTraveled != -1);
-
-        this.controller.projectiles.forEach(projectile => {
-
-            if (projectile.distanceTraveled == 0) { // first iteration, set velocitiess
-
-                projectile.velocity.y = (projectile.direction.y) * 500;
-                projectile.velocity.z = projectile.item.attributes.throwableAttributes.speed * 500;
-                
-            } else { // subsequent iterations
-
-                // INERTIA/GRAVITY
-                projectile.velocity.z -= projectile.velocity.z * delta;
-                projectile.velocity.y -= 9.8 * projectile.item.attributes.throwableAttributes.weight * 100 * delta;
-            }
-
-            projectile.item.model.translateY( projectile.velocity.y * delta );
-            projectile.item.model.translateZ( -projectile.velocity.z * delta );
-
-            let entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
-
-            if (entitiesInRange.length > 0) {
-                this.handleAction(projectile, entitiesInRange);
-                this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
-            }
-
-            projectile.distanceTraveled += (Math.abs(projectile.velocity.z * delta) + Math.abs(projectile.velocity.y * delta));
-
-            let maxDistance = projectile.item.attributes.throwableAttributes.distance;
-
-            console.log(`traveled: ${projectile.distanceTraveled}, position: ${projectile.item.model.position.x}, ${projectile.item.model.position.y},${projectile.item.model.position.z }`);
-            if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= 0) {
-                projectile.distanceTraveled = -1;
-            }
-
+        if (this.controller.projectiles.length > 0) {
+            this.controller.projectiles.filter(el => el.distanceTraveled == -1).forEach(projectile => {
+                this.handleAction(projectile, []);
+            })
             
-        })
+            this.controller.projectiles = this.controller.projectiles.filter(el => el.distanceTraveled != -1);
+    
+            this.controller.projectiles.forEach(projectile => {
+    
+                if (projectile.distanceTraveled == 0) { // first iteration, set velocitiess
+    
+                    projectile.velocity.y = (projectile.direction.y) * 500;
+                    projectile.velocity.z = projectile.item.attributes.throwableAttributes.speed * 500;
+                    
+                } else { // subsequent iterations
+    
+                    // INERTIA/GRAVITY
+                    projectile.velocity.z -= projectile.velocity.z * delta;
+                    projectile.velocity.y -= 9.8 * projectile.item.attributes.throwableAttributes.weight * 100 * delta;
+                }
+    
+                projectile.item.model.translateY( projectile.velocity.y * delta );
+                projectile.item.model.translateZ( -projectile.velocity.z * delta );
+    
+                let entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
+    
+                if (entitiesInRange.length > 0) {
+                    this.handleAction(projectile, entitiesInRange);
+                    this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
+                }
+    
+                projectile.distanceTraveled += (Math.abs(projectile.velocity.z * delta) + Math.abs(projectile.velocity.y * delta));
+    
+                let maxDistance = projectile.item.attributes.throwableAttributes.distance;
+    
+                console.log(`traveled: ${projectile.distanceTraveled}, position: ${projectile.item.model.position.x}, ${projectile.item.model.position.y},${projectile.item.model.position.z }`);
+                if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= 0) {
+                    projectile.distanceTraveled = -1;
+                }
+            })
+        }
     }
 
     animate() {

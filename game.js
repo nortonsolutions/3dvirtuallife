@@ -57,42 +57,4 @@ class Game {
     }
 }
 
-function newHeroTemplate(name,height) {
-    return {
-        name: name,
-        type: "hero",
-        location: { x: 0, y: 0, z: 0 },
-        attributes: {
-            moves: true,
-            animates: true,
-            height: height,
-            length: 20,
-            width: 20,
-            scale: 10,
-            elevation: 0,
-            experience: 0,
-            stats: {
-                health: "3/5/0",  // min/max/boost
-                mana: "0/0/0",
-                strength: "1/1/0",
-                agility: "3/3/0",
-                defense: "0/0/0"
-            },
-            xpLevels: {
-                health: 0,
-                mana: 0,
-                strength: 0,
-                agility: 0,
-                defense: 0
-            }
-        },
-        gltf: 'robot.glb',
-        model: null,
-        inventory: [],
-        spells: [],
-        equipped: {}
-
-    }
-}
-
-export { Game, newHeroTemplate };
+export { Game };

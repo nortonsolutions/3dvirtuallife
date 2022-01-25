@@ -333,6 +333,14 @@ main {
     width: 40px;
 }
 
+.btn-wide {
+    width: 100px;
+}
+
+.maxHeight240 {
+    max-height: 240px !important;
+}
+
 #sidebar {
     display: none;
     flex-direction: column;

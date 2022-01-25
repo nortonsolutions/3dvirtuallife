@@ -144,7 +144,7 @@ export const Entities = {
     },
     shopkeep: {
         name: 'shopkeep',
-        gltf: 'robot.glb',
+        gltf: 'robot_blue.glb',
         description: 'Robust shopkeeper',
         type: 'friendly',
         inventory: [

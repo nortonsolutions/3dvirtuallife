@@ -64,8 +64,6 @@ export class StandardForm {
                 
             }
             
-            this.setToCastShadows();
-            
             callback();
 
         }, undefined, function ( error ) {
@@ -122,6 +120,18 @@ export class StandardForm {
 
         if (root.children) {
             root.children.forEach(e => this.setRoofToSingleSided(e)); 
+        }
+    }
+
+    setToDoubleSided(root) {
+        
+        if (!root) root = this.model;
+        if (root.material) { 
+                root.material.side = THREE.DoubleSide;
+        }
+
+        if (root.children) {
+            root.children.forEach(e => this.setToDoubleSided(e)); 
         }
     }
 

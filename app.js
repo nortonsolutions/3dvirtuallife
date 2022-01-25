@@ -4,7 +4,7 @@
 * saving and loading props and hero template from localStorage, starting or joining games.
 */
 import { EventDepot } from '/public/eventDepot.js';
-import { Game, newHeroTemplate } from '/game.js';
+import { Game } from '/game.js';
 import { GameAPI } from './gameAPI.js'
 import { Modal } from '/views/modal.js';
 import { Sidebar } from '/views/sidebar.js';
@@ -13,8 +13,6 @@ import { Chatbar } from '/views/chatbar.js';
 export const app = () => {
 
     var game = null;
-    var props = { level: 0, layouts: [] }
-    var heroTemplate = newHeroTemplate('dave', 20);
     var minimap = false;
     var eventDepot = new EventDepot();
     var socket = null;
@@ -68,7 +66,9 @@ export const app = () => {
         Array.from(document.querySelectorAll('.newGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
-                startGame(heroTemplate, props);
+                // startGame(heroTemplate, props);
+                eventDepot.fire('modal', { type: 'character', title: "Character", context: { } });
+                
             })
         })
 
