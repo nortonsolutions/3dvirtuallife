@@ -10,46 +10,38 @@ class Chatbar {
         this.addEventListeners = this.addEventListeners.bind(this);
         this.addEventListeners();
 
-
+        this.messageThread = [];
     }
+
+
 
     addEventListeners() {
 
         this.socket.on('chat', (data) => {
 
-            let chatOutput = document.getElementById('chatOutput');
-            // append chat message to chatOutput div
-            let newMessage = document.createElement('span');
-            newMessage.innerText = data.playerName + ': ' + data.message + '\n';
-            chatOutput.append(newMessage);
-
-            if (chatOutput.childElementCount > 5) chatOutput.removeChild(chatOutput.firstChild);
+            let newMessage = data.playerName + ': ' + data.message + '\n';
+            this.messageThread.push(newMessage);
+            if (this.messageThread.length > 5) this.messageThread.unshift();
+            this.refreshChatbar();
         })
 
         this.eventDepot.addListener('toggleChatbar', data => {
-            
 
             if (data.show) {
                 this.eventDepot.fire('disableKeyDownListener', {});
-                this.refreshChatbar(data);
-
+                this.refreshChatbar();
                 
             } else { 
                 this.eventDepot.fire('enableKeyDownListener', {});
-                document.getElementById('chatInput').style.display = data.show? 'flex' : 'none';
+                document.getElementById('chatInput').style.display = 'none';
             }
         })
-
-        // // data: { ... }
-        // this.eventDepot.addListener('refreshChatbar', data => {
-        //     this.refreshChatbar(data);
-        // })
     }
 
-    refreshChatbar = (data) => {
+    refreshChatbar = () => {
         // set context data and call loadTemplate
-        this.loadTemplate(data, () => {
-            document.getElementById('chatInput').style.display = data.show? 'flex' : 'none';
+        this.loadTemplate(this.messageThread, () => {
+            document.getElementById('chatInput').style.display = 'flex';
             document.getElementById('chatMessage').focus();
             this.addChatMessageListeners();
 
