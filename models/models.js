@@ -22,5 +22,16 @@ export const models = [
         },
         description: "Above-average intelligence (mana)."
     },
-
+    {
+        type: "Rosen",
+        gltf: "robot2.glb",
+        png: "robot2.png",
+        attributes: {
+            stats: {
+                agility: "1/1/0",
+                strenth: "2/2/0"
+            }
+        },
+        description: "Above-average strength, slower agility."
+    }
 ]

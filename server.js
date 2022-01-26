@@ -22,6 +22,7 @@ const socket                   = require('socket.io');
 
 const app = express();
 
+app.games = {};  // i.e. catalog of 'namespaces' (games)
 app.use('/', express.static(process.cwd() + '/'));
 app.use('/cdn', express.static(process.cwd() + '/cdn'));
 app.use('/assets', express.static(process.cwd() + '/assets'));
@@ -40,7 +41,7 @@ database(mongoose, (db) => {
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
-    
+  
   //For FCC testing purposes
   // fccTestingRoutes(app);
     
@@ -73,21 +74,65 @@ database(mongoose, (db) => {
   // Socket setup
   var io = socket(server);
 
+  /**  
+   * Allow regex for multiple namespaces in future socket.io release:
+   * 
+   * io.of(/.+/).on('connection', (socket) => {
+   * 
+   * For now, I'll use just one universal namespace (i.e. one game per server).
+   *   -Dave 
+   */
   io.on('connection', (socket) => {
     console.log(`Made socket connection - ${socket.id}`);
 
+    // Default namespace = "/" (equivalent to io.sockets)
+    app.games[socket.nsp.name] = {};
+    var connectionId = socket.id;
     var playerName = null;
 
-    // CHAT messages:
+    // CHAT messages (data: { message: ...})
     socket.on('chat', (data) => {
-      // update shared layout and send out to all subscribers
-      io.sockets.emit('chat', {...data, playerName});
-    })
+      // io.sockets.emit('chat', {...data, playerName});
+      socket.nsp.emit('chat', {...data, playerName});
+    });
+
+    /**
+     * The 'room' corresponds to a particular level in the game,
+     * with its own layout and such.  The idea here is that when
+     * live changes are happening in the level such as entity movement,
+     * these updates are broadcast only to others in the same room.
+     */
+    socket.on('joinroom', (data) => {
+      Object.keys(socket.rooms).forEach(key => {
+        if (socket.key != socket.id) socket.leave(key);
+      });
+      socket.join(socket.nsp.name + data.level);
+      socket.nsp.emit('chat', { message: `entered ${data.level}`, playerName});
+    });
+
+    socket.on('updateEntityPosition', (data) => {
+      // Which room to notify?
+      Object.keys(socket.rooms).forEach(room => {
+        if (socket.key != socket.id) socket.to(room).emit(data);
+      });
+    });
     
+    socket.on('gameProps', (data) => {
+      app.games[socket.nsp.name] = data; // save for join-game lookups
+      socket.nsp.emit('gameProps', data); // can I only broadcast.emit to others in the nsp?
+    });
+
     socket.on('introduce', (data) => {
       playerName = data.name; 
     });
 
+    socket.on('disconnect', (reason) => {
+
+      if (Object.keys(socket.nsp.sockets).length == 0) {
+        delete app.games[socket.nsp.name];
+      }
+      console.log(`Disconnecting ${socket.id}`)
+    });
   })
 
 })

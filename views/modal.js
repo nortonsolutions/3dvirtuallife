@@ -3,7 +3,8 @@ import { InventoryScreen } from './inventoryScreen.js';
 import { LoadGameScreen } from './loadGameScreen.js';
 import { LevelUpScreen } from './levelUpScreen.js';
 import { DialogScreen } from './dialogScreen.js';
-import { CharacterScreen } from './characterScreen.js'
+import { CharacterScreen } from './characterScreen.js';
+import { JoinGameScreen } from './joinGameScreen.js';
 
 class Modal {
 
@@ -16,6 +17,7 @@ class Modal {
         this.levelUpScreen = new LevelUpScreen(eventDepot, this);
         this.dialogScreen = new DialogScreen(eventDepot, this);
         this.characterScreen = new CharacterScreen(eventDepot, this);
+        this.joinGameScreen = new JoinGameScreen(eventDepot, this);
 
         this.closeModal = this.closeModal.bind(this);
 
@@ -62,6 +64,8 @@ class Modal {
                     case "character":
                         this.characterScreen.addCharacterScreenEvents();
                         break;
+                    case "joinGame":
+                        this.joinGameScreen.addJoinGameEvents(context);
                 }
             });
             

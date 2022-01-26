@@ -16,11 +16,12 @@ import { SceneController } from '/scene/sceneController.js'
 
 class LayoutManager {
 
-    constructor(level, eventDepot) {
+    constructor(level, eventDepot, socket) {
 
         this.props = localStorage.getItem('gameProps')? JSON.parse(localStorage.getItem('gameProps')): { level: 0, layouts: [] };
         this.props.level = level;
         this.eventDepot = eventDepot;
+        this.socket = socket;
         
         this.allItems = Items;
         this.allStructures = Structures;
@@ -45,11 +46,17 @@ class LayoutManager {
 
     launch(heroTemplate) {
         
-        this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects);
+        this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects, this.socket);
         this.sceneController.animateScene();
     }
 
     addEventListeners() {
+
+        this.socket.on('gameProps', (data) => {
+            this.props = data;
+            this.layout = this.props.layouts[this.props.level];
+        });
+
         this.eventDepot.addListener('removeItemFromLayout', (uuid) => {
             this.layout.items = this.layout.items.filter(el => el.uuid != uuid);
             this.cacheLayout();
@@ -106,6 +113,7 @@ class LayoutManager {
             currentProps.layouts[this.props.level] = this.layout;
         }
         localStorage.setItem('gameProps', JSON.stringify(currentProps));
+        this.socket.emit('gameProps', currentProps );
     }
 
     getAllItems() {

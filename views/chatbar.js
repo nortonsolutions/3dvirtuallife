@@ -17,10 +17,10 @@ class Chatbar {
 
     addEventListeners() {
 
+        // data: { playerName: ..., message: ... }
         this.socket.on('chat', (data) => {
 
-            let newMessage = data.playerName + ': ' + data.message + '\n';
-            this.messageThread.push(newMessage);
+            this.messageThread.push(data);
             if (this.messageThread.length > 5) this.messageThread.unshift();
             this.refreshChatbar();
         })

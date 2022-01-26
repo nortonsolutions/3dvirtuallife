@@ -16,13 +16,14 @@ import { FormFactory } from '/forms/formFactory.js';
 
 export class SceneController {
 
-    constructor(heroTemplate, layout, eventDepot, allObjects) {
+    constructor(heroTemplate, layout, eventDepot, allObjects, socket) {
         
         // layout is shared by SceneController and LayoutManager
         this.layout = layout;
         this.heroTemplate = heroTemplate;
         this.eventDepot = eventDepot;
         this.allObjects = allObjects;
+        this.socket = socket;
 
         this.formFactory = new FormFactory(this);
         this.loader = new THREE.GLTFLoader();
@@ -362,6 +363,9 @@ export class SceneController {
             this.eventDepot.fire('SCResponse' + key, response);
         })
 
+        this.socket.on('updateEntityPosition', (data) => {
+            // TODO: 
+        });
     }
 
     loadFormbyName(formName, callback) {

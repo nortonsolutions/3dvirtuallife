@@ -27,17 +27,62 @@ export class CharacterScreen {
             this.refresh();
         });
 
-        document.getElementById('startGame').addEventListener('click', (e) => {
+        document.getElementById('startLevel').addEventListener('click', (e) => {
             e.preventDefault();
+
             this.heroTemplate.name = document.getElementById('name').value;
             this.heroTemplate.gltf = models[this.selectedModel].gltf;
             this.heroTemplate.attributes.stats = {...this.heroTemplate.attributes.stats, ...models[this.selectedModel].attributes.stats }
             this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
-            this.eventDepot.fire('startGame', { heroTemplate: this.heroTemplate, props });
-            this.eventDepot.fire('closeModal', {});
+
+            handleGet('/listActiveGames', (response) => {
+
+                let activeGames = JSON.parse(response);
+                if (Object.keys(activeGames).length > 0) { // if there are games
+
+                    /** 
+                     * TODO (future): allow creation of new game namespace.
+                     * For now only one namespace is allowed ('/') so the
+                     * only option is to join game.
+                     */
+                    this.eventDepot.fire('closeModal', {});
+                    this.eventDepot.fire('joinGame', { heroTemplate: this.heroTemplate, activeGames });
+
+                } else { // no games, so start a new one
+                    
+                    let namespace = '/';
+                    this.eventDepot.fire('closeModal', {});
+                    this.eventDepot.fire('startLevel', { heroTemplate: this.heroTemplate, props, namespace });
+                }
+            });
         });
 
-        document.getElementById('joinGame').addEventListener('click', () => {
+        document.getElementById('joinGame').addEventListener('click', (e) => {
+            
+            e.preventDefault();
+
+            this.heroTemplate.name = document.getElementById('name').value;
+            this.heroTemplate.gltf = models[this.selectedModel].gltf;
+            this.heroTemplate.attributes.stats = {...this.heroTemplate.attributes.stats, ...models[this.selectedModel].attributes.stats }
+            this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
+
+            handleGet('/listActiveGames', (response) => {
+
+                let activeGames = JSON.parse(response);
+                if (Object.keys(activeGames).length > 0) { // if there are games
+            
+                    this.eventDepot.fire('closeModal', {});
+                    this.eventDepot.fire('joinGame', { heroTemplate: this.heroTemplate, activeGames });
+
+                } else { // no games to join, so notify and start new game
+
+                    let namespace = '/';
+                    alert('No games to join!  Starting new game.');
+                    this.eventDepot.fire('closeModal', {});
+                    this.eventDepot.fire('startLevel', { heroTemplate: this.heroTemplate, props, namespace });
+                }
+            });
+
         });
     }
 

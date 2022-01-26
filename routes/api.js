@@ -75,5 +75,9 @@ module.exports = function (app, db) {
                 res.json(err? {error: err.message} : savedGame);
             });
         })
-        
+    
+    app.route('/listActiveGames')
+        .get((req,res) => {
+            res.json(app.games);
+        });
 }

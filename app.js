@@ -49,10 +49,15 @@ export const app = () => {
             document.getElementById('minimap').style.display = minimap? 'block' : 'none';
         });
 
-        eventDepot.addListener('startGame', (data) => {
+        eventDepot.addListener('joinGame', (data) => {
             eventDepot.fire('unlockControls', {});
-            startGame(data.heroTemplate, data.props);
-        })
+            joinGame(data.heroTemplate, data.activeGames);
+        });
+
+        eventDepot.addListener('startLevel', (data) => {
+            eventDepot.fire('unlockControls', {});
+            startLevel(data.heroTemplate, data.props, data.namespace);
+        });
 
     }
 
@@ -66,18 +71,18 @@ export const app = () => {
         Array.from(document.querySelectorAll('.newGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
-                // startGame(heroTemplate, props);
+                // startLevel(heroTemplate, props);
                 eventDepot.fire('modal', { type: 'character', title: "Character", context: { } });
                 
             })
-        })
+        });
 
         Array.from(document.querySelectorAll('.clearGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
                 localStorage.clear();
             })
-        })
+        });
 
         Array.from(document.querySelectorAll('.saveGame')).forEach(el => {
             el.addEventListener('click', e => {
@@ -94,7 +99,7 @@ export const app = () => {
                     gameAPI.saveGame(gameName);
                 }
             })
-        })
+        });
 
         // List the games via the loadGame template, where the game can be selected and loaded
         Array.from(document.querySelectorAll('.loadGame')).forEach(el => {
@@ -102,7 +107,7 @@ export const app = () => {
                 e.preventDefault();
                 gameAPI.listGames();
             })
-        })
+        });
 
         Array.from(document.querySelectorAll('.quitGame')).forEach(el => {
             el.addEventListener('click', e => {
@@ -111,31 +116,37 @@ export const app = () => {
                 window.location = '/';
                 e.preventDefault();
             })
-        })
+        });
     }
 
     addDocumentEventListeners();
     addEventDepotListeners(eventDepot);
 
-    const startGame = (heroTemplate, props) => {
-        
-        if (socket) socket.disconnect('http://192.168.109.2:3001');
+    /** Launch modal to select from activeGames */
+    const joinGame = (heroTemplate, activeGames) => {
+        eventDepot.fire('modal', { type: 'joinGame', title: "Join Game", context: { heroTemplate, activeGames } });
+    }
 
-        eventDepot = null; gameAPI = null; modal = null; sidebar = null; chatbar = null; socket = null;
+    const startLevel = (heroTemplate, props, namespace = '/') => {
+        
+        // let uniqueNamespace = heroTemplate.name + getRndInteger(1,1000000);
+        
+        if (socket) socket.disconnect('http://192.168.109.2:3001'); socket = null;
+        socket = io.connect(`http://192.168.109.2:3001${namespace}`);
+        socket.emit('introduce', { name: heroTemplate.name, newGame: true });
+
+        eventDepot = null; gameAPI = null; modal = null; sidebar = null; chatbar = null; 
         
         eventDepot = new EventDepot();
         addEventDepotListeners(eventDepot);
         
-        socket = io.connect('http://192.168.109.2:3001');
-        socket.emit('introduce', { name: heroTemplate.name });
-
         gameAPI = new GameAPI(eventDepot);
         modal = new Modal(eventDepot, gameAPI);
         sidebar = new Sidebar(eventDepot);
         chatbar = new Chatbar(eventDepot, socket);
 
         if (game) game.stop();
-        game = new Game(heroTemplate, eventDepot);
+        game = new Game(heroTemplate, eventDepot, socket);
         game.start(props.level);
     }
 

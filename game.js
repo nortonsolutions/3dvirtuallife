@@ -12,11 +12,12 @@ import { LayoutManager } from './layout/layoutManager.js';
 
 class Game {
 
-    constructor(heroTemplate, eventDepot) {
+    constructor(heroTemplate, eventDepot, socket) {
 
         // this.props = props;
         this.heroTemplate = heroTemplate;
         this.eventDepot = eventDepot;
+        this.socket = socket;
 
         this.stop = this.stop.bind(this);
         this.start = this.start.bind(this);
@@ -35,7 +36,7 @@ class Game {
 
             this.heroTemplate.location.x -= 1;
 
-            this.eventDepot.fire('startGame', {
+            this.eventDepot.fire('startLevel', {
                 heroTemplate: this.heroTemplate,
                 props: { level: data.level }
             })
@@ -52,7 +53,7 @@ class Game {
 
     start(level) {
 
-        this.layoutManager = new LayoutManager(level, this.eventDepot);
+        this.layoutManager = new LayoutManager(level, this.eventDepot, this.socket);
         this.layoutManager.launch(this.heroTemplate);
     }
 }

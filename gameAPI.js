@@ -53,7 +53,7 @@ export class GameAPI {
             localStorage.setItem('gameProps', props);
             localStorage.setItem('gameHeroTemplate', heroTemplate);
 
-            this.eventDepot.fire('startGame', { heroTemplate: JSON.parse(heroTemplate), props: JSON.parse(props) });
+            this.eventDepot.fire('startLevel', { heroTemplate: JSON.parse(heroTemplate), props: JSON.parse(props) });
         })
     }
 

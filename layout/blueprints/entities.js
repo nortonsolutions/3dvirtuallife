@@ -34,6 +34,29 @@ export const Entities = {
             grants: ["gold3"]
         }
     },
+    rosenBot: {
+        name: 'rosenBot',
+        gltf: 'robot2.glb',
+        description: 'Flying tin can',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 50,
+            length: 20,
+            width: 20,
+            elevation: 100,
+            scale: 10,
+            stats: {
+                health: "2/2/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "2/2/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold3"]
+        }
+    },
     rat: {
         name: 'rat',
         gltf: 'rat.glb',
