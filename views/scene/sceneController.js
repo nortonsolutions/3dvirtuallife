@@ -97,7 +97,7 @@ export class SceneController {
 
         if (addToForms) this.forms.push( form );
 
-        if (form.objectType == "hero" || form.objectType == "friendly" || form.objectType == "beast") {
+        if (form.objectType == "friendly" || form.objectType == "beast") {
             this.entities.push( form );
         } else if (form.objectType == "floor" || form.objectType == "structure") {
             this.structureModels.push ( form.model );
@@ -183,7 +183,7 @@ export class SceneController {
     seedForms(firstInRoom, callback) {
 
         // Pull layout with layoutIds assigned from leader
-        if (!firstInRoom) this.socket.emit('pullLayout', data => { this.layout = data; });
+        if (!firstInRoom) this.socket.emit('pullLayout', this.level, data => { this.layout = data; });
 
         this.layoutId = 0;
         this.layout.items.forEach(({name,location,attributes},index) => {
@@ -289,17 +289,33 @@ export class SceneController {
         })
     }
 
+
     handleMovement(delta) {
 
         if (this.hero) this.hero.move(delta);
         if (this.hero) this.hero.animate(delta);
         
         if (this.firstInRoom) { 
-            this.forms.forEach(form => {
-                if (form.attributes.moves) {
-                    form.move(delta);
-                }
+            // this.forms.forEach(form => {
+            //     if (form.attributes.moves) {
+            this.entities.forEach(entity => {  
+                entity.move(delta);
             });
+
+            if (Math.random() < 0.1) { // Update others 10% of the time
+
+                let positions = this.entities.map(el => {
+                    return {
+                        layoutId: el.attributes.layoutId,
+                        position: el.model.position,
+                        rotation: el.rotation,
+                        velocity: el.velocity
+                    }
+                });
+    
+                this.socket.emit('updateEntityPositions', { level: this.level, positions });
+            }
+
         }
         
         this.forms.forEach(form => {
@@ -382,8 +398,14 @@ export class SceneController {
             this.multiplayer = data;
         })
 
-        this.socket.on('syncForms', (data) => {
-            this.forms = data;
+        this.socket.on('updateEntityPositions', (entities) => {
+            entities.forEach(entity => {
+                // find the entity here by layoutId
+                let localEntity = this.entities.find(el => el.attributes.layoutId = entity.layoutId);
+                localEntity.rotation.copy(entity.rotation);
+                localEntity.velocity.copy(entity.velocity);
+                localEntity.model.position.copy(entity.position);
+            });
         });
 
         this.eventDepot.addListener('takeItemFromScene', this.takeItemFromScene);

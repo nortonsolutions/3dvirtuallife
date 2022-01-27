@@ -97,7 +97,7 @@ class Scene {
 
     removeFromScenebyLayoutId(layoutId) {
         this.scene.remove(this.scene.children.find(el => {
-            return el.attributes.layoutId == layoutId;
+            return el.attributes? el.attributes.layoutId == layoutId : false;
         }));
     }
     
@@ -397,7 +397,7 @@ class Scene {
     handleAutoZoom = () => {
 
         this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
-        this.cameraBackray.ray.origin.y += this.controller.hero.attributes.height;
+        this.cameraBackray.ray.origin.y += this.controller.hero.attributes.height-10;
 
         // NEEDS PITCH as well
         let cameraDirection = this.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
@@ -413,7 +413,7 @@ class Scene {
             // console.dir(backrayIntersections[0]);
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
-                this.camera.position.z = distance -20; // -= cameraDistanceDefault / 30;
+                this.camera.position.z = distance - 20; // -= cameraDistanceDefault / 30;
                 if (this.camera.position.y > cameraElevationDefault + this.controller.hero.attributes.height) this.camera.position.y -= cameraElevationDefault / 30;
             }
         } else {

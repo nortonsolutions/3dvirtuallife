@@ -23,7 +23,7 @@ class LayoutManager {
         this.socket = socket;
         this.addEventListeners();
 
-        if (!localStorage.getItem('gameObjects')) {
+        // if (!localStorage.getItem('gameObjects')) { //
             
             this.allItems = Items;
             this.allStructures = Structures;
@@ -33,7 +33,7 @@ class LayoutManager {
 
             localStorage.setItem('gameObjects', JSON.stringify(this.allObjects));
 
-        }
+        // }
 
         this.props = localStorage.getItem('gameProps')? JSON.parse(localStorage.getItem('gameProps')): { level: 0, layouts: [] };
         this.props.level = level;
@@ -52,11 +52,11 @@ class LayoutManager {
                     this.levelBuilder = new LevelBuilder(this.props.level);
                     this.layout = this.levelBuilder.getLayout();
                 }
+                this.cacheLayout();
 
                 this.socket.emit('gameProps', JSON.parse(localStorage.getItem('gameProps')));
                 this.socket.emit('pushLayout', { level, layout: this.layout });
-                this.cacheLayout();
-                
+
                 callback();
 
             } else {

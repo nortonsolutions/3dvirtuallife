@@ -115,6 +115,23 @@ export class Hero extends IntelligentForm {
     
                     switch (stat) {
 
+                        case "scale":
+
+                            // Find the head
+                            // let head = this.model.getObjectByName('Head');
+                            // head.scale.x *= change;
+                            // head.scale.y *= change;
+                            // head.scale.z *= change;
+
+                            let torso = this.model.getObjectByName('Torso');
+                            torso.scale.x *= change;
+                            torso.scale.y *= change;
+                            torso.scale.z *= change;
+
+                            this.attributes.height *= change;
+                            this.changeStatBoost("strength", 2);
+                            this.changeStat("health", 2);
+                            break;
                         case "mana": 
                             this.fadeToAction("ThumbsUp", 0.2); // TODO: Use sprites to spritz things up
                             this.changeStat(stat, change, false);

@@ -198,7 +198,7 @@ export const Items = {
             animates: false,
             scale: 100,
             elevation: 10,
-            effect: "scale/2",
+            effect: "scale/1.5",
             sprites: [{ 
                 name: "Heal",
                 regex: "",

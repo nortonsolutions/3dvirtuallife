@@ -264,10 +264,10 @@ class InventoryScreen {
         if (itemName.match(/key|gold/i) && Array.from(targetElement.classList).includes('body')) {
             alert(`${itemName} cannot be equipped.`);
             return false;
-        } else if (/redpotion|bluepotion|spell/i.test(itemName) && Array.from(targetElement.classList).includes('bodyPart')) {
+        } else if (/redpotion|bluepotion|mushroom|spell/i.test(itemName) && Array.from(targetElement.classList).includes('bodyPart')) {
             alert(`${itemName} can only be equipped on the hotkeys, 1-8.`);
             return false;
-        } else if (!/potion|spell/i.test(itemName) && Array.from(targetElement.classList).includes('fKey')){
+        } else if (!/potion|spell|mushroom/i.test(itemName) && Array.from(targetElement.classList).includes('fKey')){
             alert(`${itemName} can only be equipped on the body.`);
             return false;
         } else return true;

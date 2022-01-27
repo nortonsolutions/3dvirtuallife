@@ -108,21 +108,21 @@ database(mongoose, (db) => {
      * live changes are happening in the level such as entity movement,
      * these updates are broadcast only to others in the same room.
      */
-    socket.on('joinroom', (data, callback) => {
+    socket.on('joinroom', (level, callback) => {
 
       // Join up with the room:
-      if (!app.rooms[socket.nsp.name][data.level]) app.rooms[socket.nsp.name][data.level] = [];
-      app.rooms[socket.nsp.name][data.level].push(socket.id);
+      if (!app.rooms[socket.nsp.name][level]) app.rooms[socket.nsp.name][level] = [];
+      app.rooms[socket.nsp.name][level].push(socket.id);
 
       // Exit other rooms:
       app.rooms[socket.nsp.name].forEach((key,index) => {
-        if (index != data.level) {
+        if (index != level) {
           app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el != socket.id);
         }
       })
 
       // Am I the first in the room?
-      let firstInRoom = app.rooms[socket.nsp.name][data.level].length == 1;
+      let firstInRoom = app.rooms[socket.nsp.name][level].length == 1;
       if (!firstInRoom) socket.nsp.emit('multiplayer', true);
       callback(firstInRoom);
     });
@@ -138,14 +138,18 @@ database(mongoose, (db) => {
 
     socket.on('introduce', (data) => {
       // Notify the others
-      socket.nsp.emit('chat', { message: `<is in the ${data.description}>`, playerName: data.name});
+      playerName = data.name;
+      socket.nsp.emit('chat', { message: `<is in the ${data.description}>`, playerName });
     });
 
-    socket.on('updateEntityPosition', (data) => {
-      // Which room to notify?
-      Object.keys(socket.rooms).forEach(room => {
-        if (socket.key != socket.id) socket.to(room).emit(data);
-      });
+    socket.on('updateEntityPositions', (data) => {
+
+      console.log(`${app.rooms[socket.nsp.name][data.level]}`);
+      if (app.rooms[socket.nsp.name][data.level]) {
+        app.rooms[socket.nsp.name][data.level].forEach(member => {
+          if (member != socket.id) socket.to(member).emit(data.positions);
+        });
+      }
     });
     
     socket.on('gameProps', (data) => {

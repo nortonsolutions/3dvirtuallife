@@ -153,7 +153,7 @@ export class IntelligentForm extends AnimatedForm{
 
     setElevation() {
         
-        let downRayOriginHeight = this.model.position.y + 30;
+        let downRayOriginHeight = this.model.position.y + 40;
 
         this.downRaycaster.ray.origin.copy(this.model.position);
         this.downRaycaster.ray.origin.y = downRayOriginHeight;
