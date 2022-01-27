@@ -81,6 +81,7 @@ export const app = () => {
             el.addEventListener('click', e => {
                 e.preventDefault();
                 localStorage.clear();
+                handleGet('/clearActiveGames', () => {});
             })
         });
 

@@ -52,9 +52,9 @@ class Game {
     }
 
     start(level) {
-
-        this.layoutManager = new LayoutManager(level, this.eventDepot, this.socket);
-        this.layoutManager.launch(this.heroTemplate);
+        this.layoutManager = new LayoutManager(level, this.eventDepot, this.socket, () => {
+            this.layoutManager.launch(this.heroTemplate);
+        });
     }
 }
 

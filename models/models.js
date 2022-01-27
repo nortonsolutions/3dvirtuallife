@@ -6,7 +6,7 @@ export const models = [
         png: "robot.png",
         attributes: {
             stats: {
-                agility: "3/3/0"
+                agility: "5/5/0"
             }
         },
         description: "Above-average agility."

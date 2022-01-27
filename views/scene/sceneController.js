@@ -16,7 +16,7 @@ import { FormFactory } from '/forms/formFactory.js';
 
 export class SceneController {
 
-    constructor(heroTemplate, layout, eventDepot, allObjects, socket) {
+    constructor(heroTemplate, layout, eventDepot, allObjects, socket, firstInRoom, level) {
         
         // layout is shared by SceneController and LayoutManager
         this.layout = layout;
@@ -24,6 +24,8 @@ export class SceneController {
         this.eventDepot = eventDepot;
         this.allObjects = allObjects;
         this.socket = socket;
+        this.firstInRoom = firstInRoom;
+        this.level = level;
 
         this.formFactory = new FormFactory(this);
         this.loader = new THREE.GLTFLoader();
@@ -52,6 +54,8 @@ export class SceneController {
         this.dropItemToScene = this.dropItemToScene.bind(this);
         this.seedForms = this.seedForms.bind(this);
         
+        this.multiplayer = false;
+
         this.addEventListeners();
     }
 
@@ -63,9 +67,9 @@ export class SceneController {
                 this.addWater(() => {
                     this.addLights();
                     this.addHero(() => {
-                        this.seedForms(() => {
+                        this.seedForms(this.firstInRoom, () => {
                             this.scene.animate();
-                        });
+                        })
                     });
                 });
             });
@@ -160,7 +164,7 @@ export class SceneController {
         
         this.hero.load(() => {
 
-            this.addToScene( this.hero );
+            this.addToScene( this.hero, false );
 
 
 
@@ -176,13 +180,26 @@ export class SceneController {
         })
     }
 
-    seedForms(callback) {
+    seedForms(firstInRoom, callback) {
+
+        // Pull layout with layoutIds assigned from leader
+        if (!firstInRoom) this.socket.emit('pullLayout', data => { this.layout = data; });
+
+        this.layoutId = 0;
         this.layout.items.forEach(({name,location,attributes},index) => {
+            
             let item = this.getObjectByName(name);
             if (location) item.location = location;
             if (attributes) item.attributes = {...item.attributes, ...attributes};
+            let layoutId = this.layoutId++;
+            if (firstInRoom) {
+                item.attributes.layoutId = layoutId;
+                if (!this.layout.items[index].attributes) this.layout.items[index].attributes = {};
+                this.layout.items[index].attributes.layoutId = layoutId; // form.model.uuid;
+            }
+
             this.seedForm(item, true).then(form => {
-                this.layout.items[index].uuid = form.model.uuid;
+                // form.model.attributes.layoutId = layoutId;
             });
         });
 
@@ -190,21 +207,36 @@ export class SceneController {
             let structure = this.getObjectByName(name);
             if (location) structure.location = location;
             if (attributes) structure.attributes = {...structure.attributes, ...attributes};
-            this.seedForm(structure, true).then(form => {
-                this.layout.structures[index].uuid = form.model.uuid;
-            });
+            
+            let layoutId = this.layoutId++;
+            if (firstInRoom) {
+                structure.attributes.layoutId = layoutId;
+                if (!this.layout.structures[index].attributes) this.layout.structures[index].attributes = {};
+                this.layout.structures[index].attributes.layoutId = layoutId; // form.model.uuid;
+            }
+            this.seedForm(structure, true).then(form => {});
         });
 
         this.layout.entities.forEach(({name,location,attributes}, index) => {
             let entity = this.getObjectByName(name);
             if (location) entity.location = location;
             if (attributes) entity.attributes = {...entity.attributes, ...attributes};
-            this.seedForm(entity, true).then(form => {
-                this.layout.entities[index].uuid = form.model.uuid;
-            });
+            
+            let layoutId = this.layoutId++;
+            if (firstInRoom) {
+                entity.attributes.layoutId = layoutId;
+                if (!this.layout.entities[index].attributes) this.layout.entities[index].attributes = {};
+                this.layout.entities[index].attributes.layoutId = layoutId; // form.model.uuid;
+            }
+            this.seedForm(entity, true).then(form => {});
         });
 
-        this.eventDepot.fire('cacheLayout', {});
+
+        if (firstInRoom) { // Update layouts with layoutIds assigned....
+            this.socket.emit('pushLayout', {level: this.level, layout: this.layout });
+        }
+
+        this.eventDepot.fire('cacheLayout', {}); 
         callback();
     }
 
@@ -257,24 +289,25 @@ export class SceneController {
         })
     }
 
-
-
     handleMovement(delta) {
 
         if (this.hero) this.hero.move(delta);
         if (this.hero) this.hero.animate(delta);
         
+        if (this.firstInRoom) { 
+            this.forms.forEach(form => {
+                if (form.attributes.moves) {
+                    form.move(delta);
+                }
+            });
+        }
+        
         this.forms.forEach(form => {
-            if (form.attributes.moves) {
-                form.move(delta);
-            }
-
             if (form.attributes.animates) {
                 form.animate(delta);
             }
-    
-        })
-
+        });
+        
         if (this.refractor) {
             this.refractor.material.uniforms[ "time" ].value += this.clock.getDelta();
         }
@@ -317,15 +350,15 @@ export class SceneController {
         return this.allObjects[name];
     }
 
-    /** data: {itemName: ..., uuid: ...} */
+    /** data: {itemName: ..., layoutId: ...} */
     takeItemFromScene(data) {
 
-        this.scene.removeFromScenebyUUID(data.uuid);
+        this.scene.removeFromScenebyLayoutId(data.layoutId);
         this.forms = this.forms.filter(el => {
-            return el.model.uuid != data.uuid;
+            return el.model.attributes.layoutId != data.layoutId;
         });
 
-        this.eventDepot.fire('removeItemFromLayout', data.uuid);
+        this.eventDepot.fire('removeItemFromLayout', data.layoutId);
     }
 
     /** data: {location ..., itemName..., } */
@@ -337,12 +370,21 @@ export class SceneController {
             form.model.position.copy(this.hero.model.position);
             form.model.position.y = this.hero.determineElevationFromBase();
 
-            data.uuid = form.model.uuid;
+            let layoutId = this.layoutId++;
+            data.layoutId = form.model.attributes.layoutId = layoutId;
             this.eventDepot.fire('addItemToLayout', data);
         })
     }
 
     addEventListeners() {
+
+        this.socket.on('multiplayer', (data) => {
+            this.multiplayer = data;
+        })
+
+        this.socket.on('syncForms', (data) => {
+            this.forms = data;
+        });
 
         this.eventDepot.addListener('takeItemFromScene', this.takeItemFromScene);
         this.eventDepot.addListener('dropItemToScene', this.dropItemToScene);

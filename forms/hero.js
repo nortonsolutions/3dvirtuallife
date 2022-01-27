@@ -245,7 +245,7 @@ export class Hero extends IntelligentForm {
                         this.sceneController.eventDepot.fire('takeItemFromScene', {
                             itemName: this.selectedObject.attributes.baseItemName? this.selectedObject.attributes.baseItemName : this.selectedObject.objectName, 
                             quantity: this.selectedObject.attributes.quantity? this.selectedObject.attributes.quantity : 1,
-                            uuid: this.selectedObject.model.uuid
+                            layoutId: this.selectedObject.model.attributes.layoutId
                         });
     
                     } else if (objectType == "friendly") {

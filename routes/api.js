@@ -80,4 +80,15 @@ module.exports = function (app, db) {
         .get((req,res) => {
             res.json(app.games);
         });
+
+    app.route('/clearActiveGames')
+        .get((req,res) => {
+            app.games = {};
+            app.rooms = {}; 
+            app.layouts = {};
+            app.forms = {};
+            
+            res.json({});
+        });
+
 }

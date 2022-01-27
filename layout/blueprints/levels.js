@@ -33,6 +33,7 @@ export const levels = [
             { name: "smallSword" },
             { name: "redpotion" },
             { name: "greenpotion" },
+            { name: "mushroom" },
             { name: "crystalBall" },
             { name: "gold3" },
             { name: "bagOfGems" },
@@ -59,7 +60,7 @@ export const levels = [
             { name: "john" },
             { name: "evilOne" },
             { name: "shopkeep" },
-            { name: "rosenBot" }
+            // { name: "rosenBot" }
         ]
     },
     {
@@ -107,10 +108,10 @@ export const levels = [
                 name: "archway", location: { x: 16, y: 0, z: 4 },
                 attributes: { routeTo: { level: 0, location: { x: 3, y: 0, z: 4} } } 
             },
-            { 
-                name: "archway", location: { x: 16, y: 0, z: -4 },
-                attributes: { routeTo: { level: 2, location: { x: 0, y: 0, z: 0} } } 
-            }
+            // { 
+            //     name: "archway", location: { x: 16, y: 0, z: -4 },
+            //     attributes: { routeTo: { level: 2, location: { x: 0, y: 0, z: 0} } } 
+            // }
         ],
         entities: [
             { name: "john" },

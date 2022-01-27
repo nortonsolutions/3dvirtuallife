@@ -188,6 +188,28 @@ export const Items = {
             }]
         }
     },
+    mushroom: {
+        name: 'mushroom',
+        gltf: 'mushroom.glb',
+        image: 'mushroom.png',
+        description: 'A mysterious mushroom',
+        type: 'item',
+        attributes: {
+            animates: false,
+            scale: 100,
+            elevation: 10,
+            effect: "scale/2",
+            sprites: [{ 
+                name: "Heal",
+                regex: "",
+                frames: 10,
+                scale: 50,
+                elevation: 30,
+                flip: false,
+                time: 1
+            }]
+        }
+    },
     smallSword: {
         name: 'smallSword',
         gltf: 'broadsword.glb',
@@ -275,7 +297,7 @@ export const Items = {
     },
     arrow25: {
         name: 'arrow25',
-        gltf: 'arrow.glb',
+        gltf: 'arrow25.glb',
         description: 'Twenty-five arrows',
         type: 'item',
         attributes: {

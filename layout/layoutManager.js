@@ -16,53 +16,77 @@ import { SceneController } from '/scene/sceneController.js'
 
 class LayoutManager {
 
-    constructor(level, eventDepot, socket) {
+    /** Socket interaction must take place during construction to push/pull layout accordingly */
+    constructor(level, eventDepot, socket, callback) {
+        
+        this.eventDepot = eventDepot;
+        this.socket = socket;
+        this.addEventListeners();
+
+        if (!localStorage.getItem('gameObjects')) {
+            
+            this.allItems = Items;
+            this.allStructures = Structures;
+            this.allEntities = Entities;
+            this.allSpells = Spells;
+            this.allObjects = {...Items, ...Structures, ...Entities, ...Spells, ...{ floor: { description: "floor"}}, ...{ xpLevels } };
+
+            localStorage.setItem('gameObjects', JSON.stringify(this.allObjects));
+
+        }
 
         this.props = localStorage.getItem('gameProps')? JSON.parse(localStorage.getItem('gameProps')): { level: 0, layouts: [] };
         this.props.level = level;
-        this.eventDepot = eventDepot;
-        this.socket = socket;
-        
-        this.allItems = Items;
-        this.allStructures = Structures;
-        this.allEntities = Entities;
-        this.allSpells = Spells;
-        this.allObjects = {...Items, ...Structures, ...Entities, ...Spells, ...{ floor: { description: "floor"}}, ...{ xpLevels } };
 
-        localStorage.setItem('gameObjects', JSON.stringify(this.allObjects));
-        
-        this.layout = {};
-        
-        if (this.props.layouts[this.props.level]) {
-            this.layout = this.props.layouts[this.props.level];
-        } else {
-            this.levelBuilder = new LevelBuilder(this.props.level);
-            this.layout = this.levelBuilder.getLayout();
-        }
+        this.socket.emit('joinroom', level, (firstInRoom) => {
 
-        this.cacheLayout();
-        this.addEventListeners();
+            this.firstInRoom = firstInRoom;
+
+            if (this.firstInRoom) {
+
+                this.layout = {};
+
+                if (this.props.layouts[this.props.level]) {
+                    this.layout = this.props.layouts[this.props.level];
+                } else {
+                    this.levelBuilder = new LevelBuilder(this.props.level);
+                    this.layout = this.levelBuilder.getLayout();
+                }
+
+                this.socket.emit('gameProps', JSON.parse(localStorage.getItem('gameProps')));
+                this.socket.emit('pushLayout', { level, layout: this.layout });
+                this.cacheLayout();
+                
+                callback();
+
+            } else {
+
+                this.socket.emit('pullLayout', level, (data) => {
+                    this.layout = data;
+                    this.cacheLayout();
+                    callback();
+                })
+            }
+        });
     }
 
     launch(heroTemplate) {
         
-        let joinData = { name: heroTemplate.name, level: this.props.level, description: this.layout.description };
-        this.socket.emit('joinroom', joinData, (firstInRoom) => {
-            this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects, this.socket, firstInRoom);
-            this.sceneController.animateScene();
-        });
+        this.socket.emit('introduce', { name: heroTemplate.name, description: this.layout.description });
+        this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects, this.socket, this.firstInRoom, this.props.level);
+        this.sceneController.animateScene();
 
     }
 
     addEventListeners() {
 
-        this.socket.on('gameProps', (data) => {
-            this.props = data;
-            this.layout = this.props.layouts[this.props.level];
-        });
+        // this.socket.on('gameProps', (data) => {
+        //     this.props = data;
+        //     this.layout = this.props.layouts[this.props.level];
+        // });
 
-        this.eventDepot.addListener('removeItemFromLayout', (uuid) => {
-            this.layout.items = this.layout.items.filter(el => el.uuid != uuid);
+        this.eventDepot.addListener('removeItemFromLayout', (layoutId) => {
+            this.layout.items = this.layout.items.filter(el => el.attributes.layoutId != layoutId);
             this.cacheLayout();
         });
 
@@ -70,7 +94,7 @@ class LayoutManager {
             let item = {};
             item.name = this.allItems[data.itemName].name;
             item.location = data.location;
-            item.uuid = data.uuid;
+            item.attributes.layoutId = data.layoutId;
             this.layout.items.push(item);
             this.cacheLayout();
         });
@@ -79,10 +103,10 @@ class LayoutManager {
             this.cacheLayout();
         });
 
-        // data: {uuid: ..., attributes: ...}
+        // data: {layoutId: ..., attributes: ...}
         this.eventDepot.addListener('updateStructureAttributes', (data) => {
             
-            var index = this.layout.structures.findIndex(el => el.uuid == data.uuid);
+            var index = this.layout.structures.findIndex(el => el.attributes.layoutId == data.layoutId);
             if (index == -1) {
                 console.log('NOT FOUND');
             } else {
@@ -93,16 +117,20 @@ class LayoutManager {
 
     }
 
+
+
     shutdown(callback) {
         this.eventDepot.removeListeners('updateStructureAttributes');
         this.eventDepot.removeListeners('removeItemFromLayout');
         this.eventDepot.removeListeners('addItemToLayout');
         this.eventDepot.removeListeners('cacheLayout');
         
-        this.sceneController.deanimateScene(() => {
-            this.sceneController = null;
-            callback();
-        });
+        if (this.sceneController) {
+            this.sceneController.deanimateScene(() => {
+                this.sceneController = null;
+                callback();
+            });
+        } else callback();
     }
 
     cacheLayout() {
@@ -117,7 +145,6 @@ class LayoutManager {
             currentProps.layouts[this.props.level] = this.layout;
         }
         localStorage.setItem('gameProps', JSON.stringify(currentProps));
-        this.socket.emit('gameProps', currentProps );
     }
 
     getAllItems() {

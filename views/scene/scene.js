@@ -95,9 +95,9 @@ class Scene {
         this.scene.add( model );
     }
 
-    removeFromScenebyUUID(uuid) {
+    removeFromScenebyLayoutId(layoutId) {
         this.scene.remove(this.scene.children.find(el => {
-            return el.uuid == uuid;
+            return el.attributes.layoutId == layoutId;
         }));
     }
     

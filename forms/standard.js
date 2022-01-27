@@ -176,7 +176,7 @@ export class StandardForm {
     updateAttributes(payload) {
         this.attributes = {...this.attributes, ...payload};
         this.model.attributes = {...this.attributes, ...payload};
-        this.sceneController.eventDepot.fire('updateStructureAttributes', {uuid: this.model.uuid, attributes: payload});
+        this.sceneController.eventDepot.fire('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, attributes: payload});
     }
 
 

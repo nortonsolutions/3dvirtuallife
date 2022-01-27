@@ -22,8 +22,10 @@ const socket                   = require('socket.io');
 
 const app = express();
 
-app.games = {}; // i.e. catalog of 'namespaces' (games)
-app.rooms = {};
+app.games = {}; // catalog of 'namespaces' (games)
+app.rooms = {}; // keeps track of current room membership
+app.layouts = {}; // catalog of nsp to array of layouts for each room { '/': [{layout0},{layout1},...] } 
+app.forms = {}; // catalog of nsp to array of forms for each room { '/': [{forms0},{forms1},...] }
 
 app.use('/', express.static(process.cwd() + '/'));
 app.use('/cdn', express.static(process.cwd() + '/cdn'));
@@ -88,7 +90,7 @@ database(mongoose, (db) => {
     console.log(`Made socket connection - ${socket.id}`);
 
     // Default namespace = "/" (equivalent to io.sockets)
-    if (!app.games[socket.nsp.name]) app.games[socket.nsp.name] = {};
+    // if (!app.games[socket.nsp.name]) app.games[socket.nsp.name] = {};
     if (!app.rooms[socket.nsp.name]) app.rooms[socket.nsp.name] = [];
 
     var connectionId = socket.id;
@@ -108,8 +110,6 @@ database(mongoose, (db) => {
      */
     socket.on('joinroom', (data, callback) => {
 
-      playerName = data.name; 
-
       // Join up with the room:
       if (!app.rooms[socket.nsp.name][data.level]) app.rooms[socket.nsp.name][data.level] = [];
       app.rooms[socket.nsp.name][data.level].push(socket.id);
@@ -121,11 +121,24 @@ database(mongoose, (db) => {
         }
       })
 
-      // Notify the others
-      socket.nsp.emit('chat', { message: `<is in the ${data.description}>`, playerName});
+      // Am I the first in the room?
+      let firstInRoom = app.rooms[socket.nsp.name][data.level].length == 1;
+      if (!firstInRoom) socket.nsp.emit('multiplayer', true);
+      callback(firstInRoom);
+    });
 
-      // Callback with whether or not I am the first in the room.
-      callback(app.rooms[socket.nsp.name][data.level].length == 1);
+    socket.on('pullLayout', (level, callback) => {
+      callback(app.layouts[socket.nsp.name][level]);
+    });
+
+    socket.on('pushLayout', data => {
+      if (!app.layouts[socket.nsp.name]) app.layouts[socket.nsp.name] = [];
+      app.layouts[socket.nsp.name][data.level] = data.layout;
+    })
+
+    socket.on('introduce', (data) => {
+      // Notify the others
+      socket.nsp.emit('chat', { message: `<is in the ${data.description}>`, playerName: data.name});
     });
 
     socket.on('updateEntityPosition', (data) => {
@@ -137,7 +150,7 @@ database(mongoose, (db) => {
     
     socket.on('gameProps', (data) => {
       app.games[socket.nsp.name] = data; // save for join-game lookups
-      socket.nsp.emit('gameProps', data); // can I only broadcast.emit to others in the nsp?
+      // socket.nsp.emit('gameProps', data); // can I only broadcast.emit to others in the nsp?
     });
 
     socket.on('disconnect', (reason) => {
