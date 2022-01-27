@@ -22,7 +22,9 @@ const socket                   = require('socket.io');
 
 const app = express();
 
-app.games = {};  // i.e. catalog of 'namespaces' (games)
+app.games = {}; // i.e. catalog of 'namespaces' (games)
+app.rooms = {};
+
 app.use('/', express.static(process.cwd() + '/'));
 app.use('/cdn', express.static(process.cwd() + '/cdn'));
 app.use('/assets', express.static(process.cwd() + '/assets'));
@@ -46,7 +48,7 @@ database(mongoose, (db) => {
   // fccTestingRoutes(app);
     
   apiRoutes(app, db);
-    
+  
   //404 Not Found Middleware
   app.use(function(req, res, next) {
     res.status(404)
@@ -86,7 +88,9 @@ database(mongoose, (db) => {
     console.log(`Made socket connection - ${socket.id}`);
 
     // Default namespace = "/" (equivalent to io.sockets)
-    app.games[socket.nsp.name] = {};
+    if (!app.games[socket.nsp.name]) app.games[socket.nsp.name] = {};
+    if (!app.rooms[socket.nsp.name]) app.rooms[socket.nsp.name] = [];
+
     var connectionId = socket.id;
     var playerName = null;
 
@@ -102,12 +106,26 @@ database(mongoose, (db) => {
      * live changes are happening in the level such as entity movement,
      * these updates are broadcast only to others in the same room.
      */
-    socket.on('joinroom', (data) => {
-      Object.keys(socket.rooms).forEach(key => {
-        if (socket.key != socket.id) socket.leave(key);
-      });
-      socket.join(socket.nsp.name + data.level);
-      socket.nsp.emit('chat', { message: `entered ${data.level}`, playerName});
+    socket.on('joinroom', (data, callback) => {
+
+      playerName = data.name; 
+
+      // Join up with the room:
+      if (!app.rooms[socket.nsp.name][data.level]) app.rooms[socket.nsp.name][data.level] = [];
+      app.rooms[socket.nsp.name][data.level].push(socket.id);
+
+      // Exit other rooms:
+      app.rooms[socket.nsp.name].forEach((key,index) => {
+        if (index != data.level) {
+          app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el != socket.id);
+        }
+      })
+
+      // Notify the others
+      socket.nsp.emit('chat', { message: `<is in the ${data.description}>`, playerName});
+
+      // Callback with whether or not I am the first in the room.
+      callback(app.rooms[socket.nsp.name][data.level].length == 1);
     });
 
     socket.on('updateEntityPosition', (data) => {
@@ -122,15 +140,16 @@ database(mongoose, (db) => {
       socket.nsp.emit('gameProps', data); // can I only broadcast.emit to others in the nsp?
     });
 
-    socket.on('introduce', (data) => {
-      playerName = data.name; 
-    });
-
     socket.on('disconnect', (reason) => {
 
       if (Object.keys(socket.nsp.sockets).length == 0) {
         delete app.games[socket.nsp.name];
       }
+
+      app.rooms[socket.nsp.name].forEach((key,index) => {
+          app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el != socket.id);
+      })
+
       console.log(`Disconnecting ${socket.id}`)
     });
   })

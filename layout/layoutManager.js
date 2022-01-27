@@ -46,8 +46,12 @@ class LayoutManager {
 
     launch(heroTemplate) {
         
-        this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects, this.socket);
-        this.sceneController.animateScene();
+        let joinData = { name: heroTemplate.name, level: this.props.level, description: this.layout.description };
+        this.socket.emit('joinroom', joinData, (firstInRoom) => {
+            this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects, this.socket, firstInRoom);
+            this.sceneController.animateScene();
+        });
+
     }
 
     addEventListeners() {

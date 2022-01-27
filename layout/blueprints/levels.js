@@ -8,7 +8,7 @@ export const levels = [
         level: 0,
         width: 6, //26
         length: 6, //26
-        name: "In the valley of mist",
+        description: "Valley of Mist",
         background: 'clouds.png',
         terrain: {
             name: 'floor',
@@ -66,7 +66,7 @@ export const levels = [
         level: 1,
         width: 32, //32
         length: 32,  //32
-        name: "In the dungeon",
+        description: "Dungeon",
         background: '',
         terrain: {
             name: 'floor',
@@ -126,7 +126,7 @@ export const levels = [
         level: 2,
         width: 45, //32
         length: 45,  //32
-        name: "Catacomb",
+        description: "Catacomb",
         background: '',
         terrain: {
             name: 'floor',
@@ -169,7 +169,7 @@ export const levels = [
         level: 3,
         width: 26, //26
         length: 26, //26
-        name: "In the swamp",
+        description: "Swamp",
         background: 'clouds.png',
         terrain: {
             name: 'floor',

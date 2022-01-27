@@ -24,7 +24,8 @@ class LevelBuilder {
             entities: this.levelEntities,
             width: this.level.width,
             length: this.level.length,   
-            background: this.level.background
+            background: this.level.background,
+            description: this.level.description
         }
     }
 

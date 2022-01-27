@@ -133,8 +133,7 @@ export const app = () => {
         
         if (socket) socket.disconnect('http://192.168.109.2:3001'); socket = null;
         socket = io.connect(`http://192.168.109.2:3001${namespace}`);
-        socket.emit('introduce', { name: heroTemplate.name, newGame: true });
-
+        
         eventDepot = null; gameAPI = null; modal = null; sidebar = null; chatbar = null; 
         
         eventDepot = new EventDepot();

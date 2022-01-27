@@ -162,6 +162,8 @@ export class SceneController {
 
             this.addToScene( this.hero );
 
+
+
             this.eventDepot.fire('halt', {});
             this.eventDepot.fire('updateHeroLocation', { location: this.hero.location, offset: true });
             
