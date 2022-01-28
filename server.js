@@ -22,9 +22,11 @@ const socket                   = require('socket.io');
 
 const app = express();
 
+// TODO: Thread safety may become a concern for app.rooms
+
 app.games = {}; // catalog of 'namespaces' (games)
-app.rooms = {}; // current room membership, app.rooms[nsp][room] is an array of [socket.id,data.heroTemplate]
-app.layouts = {}; // catalog of nsp to array of layouts for each room { '/': [{layout0},{layout1},...] } 
+app.rooms = {}; // current room membership; app.rooms[nsp][room] is an array of [socket.id,data.heroTemplate]
+app.layouts = {}; // layouts for each room/level; app.layouts[nsp][room] = {layout} 
 
 app.use('/', express.static(process.cwd() + '/'));
 app.use('/cdn', express.static(process.cwd() + '/cdn'));
@@ -101,7 +103,18 @@ database(mongoose, (db) => {
           if (member != sender) socket.to(member[0]).emit(messageType, data);
         });
       }
+    }
 
+    const othersInRoom = function (room) {
+      let sender = socket.id;
+      let nsp = socket.nsp.name;
+
+      if (!app.rooms[nsp][room] || app.rooms[nsp][room].length <= 1) {
+        return null;
+      } else {
+        let others = app.rooms[nsp][room].filter(el => el[0] != sender).map(el => el[1]);
+        return others;
+      }
     }
 
     // Default namespace = "/" (equivalent to io.sockets)
@@ -140,6 +153,29 @@ database(mongoose, (db) => {
       let firstInRoom = app.rooms[socket.nsp.name][data.level].length == 1;
       if (!firstInRoom) socket.nsp.emit('multiplayer', true);
       callback(firstInRoom);
+
+    });
+
+    
+    /** 
+     * data: { heroTemplate: ..., description: <level description>, level: ... } 
+     * 
+     * Slight redundancy here in that the joinroom already catalogued the heroTemplates,
+     * but I receive it here just to avoid looking it up again.
+     * 
+     */
+    socket.on('introduce', (data, callback) => {
+
+      // Notify the others
+      playerName = data.heroTemplate.name;
+      socket.nsp.emit('chat', { message: `<is in the ${data.description}>`, playerName });
+
+      notifyRoomMembers(data.level, "introduce", data.heroTemplate);
+
+      // If room contains others, callback with array of heroTemplates
+      let others = othersInRoom(data.level);
+      callback(others);
+
     });
 
     socket.on('pullLayout', (level, callback) => {
@@ -150,17 +186,6 @@ database(mongoose, (db) => {
       if (!app.layouts[socket.nsp.name]) app.layouts[socket.nsp.name] = [];
       app.layouts[socket.nsp.name][data.level] = data.layout;
     })
-
-    /** data: { name: ..., description: <level description> } */
-    socket.on('introduce', (data) => {
-
-      // Notify the others
-      playerName = data.name;
-      socket.nsp.emit('chat', { message: `<is in the ${data.description}>`, playerName });
-
-    });
-
-
 
     socket.on('updateEntityPositions', (data) => {
       notifyRoomMembers(data.level, 'updateEntityPositions', data.positions);

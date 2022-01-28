@@ -58,17 +58,6 @@ export class Hero extends IntelligentForm {
                 this.model.position.y = this.determineElevationFromBase();
             }
 
-            if (this.equipped) {
-                // Reduce cached boosts to zero before re-equipping
-                Object.keys(this.attributes.stats).forEach(stat => {
-                    this.changeStatBoost(stat, -this.getStatBoost(stat));
-                })
-
-                Object.keys(this.equipped).forEach(bodyPart => {
-                    this.equip(bodyPart, this.equipped[bodyPart][0], this.equipped[bodyPart][1], this.equipped[bodyPart][2]); // bodyPart, itemName, throwable
-                })
-            }
-
             callback();
 
         }, undefined, function ( error ) {

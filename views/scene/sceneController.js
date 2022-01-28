@@ -35,9 +35,12 @@ export class SceneController {
         // Structure models tracked for basic collisions
         this.structureModels = [];
 
-        // Entities tracked for combat/convo/collision
+        // Artificial entities tracked for combat/convo/collision
         this.entities = [];
-        
+
+        // Other players tracked for movement, etc.
+        this.others = [];
+
         this.scene = null;
         this.floor = null;
 
@@ -53,10 +56,24 @@ export class SceneController {
         this.takeItemFromScene = this.takeItemFromScene.bind(this);
         this.dropItemToScene = this.dropItemToScene.bind(this);
         this.seedForms = this.seedForms.bind(this);
-        
-        this.multiplayer = false;
 
+        this.multiplayer = false;
         this.addEventListeners();
+    }
+
+    introduce() {
+        let introData = { heroTemplate: this.heroTemplate, description: this.layout.description, level: this.level };
+        this.socket.emit('introduce', introData, (response) => {
+            if (response) this.seedOthers(response);
+        });
+    }
+
+    /** Accept an array of heroTemplates, calling seedForm for each one */
+    seedOthers(others) {
+        others.forEach(other => {
+            other.type = "friendly";
+            this.seedForm(other);
+        })
     }
 
     animateScene() {
@@ -67,6 +84,7 @@ export class SceneController {
                 this.addWater(() => {
                     this.addLights();
                     this.addHero(() => {
+                        this.introduce();
                         this.seedForms(this.firstInRoom, () => {
                             this.scene.animate();
                         })
@@ -75,6 +93,64 @@ export class SceneController {
             });
         });
     }
+
+    addEventListeners() {
+
+        this.socket.on('multiplayer', (data) => {
+            this.multiplayer = data;
+        })
+
+        /** setFirstInRoom happens if the previous first leaves the room and delegates the responsibility */
+        this.socket.on('setFirstInRoom', () => {
+            this.firstInRoom = true;
+        })
+
+        this.socket.on('introduce', (heroTemplate) => {
+            /** Accept heroTemplate and call seedForm(heroTemplate) */
+            heroTemplate.type = "friendly";
+            this.seedForm(heroTemplate);
+        })
+
+        this.socket.on('updateEntityPositions', (entities) => {
+            entities.forEach(entity => {
+                // find the entity here by layoutId
+                let localEntity = this.entities.find(el => el.attributes.layoutId == entity.layoutId);
+                if (localEntity) {
+                    let rotation = new THREE.Euler( entity.rotation._x, entity.rotation._y, entity.rotation._z, 'YXZ' );
+                    localEntity.model.rotation.copy(rotation);
+                    localEntity.velocity.copy(entity.velocity);
+                    localEntity.model.position.copy(entity.position);
+                }
+            });
+        });
+
+        this.eventDepot.addListener('takeItemFromScene', this.takeItemFromScene);
+        this.eventDepot.addListener('dropItemToScene', this.dropItemToScene);
+        
+        this.eventDepot.addListener('querySC', (data) => {
+        
+            let {key, queryName, args} = data;
+            let response = null;
+        
+            switch (queryName) {
+                case 'getHeroCoordinates':
+                    response = { 
+                        x: this.hero.model.position.x.toFixed(2),
+                        y: this.hero.model.position.y.toFixed(2),
+                        z: this.hero.model.position.z.toFixed(2)
+                    }
+                    break;
+            }
+            
+            this.eventDepot.fire('SCResponse' + key, response);
+        })
+
+        this.socket.on('updateEntityPosition', (data) => {
+            // TODO: 
+        });
+    }
+
+
 
     addWater(callback) {
         if (this.layout.terrain.attributes.water) {
@@ -90,10 +166,10 @@ export class SceneController {
         }
     }
 
-    addToScene(form, addToForms = true) {
+    addToScene(form, addToForms = true, addToScene = true) {
         
         /* Hero is special case already added to scene via controls */
-        if (form.objectType != "hero") this.scene.add( form.model );
+        if (addToScene) this.scene.add( form.model );
 
         if (addToForms) this.forms.push( form );
 
@@ -164,7 +240,7 @@ export class SceneController {
         
         this.hero.load(() => {
 
-            this.addToScene( this.hero, false );
+            this.addToScene( this.hero, false, false );
             this.eventDepot.fire('halt', {});
             this.eventDepot.fire('updateHeroLocation', { location: this.hero.location, offset: true });
             
@@ -172,16 +248,14 @@ export class SceneController {
                 this.hero.updateHeroStats(stat);
             })
 
-            this.socket.emit('introduce', { name: this.heroTemplate.name, description: this.layout.description });
-
             callback();
         })
     }
 
     seedForms(firstInRoom, callback) {
 
-        // Pull layout with layoutIds assigned from leader
-        if (!firstInRoom) this.socket.emit('pullLayout', this.level, data => { this.layout = data; });
+        // Pull layout with layoutIds assigned from leader // already done in layoutManager before load
+        // if (!firstInRoom) this.socket.emit('pullLayout', this.level, data => { this.layout = data; });
 
         this.layoutId = 0;
         this.layout.items.forEach(({name,location,attributes},index) => {
@@ -197,7 +271,7 @@ export class SceneController {
                 this.layout.items[index].attributes.layoutId = layoutId; // form.model.uuid;
             }
 
-            this.seedForm(item, true).then(form => {
+            this.seedForm(item).then(form => {
                 // form.model.attributes.layoutId = layoutId;
             });
         });
@@ -213,7 +287,7 @@ export class SceneController {
                 if (!this.layout.structures[index].attributes) this.layout.structures[index].attributes = {};
                 this.layout.structures[index].attributes.layoutId = layoutId; // form.model.uuid;
             }
-            this.seedForm(structure, true).then(form => {});
+            this.seedForm(structure).then(form => {});
         });
 
         this.layout.entities.forEach(({name,location,attributes}, index) => {
@@ -227,7 +301,7 @@ export class SceneController {
                 if (!this.layout.entities[index].attributes) this.layout.entities[index].attributes = {};
                 this.layout.entities[index].attributes.layoutId = layoutId; // form.model.uuid;
             }
-            this.seedForm(entity, true).then(form => {});
+            this.seedForm(entity).then(form => {});
         });
 
 
@@ -380,7 +454,7 @@ export class SceneController {
     dropItemToScene(data) {
         
         let itemTemplate = this.getObjectByName(data.itemName);
-        this.seedForm(itemTemplate, true).then(form => {
+        this.seedForm(itemTemplate).then(form => {
 
             form.model.position.copy(this.hero.model.position);
             form.model.position.y = this.hero.determineElevationFromBase();
@@ -389,51 +463,6 @@ export class SceneController {
             data.layoutId = form.model.attributes.layoutId = layoutId;
             this.eventDepot.fire('addItemToLayout', data);
         })
-    }
-
-    addEventListeners() {
-
-        this.socket.on('multiplayer', (data) => {
-            this.multiplayer = data;
-        })
-
-        this.socket.on('updateEntityPositions', (entities) => {
-            entities.forEach(entity => {
-                // find the entity here by layoutId
-                let localEntity = this.entities.find(el => el.attributes.layoutId == entity.layoutId);
-                if (localEntity) {
-                    let rotation = new THREE.Euler( entity.rotation._x, entity.rotation._y, entity.rotation._z, 'YXZ' );
-                    localEntity.model.rotation.copy(rotation);
-                    localEntity.velocity.copy(entity.velocity);
-                    localEntity.model.position.copy(entity.position);
-                }
-            });
-        });
-
-        this.eventDepot.addListener('takeItemFromScene', this.takeItemFromScene);
-        this.eventDepot.addListener('dropItemToScene', this.dropItemToScene);
-        
-        this.eventDepot.addListener('querySC', (data) => {
-        
-            let {key, queryName, args} = data;
-            let response = null;
-        
-            switch (queryName) {
-                case 'getHeroCoordinates':
-                    response = { 
-                        x: this.hero.model.position.x.toFixed(2),
-                        y: this.hero.model.position.y.toFixed(2),
-                        z: this.hero.model.position.z.toFixed(2)
-                    }
-                    break;
-            }
-            
-            this.eventDepot.fire('SCResponse' + key, response);
-        })
-
-        this.socket.on('updateEntityPosition', (data) => {
-            // TODO: 
-        });
     }
 
     loadFormbyName(formName, callback) {

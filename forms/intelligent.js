@@ -44,6 +44,18 @@ export class IntelligentForm extends AnimatedForm{
             // this.setToDoubleSided(this.model);
             this.computeVertexNormals(this.model);
             this.setToCastShadows();
+
+            if (this.equipped) {
+                // Reduce cached boosts to zero before re-equipping
+                Object.keys(this.attributes.stats).forEach(stat => {
+                    this.changeStatBoost(stat, -this.getStatBoost(stat));
+                })
+
+                Object.keys(this.equipped).forEach(bodyPart => {
+                    this.equip(bodyPart, this.equipped[bodyPart][0], this.equipped[bodyPart][1], this.equipped[bodyPart][2]); // bodyPart, itemName, throwable
+                })
+            }
+            
             if (callback) callback();
         })
 

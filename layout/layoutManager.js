@@ -43,7 +43,7 @@ class LayoutManager {
 
     launch(heroTemplate) {
 
-        this.socket.emit('joinroom', {level: this.props.level, heroTemplate: this.heroTemplate }, (firstInRoom) => {
+        this.socket.emit('joinroom', {level: this.props.level, heroTemplate }, (firstInRoom) => {
 
             this.firstInRoom = firstInRoom;
 
