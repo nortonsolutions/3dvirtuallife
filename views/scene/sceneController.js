@@ -165,9 +165,6 @@ export class SceneController {
         this.hero.load(() => {
 
             this.addToScene( this.hero, false );
-
-
-
             this.eventDepot.fire('halt', {});
             this.eventDepot.fire('updateHeroLocation', { location: this.hero.location, offset: true });
             
@@ -175,8 +172,9 @@ export class SceneController {
                 this.hero.updateHeroStats(stat);
             })
 
-            callback();
+            this.socket.emit('introduce', { name: this.heroTemplate.name, description: this.layout.description });
 
+            callback();
         })
     }
 
@@ -192,6 +190,7 @@ export class SceneController {
             if (location) item.location = location;
             if (attributes) item.attributes = {...item.attributes, ...attributes};
             let layoutId = this.layoutId++;
+            
             if (firstInRoom) {
                 item.attributes.layoutId = layoutId;
                 if (!this.layout.items[index].attributes) this.layout.items[index].attributes = {};
@@ -302,7 +301,7 @@ export class SceneController {
                 entity.move(delta);
             });
 
-            if (Math.random() < 0.1) { // Update others 10% of the time
+            if (Math.random() < 0.5) { // Update others 10% of the time
 
                 let positions = this.entities.map(el => {
                     return {
@@ -401,10 +400,13 @@ export class SceneController {
         this.socket.on('updateEntityPositions', (entities) => {
             entities.forEach(entity => {
                 // find the entity here by layoutId
-                let localEntity = this.entities.find(el => el.attributes.layoutId = entity.layoutId);
-                localEntity.rotation.copy(entity.rotation);
-                localEntity.velocity.copy(entity.velocity);
-                localEntity.model.position.copy(entity.position);
+                let localEntity = this.entities.find(el => el.attributes.layoutId == entity.layoutId);
+                if (localEntity) {
+                    let rotation = new THREE.Euler( entity.rotation._x, entity.rotation._y, entity.rotation._z, 'YXZ' );
+                    localEntity.model.rotation.copy(rotation);
+                    localEntity.velocity.copy(entity.velocity);
+                    localEntity.model.position.copy(entity.position);
+                }
             });
         });
 

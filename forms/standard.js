@@ -63,7 +63,8 @@ export class StandardForm {
                 this.setFloorToReceiveShadow();
                 
             }
-            
+            this.computeVertexNormals(this.model);
+            this.setToCastShadows();
             callback();
 
         }, undefined, function ( error ) {
@@ -139,7 +140,7 @@ export class StandardForm {
         if (!root) root = this.model;
         if (typeof root.castShadow == "boolean") {
             // console.log((root.name));
-            if (root.name.match(new RegExp('pointlight|torch|torso|head|table|house|body|boy', 'i'))) {  //
+            if (root.name.match(new RegExp('pointlight|torch|torso|head|table|house|body|boy|cube', 'i'))) {  //
                 root.castShadow = true;
 
                 let showShadowCamera = false;

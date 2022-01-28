@@ -23,9 +23,8 @@ const socket                   = require('socket.io');
 const app = express();
 
 app.games = {}; // catalog of 'namespaces' (games)
-app.rooms = {}; // keeps track of current room membership
+app.rooms = {}; // current room membership, app.rooms[nsp][room] is an array of [socket.id,data.heroTemplate]
 app.layouts = {}; // catalog of nsp to array of layouts for each room { '/': [{layout0},{layout1},...] } 
-app.forms = {}; // catalog of nsp to array of forms for each room { '/': [{forms0},{forms1},...] }
 
 app.use('/', express.static(process.cwd() + '/'));
 app.use('/cdn', express.static(process.cwd() + '/cdn'));
@@ -89,6 +88,22 @@ database(mongoose, (db) => {
   io.on('connection', (socket) => {
     console.log(`Made socket connection - ${socket.id}`);
 
+    const notifyRoomMembers = function (room, messageType, data) {
+
+      let sender = socket.id;
+      let nsp = socket.nsp.name;
+
+      // if (!app.rooms) app.rooms = {};
+
+      if (!app.rooms[nsp]) app.rooms[nsp] = [];
+      if (app.rooms[nsp][room]) {
+        app.rooms[nsp][room].forEach(member => {
+          if (member != sender) socket.to(member[0]).emit(messageType, data);
+        });
+      }
+
+    }
+
     // Default namespace = "/" (equivalent to io.sockets)
     // if (!app.games[socket.nsp.name]) app.games[socket.nsp.name] = {};
     if (!app.rooms[socket.nsp.name]) app.rooms[socket.nsp.name] = [];
@@ -108,21 +123,21 @@ database(mongoose, (db) => {
      * live changes are happening in the level such as entity movement,
      * these updates are broadcast only to others in the same room.
      */
-    socket.on('joinroom', (level, callback) => {
-
+    socket.on('joinroom', (data, callback) => {
+      
       // Join up with the room:
-      if (!app.rooms[socket.nsp.name][level]) app.rooms[socket.nsp.name][level] = [];
-      app.rooms[socket.nsp.name][level].push(socket.id);
+      if (!app.rooms[socket.nsp.name][data.level]) app.rooms[socket.nsp.name][data.level] = [];
+      app.rooms[socket.nsp.name][data.level].push([socket.id,data.heroTemplate]);
 
       // Exit other rooms:
       app.rooms[socket.nsp.name].forEach((key,index) => {
-        if (index != level) {
-          app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el != socket.id);
+        if (index != data.level) {
+          app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el[0] != socket.id);
         }
       })
 
       // Am I the first in the room?
-      let firstInRoom = app.rooms[socket.nsp.name][level].length == 1;
+      let firstInRoom = app.rooms[socket.nsp.name][data.level].length == 1;
       if (!firstInRoom) socket.nsp.emit('multiplayer', true);
       callback(firstInRoom);
     });
@@ -136,22 +151,22 @@ database(mongoose, (db) => {
       app.layouts[socket.nsp.name][data.level] = data.layout;
     })
 
+    /** data: { name: ..., description: <level description> } */
     socket.on('introduce', (data) => {
+
       // Notify the others
       playerName = data.name;
       socket.nsp.emit('chat', { message: `<is in the ${data.description}>`, playerName });
+
     });
+
+
 
     socket.on('updateEntityPositions', (data) => {
-
-      console.log(`${app.rooms[socket.nsp.name][data.level]}`);
-      if (app.rooms[socket.nsp.name][data.level]) {
-        app.rooms[socket.nsp.name][data.level].forEach(member => {
-          if (member != socket.id) socket.to(member).emit(data.positions);
-        });
-      }
+      notifyRoomMembers(data.level, 'updateEntityPositions', data.positions);
+      // console.log(`${app.rooms[socket.nsp.name][data.level]}`);
     });
-    
+
     socket.on('gameProps', (data) => {
       app.games[socket.nsp.name] = data; // save for join-game lookups
       // socket.nsp.emit('gameProps', data); // can I only broadcast.emit to others in the nsp?
@@ -164,7 +179,7 @@ database(mongoose, (db) => {
       }
 
       app.rooms[socket.nsp.name].forEach((key,index) => {
-          app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el != socket.id);
+          app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el[0] != socket.id);
       })
 
       console.log(`Disconnecting ${socket.id}`)

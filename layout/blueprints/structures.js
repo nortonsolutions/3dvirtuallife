@@ -77,6 +77,18 @@ export const Structures = {
             elevation: 0
         }
     },
+
+    tree1: {
+        name: 'tree1',
+        gltf: 'tree.glb',
+        description: 'Standard tree',
+        type: 'structure',
+        attributes: {
+            animates: false,
+            scale: 100,
+            elevation: 0
+        }
+    },
     
     ancientChest: {
         name: 'ancientChest',

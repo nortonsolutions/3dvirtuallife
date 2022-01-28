@@ -39,14 +39,14 @@ export const levels = [
             { name: "bagOfGems" },
             { name: "bow" },
             { name: "arrow25" },
-            { name: "orb" },
+            // { name: "orb" },
             { name: "helmet" }
 
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0} },
             { name: "rock1" },
-            { name: "rock1" },
+            // { name: "tree1" },
             { 
                 name: "grate", location: { x: 3, y: 0, z: 4}, 
                 attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } 
@@ -59,7 +59,7 @@ export const levels = [
         entities: [
             { name: "john" },
             { name: "evilOne" },
-            { name: "shopkeep" },
+            { name: "shopkeep" }
             // { name: "rosenBot" }
         ]
     },

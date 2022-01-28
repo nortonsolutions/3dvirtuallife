@@ -37,8 +37,13 @@ class LayoutManager {
 
         this.props = localStorage.getItem('gameProps')? JSON.parse(localStorage.getItem('gameProps')): { level: 0, layouts: [] };
         this.props.level = level;
+        if (callback) callback();
 
-        this.socket.emit('joinroom', level, (firstInRoom) => {
+    }
+
+    launch(heroTemplate) {
+
+        this.socket.emit('joinroom', {level: this.props.level, heroTemplate: this.heroTemplate }, (firstInRoom) => {
 
             this.firstInRoom = firstInRoom;
 
@@ -55,26 +60,23 @@ class LayoutManager {
                 this.cacheLayout();
 
                 this.socket.emit('gameProps', JSON.parse(localStorage.getItem('gameProps')));
-                this.socket.emit('pushLayout', { level, layout: this.layout });
+                this.socket.emit('pushLayout', { level: this.props.level, layout: this.layout });
 
-                callback();
+                this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects, this.socket, this.firstInRoom, this.props.level);
+                this.sceneController.animateScene();
 
             } else {
 
-                this.socket.emit('pullLayout', level, (data) => {
+                this.socket.emit('pullLayout', this.props.level, (data) => {
                     this.layout = data;
                     this.cacheLayout();
-                    callback();
+                    this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects, this.socket, this.firstInRoom, this.props.level);
+                    this.sceneController.animateScene();
                 })
             }
         });
-    }
-
-    launch(heroTemplate) {
         
-        this.socket.emit('introduce', { name: heroTemplate.name, description: this.layout.description });
-        this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects, this.socket, this.firstInRoom, this.props.level);
-        this.sceneController.animateScene();
+
 
     }
 
