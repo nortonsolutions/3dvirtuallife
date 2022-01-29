@@ -107,6 +107,7 @@ function newHeroTemplate(name,height) {
     return {
         name: name,
         type: "hero",
+        subtype: "local",
         location: { x: 0, y: 0, z: 0 },
         attributes: {
             moves: true,

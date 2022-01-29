@@ -24,6 +24,8 @@ export class StandardForm {
 
         this.objectName = this.template.name;
         this.objectType = this.template.type;
+        this.objectSubtype = this.template.subtype;
+        
         this.attributes = this.template.attributes;
         
         this.model = null;

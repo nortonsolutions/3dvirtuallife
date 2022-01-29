@@ -95,8 +95,6 @@ database(mongoose, (db) => {
       let sender = socket.id;
       let nsp = socket.nsp.name;
 
-      // if (!app.rooms) app.rooms = {};
-
       if (!app.rooms[nsp]) app.rooms[nsp] = [];
       if (app.rooms[nsp][room]) {
         app.rooms[nsp][room].forEach(member => {
@@ -113,8 +111,14 @@ database(mongoose, (db) => {
         return null;
       } else {
         let others = app.rooms[nsp][room].filter(el => el[0] != sender).map(el => el[1]);
+        // console.log(`room ${room}: `);
         return others;
       }
+    }
+    
+    const updateHeroTemplate = function (room,heroTemplate) {
+      let x = app.rooms[socket.nsp.name][room].find(el => el[0] == socket.id);
+      if (x) x[1] = heroTemplate;
     }
 
     // Default namespace = "/" (equivalent to io.sockets)
@@ -140,7 +144,7 @@ database(mongoose, (db) => {
       
       // Join up with the room:
       if (!app.rooms[socket.nsp.name][data.level]) app.rooms[socket.nsp.name][data.level] = [];
-      app.rooms[socket.nsp.name][data.level].push([socket.id,data.heroTemplate]);
+      app.rooms[socket.nsp.name][data.level].push([socket.id,null]);
 
       // Exit other rooms:
       app.rooms[socket.nsp.name].forEach((key,index) => {
@@ -156,25 +160,26 @@ database(mongoose, (db) => {
 
     });
 
-    
+    socket.on('pullOthers', (level, callback) => {
+      // If room contains others, callback with array of heroTemplates
+      let others = othersInRoom(level);
+      callback(others);
+    })
+
+
     /** 
      * data: { heroTemplate: ..., description: <level description>, level: ... } 
      * 
-     * Slight redundancy here in that the joinroom already catalogued the heroTemplates,
-     * but I receive it here just to avoid looking it up again.
      * 
      */
-    socket.on('introduce', (data, callback) => {
+    socket.on('introduce', (data) => {
+
+      updateHeroTemplate(data.level, data.heroTemplate);
 
       // Notify the others
       playerName = data.heroTemplate.name;
       socket.nsp.emit('chat', { message: `<is in the ${data.description}>`, playerName });
-
       notifyRoomMembers(data.level, "introduce", data.heroTemplate);
-
-      // If room contains others, callback with array of heroTemplates
-      let others = othersInRoom(data.level);
-      callback(others);
 
     });
 
@@ -192,6 +197,12 @@ database(mongoose, (db) => {
       // console.log(`${app.rooms[socket.nsp.name][data.level]}`);
     });
 
+    /** data: { layoutId: ..., rotation: ..., velocity: ..., position: ..., level: ...} */
+    socket.on('updateHeroPosition', (data) => {
+      // console.log(`${socket.id} with ${data.layoutId} updating position`);
+      notifyRoomMembers(data.level, 'updateHeroPosition', data);
+    })
+
     socket.on('gameProps', (data) => {
       app.games[socket.nsp.name] = data; // save for join-game lookups
       // socket.nsp.emit('gameProps', data); // can I only broadcast.emit to others in the nsp?
@@ -203,7 +214,7 @@ database(mongoose, (db) => {
         delete app.games[socket.nsp.name];
       }
 
-      app.rooms[socket.nsp.name].forEach((key,index) => {
+      if (app.rooms[socket.nsp.name]) app.rooms[socket.nsp.name].forEach((key,index) => {
           app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el[0] != socket.id);
       })
 

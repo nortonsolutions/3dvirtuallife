@@ -33,14 +33,14 @@ export const levels = [
             { name: "smallSword" },
             { name: "redpotion" },
             { name: "greenpotion" },
-            { name: "mushroom" },
+            // { name: "mushroom" },
             { name: "crystalBall" },
             { name: "gold3" },
             { name: "bagOfGems" },
-            { name: "bow" },
-            { name: "arrow25" },
+            // { name: "bow" },
+            // { name: "arrow25" },
             // { name: "orb" },
-            { name: "helmet" }
+            // { name: "helmet" }
 
         ],
         structures: [
@@ -58,7 +58,7 @@ export const levels = [
         ],
         entities: [
             { name: "john" },
-            { name: "evilOne" },
+            // { name: "evilOne" },
             { name: "shopkeep" }
             // { name: "rosenBot" }
         ]

@@ -246,6 +246,7 @@ export class Hero extends IntelligentForm {
                 if (this.selectedObject) {
 
                     let objectType = this.selectedObject.objectType;
+                    let objectSubtype = this.selectedObject.objectSubtype;
                     
                     if (objectType == "item") {
                         this.sceneController.eventDepot.fire('takeItemFromScene', {
@@ -254,7 +255,7 @@ export class Hero extends IntelligentForm {
                             layoutId: this.selectedObject.model.attributes.layoutId
                         });
     
-                    } else if (objectType == "friendly") {
+                    } else if (objectType == "friendly" || objectSubtype == "remote") {
                         
                         // TODO: conversation
                         this.sceneController.eventDepot.fire('unlockControls', {});
@@ -503,6 +504,20 @@ export class Hero extends IntelligentForm {
             }
 
             this.identifySelectedForm();
+
+            /** data: { layoutId: ..., rotation: ..., velocity: ..., position: ..., level: ...} */
+
+            let heroData = {
+                layoutId: this.attributes.layoutId,
+                position: this.model.position,
+                rotation: this.model.rotation,
+                velocity: this.velocity,
+                level: this.sceneController.level
+            };
+            
+
+            this.sceneController.socket.emit('updateHeroPosition', heroData);
+
         }
 
     }

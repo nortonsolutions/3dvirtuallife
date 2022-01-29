@@ -146,7 +146,7 @@ export class IntelligentForm extends AnimatedForm{
     
             } else { // Something is blocking, so stop without moving
                 
-                if (this.objectType != "hero") {
+                if (this.objectSubtype == "local") {
                     this.model.translateX( -this.velocity.x * delta );
                     this.model.translateZ( -this.velocity.z * delta );
                 } else {
@@ -235,7 +235,7 @@ export class IntelligentForm extends AnimatedForm{
 
         this.attributes.stats[stat] = Number(newvalue).toFixed(2) + "/" + Number(max).toFixed(2) + "/" + this.getStatBoost(stat); //.toLocaleString('en-US',{minimumIntegerDigits:2})
 
-        if (this.objectType == "hero") this.updateHeroStats(stat);
+        if (this.objectSubtype == "local") this.updateHeroStats(stat);
 
         this.sceneController.eventDepot.fire('statusUpdate', { 
             message: `${this.objectName} ${stat} stat updated: ${this.attributes.stats[stat]}` 
@@ -250,7 +250,7 @@ export class IntelligentForm extends AnimatedForm{
 
         this.attributes.stats[stat] = this.getStat(stat) + "/" + this.getStatMax(stat) + "/" + (Number(currentBoost) + Number(change));
 
-        if (this.objectType == "hero") this.updateHeroStats(stat);
+        if (this.objectSubtype == "local") this.updateHeroStats(stat);
         
         this.sceneController.eventDepot.fire('statusUpdate', { 
             message: `${this.objectName} ${stat} stat boosted: ${this.attributes.stats[stat]}` 
@@ -354,7 +354,7 @@ export class IntelligentForm extends AnimatedForm{
             quantity: newQuantity
         }
 
-        if (this.objectType == "hero") this.cacheHero();
+        if (this.objectSubtype == "local") this.cacheHero();
         return {itemIndex, quantity: newQuantity};
     }
 
@@ -378,7 +378,7 @@ export class IntelligentForm extends AnimatedForm{
             }
         } else quantityRemaining = -1;
 
-        if (this.objectType == "hero") this.cacheHero();
+        if (this.objectSubtype == "local") this.cacheHero();
         return quantityRemaining;
     }
 
@@ -387,7 +387,7 @@ export class IntelligentForm extends AnimatedForm{
         let temp2 = {...this.inventory[second]};
         this.inventory[first] = temp2;
         this.inventory[second] = temp;
-        if (this.objectType == "hero") this.cacheHero();
+        if (this.objectSubtype == "local") this.cacheHero();
     }
 
     getInventory() {
@@ -462,7 +462,7 @@ export class IntelligentForm extends AnimatedForm{
 
             });
         }
-        if (this.objectType == "hero") this.cacheHero();
+        if (this.objectSubtype == "local") this.cacheHero();
 
     }
     
@@ -508,7 +508,7 @@ export class IntelligentForm extends AnimatedForm{
                 }
             }
     
-            if (this.objectType == "hero") this.cacheHero();
+            if (this.objectSubtype == "local") this.cacheHero();
     
     
         }
