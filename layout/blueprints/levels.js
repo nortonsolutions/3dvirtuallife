@@ -33,12 +33,12 @@ export const levels = [
             { name: "smallSword" },
             { name: "redpotion" },
             { name: "greenpotion" },
-            // { name: "mushroom" },
+            { name: "mushroom" },
             { name: "crystalBall" },
             { name: "gold3" },
             { name: "bagOfGems" },
-            // { name: "bow" },
-            // { name: "arrow25" },
+            { name: "bow" },
+            { name: "arrow25" },
             // { name: "orb" },
             // { name: "helmet" }
 

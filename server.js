@@ -25,8 +25,8 @@ const app = express();
 // TODO: Thread safety may become a concern for app.rooms
 
 app.games = {}; // catalog of 'namespaces' (games)
-app.rooms = {}; // current room membership; app.rooms[nsp][room] is an array of [socket.id,data.heroTemplate,firstInRoom]
-app.layouts = {}; // layouts for each room/level; app.layouts[nsp][room] = {layout} 
+app.rooms = {}; // current room membership; app.rooms[nsp][room] is an array of [socket.id,heroTemplate,firstInRoom]
+app.layouts = {}; // layouts for each room/level; app.layouts[nsp][room] = [{layout},maxLayoutId] 
 
 app.use('/', express.static(process.cwd() + '/'));
 app.use('/cdn', express.static(process.cwd() + '/cdn'));
@@ -184,13 +184,32 @@ database(mongoose, (db) => {
       // If room contains others, callback with array of heroTemplates
       let others = othersInRoom(level);
       callback(others);
-    })
+    });
 
+    socket.on('nextLayoutId', (roomNumber, callback) => {
+      callback(app.layouts[socket.nsp.name][roomNumber][1]++);
+    });
+
+    socket.on('dropItemToScene',  (data) => {
+      notifyRoomMembers(data.level, "dropItemToScene", data);
+    });
+
+    socket.on('takeItemFromScene', data => {
+      notifyRoomMembers(data.level, "takeItemFromScene", data);
+    });
+
+    socket.on('addItemToLayout', data => { // Update the local copy of the layout
+      app.layouts[socket.nsp.name][data.level][0].items.push(data.item);
+      notifyRoomMembers(data.level, "addItemToLayout", data);
+    });
+
+    socket.on('removeItemFromLayout', data => {
+      app.layouts[socket.nsp.name][data.level][0].items = app.layouts[socket.nsp.name][data.level][0].items.filter(el => el.attributes.layoutId != data.layoutId);
+      notifyRoomMembers(data.level, "removeItemFromLayout", data);
+    });
 
     /** 
      * data: { heroTemplate: ..., description: <level description>, level: ... } 
-     * 
-     * 
      */
     socket.on('introduce', (data) => {
 
@@ -204,12 +223,12 @@ database(mongoose, (db) => {
     });
 
     socket.on('pullLayout', (level, callback) => {
-      callback(app.layouts[socket.nsp.name][level]);
+      callback(app.layouts[socket.nsp.name][level][0]);
     });
 
     socket.on('pushLayout', data => {
       if (!app.layouts[socket.nsp.name]) app.layouts[socket.nsp.name] = [];
-      app.layouts[socket.nsp.name][data.level] = data.layout;
+      app.layouts[socket.nsp.name][data.level] = [data.layout,data.nextLayoutId];
     })
 
     socket.on('updateEntityPositions', (data) => {

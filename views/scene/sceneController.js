@@ -20,7 +20,6 @@ export class SceneController {
         
         // layout is shared by SceneController and LayoutManager
         this.layout = layout;
-        this.layoutId = 0;
 
         this.heroTemplate = heroTemplate;
         this.eventDepot = eventDepot;
@@ -65,17 +64,16 @@ export class SceneController {
 
     introduce() {
 
-        let layoutId = this.layoutId++; // pick the next layoutId to be used as uuid
-        
         this.socket.emit('pullOthers', this.level, (response) => {
             if (response) {
-                layoutId += response.length;
                 this.seedOthers(response);
             }
 
-            this.hero.attributes.layoutId = this.heroTemplate.attributes.layoutId = layoutId;
-            let introData = { heroTemplate: this.heroTemplate, description: this.layout.description, level: this.level };
-            this.socket.emit('introduce', introData);
+            this.socket.emit('nextLayoutId', this.level, (layoutId) => {
+                this.hero.attributes.layoutId = this.heroTemplate.attributes.layoutId = layoutId;
+                let introData = { heroTemplate: this.heroTemplate, description: this.layout.description, level: this.level };
+                this.socket.emit('introduce', introData);
+            })
         });
     }
 
@@ -107,30 +105,34 @@ export class SceneController {
 
     addEventListeners() {
 
+        this.socket.on('dropItemToScene', (data) => {
+            this.dropItemToScene(data, false);
+        });
+
+        this.socket.on('takeItemFromScene', (data) => {
+            this.takeItemFromScene(data);
+        });
+
         this.socket.on('removeHero', (heroTemplate) => {
             this.scene.removeFromScenebyLayoutId(heroTemplate.attributes.layoutId);
             this.others = this.others.filter(el => el.attributes.layoutId != heroTemplate.attributes.layoutId);
-        })
+        });
 
         this.socket.on('multiplayer', (data) => {
             this.multiplayer = data;
-        })
+        });
 
         /** setFirstInRoom happens if the previous first leaves the room and delegates the responsibility */
         this.socket.on('setFirstInRoom', () => {
             this.firstInRoom = true;
-        })
+        });
 
         /** The introduction should include attributes.layoutId assigned by the introducer him/herself */
         this.socket.on('introduce', (heroTemplate) => {
-
-            // set this.layoutId to one beyond the template, to stay current
-            this.layoutId = heroTemplate.attributes.layoutId + 1;
-
             /** Accept heroTemplate and call seedForm(heroTemplate) */
             heroTemplate.subtype = "remote";
             this.seedForm(heroTemplate);
-        })
+        });
 
         this.socket.on('updateEntityPositions', (entities) => {
             entities.forEach(entity => {
@@ -177,13 +179,7 @@ export class SceneController {
             
             this.eventDepot.fire('SCResponse' + key, response);
         })
-
-        this.socket.on('updateEntityPosition', (data) => {
-            // TODO: 
-        });
     }
-
-
 
     addWater(callback) {
         if (this.layout.terrain.attributes.water) {
@@ -291,59 +287,56 @@ export class SceneController {
         // Pull layout with layoutIds assigned from leader // already done in layoutManager before load
         // if (!firstInRoom) this.socket.emit('pullLayout', this.level, data => { this.layout = data; });
 
+        var nextLayoutId = 0; // only for tracking the firstInRoom tally
+
         this.layout.items.forEach(({name,location,attributes},index) => {
             
-            let item = this.getObjectByName(name);
-            if (location) item.location = location;
-            if (attributes) item.attributes = {...item.attributes, ...attributes};
-            let layoutId = this.layoutId++;
+            let template = this.getTemplateByName(name);
+            if (location) template.location = location;
+            if (attributes) template.attributes = {...template.attributes, ...attributes};
             
             if (firstInRoom) {
-                item.attributes.layoutId = layoutId;
                 if (!this.layout.items[index].attributes) this.layout.items[index].attributes = {};
-                this.layout.items[index].attributes.layoutId = layoutId; // form.model.uuid;
+                this.layout.items[index].attributes.layoutId = template.attributes.layoutId = nextLayoutId++;
             }
+            this.seedForm(template).then(form => {});
 
-            this.seedForm(item).then(form => {
-                // form.model.attributes.layoutId = layoutId;
-            });
         });
 
         this.layout.structures.forEach(({name,location,attributes}, index) => {
-            let structure = this.getObjectByName(name);
-            if (location) structure.location = location;
-            if (attributes) structure.attributes = {...structure.attributes, ...attributes};
+
+            let template = this.getTemplateByName(name);
+            if (location) template.location = location;
+            if (attributes) template.attributes = {...template.attributes, ...attributes};
             
-            let layoutId = this.layoutId++;
             if (firstInRoom) {
-                structure.attributes.layoutId = layoutId;
                 if (!this.layout.structures[index].attributes) this.layout.structures[index].attributes = {};
-                this.layout.structures[index].attributes.layoutId = layoutId; // form.model.uuid;
+                this.layout.structures[index].attributes.layoutId = template.attributes.layoutId = nextLayoutId++;
             }
-            this.seedForm(structure).then(form => {});
+            this.seedForm(template).then(form => {});
         });
 
         this.layout.entities.forEach(({name,location,attributes}, index) => {
-            let entity = this.getObjectByName(name);
-            if (location) entity.location = location;
-            if (attributes) entity.attributes = {...entity.attributes, ...attributes};
+            let template = this.getTemplateByName(name);
+            if (location) template.location = location;
+            if (attributes) template.attributes = {...template.attributes, ...attributes};
             
-            let layoutId = this.layoutId++;
             if (firstInRoom) {
-                entity.attributes.layoutId = layoutId;
                 if (!this.layout.entities[index].attributes) this.layout.entities[index].attributes = {};
-                this.layout.entities[index].attributes.layoutId = layoutId; // form.model.uuid;
+                this.layout.entities[index].attributes.layoutId = template.attributes.layoutId = nextLayoutId++;
             }
-            this.seedForm(entity).then(form => {});
+            this.seedForm(template).then(form => {});
         });
 
 
         if (firstInRoom) { // Update layouts with layoutIds assigned....
-            this.socket.emit('pushLayout', {level: this.level, layout: this.layout });
+            this.socket.emit('pushLayout', {level: this.level, layout: this.layout, nextLayoutId });
         }
 
         this.eventDepot.fire('cacheLayout', {}); 
+
         callback();
+
     }
 
     /** 
@@ -373,7 +366,7 @@ export class SceneController {
 
                 if (form.attributes.contentItems) {
                     form.attributes.contentItems.forEach(contentItemName => {
-                        let contentItem = this.getObjectByName(contentItemName);
+                        let contentItem = this.getTemplateByName(contentItemName);
                         contentItem.location = { x: 0, y: 20, z: 0 };
                         this.loadFormbyName(contentItem.name, (contentForm) => {
 
@@ -468,7 +461,7 @@ export class SceneController {
         callback();
     }
 
-    getObjectByName(name) {
+    getTemplateByName(name) {
         return this.allObjects[name];
     }
 
@@ -484,23 +477,35 @@ export class SceneController {
     }
 
     /** data: {location ..., itemName..., } */
-    dropItemToScene(data) {
+    /** local means it happened in this system and will be broadcast */ 
+    dropItemToScene(data, local = true) {
         
-        let itemTemplate = this.getObjectByName(data.itemName);
+        let itemTemplate = this.getTemplateByName(data.itemName);
         this.seedForm(itemTemplate).then(form => {
 
             form.model.position.copy(this.hero.model.position);
             form.model.position.y = this.hero.determineElevationFromBase();
 
-            let layoutId = this.layoutId++;
-            data.layoutId = form.model.attributes.layoutId = layoutId;
-            this.eventDepot.fire('addItemToLayout', data);
+            if (local) {
+                this.socket.emit('nextLayoutId', this.level, layoutId => {
+                    data.layoutId = form.model.attributes.layoutId = layoutId;
+                    this.eventDepot.fire('addItemToLayout', data);
+    
+                    if (this.multiplayer) {
+                        data.level = this.level;
+                        this.socket.emit('dropItemToScene', data);
+                    }
+                })
+    
+            } else {
+                this.eventDepot.fire('addItemToLayout', data);
+            }
         })
     }
 
     loadFormbyName(formName, callback) {
 
-        let formTemplate = this.getObjectByName(formName);
+        let formTemplate = this.getTemplateByName(formName);
         this.seedForm(formTemplate).then(form => {
             callback(form);
         })

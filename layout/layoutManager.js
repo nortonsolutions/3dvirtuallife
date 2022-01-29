@@ -80,6 +80,22 @@ class LayoutManager {
 
     }
 
+    addItemToLayout(data, local = true) {
+        let item = {}; item.attributes = {};
+        item.name = this.allItems[data.itemName].name;
+        item.location = data.location;
+        item.attributes.layoutId = data.layoutId;
+        this.layout.items.push(item);
+        if (local) this.socket.emit('addItemToLayout', {level: this.props.level, data, item});
+        this.cacheLayout();
+    }
+    
+    removeItemFromLayout(layoutId, local = true) {
+        this.layout.items = this.layout.items.filter(el => el.attributes.layoutId != layoutId);
+        if (local) this.socket.emit('removeItemFromLayout', {level: this.props.level, layoutId});
+        this.cacheLayout();
+    }
+
     addEventListeners() {
 
         // this.socket.on('gameProps', (data) => {
@@ -87,18 +103,20 @@ class LayoutManager {
         //     this.layout = this.props.layouts[this.props.level];
         // });
 
+        this.socket.on('addItemToLayout', data => {
+            this.addItemToLayout(data.data, false);
+        });
+
+        this.socket.on('removeItemFromLayout', data => {
+            this.removeItemFromLayout(data.layoutId, false);
+        });
+
         this.eventDepot.addListener('removeItemFromLayout', (layoutId) => {
-            this.layout.items = this.layout.items.filter(el => el.attributes.layoutId != layoutId);
-            this.cacheLayout();
+            this.removeItemFromLayout(layoutId);
         });
 
         this.eventDepot.addListener('addItemToLayout', (data) => {
-            let item = {};
-            item.name = this.allItems[data.itemName].name;
-            item.location = data.location;
-            item.attributes.layoutId = data.layoutId;
-            this.layout.items.push(item);
-            this.cacheLayout();
+            this.addItemToLayout(data);
         });
 
         this.eventDepot.addListener('cacheLayout', () => {
