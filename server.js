@@ -90,27 +90,27 @@ database(mongoose, (db) => {
   io.on('connection', (socket) => {
     console.log(`Made socket connection - ${socket.id}`);
 
-    const notifyRoomMembers = function (room, messageType, data) {
+    const notifyRoomMembers = function (roomNumber, messageType, data) {
 
       let sender = socket.id;
       let nsp = socket.nsp.name;
 
       if (!app.rooms[nsp]) app.rooms[nsp] = [];
-      if (app.rooms[nsp][room]) {
-        app.rooms[nsp][room].forEach(member => {
+      if (app.rooms[nsp][roomNumber]) {
+        app.rooms[nsp][roomNumber].forEach(member => {
           if (member != sender) socket.to(member[0]).emit(messageType, data);
         });
       }
     }
 
-    const othersInRoom = function (room) {
+    const othersInRoom = function (roomNumber) {
       let sender = socket.id;
       let nsp = socket.nsp.name;
 
-      if (!app.rooms[nsp][room] || app.rooms[nsp][room].length <= 1) {
+      if (!app.rooms[nsp][roomNumber] || app.rooms[nsp][roomNumber].length <= 1) {
         return null;
       } else {
-        let others = app.rooms[nsp][room].filter(el => el[0] != sender).map(el => el[1]);
+        let others = app.rooms[nsp][roomNumber].filter(el => el[0] != sender).map(el => el[1]);
         // console.log(`room ${room}: `);
         return others;
       }
@@ -119,17 +119,18 @@ database(mongoose, (db) => {
     /** Remove from rooms and delegate firstInRoom if needed */
     const removeFromRooms = function () {
       if (app.rooms[socket.nsp.name]) app.rooms[socket.nsp.name].forEach((key,index) => {
-        let room = app.rooms[socket.nsp.name][index];
-        let record = room.find(el => el[0] == socket.id);
+        let record = app.rooms[socket.nsp.name][index].find(el => el[0] == socket.id);
         if (record) {
-          room = room.filter(el => el[0] != socket.id);
-          if (room.length > 0 && record[2] == true) assignNewFirst(room);           
+          app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el[0] != socket.id);
+          if (app.rooms[socket.nsp.name][index].length > 0 && record[2] == true) assignNewFirst(index);
+          notifyRoomMembers(index, 'removeHero', record[1]);
+          socket.nsp.emit('chat', { message: `<dropped out of the game>`, playerName });
         }
       })
     }
 
-    const assignNewFirst = function(room) {
-      let member = room[0]; // select the first member
+    const assignNewFirst = function(roomNumber) {
+      let member = app.rooms[socket.nsp.name][roomNumber][0]; // select the first member
       member[2] = true; // set firstInRoom = true;
       socket.to(member[0]).emit('setFirstInRoom', true);
     }

@@ -107,6 +107,11 @@ export class SceneController {
 
     addEventListeners() {
 
+        this.socket.on('removeHero', (heroTemplate) => {
+            this.scene.removeFromScenebyLayoutId(heroTemplate.attributes.layoutId);
+            this.others = this.others.filter(el => el.attributes.layoutId != heroTemplate.attributes.layoutId);
+        })
+
         this.socket.on('multiplayer', (data) => {
             this.multiplayer = data;
         })
