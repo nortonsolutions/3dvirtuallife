@@ -25,7 +25,7 @@ const app = express();
 // TODO: Thread safety may become a concern for app.rooms
 
 app.games = {}; // catalog of 'namespaces' (games)
-app.rooms = {}; // current room membership; app.rooms[nsp][room] is an array of [socket.id,data.heroTemplate]
+app.rooms = {}; // current room membership; app.rooms[nsp][room] is an array of [socket.id,data.heroTemplate,firstInRoom]
 app.layouts = {}; // layouts for each room/level; app.layouts[nsp][room] = {layout} 
 
 app.use('/', express.static(process.cwd() + '/'));
@@ -115,6 +115,24 @@ database(mongoose, (db) => {
         return others;
       }
     }
+
+    /** Remove from rooms and delegate firstInRoom if needed */
+    const removeFromRooms = function () {
+      if (app.rooms[socket.nsp.name]) app.rooms[socket.nsp.name].forEach((key,index) => {
+        let room = app.rooms[socket.nsp.name][index];
+        let record = room.find(el => el[0] == socket.id);
+        if (record) {
+          room = room.filter(el => el[0] != socket.id);
+          if (room.length > 0 && record[2] == true) assignNewFirst(room);           
+        }
+      })
+    }
+
+    const assignNewFirst = function(room) {
+      let member = room[0]; // select the first member
+      member[2] = true; // set firstInRoom = true;
+      socket.to(member[0]).emit('setFirstInRoom', true);
+    }
     
     const updateHeroTemplate = function (room,heroTemplate) {
       let x = app.rooms[socket.nsp.name][room].find(el => el[0] == socket.id);
@@ -144,7 +162,10 @@ database(mongoose, (db) => {
       
       // Join up with the room:
       if (!app.rooms[socket.nsp.name][data.level]) app.rooms[socket.nsp.name][data.level] = [];
-      app.rooms[socket.nsp.name][data.level].push([socket.id,null]);
+      
+      // Am I the first in the room?
+      let firstInRoom = app.rooms[socket.nsp.name][data.level].length == 0;
+      app.rooms[socket.nsp.name][data.level].push([socket.id,null,firstInRoom]);
 
       // Exit other rooms:
       app.rooms[socket.nsp.name].forEach((key,index) => {
@@ -153,8 +174,6 @@ database(mongoose, (db) => {
         }
       })
 
-      // Am I the first in the room?
-      let firstInRoom = app.rooms[socket.nsp.name][data.level].length == 1;
       if (!firstInRoom) socket.nsp.emit('multiplayer', true);
       callback(firstInRoom);
 
@@ -214,9 +233,7 @@ database(mongoose, (db) => {
         delete app.games[socket.nsp.name];
       }
 
-      if (app.rooms[socket.nsp.name]) app.rooms[socket.nsp.name].forEach((key,index) => {
-          app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el[0] != socket.id);
-      })
+      removeFromRooms();
 
       console.log(`Disconnecting ${socket.id}`)
     });
