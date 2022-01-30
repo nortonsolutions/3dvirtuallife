@@ -92,7 +92,7 @@ class InventoryScreen {
                 }
             }
         }
-
+        
         this.location = hero.location;
         return context;
     }

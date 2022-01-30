@@ -103,6 +103,58 @@ export class SceneController {
         });
     }
 
+    /** data: {itemName: ..., layoutId: ...} */
+    takeItemFromScene(data, local = true) {
+
+        this.scene.removeFromScenebyLayoutId(data.layoutId);
+        this.forms = this.forms.filter(el => {
+            return el.model.attributes.layoutId != data.layoutId;
+        });
+
+        this.eventDepot.fire('removeItemFromLayout', data.layoutId);
+
+        if (local) {
+            data.level = this.level;
+            this.socket.emit('takeItemFromScene', data);
+        }
+    }
+
+    /** data: {location ..., itemName..., } */
+    /** local means it happened in this system and will be broadcast */ 
+    dropItemToScene(data, local = true) {
+        
+        let itemTemplate = this.getTemplateByName(data.itemName);
+
+        if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
+        this.seedForm(itemTemplate).then(form => {
+
+            if (data.position) {
+                form.model.position.copy(data.position);
+            } else {
+                form.model.position.copy(this.hero.model.position);
+                form.model.position.y = this.hero.determineElevationFromBase();
+            }
+            
+
+            if (local) {
+                this.socket.emit('nextLayoutId', this.level, layoutId => {
+                    data.layoutId = form.model.attributes.layoutId = layoutId;
+                    this.eventDepot.fire('addItemToLayout', data);
+    
+                    // if (this.multiplayer) {
+                        data.level = this.level;
+                        data.position = form.model.position;
+                        this.socket.emit('dropItemToScene', data);
+                    // }
+                })
+    
+            } else {
+                this.eventDepot.fire('addItemToLayout', data);
+            }
+        })
+    }
+    
+
     addEventListeners() {
 
         this.socket.on('dropItemToScene', (data) => {
@@ -110,7 +162,7 @@ export class SceneController {
         });
 
         this.socket.on('takeItemFromScene', (data) => {
-            this.takeItemFromScene(data);
+            this.takeItemFromScene(data, false);
         });
 
         this.socket.on('removeHero', (heroTemplate) => {
@@ -463,44 +515,6 @@ export class SceneController {
 
     getTemplateByName(name) {
         return this.allObjects[name];
-    }
-
-    /** data: {itemName: ..., layoutId: ...} */
-    takeItemFromScene(data) {
-
-        this.scene.removeFromScenebyLayoutId(data.layoutId);
-        this.forms = this.forms.filter(el => {
-            return el.model.attributes.layoutId != data.layoutId;
-        });
-
-        this.eventDepot.fire('removeItemFromLayout', data.layoutId);
-    }
-
-    /** data: {location ..., itemName..., } */
-    /** local means it happened in this system and will be broadcast */ 
-    dropItemToScene(data, local = true) {
-        
-        let itemTemplate = this.getTemplateByName(data.itemName);
-        this.seedForm(itemTemplate).then(form => {
-
-            form.model.position.copy(this.hero.model.position);
-            form.model.position.y = this.hero.determineElevationFromBase();
-
-            if (local) {
-                this.socket.emit('nextLayoutId', this.level, layoutId => {
-                    data.layoutId = form.model.attributes.layoutId = layoutId;
-                    this.eventDepot.fire('addItemToLayout', data);
-    
-                    if (this.multiplayer) {
-                        data.level = this.level;
-                        this.socket.emit('dropItemToScene', data);
-                    }
-                })
-    
-            } else {
-                this.eventDepot.fire('addItemToLayout', data);
-            }
-        })
     }
 
     loadFormbyName(formName, callback) {

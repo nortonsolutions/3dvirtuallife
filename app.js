@@ -29,7 +29,12 @@ export const app = () => {
         });
         
         eventDepot.addListener('showDescription', (data) => {
-            let description = JSON.parse(localStorage.getItem('gameObjects'))[data.objectName].description;
+            var description;
+            if (data.objectType == "hero") {
+                description = data.objectName;
+            } else {
+                description = JSON.parse(localStorage.getItem('gameObjects'))[data.objectName].description;
+            }
             document.getElementById('message').innerHTML = description;
         });
 

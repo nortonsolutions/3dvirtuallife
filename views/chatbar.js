@@ -30,6 +30,8 @@ class Chatbar {
             if (data.show) {
                 this.eventDepot.fire('disableKeyDownListener', {});
                 this.refreshChatbar();
+                document.getElementById('chatInput').style.display = 'flex';
+                document.getElementById('chatMessage').focus();
                 
             } else { 
                 this.eventDepot.fire('enableKeyDownListener', {});
@@ -41,8 +43,7 @@ class Chatbar {
     refreshChatbar = () => {
         // set context data and call loadTemplate
         this.loadTemplate(this.messageThread, () => {
-            document.getElementById('chatInput').style.display = 'flex';
-            document.getElementById('chatMessage').focus();
+
             this.addChatMessageListeners();
 
         });

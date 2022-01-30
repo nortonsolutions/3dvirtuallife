@@ -193,6 +193,7 @@ class Scene {
                 break;
 
             case 73: // i
+                this.controller.hero.cacheHero(); // saves updated location in template
                 this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
                 this.controller.eventDepot.fire('halt', {});
                 break;

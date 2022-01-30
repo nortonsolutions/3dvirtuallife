@@ -586,19 +586,23 @@ export class Hero extends IntelligentForm {
             // load the object model to the scene, copy the position/rotation of hero,
             this.sceneController.loadFormbyName(itemName, (item) => {
 
-                item.model.position.copy(this.model.position);
-                item.model.rotation.copy(this.model.rotation);
-                item.model.position.y += this.attributes.height;
-                this.sceneController.addToProjectiles(item);
-
-                if (bodyPart || parentBodyPart) { // remove from inventory, unequip when out
-                    if (this.removeFromInventory(itemName) == -1) {
-                        this.unequip(parentBodyPart? parentBodyPart : bodyPart);
-
-                        // re-equip parent item to inventory if applicable
-                        if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
+                this.sceneController.socket.emit('nextLayoutId', this.sceneController.level, layoutId => {
+                    item.attributes.layoutId = item.model.attributes.layoutId = layoutId;
+                    item.model.position.copy(this.model.position);
+                    item.model.rotation.copy(this.model.rotation);
+                    item.model.position.y += this.attributes.height;
+                    this.sceneController.addToProjectiles(item);
+    
+                    if (bodyPart || parentBodyPart) { // remove from inventory, unequip when out
+                        if (this.removeFromInventory(itemName) == -1) {
+                            this.unequip(parentBodyPart? parentBodyPart : bodyPart);
+    
+                            // re-equip parent item to inventory if applicable
+                            if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
+                        }
                     }
-                }
+                });
+
             });
 
         }
