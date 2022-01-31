@@ -437,7 +437,8 @@ class Scene {
         }
     }
 
-    /** Distribute damage to enemies, make item disappear or fall to ground */
+    /* Distribute damage to enemies, make item disappear or fall to ground */
+    /* 'local' items exert an effect while non-local are just for appearances */
     handleAction(projectile, entitiesInRange) {
 
         // Sprite effects:
@@ -454,22 +455,35 @@ class Scene {
             }, projectile.item.attributes.sprites[0].time * 500);
         }
 
-        let [stat, change] = projectile.item.attributes.effect.split("/");
+        if (projectile.local) {
+            let [stat, change] = projectile.item.attributes.effect.split("/");
 
-        entitiesInRange.forEach(entity => {
-            this.controller.hero.inflictDamage(entity, change);
-        })
+            entitiesInRange.forEach(entity => {
+                this.controller.hero.inflictDamage(entity, change);
+            })
+        }
 
         if (Math.random() < 0.5) {
             if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
         } else {  // put the item on the ground for retrieval
             projectile.item.model.position.y = projectile.item.determineElevationFromBase() + projectile.item.attributes.elevation;
         }
+        
     }
 
+
+    /** 
+     * Each projectile looks like this:
+     * {
+            item,
+            direction,
+            velocity: new THREE.Vector3(),
+            distanceTraveled: 0,
+            local
+        }
+     *
+     */
     handleProjectiles(delta) {
-        
-        // Handle action and filter out projectiles that have run their course
         
         if (this.controller.projectiles.length > 0) {
             this.controller.projectiles.filter(el => el.distanceTraveled == -1).forEach(projectile => {

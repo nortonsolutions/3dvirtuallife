@@ -274,6 +274,11 @@ database(mongoose, (db) => {
       notifyRoomMembers(data.level, 'updateStructureAttributes', data);
     })
 
+    // data: { level: this.sceneController.level, itemName, position: item.model.position, rotation: item.model.rotation })
+    socket.on('launch', data => {
+      notifyRoomMembers(data.level, 'launch', data);
+    })
+
   })
 
 })

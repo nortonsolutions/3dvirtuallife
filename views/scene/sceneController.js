@@ -157,10 +157,15 @@ export class SceneController {
 
     addEventListeners() {
 
+        // data: { itemName, position: item.model.position, rotation: item.model.rotation })
+        this.socket.on('launch', data => {
+            this.hero.launch(data.itemName, null, [], false, data);
+        });
+
         this.socket.on('updateStructureAttributes', (data) => {
             let structure = this.forms.find(el => el.attributes.layoutId == data.layoutId);
             structure.updateAttributes(data.payload, false);
-        })
+        });
 
         // if (local) this.sceneController.socket.fire('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, payload});
 
@@ -438,7 +443,7 @@ export class SceneController {
                 form.attributes.contentItems.forEach(contentItemName => {
                     let contentItem = this.getTemplateByName(contentItemName);
                     contentItem.location = { x: 0, y: 20, z: 0 };
-                    this.loadFormbyName(contentItem.name, (contentForm) => {
+                    this.loadFormByName(contentItem.name, (contentForm) => {
 
                         contentForm.model.position.x = form.model.position.x;
                         contentForm.model.position.z = form.model.position.z;
@@ -535,7 +540,7 @@ export class SceneController {
         return JSON.parse(JSON.stringify(this.allObjects[name]));
     }
 
-    loadFormbyName(formName, callback) {
+    loadFormByName(formName, callback, local = true) {
 
         let formTemplate = this.getTemplateByName(formName);
         this.socket.emit('nextLayoutId', this.level, layoutId => {
@@ -574,7 +579,7 @@ export class SceneController {
         return response;
     }
 
-    addToProjectiles(item) {
+    addToProjectiles(item, local = true) {
 
         // Starting direction
         let direction = this.scene.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
@@ -584,7 +589,8 @@ export class SceneController {
             item,
             direction,
             velocity: new THREE.Vector3(),
-            distanceTraveled: 0
+            distanceTraveled: 0,
+            local
         } );
         this.scene.add( item.model );
     }

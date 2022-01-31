@@ -283,17 +283,29 @@ export class IntelligentForm extends AnimatedForm{
         this.sceneController.entities = this.sceneController.entities.filter(el => el != this);
         // this.fadeToAction("Death", 0.2);
 
-        if (this.attributes.grants) {
-            this.attributes.grants.forEach(itemName => {
-                // load the object model to the scene, copy the position/rotation of hero,
-                this.sceneController.loadFormbyName(itemName, (item) => {
-                    item.model.position.copy(this.model.position);
-                    item.model.position.y = this.determineElevationFromBase();
-                });
-            })
-        }
+        if (local) {
+            this.sceneController.socket.emit('death', {level: this.sceneController.level, layoutId: this.attributes.layoutId, hero: this.objectType=="hero"});
+            if (this.attributes.grants) {
+                this.attributes.grants.forEach(itemName => {
+                    // load the object model to the scene, copy the position/rotation of hero,
 
-        if (local) this.sceneController.socket.emit('death', {level: this.sceneController.level, layoutId: this.attributes.layoutId, hero: this.objectType=="hero"});
+                    let position = new THREE.Vector3();
+                    position.copy(this.model.position);
+                    position.y = this.determineElevationFromBase();
+
+                    let data = {
+                        itemName,
+                        position
+                    };
+
+                    this.sceneController.dropItemToScene(data);
+
+                })
+            }
+
+        } else {
+
+        }
     }
 
     firstInventorySlot() {
@@ -422,7 +434,7 @@ export class IntelligentForm extends AnimatedForm{
         if (area.match('key')) {
             this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
         } else {
-            this.sceneController.loadFormbyName(itemName, (item) => {
+            this.sceneController.loadFormByName(itemName, (item) => {
 
                 item.model.position.set(0,0,0);
                 item.model.rotation.y = Math.PI;

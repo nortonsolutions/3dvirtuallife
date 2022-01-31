@@ -357,6 +357,8 @@ export class Hero extends IntelligentForm {
 
             this.cacheHero();
         })
+
+        
     }
 
 
@@ -584,35 +586,51 @@ export class Hero extends IntelligentForm {
      * 
      * Throwing an item affects inventory similarly to using a hotkey potion,
      * pulling from inventory until the last item is used (or all mana is used).
+     * 
+     * When local = false, data is expected to define rotation/position.
      */
-    launch(itemName, bodyPart = null, [parentBodyPart, parentItemName] = []) {
+    launch(itemName, bodyPart = null, [parentBodyPart, parentItemName] = [], local = true, data) {
 
-        // If this is a child item, check inventory first and bail if needed
-        if (parentBodyPart && this.getInventoryQuantity(itemName) == 0) {
-            this.unequip(parentBodyPart);
-            this.addToInventory(parentItemName, 0, 1);
-        } else {
-            // load the object model to the scene, copy the position/rotation of hero,
-            this.sceneController.loadFormbyName(itemName, (item) => {
+        if (local) {
+            // If this is a child item, check inventory first and bail if needed
+            if (parentBodyPart && this.getInventoryQuantity(itemName) == 0) {
+                this.unequip(parentBodyPart);
+                this.addToInventory(parentItemName, 0, 1);
+            } else {
+                // load the object model to the scene, copy the position/rotation of hero,
+                this.sceneController.loadFormByName(itemName, (item) => {
 
-                    item.model.position.copy(this.model.position);
-                    item.model.rotation.copy(this.model.rotation);
-                    item.model.position.y += this.attributes.height;
-                    this.sceneController.addToProjectiles(item);
-    
-                    if (bodyPart || parentBodyPart) { // remove from inventory, unequip when out
-                        if (this.removeFromInventory(itemName) == -1) {
-                            this.unequip(parentBodyPart? parentBodyPart : bodyPart);
-    
-                            // re-equip parent item to inventory if applicable
-                            if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
+                        item.model.position.copy(this.model.position);
+                        item.model.rotation.copy(this.model.rotation);
+                        item.model.position.y += this.attributes.height;
+
+                        this.sceneController.socket.emit('launch', { level: this.sceneController.level, itemName, position: item.model.position, rotation: item.model.rotation })
+                        this.sceneController.addToProjectiles(item);
+        
+                        if (bodyPart || parentBodyPart) { // remove from inventory, unequip when out
+                            if (this.removeFromInventory(itemName) == -1) {
+                                this.unequip(parentBodyPart? parentBodyPart : bodyPart);
+        
+                                // re-equip parent item to inventory if applicable
+                                if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
+                            }
                         }
-                    }
 
 
+                });
+
+            }
+
+        } else {
+            this.sceneController.loadFormByName(itemName, (item) => {
+
+                item.model.position.copy(data.position);
+                item.model.rotation.copy(data.rotation);
+
+                this.sceneController.addToProjectiles(item, local);
             });
-
         }
+
     }
 
     inflictDamage(entity, hitPointReduction) {
