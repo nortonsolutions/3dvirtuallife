@@ -277,7 +277,7 @@ export class IntelligentForm extends AnimatedForm{
         return this.getStat(stat) + this.getStatBoost(stat);
     }
 
-    death() {
+    death(local = true) {
 
         this.alive = false;
         this.sceneController.entities = this.sceneController.entities.filter(el => el != this);
@@ -292,6 +292,8 @@ export class IntelligentForm extends AnimatedForm{
                 });
             })
         }
+
+        if (local) this.sceneController.socket.emit('death', {level: this.sceneController.level, layoutId: this.attributes.layoutId, hero: this.objectType=="hero"});
     }
 
     firstInventorySlot() {

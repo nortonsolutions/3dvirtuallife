@@ -27,6 +27,7 @@ export class StandardForm {
         this.objectSubtype = this.template.subtype;
         
         this.attributes = this.template.attributes;
+        this.random = Math.random();
         
         this.model = null;
 
@@ -172,14 +173,20 @@ export class StandardForm {
     }
 
     setFloorToReceiveShadow() {
-        this.model.getObjectByName("Floor").receiveShadow = true;
+        if (this.model.getObjectByName("Floor")) this.model.getObjectByName("Floor").receiveShadow = true;
     }
 
 
-    updateAttributes(payload) {
+    updateAttributes(payload, local = true) {
         this.attributes = {...this.attributes, ...payload};
         this.model.attributes = {...this.attributes, ...payload};
         this.sceneController.eventDepot.fire('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, attributes: payload});
+
+        if (this.activeAction) {
+            this.runActiveAction(0.2);
+        }
+
+        if (local) this.sceneController.socket.emit('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level });
     }
 
 

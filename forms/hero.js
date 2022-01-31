@@ -284,9 +284,6 @@ export class Hero extends IntelligentForm {
                         
                         if (accessible) {
                             this.selectedObject.updateAttributes({unlocked: true});
-                            if (this.selectedObject.activeAction) {
-                                this.selectedObject.runActiveAction(0.2);
-                            }
                         }
                     }
                 } 
@@ -522,8 +519,20 @@ export class Hero extends IntelligentForm {
 
     }
 
-    death() {
-        super.death();
+    death(local = true) {
+        super.death(local);
+
+        // drop all wares
+        this.cacheHero();
+        this.inventory.forEach(item => {
+            /** data: {location ..., itemName..., } */
+            this.sceneController.dropItemToScene({itemName: item.itemName, location: this.location});
+        });
+
+        Object.values(this.equipped).forEach(item => {
+            /** data: {location ..., itemName..., } */
+            this.sceneController.dropItemToScene({itemName: item[0], location: this.location});
+        });
 
         setTimeout(() => {
             let thisModel = this.model.getObjectByProperty("objectType", "hero");
@@ -586,8 +595,6 @@ export class Hero extends IntelligentForm {
             // load the object model to the scene, copy the position/rotation of hero,
             this.sceneController.loadFormbyName(itemName, (item) => {
 
-                this.sceneController.socket.emit('nextLayoutId', this.sceneController.level, layoutId => {
-                    item.attributes.layoutId = item.model.attributes.layoutId = layoutId;
                     item.model.position.copy(this.model.position);
                     item.model.rotation.copy(this.model.rotation);
                     item.model.position.y += this.attributes.height;
@@ -601,7 +608,7 @@ export class Hero extends IntelligentForm {
                             if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
                         }
                     }
-                });
+
 
             });
 

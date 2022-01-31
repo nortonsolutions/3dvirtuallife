@@ -157,6 +157,24 @@ export class SceneController {
 
     addEventListeners() {
 
+        this.socket.on('updateStructureAttributes', (data) => {
+            let structure = this.forms.find(el => el.attributes.layoutId == data.layoutId);
+            structure.updateAttributes(data.payload, false);
+        })
+
+        // if (local) this.sceneController.socket.fire('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, payload});
+
+        // data: {layoutId: this.attributes.layoutId, hero: this.objectType=="hero"};
+        this.socket.on('death', (data) => {
+            if (data.hero) {
+                let other = this.others.find(el => el.attributes.layoutId == data.layoutId);
+                other.death(false);
+            } else {
+                let entity = this.entities.find(el => el.attributes.layoutId == data.layoutId);
+                entity.death(false);
+            }
+        });
+
         this.socket.on('dropItemToScene', (data) => {
             this.dropItemToScene(data, false);
         });
@@ -351,7 +369,7 @@ export class SceneController {
                 if (!this.layout.items[index].attributes) this.layout.items[index].attributes = {};
                 this.layout.items[index].attributes.layoutId = template.attributes.layoutId = nextLayoutId++;
             }
-            this.seedForm(template).then(form => {});
+                this.seedForm(template).then(form => {});
 
         });
 
@@ -408,37 +426,37 @@ export class SceneController {
         return new Promise((resolve,reject) => {
             form.load(() => {
 
-                if (form.attributes.sprites) {
-                    form.attributes.sprites.forEach(spriteConfig => {
-                        this.formFactory.addSpritesGeneric(form.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip);
+            if (form.attributes.sprites) {
+                form.attributes.sprites.forEach(spriteConfig => {
+                    this.formFactory.addSpritesGeneric(form.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip);
+                })
+            }
+
+            this.addToScene(form);
+
+            if (form.attributes.contentItems) {
+                form.attributes.contentItems.forEach(contentItemName => {
+                    let contentItem = this.getTemplateByName(contentItemName);
+                    contentItem.location = { x: 0, y: 20, z: 0 };
+                    this.loadFormbyName(contentItem.name, (contentForm) => {
+
+                        contentForm.model.position.x = form.model.position.x;
+                        contentForm.model.position.z = form.model.position.z;
+                        contentForm.model.position.y = form.model.position.y + contentItem.attributes.elevation;
+                        contentForm.attributes.contained = true;
+                        this.addToScene(contentForm);
                     })
-                }
-
-                this.addToScene(form);
-
-                if (form.attributes.contentItems) {
-                    form.attributes.contentItems.forEach(contentItemName => {
-                        let contentItem = this.getTemplateByName(contentItemName);
-                        contentItem.location = { x: 0, y: 20, z: 0 };
-                        this.loadFormbyName(contentItem.name, (contentForm) => {
-
-                            contentForm.model.position.x = form.model.position.x;
-                            contentForm.model.position.z = form.model.position.z;
-                            contentForm.model.position.y = form.model.position.y + contentItem.attributes.elevation;
-                            contentForm.attributes.contained = true;
-                            this.addToScene(contentForm);
-                        })
-                        resolve(form);
-
-                    });
-                } else {
                     resolve(form);
-                }
-    
-            });
-                
-        })
-    }
+
+                });
+            } else {
+                resolve(form);
+            }
+
+        });
+
+    })    
+}
 
 
     handleMovement(delta) {
@@ -514,14 +532,17 @@ export class SceneController {
     }
 
     getTemplateByName(name) {
-        return this.allObjects[name];
+        return JSON.parse(JSON.stringify(this.allObjects[name]));
     }
 
     loadFormbyName(formName, callback) {
 
         let formTemplate = this.getTemplateByName(formName);
-        this.seedForm(formTemplate).then(form => {
-            callback(form);
+        this.socket.emit('nextLayoutId', this.level, layoutId => {
+            formTemplate.attributes.layoutId = layoutId;
+            this.seedForm(formTemplate).then(form => {
+               callback(form);
+            });
         })
     }
 

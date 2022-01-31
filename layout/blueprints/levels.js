@@ -31,10 +31,11 @@ export const levels = [
         items: [
             { name: "keyToShed" },
             { name: "smallSword" },
+            { name: "smallSword" },
             { name: "redpotion" },
             { name: "greenpotion" },
             { name: "mushroom" },
-            { name: "crystalBall" },
+            // { name: "crystalBall" },
             { name: "gold3" },
             { name: "bagOfGems" },
             { name: "bow" },
@@ -53,12 +54,12 @@ export const levels = [
             },
             { 
                 name: "portal", location: { x: 19.5, y: 0, z: -6.5}, 
-                attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } 
+                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
             }
         ],
         entities: [
             { name: "john" },
-            // { name: "evilOne" },
+            { name: "evilOne" },
             { name: "shopkeep" }
             // { name: "rosenBot" }
         ]
@@ -108,10 +109,10 @@ export const levels = [
                 name: "archway", location: { x: 16, y: 0, z: 4 },
                 attributes: { routeTo: { level: 0, location: { x: 3, y: 0, z: 4} } } 
             },
-            // { 
-            //     name: "archway", location: { x: 16, y: 0, z: -4 },
-            //     attributes: { routeTo: { level: 2, location: { x: 0, y: 0, z: 0} } } 
-            // }
+            { 
+                name: "archway", location: { x: 16, y: 0, z: -4 },
+                attributes: { routeTo: { level: 2, location: { x: 0, y: 0, z: 0} } } 
+            }
         ],
         entities: [
             { name: "john" },
@@ -192,6 +193,49 @@ export const levels = [
                     elevation: 0,
                     color: "green",
                     gltf: 'water.glb',
+                    scale: 100
+                }
+            }
+        },
+        items: [
+
+        ],
+        structures: [
+            { 
+                name: "portal", location: { x: -21.5, y: 0, z: -6.5},
+                attributes: { routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } 
+            }
+        ],
+        entities: [
+
+        ]
+    },
+    {
+        level: 4,
+        width: 26, //26
+        length: 26, //26
+        description: "Lavafield",
+        background: 'clouds.png',
+        terrain: {
+            name: 'floor',
+            type: 'floor',
+            description: 'lavafield',
+            gltf: 'lavafield.glb',
+            attributes: {
+                scale: 100,
+                borderTrees: true,
+                light: {
+                    sunLight: true,
+                    overheadPointLight: false,
+                },
+                fog: {
+                    color: 'red',
+                    density: 2
+                },
+                water: {
+                    elevation: 0,
+                    color: "red",
+                    gltf: 'lava.glb',
                     scale: 100
                 }
             }

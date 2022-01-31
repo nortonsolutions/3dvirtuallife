@@ -124,7 +124,7 @@ database(mongoose, (db) => {
           app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el[0] != socket.id);
           if (app.rooms[socket.nsp.name][index].length > 0 && record[2] == true) assignNewFirst(index);
           notifyRoomMembers(index, 'removeHero', record[1]);
-          socket.nsp.emit('chat', { message: `<dropped out of the game>`, playerName });
+          socket.nsp.emit('chat', { message: `<left the area>`, playerName });
         }
       })
     }
@@ -257,6 +257,23 @@ database(mongoose, (db) => {
 
       console.log(`Disconnecting ${socket.id}`)
     });
+
+
+    socket.on('death', data => {
+      app.layouts[socket.nsp.name][data.level][0].entities = app.layouts[socket.nsp.name][data.level][0].entities.filter(el => el.attributes.layoutId != data.layoutId);
+      notifyRoomMembers(data.level, 'death', data);
+    })
+
+    socket.on('updateStructureAttributes', data => {
+      // update the stored layout for late-joiners
+      let index = app.layouts[socket.nsp.name][data.level][0].structures.findIndex(el => el.attributes.layoutId == data.layoutId);
+      let structure = app.layouts[socket.nsp.name][data.level][0].structures[index];
+      structure.attributes = {...structure.attributes, ...data.payload};
+      
+      // notify existing room members
+      notifyRoomMembers(data.level, 'updateStructureAttributes', data);
+    })
+
   })
 
 })
