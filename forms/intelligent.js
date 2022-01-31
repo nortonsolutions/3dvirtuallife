@@ -476,7 +476,11 @@ export class IntelligentForm extends AnimatedForm{
 
             });
         }
-        if (this.objectSubtype == "local") this.cacheHero();
+
+        if (this.objectType == "hero" && this.objectSubtype == "local") {
+            this.cacheHero();
+            this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
+        }
 
     }
     
@@ -522,11 +526,27 @@ export class IntelligentForm extends AnimatedForm{
                 }
             }
     
-            if (this.objectSubtype == "local") this.cacheHero();
-    
+            if (this.objectType == "hero" && this.objectSubtype == "local") {
+                this.cacheHero();
+                this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
+            }
     
         }
 
+    }
+
+    returnTemplate() {
+
+        return {
+            name: this.objectName,
+            type: this.objectType,
+            location: this.location,
+            attributes: this.attributes,
+            gltf: this.template.gltf,
+            inventory: this.inventory,
+            spells: this.spells,
+            equipped: this.equipped
+        }
     }
 
 }

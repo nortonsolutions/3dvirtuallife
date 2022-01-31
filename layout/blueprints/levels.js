@@ -41,7 +41,7 @@ export const levels = [
             { name: "bow" },
             { name: "arrow25" },
             // { name: "orb" },
-            // { name: "helmet" }
+            { name: "helmet" }
 
         ],
         structures: [

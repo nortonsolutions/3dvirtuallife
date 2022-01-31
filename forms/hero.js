@@ -398,19 +398,7 @@ export class Hero extends IntelligentForm {
 
 
     
-    returnTemplate() {
 
-        return {
-            name: this.name,
-            type: "hero",
-            location: this.location,
-            attributes: this.attributes,
-            gltf: this.template.gltf,
-            inventory: this.inventory,
-            spells: this.spells,
-            equipped: this.equipped
-        }
-    }
 
     /** updateHeroStats sends hero statistics out; effective is connsidered the stat */
     updateHeroStats = (stat) => {

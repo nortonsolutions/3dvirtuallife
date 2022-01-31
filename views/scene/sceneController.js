@@ -157,6 +157,13 @@ export class SceneController {
 
     addEventListeners() {
 
+        /**  */
+        this.socket.on('updateHeroTemplate', heroTemplate => {
+            this.scene.removeFromScenebyLayoutId(heroTemplate.attributes.layoutId);
+            heroTemplate.subtype = "remote";
+            this.seedForm(heroTemplate, true);
+        });
+
         // data: { itemName, position: item.model.position, rotation: item.model.rotation })
         this.socket.on('launch', data => {
             this.hero.launch(data.itemName, null, [], false, data);
@@ -270,9 +277,20 @@ export class SceneController {
         }
     }
 
-    addToScene(form, addToForms = true, addToScene = true) {
+    addToScene(form, addToForms = true, addToScene = true, reseed = false) {
         
-        /* Hero is special case already added to scene via controls */
+        if (reseed) {
+            this.forms = this.forms.filter(el => el.attributes.layoutId != form.attributes.layoutId);
+            
+            if (form.objectSubtype == "remote") {
+                this.others = this.others.filter(el => el.attributes.layoutId != form.attributes.layoutId);
+            } else if (form.objectType == "friendly" || form.objectType == "beast") {
+                this.entities = this.entities.filter(el => el.attributes.layoutId != form.attributes.layoutId);
+            } else if (form.objectType == "floor" || form.objectType == "structure") {
+                this.structureModels = this.structureModels.filter(el => el.attributes.layoutId != form.attributes.layoutId);
+            }
+        }
+
         if (addToScene) this.scene.add( form.model );
         if (addToForms) this.forms.push( form );
 
@@ -416,8 +434,11 @@ export class SceneController {
 
     /** 
      * Load model of each form and add to scene.
+     * 
+     * reseed is set for updates as when character equips/unequips
+     * 
      */ 
-    seedForm(formTemplate) {
+    seedForm(formTemplate, reseed = false) {
 
         var form;
         if (formTemplate.attributes.moves) {
@@ -437,8 +458,8 @@ export class SceneController {
                 })
             }
 
-            this.addToScene(form);
-
+            this.addToScene(form, true, true, reseed);
+        
             if (form.attributes.contentItems) {
                 form.attributes.contentItems.forEach(contentItemName => {
                     let contentItem = this.getTemplateByName(contentItemName);
