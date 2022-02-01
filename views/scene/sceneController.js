@@ -125,6 +125,8 @@ export class SceneController {
         
         let itemTemplate = this.getTemplateByName(data.itemName);
 
+        if (data.attributes) itemTemplate.attributes = {...itemTemplate.attributes, ...data.attributes};
+
         if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
         this.seedForm(itemTemplate).then(form => {
 
@@ -460,18 +462,26 @@ export class SceneController {
 
             this.addToScene(form, true, true, reseed);
         
-            if (form.attributes.contentItems) {
+            if (this.firstInRoom && form.attributes.contentItems) {
                 form.attributes.contentItems.forEach(contentItemName => {
                     let contentItem = this.getTemplateByName(contentItemName);
-                    contentItem.location = { x: 0, y: 20, z: 0 };
-                    this.loadFormByName(contentItem.name, (contentForm) => {
 
-                        contentForm.model.position.x = form.model.position.x;
-                        contentForm.model.position.z = form.model.position.z;
-                        contentForm.model.position.y = form.model.position.y + contentItem.attributes.elevation;
-                        contentForm.attributes.contained = true;
-                        this.addToScene(contentForm);
-                    })
+                    /** data: {location ..., itemName..., } */
+                    /** local means it happened in this system and will be broadcast */ 
+                    
+                    let position = new THREE.Vector3();
+                    position.copy(form.model.position);
+                    position.y += contentItem.attributes.elevation;
+                    
+                    let data = {
+                        itemName: contentItem.name,
+                        location: this.getLocationFromPosition(position), 
+                        position,
+                        attributes: {contained: true}
+                    }
+                    
+                    this.dropItemToScene(data);
+
                     resolve(form);
 
                 });
@@ -561,7 +571,12 @@ export class SceneController {
         return JSON.parse(JSON.stringify(this.allObjects[name]));
     }
 
-    loadFormByName(formName, callback, local = true) {
+    /** 
+     * loadFormByName is useful for loading objects in the local VM,
+     * as with launching or equipping.  Use dropItemToScene to broadcast
+     * with a shared layoutId.
+     */
+    loadFormByName(formName, callback) {
 
         let formTemplate = this.getTemplateByName(formName);
         this.socket.emit('nextLayoutId', this.level, layoutId => {
@@ -614,6 +629,15 @@ export class SceneController {
             local
         } );
         this.scene.add( item.model );
+    }
+
+    // Calculate hero location using grid coordinates
+    getLocationFromPosition(position) {
+        var location = {};
+        location.x = position.x / multiplier,
+        location.y = position.y / multiplier,
+        location.z = position.z / multiplier
+        return location;
     }
 
 }

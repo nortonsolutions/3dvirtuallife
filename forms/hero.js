@@ -585,7 +585,7 @@ export class Hero extends IntelligentForm {
                 this.unequip(parentBodyPart);
                 this.addToInventory(parentItemName, 0, 1);
             } else {
-                // load the object model to the scene, copy the position/rotation of hero,
+                // load the object model to the scene, copy the position/rotation of hero
                 this.sceneController.loadFormByName(itemName, (item) => {
 
                         item.model.position.copy(this.model.position);

@@ -243,7 +243,7 @@ database(mongoose, (db) => {
 
     /** data: { layoutId: ..., rotation: ..., velocity: ..., position: ..., level: ...} */
     socket.on('updateHeroPosition', (data) => {
-      console.log(`${socket.id} with ${data.layoutId} updating position`);
+      // console.log(`${socket.id} with ${data.layoutId} updating position`);
       notifyRoomMembers(data.level, 'updateHeroPosition', data);
     })
 

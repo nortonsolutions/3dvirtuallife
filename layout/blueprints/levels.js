@@ -60,7 +60,8 @@ export const levels = [
         entities: [
             { name: "john" },
             { name: "evilOne" },
-            { name: "shopkeep" }
+            { name: "shopkeep" },
+            // { name: "lobot" }
             // { name: "rosenBot" }
         ]
     },

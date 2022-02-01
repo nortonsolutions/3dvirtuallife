@@ -150,7 +150,7 @@ export class IntelligentForm extends AnimatedForm{
                     this.model.translateX( -this.velocity.x * delta );
                     this.model.translateZ( -this.velocity.z * delta );
                 } else {
-                    console.dir(fIntersects[0]);
+                    // console.dir(fIntersects[0]);
                 }
                 this.velocity.x = 0;
                 this.velocity.y = 0;
