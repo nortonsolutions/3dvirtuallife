@@ -588,12 +588,20 @@ export class SceneController {
     }
 
     allFriendliesInRange(range, position) { 
+        
         var response = [];
         this.entities.filter(el => el.objectType != "beast").forEach(entity => {
             if (position.distanceTo(entity.model.position) < range) {
                 response.push(entity);
             }
         })
+
+        this.others.forEach(entity => {
+            if (position.distanceTo(entity.model.position) < range) {
+                response.push(entity);
+            }
+        })
+
         return response;
     }
 
@@ -616,6 +624,30 @@ export class SceneController {
     }
 
     addToProjectiles(item, local = true) {
+
+        /**
+         * 
+         * Sprites may be configured in attributes. e.g.,
+         * 
+         * continuousSprites: true,
+         * sprites: [{ 
+                name: "greenExplosion",
+                regex: "",
+                frames: 10,
+                scale: 300,
+                elevation: 30,
+                flip: false,
+            }]
+         */
+
+        if (item.attributes.continuousSprites) {
+            /** Add a single sprite to the center of the model and display for the given time (seconds) */
+            // addSpritesSingle = (name, frames, scale, elevation, flip, model, time) => {
+
+            item.attributes.sprites.forEach(sprite => {
+                this.formFactory.addSpritesSingle(sprite.name, sprite.frames, sprite.scale, sprite.elevation, sprite.flip, item.model, 3);
+            })
+        }
 
         // Starting direction
         let direction = this.scene.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));

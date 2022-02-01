@@ -103,6 +103,15 @@ database(mongoose, (db) => {
       }
     }
 
+    const getSocketByLayoutId = function (roomNumber, layoutId) {
+      if (app.rooms[socket.nsp.name][roomNumber]) {
+        let filteredList = app.rooms[socket.nsp.name][roomNumber].filter(el => el[1].attributes.layoutId == layoutId);
+        if (filteredList && filteredList[0]) return filteredList[0][0]; // [socket.id,heroTemplate,firstInRoom]
+      } else {
+        return null;
+      }
+    }
+
     const othersInRoom = function (roomNumber) {
       let sender = socket.id;
       let nsp = socket.nsp.name;
@@ -284,6 +293,11 @@ database(mongoose, (db) => {
       notifyRoomMembers(data.level, 'launch', data);
     })
 
+    // data: { level: this.sceneController.level, layoutId: entity.attributes.layoutId, spell });    
+    socket.on('castSpell', data => {
+      let socketNumber = getSocketByLayoutId(data.level, data.layoutId);
+      if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('castSpell', data.spell);
+    })
   })
 
 })

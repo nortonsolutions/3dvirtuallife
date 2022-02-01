@@ -120,7 +120,7 @@ function newHeroTemplate(name,height) {
             experience: 0,
             stats: {
                 health: "3/5/0",  // min/max/boost
-                mana: "0/0/0",
+                mana: "10/10/0",
                 strength: "1/1/0",
                 agility: "3/3/0",
                 defense: "0/0/0"
@@ -136,7 +136,7 @@ function newHeroTemplate(name,height) {
         gltf: 'robot.glb',
         model: null,
         inventory: [],
-        spells: [],
+        spells: [{"itemName":"healAllSpell"},{"itemName":"poisonProjectileSpell"}],
         equipped: {}
 
     }

@@ -180,7 +180,7 @@ export const Items = {
             sprites: [{ 
                 name: "Heal",
                 regex: "",
-                frames: 10,
+                frames: 15,
                 scale: 50,
                 elevation: 30,
                 flip: false,
@@ -202,7 +202,7 @@ export const Items = {
             sprites: [{ 
                 name: "Heal",
                 regex: "",
-                frames: 10,
+                frames: 15,
                 scale: 50,
                 elevation: 30,
                 flip: false,

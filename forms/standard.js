@@ -68,8 +68,8 @@ export class StandardForm {
                 this.setFloorToReceiveShadow();
                 
             }
-            this.computeVertexNormals(this.model);
-            this.setToCastShadows();
+            // this.computeVertexNormals(this.model);
+            // this.setToCastShadows();
             callback();
 
         }, undefined, function ( error ) {

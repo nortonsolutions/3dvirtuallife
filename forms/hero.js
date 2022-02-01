@@ -82,7 +82,193 @@ export class Hero extends IntelligentForm {
         
     }
 
+    takeEffect(item) {
+
+        // What is the item effect?
+        let [stat, change] = item.attributes.effect.split("/");
+
+        switch (stat) {
+
+            case "scale":
+
+                let torso = this.model.getObjectByName('Torso');
+                torso.scale.x *= change;
+                torso.scale.y *= change;
+                torso.scale.z *= change;
+
+                this.attributes.height *= change;
+                this.changeStatBoost("strength", 2);
+                this.changeStat("health", 2);
+                break;
+
+            case "mana": 
+                this.fadeToAction("ThumbsUp", 0.2);
+                this.changeStat(stat, change, false);
+                break;
+
+            case "damage":
+                this.fadeToAction("Yes", 0.2);
+                
+                if (item.attributes.range) { // general attack against all in range
+                    let entitiesInRange = this.sceneController.allEnemiesInRange(item.attributes.range, this.model.position);
+                    entitiesInRange.forEach(entity => {
+                        this.inflictDamage(entity, change);
+                    })
+
+                } else { // standard attack upon 'selectedObject'
+                    this.inflictDamage(this.selectedObject, change);
+                }
+
+                break;
+
+            case "health":
+                this.fadeToAction("Yes", 0.2);
+                if (this.changeStat(stat, change, false) <= 0) {
+                    this.fadeToAction("Dance", 0.2);
+                }
+
+                break;
+        }
+    }
+
+    /**
+     * e.g.
+     * attributes: {
+            manaCost: 1,
+            effect: "damage/3",
+            range: 80,
+            throwable: true,
+            throwableAttributes: {
+                pitch: .5, // angle up (percentage of 90 degrees)
+                weight: 1, // lbs
+                distance: 1200, // px
+                speed: 4 // 1 = full walking speed
+            },
+            sprites: [{ 
+                name: "greenExplosion",
+                regex: "",
+                frames: 10,
+                scale: 300,
+                elevation: 30,
+                flip: false,
+                time: 1
+            },
+            { 
+                name: "Heal",
+                regex: "",
+                frames: 15,
+                scale: 50,
+                elevation: 30,
+                flip: false,
+                time: 1
+            }]
+        }
+     */
+
+    castSpell(spell, local = true) {
+        
+        if (local) {
+            if (this.getStat("mana") < spell.attributes.manaCost) return;
+            this.changeStat('mana', -spell.attributes.manaCost);
+        }
+
+        if (spell.attributes.throwable) {
+            this.launch(spell.name);
+        } else {
+            if (local && spell.attributes.affectAllInParty) { // general effect against all in range
+                let inRange = this.sceneController.allFriendliesInRange(spell.attributes.range, this.model.position);
+                inRange.forEach(entity => {
+                    this.sceneController.socket.emit('castSpell', { level: this.sceneController.level, layoutId: entity.attributes.layoutId, spell });    
+                });
+            }
+
+            this.takeEffect(spell);
+
+            // Sprite effects:
+            if (spell.attributes.sprites) {
+                spell.attributes.sprites.forEach(spriteConfig => {
+                    // addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false, time, animates = true) 
+                    this.sceneController.formFactory.addSpritesGeneric(this.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
+                })
+            }
+        }
+    }
+
+    useItem(item, keyString) {
+        
+        if (item.attributes.throwable) {
+            this.launch(item.name, bodyPart);
+        } else {
+            this.takeEffect(item);
+            if (this.removeFromInventory(item.name) == -1) this.unequip(keyString);
+            
+            // Sprite effects:
+            if (item.attributes.sprites) {
+                item.attributes.sprites.forEach(spriteConfig => {
+                    this.sceneController.formFactory.addSpritesGeneric(this.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
+                })
+            }
+        }
+    }
+
+    /** 
+     * launch is used for throwables, like greenpotion, arrows, spells, etc.
+     * Every throwable item has specific properties including quantity,
+     * raised pitch, and weight (which affects how the trajectory declines).
+     * 
+     * Throwing an item affects inventory similarly to using a hotkey potion,
+     * pulling from inventory until the last item is used (or all mana is used).
+     * 
+     * When local = false, data is expected to define rotation/position.
+     */
+    launch(itemName, bodyPart = null, [parentBodyPart, parentItemName] = [], local = true, data) {
+
+        if (local) {
+            // If this is a child item, check inventory first and bail if needed
+            if (parentBodyPart && this.getInventoryQuantity(itemName) == 0) {
+                this.unequip(parentBodyPart);
+                this.addToInventory(parentItemName, 0, 1);
+            } else {
+                // load the object model to the scene, copy the position/rotation of hero
+                this.sceneController.loadFormByName(itemName, (item) => {
+
+                    item.model.position.copy(this.model.position);
+                    item.model.rotation.copy(this.model.rotation);
+                    item.model.position.y += this.attributes.height;
+
+                    this.sceneController.socket.emit('launch', { level: this.sceneController.level, itemName, position: item.model.position, rotation: item.model.rotation })
+                    this.sceneController.addToProjectiles(item);
+                    
+                    if (bodyPart || parentBodyPart) { // remove from inventory, unequip when out
+                        if (this.removeFromInventory(itemName) == -1) {
+                            this.unequip(parentBodyPart? parentBodyPart : bodyPart);
+    
+                            // re-equip parent item to inventory if applicable
+                            if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
+                        }
+                    }
+                });
+
+            }
+
+        } else {
+            this.sceneController.loadFormByName(itemName, (item) => {
+
+                item.model.position.copy(data.position);
+                item.model.rotation.copy(data.rotation);
+
+                this.sceneController.addToProjectiles(item, local);
+            });
+        }
+
+    }
+
+
     addEventListeners() {
+
+        this.sceneController.socket.on('castSpell', spell => {
+            this.castSpell(spell, false);
+        })
 
         this.sceneController.eventDepot.addListener('hotkey', (data) => { // key = number, i.e. 1 => equipped.f1key
 
@@ -91,90 +277,19 @@ export class Hero extends IntelligentForm {
             let itemName = this.equipped[keyString][0];
 
             if (itemName) {
-                let item = this.gameObjects[itemName];
-                let itemType = item.type;
-    
-                if (itemType == "spell" && this.getStat("mana") < item.attributes.manaCost) return;
+                let itemTemplate = this.gameObjects[itemName];
+                let itemType = itemTemplate.type;
 
-                // Using this will diminish the item quantity in inventory for items, or mana for spells
-                if (itemType == "item" || itemType == "spell") {
-    
-                    // What is the item effect?
-                    let [stat, change] = item.attributes.effect.split("/");
-    
-                    switch (stat) {
+                switch (itemType) {
+                    case "spell": 
+                        this.castSpell(itemTemplate);
+                        break;
 
-                        case "scale":
+                    case "item": 
+                        this.useItem(itemTemplate, keyString);
+                        break;
+                }
 
-                            // Find the head
-                            // let head = this.model.getObjectByName('Head');
-                            // head.scale.x *= change;
-                            // head.scale.y *= change;
-                            // head.scale.z *= change;
-
-                            let torso = this.model.getObjectByName('Torso');
-                            torso.scale.x *= change;
-                            torso.scale.y *= change;
-                            torso.scale.z *= change;
-
-                            this.attributes.height *= change;
-                            this.changeStatBoost("strength", 2);
-                            this.changeStat("health", 2);
-                            break;
-                        case "mana": 
-                            this.fadeToAction("ThumbsUp", 0.2); // TODO: Use sprites to spritz things up
-                            this.changeStat(stat, change, false);
-                            break;
-    
-                        case "damage":
-                            this.fadeToAction("Yes", 0.2);
-                            
-                            if (item.attributes.range) { // general attack against all in range
-                                let entitiesInRange = this.sceneController.allEnemiesInRange(item.attributes.range, this.model.position);
-                                entitiesInRange.forEach(entity => {
-                                    this.inflictDamage(entity, change);
-                                })
-
-                            } else { // standard attack upon 'selectedObject'
-                                this.inflictDamage(this.selectedObject, change);
-                            }
-
-                            break;
-
-                        case "health":
-                            this.fadeToAction("Yes", 0.2);
-                                
-                            if (item.attributes.range) { // general effect against all in range
-                                let entitiesInRange = this.sceneController.allFriendliesInRange(item.attributes.range, this.model.position);
-                                entitiesInRange.forEach(entity => {
-                                    if (entity.changeStat(stat, change, false) <= 0) {
-                                        // this.fadeToAction("Dance", 0.2);
-                                    }
-                                })
-
-                            } else { // standard effect upon self
-                                if (this.changeStat(stat, change, false) <= 0) {
-                                    this.fadeToAction("Dance", 0.2);
-                                }
-                            }
-
-                            break;
-                    }
-
-                    // Sprite effects:
-                    if (item.attributes.sprites) {
-                        item.attributes.sprites.forEach(spriteConfig => {
-                            // addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false, time, animates = true) 
-                            this.sceneController.formFactory.addSpritesGeneric(this.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
-                        })
-                    }
-                    
-                    if (itemType == "item") {
-                        if (this.removeFromInventory(itemName) == -1) this.unequip(keyString);
-                    } else if (itemType == "spell") {
-                        this.changeStat('mana', -item.attributes.manaCost);
-                    }
-                } 
             }
         })
 
@@ -316,7 +431,6 @@ export class Hero extends IntelligentForm {
                             }
                         }
                     })
-    
                 }
             }
         })
@@ -565,60 +679,6 @@ export class Hero extends IntelligentForm {
         this.spells.push({
             itemName: spell.name
         });
-    }
-
-    /** 
-     * launch is used for throwables, like greenpotion, arrows, spells, etc.
-     * Every throwable item has specific properties including quantity,
-     * raised pitch, and weight (which affects how the trajectory declines).
-     * 
-     * Throwing an item affects inventory similarly to using a hotkey potion,
-     * pulling from inventory until the last item is used (or all mana is used).
-     * 
-     * When local = false, data is expected to define rotation/position.
-     */
-    launch(itemName, bodyPart = null, [parentBodyPart, parentItemName] = [], local = true, data) {
-
-        if (local) {
-            // If this is a child item, check inventory first and bail if needed
-            if (parentBodyPart && this.getInventoryQuantity(itemName) == 0) {
-                this.unequip(parentBodyPart);
-                this.addToInventory(parentItemName, 0, 1);
-            } else {
-                // load the object model to the scene, copy the position/rotation of hero
-                this.sceneController.loadFormByName(itemName, (item) => {
-
-                        item.model.position.copy(this.model.position);
-                        item.model.rotation.copy(this.model.rotation);
-                        item.model.position.y += this.attributes.height;
-
-                        this.sceneController.socket.emit('launch', { level: this.sceneController.level, itemName, position: item.model.position, rotation: item.model.rotation })
-                        this.sceneController.addToProjectiles(item);
-        
-                        if (bodyPart || parentBodyPart) { // remove from inventory, unequip when out
-                            if (this.removeFromInventory(itemName) == -1) {
-                                this.unequip(parentBodyPart? parentBodyPart : bodyPart);
-        
-                                // re-equip parent item to inventory if applicable
-                                if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
-                            }
-                        }
-
-
-                });
-
-            }
-
-        } else {
-            this.sceneController.loadFormByName(itemName, (item) => {
-
-                item.model.position.copy(data.position);
-                item.model.rotation.copy(data.rotation);
-
-                this.sceneController.addToProjectiles(item, local);
-            });
-        }
-
     }
 
     inflictDamage(entity, hitPointReduction) {
