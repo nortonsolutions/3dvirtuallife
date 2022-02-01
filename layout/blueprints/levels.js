@@ -46,6 +46,7 @@ export const levels = [
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0} },
+            // { name: "tavern", location: { x: 3, y: 0, z: -3} },
             { name: "rock1" },
             // { name: "tree1" },
             { 
@@ -54,7 +55,7 @@ export const levels = [
             },
             { 
                 name: "portal", location: { x: 19.5, y: 0, z: -6.5}, 
-                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
+                attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } 
             }
         ],
         entities: [

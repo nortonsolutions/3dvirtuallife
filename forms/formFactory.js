@@ -39,7 +39,7 @@ export class FormFactory {
                 form = new AnimatedForm(template, this.sceneController);
                 break;
             case "water":
-                form = new WaterForm(template, this.sceneController); // ,"Water" ); // , "Refractor");
+                form = new WaterForm(template, this.sceneController ); // ,"Water" ); // , "Refractor");
                 break;
             default:
                 form = new StandardForm(template, this.sceneController);

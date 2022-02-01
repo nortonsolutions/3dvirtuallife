@@ -23,6 +23,27 @@ export const Structures = {
     
     },
 
+    tavern: {
+        name: 'tavern',
+        gltf: 'tavern.glb',
+        description: 'Old-fashioned tavern and shop',
+        type: 'structure',
+        attributes: {
+            animates: false,
+            scale: 20,
+            elevation: 0
+            // sprites: [{ 
+            //     name: "Fount",
+            //     regex: "fount",
+            //     frames: 10,
+            //     scale: 5,
+            //     elevation: 1,
+            //     flip: false
+            // }]
+        }
+    
+    },
+
     grate: {
         name: 'grate',
         gltf: 'grate.gltf',

@@ -59,6 +59,8 @@ export class StandardForm {
                 this.model.position.z = this.template.location.z * multiplier;
                 this.model.position.y = this.determineElevationFromBase() + this.attributes.elevation;
 
+                this.tweakPosition();
+
                 console.log(`Placing ${this.objectName} @ ${this.model.position.x},${this.model.position.y},${this.model.position.z}` );
             
             } else if (this.objectName == "floor") { // floor is the only form without location
@@ -73,6 +75,54 @@ export class StandardForm {
         }, undefined, function ( error ) {
             console.error( error );
         });
+    }
+
+    /** 
+     * Test the position to ensure it is not inside a wall;
+     * test all four directions (+/- x, +/- z); if three intersect,
+     * then move some distance in the direction of the shortest vector.
+     * 
+     */
+    tweakPosition() {
+
+        
+        let directions = [
+            new THREE.Vector3( 1, 0, 0 ),
+            new THREE.Vector3( -1, 0, 0 ),
+            new THREE.Vector3( 0, 0, 1 ),
+            new THREE.Vector3( 0, 0, -1 )
+        ]
+
+        let tweakRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, 40 );
+        tweakRaycaster.ray.origin.copy(this.model.position);
+
+        let hits = 0;
+        let result = null;
+        let minDist = Infinity;
+
+        for (let d = 0; d < 4; d++) {
+            tweakRaycaster.ray.direction = directions[d];
+
+            let tweakIntersections = tweakRaycaster.intersectObject( this.sceneController.floor.model, true );
+            if (tweakIntersections && tweakIntersections.length>0) {
+                hits++;
+                if (tweakIntersections[0].distance < minDist) {
+                    minDist = tweakIntersections[0].distance;
+                    result = directions[d];
+                };
+            }
+        }
+
+        hits = 0;
+        result = null;
+        minDist = Infinity;
+
+        if (hits>=3) {
+            // Move the item in the direction of the shortest vector (min)
+            this.model.translateOnAxis(result, minDist);
+            console.log(`Tweaking ${this.objectName} ${minDist} on axis ${result.x},${result.z}`);
+        }
+
     }
 
     computeVertexNormals(el) {
