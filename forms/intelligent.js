@@ -118,6 +118,10 @@ export class IntelligentForm extends AnimatedForm{
                     this.velocity.x *= Math.max((100-(distanceBelowWater*3))/100,.005);
                     this.velocity.y *= Math.max((100-(distanceBelowWater*3))/100,.005);
                     this.velocity.z *= Math.max((100-(distanceBelowWater*3))/100,.005);
+
+                    if (this.sceneController.water.attributes.lava) {
+                        this.changeStat('health',-distanceBelowWater/1000);
+                    }
                 }
     
             }

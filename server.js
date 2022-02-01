@@ -274,6 +274,11 @@ database(mongoose, (db) => {
 
 
     socket.on('death', data => {
+      
+      if (data.hero) {  // remove from room/layouts
+        removeFromRooms();
+      }
+
       app.layouts[socket.nsp.name][data.level][0].entities = app.layouts[socket.nsp.name][data.level][0].entities.filter(el => el.attributes.layoutId != data.layoutId);
       notifyRoomMembers(data.level, 'death', data);
     })

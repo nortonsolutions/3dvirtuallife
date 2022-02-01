@@ -268,7 +268,7 @@ export class SceneController {
     addWater(callback) {
         if (this.layout.terrain.attributes.water) {
             this.refractor = null;
-            this.waterElevation = this.layout.terrain.attributes.water.elevation;
+            this.waterElevation = this.layout.terrain.attributes.water.attributes.elevation;
             this.water = this.formFactory.newForm("water", this.layout.terrain.attributes.water);
             this.water.load(() => {
                 this.addToScene(this.water, false);

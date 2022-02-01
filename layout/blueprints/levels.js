@@ -6,8 +6,8 @@ export const levels = [
 
     {
         level: 0,
-        width: 6, //26
-        length: 6, //26
+        width: 26, //26
+        length: 26, //26
         description: "Valley of Mist",
         background: 'clouds.png',
         terrain: {
@@ -29,12 +29,11 @@ export const levels = [
             }
         },
         items: [
-            { name: "keyToShed" },
-            { name: "smallSword" },
+            { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
             { name: "smallSword" },
             { name: "redpotion" },
             { name: "greenpotion" },
-            { name: "mushroom" },
+            // { name: "mushroom" },
             // { name: "crystalBall" },
             { name: "gold3" },
             { name: "bagOfGems" },
@@ -56,13 +55,19 @@ export const levels = [
             { 
                 name: "portal", location: { x: 19.5, y: 0, z: -6.5}, 
                 attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "portal", location: { x: -19.5, y: 0, z: -6.5}, 
+                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
             }
         ],
         entities: [
             { name: "john" },
             { name: "evilOne" },
+            { name: "evilOne" },
             { name: "shopkeep" },
-            // { name: "lobot" }
+            // { name: "lobot" },
+            { name: "blueShirt" },
             // { name: "rosenBot" }
         ]
     },
@@ -192,10 +197,12 @@ export const levels = [
                     density: 2
                 },
                 water: {
-                    elevation: 0,
-                    color: "green",
-                    gltf: 'water.glb',
-                    scale: 100
+                    attributes: {
+                        elevation: 0,
+                        color: "green",
+                        scale: 100
+                    },
+                    gltf: 'water.glb'
                 }
             }
         },
@@ -232,13 +239,17 @@ export const levels = [
                 },
                 fog: {
                     color: 'red',
-                    density: 2
+                    density: 1.2
                 },
                 water: {
-                    elevation: 0,
-                    color: "red",
-                    gltf: 'lava.glb',
-                    scale: 100
+
+                    attributes: {
+                        elevation: 0,
+                        color: "green",
+                        scale: 100,
+                        lava: true
+                    },
+                    gltf: 'lava.glb'
                 }
             }
         },
@@ -248,7 +259,7 @@ export const levels = [
         structures: [
             { 
                 name: "portal", location: { x: -21.5, y: 0, z: -6.5},
-                attributes: { routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } 
+                attributes: { routeTo: { level: 0, location: { x: -19.5, y: 0, z: -6.5 } } } 
             }
         ],
         entities: [

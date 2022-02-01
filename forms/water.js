@@ -42,17 +42,18 @@ export class WaterForm {
 
             }
 
-            this.model.scale.x = this.template.scale;
-            this.model.scale.y = this.template.scale;
-            this.model.scale.z = this.template.scale;
+            this.model.scale.x = this.template.attributes.scale;
+            this.model.scale.y = this.template.attributes.scale;
+            this.model.scale.z = this.template.attributes.scale;
             this.model.objectName = 'water';
             this.model.objectType = 'water';
+            this.attributes = this.model.attributes = this.template.attributes;
 
 
 
             this.animations = gltf.animations;
            
-            this.model.position.y = this.template.elevation;
+            this.model.position.y = this.template.attributes.elevation;
             callback();
 
         }, undefined, function ( error ) {
