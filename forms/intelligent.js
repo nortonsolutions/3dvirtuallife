@@ -540,6 +540,7 @@ export class IntelligentForm extends AnimatedForm{
         return {
             name: this.objectName,
             type: this.objectType,
+            subtype: this.objectSubtype,
             location: this.location,
             attributes: this.attributes,
             gltf: this.template.gltf,
