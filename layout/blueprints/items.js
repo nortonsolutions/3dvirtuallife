@@ -162,7 +162,7 @@ export const Items = {
                 scale: 300,
                 elevation: 30,
                 flip: false,
-                time: 1
+                time: 3
             }]
         }
     },
@@ -288,7 +288,8 @@ export const Items = {
                 pitch: .5, // angle up (percentage of 90 degrees)
                 weight: 1, // lbs
                 distance: 1200, // px
-                speed: 4 // 1 = full walking speed
+                speed: 4, // 1 = full walking speed
+                chanceToLeaveOnGround: 0.5
             },
             elevation: 10,
             effect: "damage/5",
@@ -347,7 +348,16 @@ export const Items = {
             animates: false,
             scale: 100,
             elevation: 5,
-            effect: "light/15"
+            effect: "light/15",
+            sprites: [{ 
+                name: "flame",
+                frames: 40,
+                scale: .06,
+                translateZ: -.26,
+                flip: true,
+                showOnSeed: true,
+                elevation: .04
+            }]
         } 
     },
     mace: {

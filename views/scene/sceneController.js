@@ -159,7 +159,12 @@ export class SceneController {
 
     addEventListeners() {
 
-        /**  */
+        // data: { level: this.sceneController.level, spriteConfig, spritePosition });
+        // addSprites = (model, spriteConfig, scene = null, broadcast = false, position = null) => {
+        this.socket.on('addSprites', data => {
+            this.formFactory.addSprites(null, data.spriteConfig, this.scene, false, data.spritePosition);
+        })
+        
         this.socket.on('updateHeroTemplate', heroTemplate => {
             this.scene.removeFromScenebyLayoutId(heroTemplate.attributes.layoutId);
             heroTemplate.subtype = "remote";
@@ -456,7 +461,7 @@ export class SceneController {
 
             if (form.attributes.sprites) {
                 form.attributes.sprites.forEach(spriteConfig => {
-                    this.formFactory.addSpritesGeneric(form.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip);
+                    if (spriteConfig.showOnSeed) this.formFactory.addSprites(form.model, spriteConfig);
                 })
             }
 
@@ -641,11 +646,9 @@ export class SceneController {
          */
 
         if (item.attributes.continuousSprites) {
-            /** Add a single sprite to the center of the model and display for the given time (seconds) */
-            // addSpritesSingle = (name, frames, scale, elevation, flip, model, time) => {
-
-            item.attributes.sprites.forEach(sprite => {
-                this.formFactory.addSpritesSingle(sprite.name, sprite.frames, sprite.scale, sprite.elevation, sprite.flip, item.model, 3);
+            item.attributes.sprites.forEach(spriteConfig => {
+                spriteConfig.time = 3;
+                this.formFactory.addSprites(item.model, spriteConfig);
             })
         }
 

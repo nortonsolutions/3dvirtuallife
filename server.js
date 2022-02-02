@@ -303,6 +303,12 @@ database(mongoose, (db) => {
       let socketNumber = getSocketByLayoutId(data.level, data.layoutId);
       if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('castSpell', data.spell);
     })
+
+    // data:  { level: this.sceneController.level, spriteConfig, spritePosition });
+    socket.on('addSprites', data => {
+      notifyRoomMembers(data.level, 'addSprites', data);
+    })
+
   })
 
 })

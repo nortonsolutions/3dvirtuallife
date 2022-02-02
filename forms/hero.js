@@ -58,6 +58,8 @@ export class Hero extends IntelligentForm {
                 this.model.position.y = this.determineElevationFromBase();
             }
 
+            this.actions['Punch'].setEffectiveTimeScale(4);
+
             callback();
 
         }, undefined, function ( error ) {
@@ -187,8 +189,7 @@ export class Hero extends IntelligentForm {
             // Sprite effects:
             if (spell.attributes.sprites) {
                 spell.attributes.sprites.forEach(spriteConfig => {
-                    // addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false, time, animates = true) 
-                    this.sceneController.formFactory.addSpritesGeneric(this.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
+                    this.sceneController.formFactory.addSprites(this.model, spriteConfig, null, true);
                 })
             }
         }
@@ -205,7 +206,7 @@ export class Hero extends IntelligentForm {
             // Sprite effects:
             if (item.attributes.sprites) {
                 item.attributes.sprites.forEach(spriteConfig => {
-                    this.sceneController.formFactory.addSpritesGeneric(this.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale, spriteConfig.elevation, spriteConfig.flip, spriteConfig.time);
+                    this.sceneController.formFactory.addSprites(this.model, spriteConfig, null, true);
                 })
             }
         }
@@ -380,13 +381,14 @@ export class Hero extends IntelligentForm {
     
                         if (this.selectedObject.alive) {
     
-                            this.fadeToAction("Punch", 0.2)
+                            this.fadeToAction("Punch", 0.3);
     
                             let chanceToHit = this.getEffectiveStat('agility') / 10;
                             let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
     
                             // console.dir(this.selectedObject);
                             if (Math.random() < chanceToHit) {
+                                this.selectedObject.model.translateZ(-10);
                                 this.inflictDamage(this.selectedObject, hitPointReduction);
                             }
                         }

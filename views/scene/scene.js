@@ -442,17 +442,18 @@ class Scene {
     handleAction(projectile, entitiesInRange) {
 
         // Sprite effects:
-        if (projectile.item.attributes.sprites) {
+        if (projectile.local && projectile.item.attributes.sprites) {
             projectile.item.attributes.sprites.forEach(spriteConfig => {
-                // addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false, time, animates = true) 
-                this.controller.formFactory.addSpritesGeneric(projectile.item.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale/10, spriteConfig.elevation-20, spriteConfig.flip, spriteConfig.time);
+
+                spriteConfig.scale = spriteConfig.scale/10;
+                spriteConfig.elevation = spriteConfig.elevation-20;
+
+                this.controller.formFactory.addSprites(projectile.item.model, spriteConfig, this, true, projectile.item.model.position);
                 entitiesInRange.forEach(entity => {
-                    this.controller.formFactory.addSpritesGeneric(entity.model, spriteConfig.name, spriteConfig.regex, spriteConfig.frames, spriteConfig.scale/20, spriteConfig.elevation-20, spriteConfig.flip, spriteConfig.time);
+                    this.controller.formFactory.addSprites(entity.model, spriteConfig, this, true, projectile.item.model.position);
                 })
-            })
-            setTimeout(() => {
-                this.scene.remove(projectile.item.model);
-            }, projectile.item.attributes.sprites[0].time * 500);
+            });
+
         }
 
         if (projectile.local) {
@@ -463,12 +464,12 @@ class Scene {
             })
         }
 
-        if (Math.random() < 0.5) {
-            if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
-        } else {  // put the item on the ground for retrieval
+        if (projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround && 
+            Math.random() < projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround) {
             projectile.item.model.position.y = projectile.item.determineElevationFromBase() + projectile.item.attributes.elevation;
+        } else {  // put the item on the ground for retrieval
+            if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
         }
-        
     }
 
 
@@ -520,8 +521,9 @@ class Scene {
     
                 let maxDistance = projectile.item.attributes.throwableAttributes.distance;
     
-                console.log(`traveled: ${projectile.distanceTraveled}, position: ${projectile.item.model.position.x}, ${projectile.item.model.position.y},${projectile.item.model.position.z }`);
-                if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= 0) {
+                // console.log(`traveled: ${projectile.distanceTraveled}, position: ${projectile.item.model.position.x}, ${projectile.item.model.position.y},${projectile.item.model.position.z }`);
+                console.log(`${projectile.item.model.position.y}`)
+                if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= 20) {
                     projectile.distanceTraveled = -1;
                 }
             })

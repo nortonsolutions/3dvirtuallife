@@ -446,9 +446,9 @@ export class IntelligentForm extends AnimatedForm{
                 let scale = item.attributes.equippedScale? item.attributes.equippedScale: 0.1;
                 item.model.scale.copy(new THREE.Vector3( scale, scale, scale ));
 
-                if (itemName == "torch") {
-                    this.sceneController.formFactory.addTorchLight(item.model);
-                } 
+                // if (itemName == "torch") {
+                //     this.sceneController.formFactory.addTorchLight(item.model);
+                // } 
 
                 if (item.attributes.effect && !item.attributes.throwable) { // body parts (non 'key' positions)
                     

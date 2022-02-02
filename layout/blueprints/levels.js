@@ -40,7 +40,8 @@ export const levels = [
             { name: "bow" },
             { name: "arrow25" },
             // { name: "orb" },
-            { name: "helmet" }
+            { name: "helmet" },
+            { name: "torch", location: { x: 0, y: 0, z: 0}}
 
         ],
         structures: [
@@ -67,7 +68,7 @@ export const levels = [
             { name: "evilOne" },
             { name: "shopkeep" },
             // { name: "lobot" },
-            { name: "blueShirt" },
+            // { name: "blueShirt" },
             // { name: "rosenBot" }
         ]
     },

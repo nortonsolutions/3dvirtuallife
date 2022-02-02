@@ -6,6 +6,7 @@ class Chatbar {
         
         this.eventDepot = eventDepot;
         this.socket = socket;
+        this.show = false;
 
         this.addEventListeners = this.addEventListeners.bind(this);
         this.addEventListeners();
@@ -27,11 +28,12 @@ class Chatbar {
 
         this.eventDepot.addListener('toggleChatbar', data => {
 
-            if (data.show) {
+            this.show = data.show;
+            if (this.show) {
+                
                 this.eventDepot.fire('disableKeyDownListener', {});
                 this.refreshChatbar();
-                document.getElementById('chatInput').style.display = 'flex';
-                document.getElementById('chatMessage').focus();
+
                 
             } else { 
                 this.eventDepot.fire('enableKeyDownListener', {});
@@ -45,6 +47,11 @@ class Chatbar {
         this.loadTemplate(this.messageThread, () => {
 
             this.addChatMessageListeners();
+
+            if (this.show) {
+                document.getElementById('chatInput').style.display = 'flex';
+                document.getElementById('chatMessage').focus();
+            }
 
         });
     }

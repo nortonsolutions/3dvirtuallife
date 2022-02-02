@@ -6,7 +6,7 @@ import { SpriteForm } from './sprite.js';
 import { Fire, params } from './fire.js';
 import { WaterForm } from './water.js';
 
-/**s
+/**
  * The FormFactory will provide objects based on templates
  * for the SceneController, to be modeled and used in the
  * scene.
@@ -51,99 +51,118 @@ export class FormFactory {
 
     addSconces = (model) => {
 
-        let regex = new RegExp('sconce', 'i');
-        this.addSpritesRecursive('flame', 40, .25, .1, true, model, regex, true);
+        let spriteConfig = {
+            name: 'flame',
+            regex: new RegExp('sconce', 'i'),
+            frames: 40,
+            scale: .25,
+            elevation: .1,
+            flip: true,
+            animates: true,
+            time: null
+        }
+
+        this.addSprites(model, spriteConfig);
 
     }
 
     addBorderTrees = (scene, model) => {
         
-        let regex = new RegExp('null', 'i');
-        let treeTypes = ['aspen1','pine1','pine2','maple1','tree1'];
-        this.addSpritesRecursive(treeTypes, 1, 500, 200, false, model, regex, false, scene);
-
-    }
-
-    addSpritesGeneric = (model, name, regexString, frames = 10, scale = 1, elevation = 5, flip = false, time, animates = true) => {
-        
-        if (regexString) {
-            let regex = new RegExp(regexString, 'i');
-            this.addSpritesRecursive(name, frames, scale, elevation, flip, model, regex, animates);
-    
-        } else { // No regex, so just add one in the center of the object
-            this.addSpritesSingle(name, frames, scale, elevation, flip, model, time);
+        let spriteConfig = {
+            name: ['aspen1','pine1','pine2','maple1','tree1'],
+            regex: new RegExp('null|edge', 'i'),
+            frames: 1,
+            scale: 500,
+            elevation: 200,
+            flip: false,
+            animates: false,
+            time: null
         }
+
+        this.addSprites(model, spriteConfig, scene);
+
     }
 
     /** 
-     * Scan down the model for any part that matches regex;
+     * If regex is provided, scan down the model for any part that matches regex;
      * the first param may optionally be an array for random selection.
      * 
      * If the scene is provided, the sprites will be added to the scene, not the model.
+     * If broadcast is true, the socket will emit an addSprite event with positioning.
+     * 
+     * If spriteConfig.regex is null/false, add a single sprite to the center of the model and display for the given time (seconds) 
      */
-    addSpritesRecursive = (name, frames, scale, elevation, flip, model, regex, animates = true, scene = null) => {
+
+    addSprites = (model, spriteConfig, scene = null, broadcast = false, position = null) => {
         
-        if (regex.test(model.name)) {
+        // Either position was passed OR there is no regex defined; position requires scene
+        if (position || !spriteConfig.regex) {
 
-            var itemName;
-            if (typeof name == 'object') {
-                itemName = name[getRndInteger(0,name.length-1)];
-            } else itemName = name;
-
-            let spriteForm = new SpriteForm(itemName, frames, flip);
+            let spriteForm = new SpriteForm(spriteConfig.name, spriteConfig.frames, spriteConfig.flip);
             let sprite = spriteForm.getSprite();
-            sprite.scale.set(scale, scale, scale);
-
-            if (!scene) {
-                sprite.translateY(elevation);
-                model.add(sprite);
+            sprite.scale.set(spriteConfig.scale, spriteConfig.scale, spriteConfig.scale);
+            
+            if (position) {
+                sprite.position.copy(position);
+                scene.add(sprite);
             } else {
-                sprite.position.x = model.position.x * multiplier;
-                sprite.position.z = model.position.z * multiplier;
-                sprite.position.y = model.position.y * multiplier;
-                sprite.translateY(elevation);
-                scene.scene.add(sprite);
+                sprite.position.y += spriteConfig.elevation;
+                if (spriteConfig.translateZ) sprite.translateZ(spriteConfig.translateZ);
+                model.add(sprite);
             }
 
-            if (animates) this.sceneController.sprites.push({ sprite, frames: spriteForm.getFrames() });
+            this.sceneController.sprites.push({ sprite, frames: spriteForm.getFrames() });
 
-        } else {
-            if (model.children) {
-                model.children.forEach(m => {
-                    this.addSpritesRecursive(name, frames, scale, elevation, flip, m, regex, animates, scene);
-                })
+            if (broadcast) this.broadcastSprite(spriteConfig, model.position);
+
+            if (spriteConfig.time) {
+                setTimeout(() => {
+                    position? scene.scene.remove(sprite) : model.remove(sprite);
+                    this.sceneController.sprites.pop();
+                }, spriteConfig.time * 1000);
             }
-        }
-    }
 
-    /** Add a single sprite to the center of the model and display for the given time (seconds) */
-    addSpritesSingle = (name, frames, scale, elevation, flip, model, time) => {
+        } else { // If there is a regex, recurse
+
+            if (typeof spriteConfig.regex == "string") spriteConfig.regex = new RegExp(spriteConfig.regex, 'i');
+            if (spriteConfig.regex.test(model.name)) {
+
+                var itemName;
+                if (typeof spriteConfig.name == 'object') {
+                    itemName = spriteConfig.name[getRndInteger(0,spriteConfig.name.length-1)];
+                } else itemName = spriteConfig.name;
     
-        let spriteForm = new SpriteForm(name, frames, flip);
-        let sprite = spriteForm.getSprite();
-        sprite.scale.set(scale, scale, scale);
-        sprite.translateY(elevation);
+                let spriteForm = new SpriteForm(itemName, spriteConfig.frames, spriteConfig.flip);
+                let sprite = spriteForm.getSprite();
+                sprite.scale.set(spriteConfig.scale, spriteConfig.scale, spriteConfig.scale);
+    
+                if (!scene) {
+                    sprite.position.y += spriteConfig.elevation;
+                    model.add(sprite);
+                } else {
+                    sprite.position.x = model.position.x * multiplier;
+                    sprite.position.z = model.position.z * multiplier;
+                    sprite.position.y = model.position.y * multiplier;
+                    sprite.translateY(spriteConfig.elevation);
+                    scene.scene.add(sprite);
+                }
 
-        model.add(sprite);
-        this.sceneController.sprites.push({ sprite, frames: spriteForm.getFrames() });
-
-        setTimeout(() => {
-            model.remove(sprite);
-            this.sceneController.sprites.pop();
-        }, time * 1000);
+                if (broadcast) this.broadcastSprite(spriteConfig, sprite.position);
+                if (spriteConfig.animates) this.sceneController.sprites.push({ sprite, frames: spriteForm.getFrames() });
+    
+            } else {
+                if (model.children) {
+                    model.children.forEach(m => {
+                        this.addSprites(m, spriteConfig, scene, position, broadcast);
+                    })
+                }
+            }
+    
+        } 
     }
 
-    addTorchLight = (model) => {
-        
-        let spriteForm = new SpriteForm('flame', 40, true);
-        let sprite = spriteForm.getSprite();
-        sprite.scale.set(.05, .1, .05);
-        sprite.translateZ(-.32);
-        // sprite.translateY();
-
-        model.add(sprite);
-        this.sceneController.sprites.push({ sprite, frames: spriteForm.getFrames() });
-
+    broadcastSprite = (spriteConfig, spritePosition) => {
+        this.sceneController.socket.emit('addSprites', { level: this.sceneController.level, spriteConfig, spritePosition });
     }
 
     getFire(params) {

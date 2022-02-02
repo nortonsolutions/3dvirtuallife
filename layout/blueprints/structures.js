@@ -17,7 +17,8 @@ export const Structures = {
                 frames: 10,
                 scale: 5,
                 elevation: 1,
-                flip: false
+                flip: false,
+                animates: true
             }]
         }
     
@@ -32,14 +33,6 @@ export const Structures = {
             animates: false,
             scale: 20,
             elevation: 0
-            // sprites: [{ 
-            //     name: "Fount",
-            //     regex: "fount",
-            //     frames: 10,
-            //     scale: 5,
-            //     elevation: 1,
-            //     flip: false
-            // }]
         }
     
     },
