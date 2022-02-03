@@ -107,8 +107,13 @@ export class FormFactory {
                 scene.add(sprite);
             } else {
                 sprite.position.y += spriteConfig.elevation;
+
+                // ONE-OFFs for torch and health/mana bars (make this more generic later)
                 if (spriteConfig.translateZ) sprite.translateZ(spriteConfig.translateZ);
+                if (spriteConfig.scaleY) sprite.scale.y = sprite.scale.y * spriteConfig.scaleY;
+
                 model.add(sprite);
+                
             }
 
             this.sceneController.sprites.push({ sprite, frames: spriteForm.getFrames() });
@@ -121,6 +126,8 @@ export class FormFactory {
                     this.sceneController.sprites.pop();
                 }, spriteConfig.time * 1000);
             }
+
+            return sprite; // return sprite for non-recursive single instance
 
         } else { // If there is a regex, recurse
 
@@ -158,7 +165,9 @@ export class FormFactory {
                 }
             }
     
-        } 
+        }
+        
+
     }
 
     broadcastSprite = (spriteConfig, spritePosition) => {

@@ -56,6 +56,9 @@ export class IntelligentForm extends AnimatedForm{
                 })
             }
             
+            
+            this.addHealthBarToModel();
+
             if (callback) callback();
         })
 
@@ -69,6 +72,41 @@ export class IntelligentForm extends AnimatedForm{
         // console.log("Test")
 
     }
+
+    addHealthBarToModel() {
+        
+        // addSprites = (model, spriteConfig, scene = null, broadcast = false, position = null) => {
+        let spriteConfig = {
+            name: 'greensquare',
+            frames: 1,
+            scale: 10 / this.attributes.scale,
+            scaleY: .25,
+            elevation: 63 / this.attributes.scale,
+            flip: false,
+            animates: false,
+            time: null
+        }
+        
+        this.healthSprite = this.sceneController.formFactory.addSprites(this.model, spriteConfig);
+        this.healthSprite.scale.x = (this.getEffectiveStat("health") / this.getStatMax("health"))*10 / this.attributes.scale;
+        
+        spriteConfig = {
+            name: 'redsquare',
+            frames: 1,
+            scale: 10 / this.attributes.scale,
+            scaleY: .25,
+            elevation: 60 / this.attributes.scale,
+            flip: false,
+            animates: false,
+            time: null
+        }
+        
+        this.manaSprite = this.sceneController.formFactory.addSprites(this.model, spriteConfig);
+        this.manaSprite.scale.x = (this.getEffectiveStat("mana") / this.getStatMax("mana"))*10 / this.attributes.scale;
+
+    }
+
+    
 
     listGeometries(el) {
 
@@ -163,7 +201,7 @@ export class IntelligentForm extends AnimatedForm{
                 this.sceneController.eventDepot.fire('updateHelper', { position: fIntersects[0].point, color: { r: 0, g: 1, b: 0 }});
                 
             }
-    
+            this.intermittentRecharge();
         }
     }
 
@@ -207,6 +245,17 @@ export class IntelligentForm extends AnimatedForm{
         }
     }
 
+    /** Intermittently recharge mana and health for the player based on strength and agility */
+    intermittentRecharge() {
+        
+        let chance = this.getEffectiveStat("strength") + this.getEffectiveStat("agility");
+
+        if (Math.random()*100 < chance) {
+            this.changeStat("health", 0.01);
+            this.changeStat("mana", 0.01);
+        }
+    }
+
     /** returns the new value */
     changeStat(stat, change, changeMax = false) {
 
@@ -230,7 +279,7 @@ export class IntelligentForm extends AnimatedForm{
                 if (this.alive && newvalue <= 0) {
                     this.death();
                 } else if (this.alive) {
-                    // this.fadeToAction("No", 0.2);
+                    
                 } 
             } else {
                 // 
@@ -238,12 +287,23 @@ export class IntelligentForm extends AnimatedForm{
         }
 
         this.attributes.stats[stat] = Number(newvalue).toFixed(2) + "/" + Number(max).toFixed(2) + "/" + this.getStatBoost(stat); //.toLocaleString('en-US',{minimumIntegerDigits:2})
-
+        
         if (this.objectSubtype == "local") this.updateHeroStats(stat);
 
         this.sceneController.eventDepot.fire('statusUpdate', { 
-            message: `${this.objectName} ${stat} stat updated: ${this.attributes.stats[stat]}` 
+            // message: `${this.objectName} ${stat} stat updated: ${this.attributes.stats[stat]}` 
         }); 
+
+        switch (stat) {
+            case "health":
+                this.healthSprite.scale.x = Math.max( (this.getEffectiveStat("health") / this.getStatMax("health") )*10 / this.attributes.scale, 0);
+                break;
+            case "mana":
+                this.manaSprite.scale.x = Math.max( (this.getEffectiveStat("mana") / this.getStatMax("mana") )*10 / this.attributes.scale,0);
+                break;
+        }
+
+
         return newvalue;
     }
 

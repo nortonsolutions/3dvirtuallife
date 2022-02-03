@@ -6,8 +6,8 @@ export const levels = [
 
     {
         level: 0,
-        width: 26, //26
-        length: 26, //26
+        width: 16, //26
+        length: 16, //26
         description: "Valley of Mist",
         background: 'clouds.png',
         terrain: {
@@ -31,6 +31,7 @@ export const levels = [
         items: [
             { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
             { name: "smallSword" },
+            { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
             { name: "redpotion" },
             { name: "greenpotion" },
             // { name: "mushroom" },
@@ -67,8 +68,11 @@ export const levels = [
             { name: "evilOne" },
             { name: "evilOne" },
             { name: "shopkeep" },
+            { name: "rat" },
+            // { name: "rat" },
+            // { name: "rat" },
             // { name: "lobot" },
-            // { name: "blueShirt" },
+            { name: "blueShirt" }
             // { name: "rosenBot" }
         ]
     },

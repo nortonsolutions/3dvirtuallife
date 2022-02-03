@@ -224,6 +224,20 @@ export const Items = {
             effect: "strength/1"
         } 
     },
+    lightSaber: {
+        name: 'lightSaber',
+        gltf: 'lightSaber.glb',
+        image: 'broadsword.png',
+        description: 'Red light saber',
+        type: 'item',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: true,
+            scale: 10,
+            elevation: 20,
+            effect: "strength/1"
+        } 
+    },
     armor: {
         name: 'armor',
         gltf: 'armor.glb',
@@ -352,11 +366,12 @@ export const Items = {
             sprites: [{ 
                 name: "flame",
                 frames: 40,
-                scale: .06,
-                translateZ: -.26,
+                scale: .05,
+                scaleY: 2,
+                translateZ: -.25,
                 flip: true,
                 showOnSeed: true,
-                elevation: .04
+                elevation: .1
             }]
         } 
     },

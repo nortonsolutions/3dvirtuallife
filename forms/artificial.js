@@ -4,9 +4,7 @@ import { IntelligentForm } from './intelligent.js'
 export class ArtificialForm extends IntelligentForm{
 
     constructor(template, sceneController) {
-
         super(template, sceneController);
-
     }
 
     load(callback) {
@@ -17,6 +15,12 @@ export class ArtificialForm extends IntelligentForm{
                     this.actions['Walking'].setEffectiveTimeScale(20);
                     this.actions['Punch'].setEffectiveTimeScale(20);
                     this.actions['Death'].setEffectiveTimeScale(20);
+                    break;
+                case "blueShirt":
+                    this.actions['Idle'].setEffectiveTimeScale(2);
+                    this.actions['Walking'].setEffectiveTimeScale(2);
+                    this.actions['Punch'].setEffectiveTimeScale(2);
+                    this.actions['Death'].setEffectiveTimeScale(1);
                     break;
             }
             if (callback) callback();

@@ -92,7 +92,7 @@ export const Entities = {
             length: 20,
             width: 20,
             elevation: 100,
-            scale: 25,
+            scale: 40,
             stats: {
                 health: "2/2/0",
                 mana: "0/0/0",

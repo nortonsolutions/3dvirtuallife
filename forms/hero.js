@@ -58,7 +58,7 @@ export class Hero extends IntelligentForm {
                 this.model.position.y = this.determineElevationFromBase();
             }
 
-            this.actions['Punch'].setEffectiveTimeScale(4);
+            this.actions['Punch'].setEffectiveTimeScale(1);
 
             callback();
 
@@ -656,7 +656,7 @@ export class Hero extends IntelligentForm {
 
         if (change < 0) {
             this.fadeToAction("No", 0.2);
-        } else {
+        } else if (change > 1) {
             this.fadeToAction("Yes", 0.2);
         }
     }

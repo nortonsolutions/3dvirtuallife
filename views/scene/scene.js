@@ -523,7 +523,7 @@ class Scene {
     
                 // console.log(`traveled: ${projectile.distanceTraveled}, position: ${projectile.item.model.position.x}, ${projectile.item.model.position.y},${projectile.item.model.position.z }`);
                 console.log(`${projectile.item.model.position.y}`)
-                if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= 20) {
+                if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+5) {
                     projectile.distanceTraveled = -1;
                 }
             })
