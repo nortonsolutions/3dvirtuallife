@@ -364,8 +364,12 @@ export class Hero extends IntelligentForm {
             this.addToInventory(data.itemName, undefined, data.quantity);
         });
 
-        this.sceneController.eventDepot.addListener('removeItem', (itemName) => {
+        this.sceneController.eventDepot.addListener('removeFromInventory', (itemName) => {
             this.removeFromInventory(itemName);
+        });
+
+        this.sceneController.eventDepot.addListener('addToInventory', (data) => {
+            this.addToInventory(data.itemName, undefined, data.quantity);
         });
 
         this.sceneController.eventDepot.addListener('dropItemToScene', (data) => {
@@ -541,7 +545,8 @@ export class Hero extends IntelligentForm {
         this.sceneController.eventDepot.removeListeners('equipItem');
         this.sceneController.eventDepot.removeListeners('placeItem');
         this.sceneController.eventDepot.removeListeners('takeItemFromScene');
-        this.sceneController.eventDepot.removeListeners('removeItem');
+        this.sceneController.eventDepot.removeListeners('removeFromInventory');
+        this.sceneController.eventDepot.removeListeners('addToInventory');
         this.sceneController.eventDepot.removeListeners('dropItemToScene');
         this.sceneController.eventDepot.removeListeners('mouse0click');
         this.sceneController.eventDepot.removeListeners('mouse1click');

@@ -321,11 +321,26 @@ database(mongoose, (db) => {
       if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('heroDialogInventory', data.heroInventory);
     });
 
+    // data: { level, otherLayoutId, tab, payment });
+    socket.on('heroDialogUpdateExchange', data => {
+      let socketNumber = getSocketByLayoutId(data.level, data.otherLayoutId);
+      if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('heroDialogUpdateExchange', { tab: data.payment, payment: data.tab } );
+    });
+
     socket.on('closeModal', data => {
       let socketNumber = getSocketByLayoutId(data.level, data.otherLayoutId);
       if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('closeModal', {});
     });
 
+    socket.on('heroDialogAcceptDeal', data => {
+      let socketNumber = getSocketByLayoutId(data.level, data.otherLayoutId);
+      if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('heroDialogAcceptDeal', { } );
+    });
+
+    socket.on('heroDialogProposeDeal', data => {
+      let socketNumber = getSocketByLayoutId(data.level, data.otherLayoutId);
+      if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('heroDialogProposeDeal', { } );
+    });    
   })
 })
 

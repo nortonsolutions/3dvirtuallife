@@ -44,7 +44,7 @@ class Modal {
                 context = this.characterScreen.getContext();
             
             } else if (data.type == "heroDialog") {
-
+                this.heroDialogScreen.reset();
                 this.heroDialogScreen.setup(data.socket, data.level, data.initiator, data.layoutId, data.otherLayoutId, data.heroInventory, data.otherInventory);
                 context = this.heroDialogScreen.getContext();
                 

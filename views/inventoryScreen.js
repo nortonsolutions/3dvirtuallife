@@ -160,7 +160,7 @@ class InventoryScreen {
                             this.eventDepot.fire('unequipItem', targetElement.id);
                             this.eventDepot.fire('placeItem', {itemName: itemNameToSwap, desiredIndex: index});
                         }
-                        this.eventDepot.fire('removeItem', itemName)
+                        this.eventDepot.fire('removeFromInventory', itemName)
                         this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName, throwable: this.isItemThrowable(itemName), throws: this.itemThrows(itemName) });
 
                     } 
