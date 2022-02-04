@@ -137,7 +137,14 @@ function newHeroTemplate(name,height) {
         model: null,
         inventory: [],
         spells: [{"itemName":"healAllSpell"},{"itemName":"poisonProjectileSpell"}],
-        equipped: {}
-
+        equipped: {},
+        conversation: {
+            conversationState: "intro",
+            engagementState: 0,
+            special: {
+                speech: "Most esteemed greetings to you, my friend!  Let's trade.",
+                action: 'showWares'
+            }
+        },
     }
 }

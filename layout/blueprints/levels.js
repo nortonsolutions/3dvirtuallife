@@ -75,7 +75,9 @@ export const levels = [
             { name: "evilOne" },
             { name: "shopkeep" },
             { name: "rat" },
-
+            { name: "lavaMan" },
+            { name: "crystalMan" },
+            { name: "rockyMan" },
             // { name: "rat" },
             // { name: "rat" },
             // { name: "lobot" },
@@ -276,8 +278,7 @@ export const levels = [
         ],
         entities: [
             { name: "lavaMan" },
-            { name: "lavaMan" },
-            { name: "lavaMan" }
+
         ]
     },
     {

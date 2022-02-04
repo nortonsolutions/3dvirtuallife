@@ -371,7 +371,7 @@ export class Hero extends IntelligentForm {
                             layoutId: this.selectedObject.model.attributes.layoutId
                         });
     
-                    } else if (objectType == "friendly" || objectSubtype == "remote") {
+                    } else if (objectType == "friendly") {
                         
                         // TODO: conversation
                         this.sceneController.eventDepot.fire('unlockControls', {});
@@ -715,4 +715,10 @@ export class Hero extends IntelligentForm {
 
         return throws;
     }
+
+    getCurrentConversation() {
+        let context = this.attributes.conversation.special;
+        context.wares = this.inventory;
+    }
+
 }
