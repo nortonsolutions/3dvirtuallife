@@ -5,6 +5,7 @@ import { LevelUpScreen } from './levelUpScreen.js';
 import { DialogScreen } from './dialogScreen.js';
 import { CharacterScreen } from './characterScreen.js';
 import { JoinGameScreen } from './joinGameScreen.js';
+import { HeroDialogScreen } from './heroDialogScreen.js';
 
 class Modal {
 
@@ -18,8 +19,10 @@ class Modal {
         this.dialogScreen = new DialogScreen(eventDepot, this);
         this.characterScreen = new CharacterScreen(eventDepot, this);
         this.joinGameScreen = new JoinGameScreen(eventDepot, this);
+        this.heroDialogScreen = new HeroDialogScreen(eventDepot, this);
 
         this.closeModal = this.closeModal.bind(this);
+        this.heroDialog = false;
 
         /** e.g. data: { type: 'loadGame', title: 'Load Game', context: response } */
         eventDepot.addListener('modal', (data) => {
@@ -40,6 +43,11 @@ class Modal {
 
                 context = this.characterScreen.getContext();
             
+            } else if (data.type == "heroDialog") {
+
+                this.heroDialogScreen.setup(data.socket, data.level, data.initiator, data.layoutId, data.otherLayoutId, data.heroInventory, data.otherInventory);
+                context = this.heroDialogScreen.getContext();
+                
             } else {
 
                 context = data.context;
@@ -47,6 +55,8 @@ class Modal {
             }
             
             this.loadTemplate('modal-body', data.type, context, () => {
+
+                this.heroDialog = false;
 
                 switch (data.type) {
                     case "inventory":
@@ -64,8 +74,13 @@ class Modal {
                     case "character":
                         this.characterScreen.addCharacterScreenEvents();
                         break;
+                    case "heroDialog":
+                        this.heroDialog = true;
+                        this.heroDialogScreen.addHeroDialogEvents();
+                        break;
                     case "joinGame":
                         this.joinGameScreen.addJoinGameEvents(context);
+                        break;
                 }
             });
             

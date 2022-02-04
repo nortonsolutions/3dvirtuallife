@@ -43,7 +43,7 @@ export const levels = [
             // { name: "orb" },
             { name: "helmet" },
             { name: "busterboot", location: { x: 0, y: 0, z: 0} },
-            { name: "torch", location: { x: 0, y: 0, z: 0}}
+            { name: "torch", location: { x: 0, y: 0, z: 0} }
 
         ],
         structures: [
@@ -70,14 +70,14 @@ export const levels = [
 
         ],
         entities: [
-            { name: "john" },
-            { name: "evilOne" },
-            { name: "evilOne" },
-            { name: "shopkeep" },
-            { name: "rat" },
-            { name: "lavaMan" },
-            { name: "crystalMan" },
-            { name: "rockyMan" },
+            // { name: "john" },
+            // { name: "evilOne" },
+            // { name: "evilOne" },
+            // { name: "shopkeep" },
+            // { name: "rat" },
+            // { name: "lavaMan" },
+            // { name: "crystalMan" },
+            // { name: "rockyMan" },
             // { name: "rat" },
             // { name: "rat" },
             // { name: "lobot" },

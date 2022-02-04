@@ -267,6 +267,28 @@ export class Hero extends IntelligentForm {
 
     addEventListeners() {
 
+        // data: { otherLayoutId: data.layoutId, otherInventory: data.heroInventory, initiator: ...}
+        this.sceneController.socket.on('heroDialogNew', data => { // request for heroDialog; open modal
+            
+            this.sceneController.eventDepot.fire('unlockControls', {});
+
+            let heroDialogData = { 
+                type: 'heroDialog', 
+                title: data.initiator,
+                layoutId: this.attributes.layoutId, 
+                heroInventory: this.inventory,
+                otherLayoutId: data.otherLayoutId, 
+                otherInventory: data.otherInventory, 
+                socket: this.sceneController.socket, 
+                initiator: false, 
+                level: this.sceneController.level
+                
+            };
+
+            this.sceneController.eventDepot.fire('modal', heroDialogData);
+
+        });
+
         this.sceneController.socket.on('castSpell', spell => {
             this.castSpell(spell, false);
         })
@@ -402,7 +424,25 @@ export class Hero extends IntelligentForm {
                         if (accessible) {
                             this.selectedObject.updateAttributes({unlocked: true});
                         }
-                    }
+
+                    } else if ( objectType == "hero") {
+                        
+                        // TODO: conversation
+                        this.sceneController.eventDepot.fire('unlockControls', {});
+
+                        let dialogData = { 
+                            type: 'heroDialog', 
+                            title: this.selectedObject.objectName, 
+                            heroInventory: this.inventory, 
+                            otherLayoutId: this.selectedObject.attributes.layoutId, 
+                            socket: this.sceneController.socket, 
+                            initiator: this.objectName, 
+                            level: this.sceneController.level,
+                            layoutId: this.attributes.layoutId
+                        };
+
+                        this.sceneController.eventDepot.fire('modal', dialogData);
+                    } 
                 } 
            }
         })

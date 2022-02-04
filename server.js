@@ -243,7 +243,7 @@ database(mongoose, (db) => {
     socket.on('pushLayout', data => {
       if (!app.layouts[socket.nsp.name]) app.layouts[socket.nsp.name] = [];
       app.layouts[socket.nsp.name][data.level] = [data.layout,data.nextLayoutId];
-    })
+    });
 
     socket.on('updateEntityPositions', (data) => {
       notifyRoomMembers(data.level, 'updateEntityPositions', data.positions);
@@ -281,7 +281,7 @@ database(mongoose, (db) => {
 
       app.layouts[socket.nsp.name][data.level][0].entities = app.layouts[socket.nsp.name][data.level][0].entities.filter(el => el.attributes.layoutId != data.layoutId);
       notifyRoomMembers(data.level, 'death', data);
-    })
+    });
 
     socket.on('updateStructureAttributes', data => {
       // update the stored layout for late-joiners
@@ -291,26 +291,42 @@ database(mongoose, (db) => {
       
       // notify existing room members
       notifyRoomMembers(data.level, 'updateStructureAttributes', data);
-    })
+    });
 
     // data: { level: this.sceneController.level, itemName, position: item.model.position, rotation: item.model.rotation })
     socket.on('launch', data => {
       notifyRoomMembers(data.level, 'launch', data);
-    })
+    });
 
     // data: { level: this.sceneController.level, layoutId: entity.attributes.layoutId, spell });    
     socket.on('castSpell', data => {
       let socketNumber = getSocketByLayoutId(data.level, data.layoutId);
       if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('castSpell', data.spell);
-    })
+    });
 
     // data:  { level: this.sceneController.level, spriteConfig, spritePosition });
     socket.on('addSprites', data => {
       notifyRoomMembers(data.level, 'addSprites', data);
-    })
+    });
+
+    // data: { heroInventory: this.inventory, otherLayoutId: data.layoutId, socket: this.sceneController.socket, level: this.sceneController.level, layoutId: ... } 
+    socket.on('heroDialogNew', data => {
+      let socketNumber = getSocketByLayoutId(data.level, data.otherLayoutId);
+      if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('heroDialogNew', { otherLayoutId: data.layoutId, otherInventory: data.heroInventory, initiator: data.initiator });
+    });
+
+    // data: { layoutId, heroInventory, otherLayoutId, level })
+    socket.on('heroDialogInventory', data => {
+      let socketNumber = getSocketByLayoutId(data.level, data.otherLayoutId);
+      if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('heroDialogInventory', data.heroInventory);
+    });
+
+    socket.on('closeModal', data => {
+      let socketNumber = getSocketByLayoutId(data.level, data.otherLayoutId);
+      if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('closeModal', {});
+    });
 
   })
-
 })
 
 module.exports = app; //for testing
