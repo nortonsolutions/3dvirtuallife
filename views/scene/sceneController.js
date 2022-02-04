@@ -340,7 +340,7 @@ export class SceneController {
             };
 
             var sunLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 2 );
-            sunLight.position.set( 500, 800, 500);
+            sunLight.position.set( 500, 1000, 500);
 
             sunLight.castShadow = true;
 

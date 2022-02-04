@@ -6,8 +6,8 @@ export const levels = [
 
     {
         level: 0,
-        width: 16, //26
-        length: 16, //26
+        width: 26, //26
+        length: 26, //26
         description: "Valley of Mist",
         background: 'clouds.png',
         terrain: {
@@ -31,7 +31,7 @@ export const levels = [
         items: [
             { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
             { name: "smallSword" },
-            { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
+            // { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
             { name: "redpotion" },
             { name: "greenpotion" },
             // { name: "mushroom" },
@@ -42,12 +42,13 @@ export const levels = [
             { name: "arrow25" },
             // { name: "orb" },
             { name: "helmet" },
+            { name: "busterboot", location: { x: 0, y: 0, z: 0} },
             { name: "torch", location: { x: 0, y: 0, z: 0}}
 
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0} },
-            // { name: "tavern", location: { x: 3, y: 0, z: -3} },
+            
             { name: "rock1" },
             // { name: "tree1" },
             { 
@@ -61,7 +62,12 @@ export const levels = [
             { 
                 name: "portal", location: { x: -19.5, y: 0, z: -6.5}, 
                 attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "portal", location: { x: -6.5, y: 0, z: -19.5}, 
+                attributes: { routeTo: { level: 5, location: { x: -40.0, y: 0, z: -6.5 } } } 
             }
+
         ],
         entities: [
             { name: "john" },
@@ -69,10 +75,11 @@ export const levels = [
             { name: "evilOne" },
             { name: "shopkeep" },
             { name: "rat" },
+
             // { name: "rat" },
             // { name: "rat" },
             // { name: "lobot" },
-            { name: "blueShirt" }
+            // { name: "blueShirt" }
             // { name: "rosenBot" }
         ]
     },
@@ -199,7 +206,7 @@ export const levels = [
                 },
                 fog: {
                     color: 'darkgreen',
-                    density: 2
+                    density: 1.2
                 },
                 water: {
                     attributes: {
@@ -264,8 +271,49 @@ export const levels = [
         structures: [
             { 
                 name: "portal", location: { x: -21.5, y: 0, z: -6.5},
-                attributes: { routeTo: { level: 0, location: { x: -19.5, y: 0, z: -6.5 } } } 
+                attributes: { routeTo: { level: 0, location: { x: -17.0, y: 0, z: -6.0 } } } 
             }
+        ],
+        entities: [
+            { name: "lavaMan" },
+            { name: "lavaMan" },
+            { name: "lavaMan" }
+        ]
+    },
+    {
+        level: 5,
+        width: 52, //26
+        length: 52, //26
+        description: "Kingdom",
+        background: 'clouds.png',
+        terrain: {
+            name: 'floor',
+            type: 'floor',
+            description: 'kingdom',
+            gltf: 'kingdom.glb',
+            attributes: {
+                scale: 100,
+                borderTrees: true,
+                light: {
+                    sunLight: true,
+                    overheadPointLight: false,
+                },
+                fog: {
+                    color: 'white',
+                    density: 1
+                }
+
+            }
+        },
+        items: [
+
+        ],
+        structures: [
+            { 
+                name: "portal", location: { x: -43, y: 0, z: -6.5},
+                attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: -18.5 } } } 
+            },
+            // { name: "tavern", location: { x: -45, y: 0, z: -4.5} },
         ],
         entities: [
 

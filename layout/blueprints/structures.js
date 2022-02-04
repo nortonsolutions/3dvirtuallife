@@ -1,11 +1,9 @@
-import {Items} from './items.js'
-
 export const Structures = {
     
     shed: {
         name: 'shed',
         gltf: 'sceneHouse.glb',
-        description: 'Wooden Shed with a locked door',
+        description: 'Mighty regal castle',
         type: 'structure',
         attributes: {
             animates: false,
@@ -18,7 +16,8 @@ export const Structures = {
                 scale: 5,
                 elevation: 1,
                 flip: false,
-                animates: true
+                animates: true,
+                showOnSeed: true
             }]
         }
     

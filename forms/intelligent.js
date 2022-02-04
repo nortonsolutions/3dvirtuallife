@@ -530,14 +530,38 @@ export class IntelligentForm extends AnimatedForm{
                     }
                 }
                 
-
-                if (area != "special") this.model.getObjectByName(area).add(item.model);
-                
-                if (item.attributes.animates) {
-
-                    this.animatedSubforms.push([area,item]);
+                switch (area) {
+                    case "special":
+                        break;
+                    case "feet":
+                        let itemCopy = new THREE.Object3D().copy(item.model);
+                        this.model.getObjectByName("FootR").add(item.model);
+                        this.model.getObjectByName("FootL").add(itemCopy);
+                        break;
+                    default:
+                        this.model.getObjectByName(area).add(item.model);
+                        break;
                 }
 
+                if (item.attributes.animates) {
+                    
+                    this.animatedSubforms.push([area,item]);
+                    if (item.attributes.animationOnEquip) {
+                        // let action = item.activeAction;
+                        // action.clampWhenFinished = true;
+                        // action.loop = THREE.LoopPingPong;
+                        // action.repetitions = 1;
+                        item.runActiveAction(2);
+                    }
+                }
+
+                if (item.attributes.sprites) {
+                    item.attributes.sprites.forEach(spriteConfig => {
+                        if (spriteConfig.showOnEquip) {
+                            this.sceneController.formFactory.addSprites(item.model, spriteConfig, null, false);
+                        }
+                    })
+                } 
             });
         }
 

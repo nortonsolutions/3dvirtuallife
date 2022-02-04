@@ -227,15 +227,17 @@ export const Items = {
     lightSaber: {
         name: 'lightSaber',
         gltf: 'lightSaber.glb',
-        image: 'broadsword.png',
+        image: 'lightSaber.png',
         description: 'Red light saber',
         type: 'item',
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: true,
-            scale: 10,
+            scale: 3,
+            equippedScale: 0.003,
             elevation: 20,
-            effect: "strength/1"
+            effect: "strength/1",
+            animationOnEquip: true
         } 
     },
     armor: {
@@ -251,6 +253,21 @@ export const Items = {
             equippedScale: 0.02,
             elevation: 20,
             effect: "defense/1"
+        } 
+    },
+    busterboot: {
+        name: 'busterboot',
+        gltf: 'busterboot.glb',
+        image: 'busterboot.png',
+        description: 'Light-weight armored boots',
+        type: 'item',
+        attributes: {
+            equippable: ['FootL, FootR'],
+            animates: false,
+            scale: 40,
+            equippedScale: 0.02,
+            elevation: 0,
+            effect: "agility/1"
         } 
     },
     helmet: {
@@ -367,12 +384,13 @@ export const Items = {
                 name: "flame",
                 frames: 40,
                 scale: .05,
-                scaleY: 2,
-                translateZ: -.25,
+                scaleY: 1.5,
+                translateZ: -.30,
                 flip: true,
-                showOnSeed: true,
-                elevation: .1
-            }]
+                showOnSeed: false,
+                showOnEquip: true,
+                elevation: 0
+            }],
         } 
     },
     mace: {

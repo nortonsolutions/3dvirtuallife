@@ -34,6 +34,29 @@ export const Entities = {
             grants: ["gold3"]
         }
     },
+    lavaMan: {
+        name: 'lavaMan',
+        gltf: 'lavaMan.glb',
+        description: 'Lava man',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 30,
+            length: 20,
+            width: 20,
+            elevation: 0,
+            scale: 20,
+            stats: {
+                health: "2/2/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "2/2/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold3"]
+        }
+    },
     rosenBot: {
         name: 'rosenBot',
         gltf: 'robot2.glb',
