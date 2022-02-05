@@ -685,12 +685,12 @@ export class Hero extends IntelligentForm {
             this.sceneController.dropItemToScene({itemName: item[0], location: this.location});
         });
 
-        setTimeout(() => {
-            let thisModel = this.model.getObjectByProperty("objectType", "hero");
-            thisModel.position.copy(this.model.position);
-            this.sceneController.scene.add(thisModel);
+        // setTimeout(() => {
+        //     let thisModel = this.model.getObjectByProperty("objectType", "hero");
+        //     thisModel.position.copy(this.model.position);
+        //     this.sceneController.scene.add(thisModel);
 
-        }, 2000);
+        // }, 2000);
         
     }
 

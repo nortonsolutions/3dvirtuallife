@@ -6,8 +6,8 @@ export const levels = [
 
     {
         level: 0,
-        width: 26, //26
-        length: 26, //26
+        width: 6, //26
+        length: 6, //26
         description: "Valley of Mist",
         background: 'clouds.png',
         terrain: {
@@ -29,50 +29,50 @@ export const levels = [
             }
         },
         items: [
-            { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
-            { name: "smallSword" },
-            // { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
-            { name: "redpotion" },
-            { name: "greenpotion" },
+            // { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
+            // { name: "smallSword" },
+            // // { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
+            // { name: "redpotion" },
+            // { name: "greenpotion" },
             // { name: "mushroom" },
-            // { name: "crystalBall" },
-            { name: "gold3" },
-            { name: "bagOfGems" },
-            { name: "bow" },
-            { name: "arrow25" },
-            // { name: "orb" },
-            { name: "helmet" },
-            { name: "busterboot", location: { x: 0, y: 0, z: 0} },
-            { name: "torch", location: { x: 0, y: 0, z: 0} }
+            // // { name: "crystalBall" },
+            // { name: "gold3" },
+            // { name: "bagOfGems" },
+            // { name: "bow" },
+            // { name: "arrow25" },
+            // { name: "orb" }, // "invalid typed array length: 2"
+            // { name: "helmet" },
+            // { name: "busterboot", location: { x: 0, y: 0, z: 0} },
+            // { name: "torch", location: { x: 0, y: 0, z: 0} }
 
         ],
         structures: [
-            { name: "shed", location: { x: 0, y: 0, z: 0} },
+            // { name: "shed", location: { x: 0, y: 0, z: 0} },
             
-            { name: "rock1" },
-            // { name: "tree1" },
-            { 
-                name: "grate", location: { x: 3, y: 0, z: 4}, 
-                attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } 
-            },
-            { 
-                name: "portal", location: { x: 19.5, y: 0, z: -6.5}, 
-                attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } 
-            },
-            { 
-                name: "portal", location: { x: -19.5, y: 0, z: -6.5}, 
-                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
-            },
-            { 
-                name: "portal", location: { x: -6.5, y: 0, z: -19.5}, 
-                attributes: { routeTo: { level: 5, location: { x: -40.0, y: 0, z: -6.5 } } } 
-            }
+            // { name: "rock1" },
+            // // { name: "tree1" },
+            // { 
+            //     name: "grate", location: { x: 3, y: 0, z: 4}, 
+            //     attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } 
+            // },
+            // { 
+            //     name: "portal", location: { x: 19.5, y: 0, z: -6.5}, 
+            //     attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            // },
+            // { 
+            //     name: "portal", location: { x: -19.5, y: 0, z: -6.5}, 
+            //     attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            // },
+            // { 
+            //     name: "portal", location: { x: -6.5, y: 0, z: -19.5}, 
+            //     attributes: { routeTo: { level: 5, location: { x: -40.0, y: 0, z: -6.5 } } } 
+            // }
 
         ],
         entities: [
             // { name: "john" },
             // { name: "evilOne" },
-            // { name: "evilOne" },
+            { name: "evilOne" },
             // { name: "shopkeep" },
             // { name: "rat" },
             // { name: "lavaMan" },

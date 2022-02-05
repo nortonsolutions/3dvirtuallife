@@ -73,6 +73,10 @@ export class IntelligentForm extends AnimatedForm{
 
     }
 
+    spriteScaleX(stat) { // can't be zero
+        return Math.max((this.getEffectiveStat(stat) / this.getStatMax(stat))*10 / this.attributes.scale, 0.0001);
+    }
+
     addHealthBarToModel() {
         
         // addSprites = (model, spriteConfig, scene = null, broadcast = false, position = null) => {
@@ -88,7 +92,7 @@ export class IntelligentForm extends AnimatedForm{
         }
         
         this.healthSprite = this.sceneController.formFactory.addSprites(this.model, spriteConfig);
-        this.healthSprite.scale.x = (this.getEffectiveStat("health") / this.getStatMax("health"))*10 / this.attributes.scale;
+        this.healthSprite.scale.x = this.spriteScaleX("health");
         
         spriteConfig = {
             name: 'redsquare',
@@ -102,7 +106,7 @@ export class IntelligentForm extends AnimatedForm{
         }
         
         this.manaSprite = this.sceneController.formFactory.addSprites(this.model, spriteConfig);
-        this.manaSprite.scale.x = (this.getEffectiveStat("mana") / this.getStatMax("mana"))*10 / this.attributes.scale;
+        this.manaSprite.scale.x = this.spriteScaleX("mana");
 
     }
 
@@ -296,10 +300,10 @@ export class IntelligentForm extends AnimatedForm{
 
         switch (stat) {
             case "health":
-                this.healthSprite.scale.x = Math.max( (this.getEffectiveStat("health") / this.getStatMax("health") )*10 / this.attributes.scale, 0);
+                this.healthSprite.scale.x = this.spriteScaleX("health");
                 break;
             case "mana":
-                this.manaSprite.scale.x = Math.max( (this.getEffectiveStat("mana") / this.getStatMax("mana") )*10 / this.attributes.scale,0);
+                this.manaSprite.scale.x = this.spriteScaleX("mana");
                 break;
         }
 
@@ -338,12 +342,13 @@ export class IntelligentForm extends AnimatedForm{
     }
 
     getEffectiveStat(stat) {
-        return this.getStat(stat) + this.getStatBoost(stat);
+        return Math.max(this.getStat(stat) + this.getStatBoost(stat),0);
     }
 
     death(local = true) {
 
         this.alive = false;
+        this.sceneController.forms = this.sceneController.forms.filter(el => el != this);
         this.sceneController.entities = this.sceneController.entities.filter(el => el != this);
         // this.fadeToAction("Death", 0.2);
 
