@@ -146,7 +146,7 @@ export const app = () => {
         addEventDepotListeners(eventDepot);
         
         gameAPI = new GameAPI(eventDepot);
-        modal = new Modal(eventDepot, gameAPI);
+        modal = new Modal(eventDepot, gameAPI, socket);
         sidebar = new Sidebar(eventDepot);
         chatbar = new Chatbar(eventDepot, socket);
 

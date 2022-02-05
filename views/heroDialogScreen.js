@@ -1,9 +1,9 @@
 export class HeroDialogScreen {
 
-    constructor(eventDepot, modal) {
+    constructor(eventDepot, modal, socket) {
         this.modal = modal;
         this.eventDepot = eventDepot;
-        this.socket = null;
+        this.socket = socket;
         this.heroInventory = null;
         this.otherInventory = null;
         this.tempSpeech = null;
@@ -12,6 +12,7 @@ export class HeroDialogScreen {
         this.payment = { };
 
         this.readyForAccept = false;
+        if (this.socket) this.addSocketEvents();
     }
 
     /**
@@ -27,19 +28,18 @@ export class HeroDialogScreen {
      */
 
     // data.socket, data.level, data.initiator, data.layoutId, data.otherLayoutId, data.hero, data.otherInventory);
-    setup(socket, level, initiator, layoutId, otherLayoutId, heroInventory, otherInventory) {
-        this.socket = socket;
+    setup(level, initiator, layoutId, otherLayoutId, heroInventory, otherInventory) {
+        
+        this.layoutId = layoutId;
         this.heroInventory = heroInventory;
         this.otherInventory = otherInventory;
         this.otherLayoutId = otherLayoutId;
         this.level = level;
 
-        this.addSocketEvents();
-
         if (initiator) {
-            this.socket.emit('heroDialogNew', { layoutId, heroInventory, otherLayoutId, level, initiator })
+            this.socket.emit('heroDialogNew', { layoutId, heroInventory, otherLayoutId, level, initiator });
         } else {
-            this.socket.emit('heroDialogInventory', { layoutId, heroInventory, otherLayoutId, level })
+            this.socket.emit('heroDialogInventory', { layoutId, heroInventory, otherLayoutId, level });
         }
     }
 
@@ -120,9 +120,6 @@ export class HeroDialogScreen {
                 this.acceptDeal();
                 this.socket.emit('heroDialogAcceptDeal', { level: this.level, otherLayoutId: this.otherLayoutId });
 
-                this.readyForAccept = false;
-                this.refresh();
-                
             } else { // propose deal
                 this.proposeDeal("Waiting");
                 this.socket.emit('heroDialogProposeDeal', { level: this.level, otherLayoutId: this.otherLayoutId });
@@ -133,6 +130,17 @@ export class HeroDialogScreen {
     reset() {
         this.tab = { } ;
         this.payment = { };
+        this.resetProposal();
+    }
+
+    resetProposal() {
+        this.readyForAccept = false;
+
+        let button = document.querySelector('#deal');
+        if (button) {
+            button.innerHTML = "Propose";
+            button.disabled = false;
+        }
     }
 
     refresh = (tempSpeech) => {
@@ -269,13 +277,6 @@ export class HeroDialogScreen {
 
     }
 
-    resetProposal() {
-        this.readyForAccept = false;
-        let button = document.querySelector('#deal');
-        button.innerHTML = "Propose";
-        button.disabled = false;
-    }
-
     acceptDeal() { // item exchange
         Object.keys(this.tab).forEach(item => {
             this.eventDepot.fire('addToInventory', {itemName: item, quantity: this.tab[item]}); 
@@ -286,6 +287,10 @@ export class HeroDialogScreen {
                 this.eventDepot.fire('removeFromInventory', item); 
             }
         })
+        
+        this.socket.emit('heroDialogInventory', { layoutId: this.layoutId, heroInventory: this.heroInventory, otherLayoutId: this.otherLayoutId, level: this.level });
+        this.reset();
+        this.refresh();
     }
 
     getInventoryQuantity(inventory, itemName) {
