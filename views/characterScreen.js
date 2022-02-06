@@ -136,7 +136,14 @@ function newHeroTemplate(name,height) {
         gltf: 'robot.glb',
         model: null,
         inventory: [],
-        spells: [{"itemName":"healAllSpell"},{"itemName":"poisonProjectileSpell"}],
+        spells: [
+            {"itemName":"healSpell"},
+            {"itemName":"healAllSpell"},
+            {"itemName":"poisonSpell"},
+            {"itemName":"poisonProjectileSpell"},
+            {"itemName":"fireProjectileSpell"},
+            {"itemName":"iceProjectileSpell"},
+        ],
         equipped: {},
         conversation: {
             conversationState: "intro",

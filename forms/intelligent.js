@@ -348,9 +348,8 @@ export class IntelligentForm extends AnimatedForm{
     death(local = true) {
 
         this.alive = false;
-        this.sceneController.forms = this.sceneController.forms.filter(el => el != this);
         this.sceneController.entities = this.sceneController.entities.filter(el => el != this);
-        // this.fadeToAction("Death", 0.2);
+        this.fadeToAction("Death", 0.2);
 
         if (local) {
             this.sceneController.socket.emit('death', {level: this.sceneController.level, layoutId: this.attributes.layoutId, hero: this.objectType=="hero"});
@@ -375,6 +374,12 @@ export class IntelligentForm extends AnimatedForm{
         } else {
 
         }
+
+        setTimeout(() => {  // Wait until the death scene has occurred before removal
+            this.sceneController.forms = this.sceneController.forms.filter(el => {
+                return el.model.attributes.layoutId != this.attributes.layoutId;
+            });
+        }, 5000);
     }
 
     firstInventorySlot() {
@@ -567,7 +572,7 @@ export class IntelligentForm extends AnimatedForm{
                         }
                     })
                 } 
-            });
+            }, false);  // false means do not add to forms
         }
 
         if (this.objectType == "hero" && this.objectSubtype == "local") {

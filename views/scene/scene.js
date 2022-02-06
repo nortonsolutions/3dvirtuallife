@@ -464,11 +464,13 @@ class Scene {
             })
         }
 
-        if (projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround && 
+        if (projectile.item.objectType == 'item' && 
+            projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround && 
             Math.random() < projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround) {
             projectile.item.model.position.y = projectile.item.determineElevationFromBase() + projectile.item.attributes.elevation;
-        } else {  // put the item on the ground for retrieval
-            if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
+        } else {  // remove the item
+            // if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
+            this.removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
         }
     }
 

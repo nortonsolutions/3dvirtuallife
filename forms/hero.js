@@ -248,7 +248,7 @@ export class Hero extends IntelligentForm {
                             if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
                         }
                     }
-                });
+                }, false); // false means do not addToForms
 
             }
 
@@ -259,7 +259,7 @@ export class Hero extends IntelligentForm {
                 item.model.rotation.copy(data.rotation);
 
                 this.sceneController.addToProjectiles(item, local);
-            });
+            }, false);
         }
 
     }
@@ -582,7 +582,7 @@ export class Hero extends IntelligentForm {
         this.sceneController.forms.forEach(o => {
             let distance = o.model.position.distanceTo(this.proximityLight.position);
 
-            if (o.attributes.contained) distance += 20;
+            if (o.attributes.contentItems) distance -= 20;
 
             if (distance <= 50 && distance < closest) {
                 
@@ -647,6 +647,7 @@ export class Hero extends IntelligentForm {
                         location: this.standingUpon.attributes.routeTo.location,
                     }
 
+                    this.sceneController.scene.removeFromScenebyLayoutId(this.attributes.layoutId);
                     this.sceneController.eventDepot.fire('loadLevel', loadData);
                 }
             }
@@ -676,21 +677,29 @@ export class Hero extends IntelligentForm {
         // drop all wares
         this.cacheHero();
         this.inventory.forEach(item => {
-            /** data: {location ..., itemName..., } */
-            this.sceneController.dropItemToScene({itemName: item.itemName, location: this.location});
+            
+            if (item) {
+                for (let x = 0; x < item.quantity; x++) {
+                    /** data: {location ..., itemName..., } */
+                    this.sceneController.dropItemToScene({itemName: item.itemName, location: this.location});
+                }
+            }
         });
 
         Object.values(this.equipped).forEach(item => {
             /** data: {location ..., itemName..., } */
-            this.sceneController.dropItemToScene({itemName: item[0], location: this.location});
+            if (item) {
+                this.unequip(item[1]);
+                this.sceneController.dropItemToScene({itemName: item[0], location: this.location});
+            }
         });
 
-        // setTimeout(() => {
-        //     let thisModel = this.model.getObjectByProperty("objectType", "hero");
-        //     thisModel.position.copy(this.model.position);
-        //     this.sceneController.scene.add(thisModel);
+        setTimeout(() => {
+            let thisModel = this.model.getObjectByProperty("objectType", "hero");
+            thisModel.position.copy(this.model.position);
+            this.sceneController.scene.add(thisModel);
 
-        // }, 2000);
+        }, 2000);
         
     }
 
@@ -723,9 +732,11 @@ export class Hero extends IntelligentForm {
 
     grantSpell(spellName) {
         let spell = this.gameObjects[spellName];
-        this.spells.push({
-            itemName: spell.name
-        });
+        if (!this.spells.map(el => el.itemName).includes(spellName)) {
+            this.spells.push({
+                itemName: spell.name
+            });
+        }
     }
 
     inflictDamage(entity, hitPointReduction) {

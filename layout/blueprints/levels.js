@@ -6,8 +6,8 @@ export const levels = [
 
     {
         level: 0,
-        width: 6, //26
-        length: 6, //26
+        width: 26, //26
+        length: 26, //26
         description: "Valley of Mist",
         background: 'clouds.png',
         terrain: {
@@ -29,60 +29,44 @@ export const levels = [
             }
         },
         items: [
-            // { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
-            // { name: "smallSword" },
-            // // { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
-            // { name: "redpotion" },
-            // { name: "greenpotion" },
-            // { name: "mushroom" },
-            // // { name: "crystalBall" },
-            // { name: "gold3" },
-            // { name: "bagOfGems" },
-            // { name: "bow" },
-            // { name: "arrow25" },
-            // { name: "orb" }, // "invalid typed array length: 2"
-            // { name: "helmet" },
-            // { name: "busterboot", location: { x: 0, y: 0, z: 0} },
-            // { name: "torch", location: { x: 0, y: 0, z: 0} }
-
+            { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
+            { name: "smallSword" },
+            { name: "redpotion" },
+            { name: "greenpotion" },
+            { name: "gold3" },
+            { name: "bagOfGems" },
+            { name: "bow" },
+            { name: "arrow25" },
         ],
         structures: [
-            // { name: "shed", location: { x: 0, y: 0, z: 0} },
+            { name: "shed", location: { x: 0, y: 0, z: 0} },
             
-            // { name: "rock1" },
-            // // { name: "tree1" },
-            // { 
-            //     name: "grate", location: { x: 3, y: 0, z: 4}, 
-            //     attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } 
-            // },
-            // { 
-            //     name: "portal", location: { x: 19.5, y: 0, z: -6.5}, 
-            //     attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } 
-            // },
-            // { 
-            //     name: "portal", location: { x: -19.5, y: 0, z: -6.5}, 
-            //     attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
-            // },
-            // { 
-            //     name: "portal", location: { x: -6.5, y: 0, z: -19.5}, 
-            //     attributes: { routeTo: { level: 5, location: { x: -40.0, y: 0, z: -6.5 } } } 
-            // }
+            { name: "rock1" },
+            { 
+                name: "grate", location: { x: 3, y: 0, z: 4}, 
+                attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } 
+            },
+            { 
+                name: "portal", location: { x: 19.5, y: 0, z: -6.5}, 
+                attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "portal", location: { x: -19.5, y: 0, z: -6.5}, 
+                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "portal", location: { x: -6.5, y: 0, z: -19.5}, 
+                attributes: { routeTo: { level: 5, location: { x: -40.0, y: 0, z: -6.5 } } } 
+            }
 
         ],
         entities: [
-            // { name: "john" },
-            // { name: "evilOne" },
+            { name: "john" },
             { name: "evilOne" },
-            // { name: "shopkeep" },
-            // { name: "rat" },
-            // { name: "lavaMan" },
-            // { name: "crystalMan" },
-            // { name: "rockyMan" },
-            // { name: "rat" },
-            // { name: "rat" },
-            // { name: "lobot" },
-            // { name: "blueShirt" }
-            // { name: "rosenBot" }
+            { name: "evilOne" },
+            { name: "shopkeep" },
+            { name: "rat" }
+            
         ]
     },
     {
@@ -119,7 +103,7 @@ export const levels = [
             { name: "gold25" },
             { name: "gold1" },
             { name: "gold10" },
-            { name: "arrow", location: { x: 0, y: 0, z: 0}}
+            { name: "arrow25", location: { x: 0, y: 0, z: 0}}
         ],
         structures: [
             { 
@@ -170,8 +154,10 @@ export const levels = [
         },
         items: [
             { name: "crystalBall", location: { x: 10, y: 0, z: 0 }},
-            { name: "busterblade", location: { x: 0, y: 0, z: 0 }},
-            { name: "gold25", location: { x: 1, y: 0, z: -1 }}
+            { name: "busterblade", location: { x: 10, y: 0, z: -1 }},
+            { name: "gold25", location: { x: 10, y: 0, z: -1 }},
+            { name: "redpotion" },
+            { name: "greenpotion" }
         ],
         structures: [
             { 
@@ -185,7 +171,8 @@ export const levels = [
 
         ],
         entities: [
-            { name: "rat", location: { x: 10, y: 0, z: 0 }}
+            { name: "rat", location: { x: 10, y: 0, z: 0 }},
+            { name: "spiderQueen", location: { x: 10, y: 0, z: 0 }}
         ]
     },
     {
@@ -207,7 +194,7 @@ export const levels = [
                     overheadPointLight: false,
                 },
                 fog: {
-                    color: 'darkgreen',
+                    color: 'white',
                     density: 1.2
                 },
                 water: {
@@ -221,7 +208,11 @@ export const levels = [
             }
         },
         items: [
-
+            { name: "busterboot", location: { x: 0, y: 0, z: 0} },
+            { name: "gold25", location: { x: 10, y: 0, z: -1 }},
+            { name: "redpotion" },
+            { name: "greenpotion" },
+            { name: "lightSaber", location: { x: -1, y: 0, z: -1} }
         ],
         structures: [
             { 
@@ -230,7 +221,10 @@ export const levels = [
             }
         ],
         entities: [
-
+            { name: "crystalMan" },
+            { name: "crystalMan" },
+            { name: "crystalMan" },
+            { name: "crystalMan" }
         ]
     },
     {
@@ -252,7 +246,7 @@ export const levels = [
                     overheadPointLight: false,
                 },
                 fog: {
-                    color: 'red',
+                    color: 'whites',
                     density: 1.2
                 },
                 water: {
@@ -268,7 +262,10 @@ export const levels = [
             }
         },
         items: [
-
+            { name: "gold25", location: { x: 10, y: 0, z: -1 }},
+            { name: "redpotion" },
+            { name: "greenpotion" },
+            { name: "helmet" }
         ],
         structures: [
             { 
@@ -278,7 +275,8 @@ export const levels = [
         ],
         entities: [
             { name: "lavaMan" },
-
+            // { name: "lavaMan" },
+            
         ]
     },
     {
@@ -307,17 +305,26 @@ export const levels = [
             }
         },
         items: [
-
+            // { name: "crystalBall" },
+            // { name: "mushroom" },
         ],
         structures: [
             { 
                 name: "portal", location: { x: -43, y: 0, z: -6.5},
                 attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: -18.5 } } } 
             },
+            // { name: "tree1" },
             // { name: "tavern", location: { x: -45, y: 0, z: -4.5} },
         ],
         entities: [
-
+            { name: "shopkeep" },
+            { name: "rockyMan" },
+            // { name: "rockyMan" },
+            // { name: "rockyMan" },
+            // { name: "rockyMan" },
+            // { name: "lobot" },
+            // { name: "blueShirt" }
+            // { name: "rosenBot" }
         ]
     }
  

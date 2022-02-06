@@ -68,16 +68,23 @@ export const xpLevels = {
             effect: "mana/1"
         },
         5: {
-            effect: "mana/1"
+            effect: "mana/1",
+            spell: "healAllSpell"
         },
         6: {
             effect: "mana/1"
         },
         7: {
-            effect: "mana/1"
+            effect: "mana/1",
+            spell: "poisonProjectileSpell"
         },
         8: {
-            effect: "mana/1"
+            effect: "mana/1",
+            spell: "fireProjectileSpell"
+        },
+        9: {
+            effect: "mana/1",
+            spell: "iceProjectileSpell"
         }
         
     },

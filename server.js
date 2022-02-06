@@ -116,13 +116,15 @@ database(mongoose, (db) => {
       let sender = socket.id;
       let nsp = socket.nsp.name;
 
-      if (!app.rooms[nsp][roomNumber] || app.rooms[nsp][roomNumber].length <= 1) {
-        return null;
-      } else {
-        let others = app.rooms[nsp][roomNumber].filter(el => el[0] != sender).map(el => el[1]);
-        // console.log(`room ${room}: `);
-        return others;
-      }
+      if (app.rooms[nsp]) {
+        if (!app.rooms[nsp][roomNumber] || app.rooms[nsp][roomNumber].length <= 1) {
+          return null;
+        } else {
+          let others = app.rooms[nsp][roomNumber].filter(el => el[0] != sender).map(el => el[1]);
+          // console.log(`room ${room}: `);
+          return others;
+        }
+      } else return null;
     }
 
     /** Remove from rooms and delegate firstInRoom if needed */
@@ -268,19 +270,18 @@ database(mongoose, (db) => {
       }
 
       removeFromRooms();
-
       console.log(`Disconnecting ${socket.id}`)
     });
 
 
     socket.on('death', data => {
       
-      if (data.hero) {  // remove from room/layouts
-        removeFromRooms();
-      }
-
       app.layouts[socket.nsp.name][data.level][0].entities = app.layouts[socket.nsp.name][data.level][0].entities.filter(el => el.attributes.layoutId != data.layoutId);
       notifyRoomMembers(data.level, 'death', data);
+
+      // if (data.hero) {  // remove from room/layouts
+      //   removeFromRooms();
+      // }
     });
 
     socket.on('updateStructureAttributes', data => {

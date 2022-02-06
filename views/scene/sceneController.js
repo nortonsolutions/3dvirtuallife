@@ -168,7 +168,7 @@ export class SceneController {
         this.socket.on('updateHeroTemplate', heroTemplate => {
             this.scene.removeFromScenebyLayoutId(heroTemplate.attributes.layoutId);
             heroTemplate.subtype = "remote";
-            this.seedForm(heroTemplate, true);
+            this.seedForm(heroTemplate, true, false); // no need to re-add to forms
         });
 
         // data: { itemName, position: item.model.position, rotation: item.model.rotation })
@@ -445,7 +445,7 @@ export class SceneController {
      * reseed is set for updates as when character equips/unequips
      * 
      */ 
-    seedForm(formTemplate, reseed = false) {
+    seedForm(formTemplate, reseed = false, addToForms = true) {
 
         var form;
         if (formTemplate.attributes.moves) {
@@ -465,7 +465,7 @@ export class SceneController {
                 })
             }
 
-            this.addToScene(form, true, true, reseed);
+            this.addToScene(form, addToForms, true, reseed);
         
             if (this.firstInRoom && form.attributes.contentItems) {
                 form.attributes.contentItems.forEach(contentItemName => {
@@ -581,12 +581,12 @@ export class SceneController {
      * as with launching or equipping.  Use dropItemToScene to broadcast
      * with a shared layoutId.
      */
-    loadFormByName(formName, callback) {
+    loadFormByName(formName, callback, addToForms) {
 
         let formTemplate = this.getTemplateByName(formName);
         this.socket.emit('nextLayoutId', this.level, layoutId => {
             formTemplate.attributes.layoutId = layoutId;
-            this.seedForm(formTemplate).then(form => {
+            this.seedForm(formTemplate, null, addToForms).then(form => {
                callback(form);
             });
         })
