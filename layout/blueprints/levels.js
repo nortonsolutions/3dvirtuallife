@@ -291,7 +291,7 @@ export const levels = [
             description: 'kingdom',
             gltf: 'kingdom.glb',
             attributes: {
-                scale: 100,
+                scale: 140,
                 borderTrees: true,
                 light: {
                     sunLight: true,

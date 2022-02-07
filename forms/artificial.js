@@ -22,6 +22,16 @@ export class ArtificialForm extends IntelligentForm{
                     this.actions['Punch'].setEffectiveTimeScale(2);
                     this.actions['Death'].setEffectiveTimeScale(1);
                     break;
+                case "rockyman":
+                case "lavaman":
+                case "crystalman":
+                    this.actions['Idle'].setEffectiveTimeScale(1);
+                    this.actions['Walking'].setEffectiveTimeScale(1);
+                    this.actions['Punch'].setEffectiveTimeScale(1);
+                    this.actions['Punch2'].setEffectiveTimeScale(1);
+                    this.actions['Kick'].setEffectiveTimeScale(1);
+                    this.actions['Death'].setEffectiveTimeScale(1);
+                    break;
             }
             if (callback) callback();
         });
@@ -105,10 +115,22 @@ export class ArtificialForm extends IntelligentForm{
 
     attackHero() {
         
-        if (this.objectName.match(new RegExp('rat', 'i'))) {
-            this.fadeToAction("Attack", 0.2);
-        } else {
-            this.fadeToAction("Punch", 0.2);
+        switch (this.objectName) {
+            case 'rat':
+                this.fadeToAction("Attack", 0.2);
+                break;
+            case 'crystalman':
+            case 'lavaman':
+            case 'rockyman':
+
+                let attackArray = ['Punch','Punch2','Kick'];
+                let attack = getRndInteger(0,attackArray.length - 1);
+                this.fadeToAction(attackArray[attack], 0.2);
+
+                break;
+            default:
+                this.fadeToAction("Punch", 0.2);
+                break;
         }
 
         let chanceToHit = this.getEffectiveStat('agility') / 100;

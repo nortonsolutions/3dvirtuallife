@@ -7,12 +7,23 @@ module.exports = function (mongoose, callback) {
         gameName: {type: String, unique: true, required: true},
         props: String,
         heroTemplate: String
-    })
+    });
       
     const SavedGame = mongoose.model('SavedGame', savedGameSchema);
 
+    const userSchema = mongoose.Schema({
+      username: { type: String, required: true, unique: true },
+      password: { type: String, required: true },
+      roles: {type: [String], default: ['player']},
+      firstname: String,
+      surname: String
+    });
+    
+    const UserModel = mongoose.model('User', userSchema);
+
     mongoose.connect(CONNECTION_STRING, { useMongoClient: true })
     .then(
+
       (db) => {
         callback(db);
       },

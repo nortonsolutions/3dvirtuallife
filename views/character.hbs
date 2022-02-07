@@ -3,7 +3,8 @@
     <div class="col-4">
 
         <div class="row justify-content-center">
-            <img class="maxHeight240 m-auto" src="/models/png/{{model.png}}" alt="">
+            {{!-- <img class="maxHeight240 m-auto" src="/models/png/{{model.png}}" alt=""> --}}
+            <div id="playerPreview"></div>
 
         </div>
         <div class="row justify-content-center">
@@ -26,7 +27,7 @@
                <div class="col-3 px-0"><label for="height">Height:</label></div>
             </div>
             <div class="row">
-               <input type="text" class="form-control col-6" name="name" id="name" placeholder="Name..." value="Dave">
+               <input type="text" class="form-control col-6" name="name" id="name" placeholder="Name..." value="New">
                <input type="number" class="form-control col-4" name="height" id="height" placeholder="20" step="1" min="18" max="99" value="20">
             </div>
 

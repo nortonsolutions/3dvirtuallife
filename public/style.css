@@ -9,6 +9,11 @@ img {
     max-width: 100% !important;
 }
 
+#playerPreview {
+    width: 200px;
+    height: 300px;
+}
+
 .card {
     height: 80px;
     width: 80px;

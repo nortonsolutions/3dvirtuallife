@@ -5,13 +5,18 @@
 'use strict';
 
 const express     = require('express');
+const session     = require('express-session');
 const bodyParser  = require('body-parser');
+const cors        = require('cors');
 // const fs          = require('fs');
+// const multer      = require('multer');
 
+const auth                     = require('./auth.js');
 const apiRoutes                = require('./routes/api.js');
 const hbsHelpers               = require('./public/handlebarsHelpers.js')
 const hbs                      = require('express-hbs');
 const mongoose                 = require('mongoose');
+const passport                 = require('passport');
 
 // For unit and functional testing with Chai later:
 // var expect            = require('chai').expect;
@@ -47,10 +52,21 @@ database(mongoose, (db) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   
+  app.use(session({
+    secret: process.env.SESSION_SECRET || "WHATEVER",
+    resave: true,
+    saveUninitialized: true
+  }));
+  
+  app.use(passport.initialize());
+  app.use(passport.session());
+
   //For FCC testing purposes
   // fccTestingRoutes(app);
-    
+
+  auth(app, db.models.User);
   apiRoutes(app, db);
+  
   
   //404 Not Found Middleware
   app.use(function(req, res, next) {

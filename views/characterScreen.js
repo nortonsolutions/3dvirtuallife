@@ -1,7 +1,7 @@
 import { models } from '/models/models.js'
 
 var props = { level: 0, layouts: [] }
-var heroTemplate = newHeroTemplate('dave', 20);
+var heroTemplate = newHeroTemplate('new', 20);
 
 export class CharacterScreen {
  
@@ -12,49 +12,86 @@ export class CharacterScreen {
 
         this.selectedModel = 0;
         this.heroTemplate = newHeroTemplate();
+
+        this.models = models;
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera( 75, 2/3, 0.1, 1000 );
+        this.renderer = new THREE.WebGLRenderer();
+
+        var geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );
+        var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+        this.cylinder = new THREE.Mesh( geometry, material );
+    }
+
+    render = () => {
+
+        this.cylinder.rotation.x += 0.01;
+        this.cylinder.rotation.y += 0.01;
+        requestAnimationFrame( this.render );
+        this.renderer.render( this.scene, this.camera );
+
+    }
+
+    runOnce(callback) {
+
+        handleGet('/listSavedHeroes', (response) => {
+            let savedHeroes = JSON.parse(response).map(el => JSON.parse(el));
+            this.models = [...this.models, ...savedHeroes];
+
+            let playerPreview = document.getElementById('playerPreview');
+            playerPreview.appendChild( this.renderer.domElement );
+            this.scene.add( this.cylinder );
+            this.camera.position.z = 30;
+    
+            this.render();
+            callback();
+        });
     }
 
     addCharacterScreenEvents() {
-        document.getElementById('next').addEventListener('click', () => {
-            this.selectedModel++;
-            if (this.selectedModel >= models.length) this.selectedModel = 0;
-            this.refresh();
-        });
 
-        document.getElementById('back').addEventListener('click', () => {
-            this.selectedModel--;
-            if (this.selectedModel < 0 ) this.selectedModel = models.length - 1;
-            this.refresh();
-        });
-
-        document.getElementById('startLevel').addEventListener('click', (e) => {
-            e.preventDefault();
-
-            this.heroTemplate.name = document.getElementById('name').value;
-            this.heroTemplate.gltf = models[this.selectedModel].gltf;
-            this.heroTemplate.attributes.stats = {...this.heroTemplate.attributes.stats, ...models[this.selectedModel].attributes.stats }
-            this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
-
-            handleGet('/listActiveGames', (response) => {
-
-                let activeGames = JSON.parse(response);
-                if (Object.keys(activeGames).length > 0) { // if there are games
-
-                    /** 
-                     * TODO (future): allow creation of new game namespace.
-                     * For now only one namespace is allowed ('/') so the
-                     * only option is to join game.
-                     */
-                    this.eventDepot.fire('closeModal', {});
-                    this.eventDepot.fire('joinGame', { heroTemplate: this.heroTemplate, activeGames });
-
-                } else { // no games, so start a new one
-                    
-                    let namespace = '/';
-                    this.eventDepot.fire('closeModal', {});
-                    this.eventDepot.fire('startLevel', { heroTemplate: this.heroTemplate, props, namespace });
-                }
+        // this.populateModels(() => {
+            document.getElementById('next').addEventListener('click', () => {
+                this.selectedModel++;
+                if (this.selectedModel >= this.models.length) this.selectedModel = 0;
+                this.refresh();
             });
+    
+            document.getElementById('back').addEventListener('click', () => {
+                this.selectedModel--;
+                if (this.selectedModel < 0 ) this.selectedModel = this.models.length - 1;
+                this.refresh();
+            });
+    
+            document.getElementById('startLevel').addEventListener('click', (e) => {
+                e.preventDefault();
+    
+                this.heroTemplate.name = document.getElementById('name').value;
+                this.heroTemplate.gltf = this.models[this.selectedModel].gltf;
+                this.heroTemplate.attributes.stats = {...this.heroTemplate.attributes.stats, ...this.models[this.selectedModel].attributes.stats }
+                this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
+    
+                handleGet('/listActiveGames', (response) => {
+    
+                    let activeGames = JSON.parse(response);
+                    if (Object.keys(activeGames).length > 0) { // if there are games
+    
+                        /** 
+                         * TODO (future): allow creation of new game namespace.
+                         * For now only one namespace is allowed ('/') so the
+                         * only option is to join game.
+                         */
+                        this.eventDepot.fire('closeModal', {});
+                        this.eventDepot.fire('joinGame', { heroTemplate: this.heroTemplate, activeGames });
+    
+                    } else { // no games, so start a new one
+                        
+                        let namespace = '/';
+                        this.eventDepot.fire('closeModal', {});
+                        this.eventDepot.fire('startLevel', { heroTemplate: this.heroTemplate, props, namespace });
+                    }
+                });
+            // });
         });
 
         document.getElementById('joinGame').addEventListener('click', (e) => {
@@ -62,8 +99,8 @@ export class CharacterScreen {
             e.preventDefault();
 
             this.heroTemplate.name = document.getElementById('name').value;
-            this.heroTemplate.gltf = models[this.selectedModel].gltf;
-            this.heroTemplate.attributes.stats = {...this.heroTemplate.attributes.stats, ...models[this.selectedModel].attributes.stats }
+            this.heroTemplate.gltf = this.models[this.selectedModel].gltf;
+            this.heroTemplate.attributes.stats = {...this.heroTemplate.attributes.stats, ...this.models[this.selectedModel].attributes.stats }
             this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
 
             handleGet('/listActiveGames', (response) => {
@@ -84,20 +121,26 @@ export class CharacterScreen {
             });
 
         });
+
+
     }
 
     getContext = () => {
 
         return {
-            model: models[this.selectedModel],
+            model: this.models[this.selectedModel],
             heroTemplate: this.heroTemplate
         }
     }
 
     refresh = () => {
+        this.cylinder.rotation.x = 0;
+        this.cylinder.rotation.y = 0;
         let context = this.getContext(this);
         this.modal.loadTemplate('modal-body', "character", this.getContext(), () => {
-            this.addCharacterScreenEvents();
+            this.runOnce(() => {
+                this.addCharacterScreenEvents();
+            })
         });
     }
 }

@@ -72,7 +72,9 @@ class Modal {
                         this.dialogScreen.addDialogEvents();
                         break;
                     case "character":
-                        this.characterScreen.addCharacterScreenEvents();
+                        this.characterScreen.runOnce(() => {
+                            this.characterScreen.addCharacterScreenEvents();
+                        });
                         break;
                     case "heroDialog":
                         this.heroDialog = true;

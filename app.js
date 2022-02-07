@@ -73,7 +73,7 @@ export const app = () => {
             e.preventDefault();
         })
 
-        Array.from(document.querySelectorAll('.newGame')).forEach(el => {
+        Array.from(document.querySelectorAll('.startGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
                 // startLevel(heroTemplate, props);
@@ -119,7 +119,7 @@ export const app = () => {
             el.addEventListener('click', e => {
                 localStorage.clear();
                 if (game) game.stop();
-                window.location = '/';
+                window.location = '/logout';
                 e.preventDefault();
             })
         });

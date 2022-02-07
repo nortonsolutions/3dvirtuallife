@@ -65,19 +65,19 @@ export const Entities = {
         attributes: {
             moves: true,
             animates: true,
-            height: 30,
+            height: 80,
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 20,
+            scale: 100,
             stats: {
-                health: "2/2/0",
+                health: "5/5/0",
                 mana: "0/0/0",
-                strength: "2/2/0",
+                strength: "4/4/0",
                 agility: "2/2/0",
-                defense: "1/1/0"
+                defense: "2/2/0"
             },
-            grants: ["gold3"]
+            grants: ["gold25"]
         }
     },
     crystalMan: {
@@ -88,19 +88,19 @@ export const Entities = {
         attributes: {
             moves: true,
             animates: true,
-            height: 30,
+            height: 80,
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 20,
+            scale: 100,
             stats: {
-                health: "2/2/0",
+                health: "5/5/0",
                 mana: "0/0/0",
-                strength: "2/2/0",
+                strength: "4/4/0",
                 agility: "2/2/0",
-                defense: "1/1/0"
+                defense: "2/2/0"
             },
-            grants: ["gold3"]
+            grants: ["gold25"]
         }
     },
     rosenBot: {
