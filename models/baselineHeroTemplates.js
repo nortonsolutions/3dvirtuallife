@@ -29,7 +29,7 @@ export const baselineHeroTemplates = [
         attributes: {
             stats: {
                 agility: "1/1/0",
-                strenth: "2/2/0"
+                strength: "2/2/0"
             }
         },
         description: "Above-average strength, slower agility."

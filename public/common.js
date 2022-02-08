@@ -44,11 +44,11 @@ function getObjectType(obj) {
     }
 }
 
-function shiftTowardCenter(value) {
+function shiftTowardCenter(value, factor) {
     if (value != 0) {
         if (value > 0) {
-            return value - 5;
-        } else return value + 5;
+            return value - (5 * factor);
+        } else return value + (5 * factor);
     }
 }
 

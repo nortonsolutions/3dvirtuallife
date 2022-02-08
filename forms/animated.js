@@ -59,7 +59,7 @@ export class AnimatedForm extends StandardForm{
             this.previousActionName = '';
             this.previousAction = null;
     
-            if (this.attributes.unlocked == undefined || this.attributes.unlocked) {
+            if (this.attributes.unlocked) {
                 if (this.activeAction) this.activeAction.play();
             }
 

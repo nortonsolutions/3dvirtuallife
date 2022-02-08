@@ -89,10 +89,10 @@ export const Items = {
         }
     },
     keyToChest2: {
-        name: 'keyToChest',
+        name: 'keyToChest2',
         gltf: 'key.gltf',
         image: 'keyGolden.png',
-        description: 'A small golden key',
+        description: 'A special key',
         type: 'item',
         attributes: {
             animates: false,

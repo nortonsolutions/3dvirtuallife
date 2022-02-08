@@ -64,6 +64,10 @@ export const app = () => {
             startLevel(data.heroTemplate, data.props, data.namespace);
         });
 
+        eventDepot.addListener('saveGame', (gameName) => {
+            gameAPI.saveGame(gameName);
+        });
+
     }
 
     const addDocumentEventListeners = () => {

@@ -69,18 +69,28 @@ export class Hero extends IntelligentForm {
 
 
 
-    cacheHero() {
-        if (this.model) this.updateHeroLocationFromPosition();
+    cacheHero(justDied = false) {
+
+        if (this.model) this.updateHeroLocationFromPosition(justDied);
         localStorage.setItem('gameHeroTemplate', JSON.stringify(this.returnTemplate()));
 
     }
 
     // Calculate hero location using grid coordinates
-    updateHeroLocationFromPosition() {
+    updateHeroLocationFromPosition(justDied) {
 
-        this.location.x = this.model.position.x / multiplier,
-        this.location.y = this.model.position.y / multiplier,
-        this.location.z = this.model.position.z / multiplier
+        var position = new THREE.Vector3();
+        if (justDied) {
+            position = this.sceneController.positionOfClosestStructure(this.model.position);
+            position.x = shiftTowardCenter(position.x, 4);
+            position.z = shiftTowardCenter(position.z, 4);
+        } else {
+            position.copy(this.model.position);
+        }
+
+        this.location.x = position.x / multiplier,
+        this.location.y = position.y / multiplier,
+        this.location.z = position.z / multiplier
         
     }
 
@@ -674,8 +684,7 @@ export class Hero extends IntelligentForm {
     death(local = true) {
         super.death(local);
 
-        // drop all wares
-        this.cacheHero();
+        // drop all wares, then cache
         this.inventory.forEach(item => {
             
             if (item) {
@@ -686,6 +695,8 @@ export class Hero extends IntelligentForm {
             }
         });
 
+        this.equipped = [];
+
         Object.values(this.equipped).forEach(item => {
             /** data: {location ..., itemName..., } */
             if (item) {
@@ -694,12 +705,21 @@ export class Hero extends IntelligentForm {
             }
         });
 
-        setTimeout(() => {
+        this.equipped = {};
+
+        setTimeout(() => { // pause before separation
             let thisModel = this.model.getObjectByProperty("objectType", "hero");
             thisModel.position.copy(this.model.position);
             this.sceneController.scene.add(thisModel);
 
-        }, 2000);
+            // auto-save with health so character can't be loaded with all wares
+            this.changeStat("health", this.getStatMax("health") * 2/3);
+            this.cacheHero(true);
+
+            let gameName = localStorage.getItem('gameName');
+            if (gameName) this.sceneController.eventDepot.fire('saveGame', gameName);
+
+        }, 1000);
         
     }
 

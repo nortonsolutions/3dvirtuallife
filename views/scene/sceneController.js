@@ -594,6 +594,18 @@ export class SceneController {
         })
     }
 
+    positionOfClosestStructure(position) {
+        var response = null;
+        let shortestDistance = Infinity;
+        this.structureModels.forEach(structureModel => {
+            if (position.distanceTo(structureModel.position) < shortestDistance) {
+                shortestDistance = position.distanceTo(structureModel.position);
+                response = structureModel.position;
+            }
+        })
+        return response;
+    }
+
     allFriendliesInRange(range, position) { 
         
         var response = [];

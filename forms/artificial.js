@@ -117,6 +117,7 @@ export class ArtificialForm extends IntelligentForm{
         
         switch (this.objectName) {
             case 'rat':
+            case 'spiderQueen':
                 this.fadeToAction("Attack", 0.2);
                 break;
             case 'crystalman':

@@ -29,14 +29,15 @@ export const levels = [
             }
         },
         items: [
-            { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
-            { name: "smallSword" },
-            { name: "redpotion" },
-            { name: "greenpotion" },
-            { name: "gold3" },
-            { name: "bagOfGems" },
-            { name: "bow" },
-            { name: "arrow25" },
+            { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
+            // { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
+            // { name: "smallSword" },
+            // { name: "redpotion" },
+            // { name: "greenpotion" },
+            // { name: "gold3" },
+            // { name: "bagOfGems" },
+            // { name: "bow" },
+            // { name: "arrow25" },
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0} },
@@ -61,11 +62,11 @@ export const levels = [
 
         ],
         entities: [
-            { name: "john" },
-            { name: "evilOne" },
+            // { name: "john" },
             // { name: "evilOne" },
-            { name: "shopkeep" },
-            { name: "rat" }
+            // { name: "evilOne" },
+            // { name: "shopkeep" },
+            // { name: "rat" }
             
         ]
     },
@@ -154,8 +155,8 @@ export const levels = [
         },
         items: [
             { name: "crystalBall", location: { x: 10, y: 0, z: 0 }},
-            { name: "busterblade", location: { x: 10, y: 0, z: -1 }},
-            { name: "gold25", location: { x: 10, y: 0, z: -1 }},
+            { name: "busterblade", location: { x: 10, y: 0, z: -2 }},
+            { name: "gold25", location: { x: 10, y: 0, z: -2 }},
             { name: "redpotion" },
             { name: "greenpotion" }
         ],
@@ -275,7 +276,9 @@ export const levels = [
         ],
         entities: [
             { name: "lavaMan" },
-            // { name: "lavaMan" },
+            { name: "lavaMan" },
+            { name: "lavaMan" },
+            { name: "lavaMan" },
             
         ]
     },

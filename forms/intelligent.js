@@ -157,9 +157,9 @@ export class IntelligentForm extends AnimatedForm{
                 
                 if (this.model.position.y < this.sceneController.waterElevation) {
                     let distanceBelowWater = Math.abs(this.sceneController.waterElevation - this.model.position.y);
-                    this.velocity.x *= Math.max((100-(distanceBelowWater*3))/100,.005);
-                    this.velocity.y *= Math.max((100-(distanceBelowWater*3))/100,.005);
-                    this.velocity.z *= Math.max((100-(distanceBelowWater*3))/100,.005);
+                    this.velocity.x *= Math.max((100-(distanceBelowWater*3))/100,.01);
+                    this.velocity.y *= Math.max((100-(distanceBelowWater*3))/100,.01);
+                    this.velocity.z *= Math.max((100-(distanceBelowWater*3))/100,.01);
 
                     if (this.sceneController.water.attributes.lava && this.objectName != "lavaMan") {
                         this.changeStat('health',-distanceBelowWater/1000);
@@ -577,7 +577,7 @@ export class IntelligentForm extends AnimatedForm{
                         }
                     })
                 } 
-            }, false);  // false means do not add to forms
+            });  // false means do not add to forms
         }
 
 
