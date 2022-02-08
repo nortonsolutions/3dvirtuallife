@@ -42,7 +42,7 @@ export class CharacterScreen {
         let templates = [];
         baselineHeroTemplates.forEach(template => {
             let newTemplate = newHeroTemplate();
-            newTemplate.attributes = {...newTemplate.attributes, ...template.attributes};
+            newTemplate.attributes.stats = {...newTemplate.attributes.stats, ...template.attributes.stats};
             newTemplate.type = template.type;
             newTemplate.gltf = template.gltf;
             newTemplate.png = template.png;
@@ -120,15 +120,6 @@ export class CharacterScreen {
 
         this.animationId = requestAnimationFrame( this.render );
         this.renderer.render( this.scene, this.camera );
-
-    }
-
-    /** 
-     * getInitialContext queries the server for saved heroes under this user account,
-     * updates "this.heroTemplates" array, and returns this.heroTemplates[0].
-     */
-    getInitialContext() {
-
 
     }
 
