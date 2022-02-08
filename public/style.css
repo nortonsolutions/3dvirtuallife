@@ -9,6 +9,11 @@ img {
     max-width: 100% !important;
 }
 
+.col {
+    display: flex;
+    flex-direction: column;
+}
+
 #playerPreview {
     width: 200px;
     height: 300px;

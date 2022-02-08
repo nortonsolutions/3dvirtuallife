@@ -248,7 +248,7 @@ export class Hero extends IntelligentForm {
                             if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
                         }
                     }
-                }, false); // false means do not addToForms
+                }); // false means do not addToForms
 
             }
 

@@ -43,7 +43,6 @@ export class CharacterScreen {
         baselineHeroTemplates.forEach(template => {
             let newTemplate = newHeroTemplate();
             newTemplate.attributes.stats = {...newTemplate.attributes.stats, ...template.attributes.stats};
-            newTemplate.type = template.type;
             newTemplate.gltf = template.gltf;
             newTemplate.png = template.png;
             newTemplate.description = template.description;
@@ -68,7 +67,7 @@ export class CharacterScreen {
     refresh = () => {
         this.heroTemplate = this.heroTemplates[this.selectedTemplate];
         this.modal.loadTemplate('modal-body', "character", this.heroTemplate, () => {
-            this.addCharacterScreenEvents();
+            this.addCharacterScreenEvents(this.heroTemplate.name);
             if (this.heroTemplate) this.updateCanvas();
         });
     }
@@ -89,16 +88,7 @@ export class CharacterScreen {
         // Which model to add to the scene?
         this.loader.load( '/models/3d/gltf/' + this.heroTemplate.gltf, (gltf) => {
             this.currentModel = gltf.scene;
-            
-            // // cylinder for testing; replace with hero glb
-            // var geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );
-            // var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-            // this.cylinder = new THREE.Mesh( geometry, material );
-            
-            // this.currentModel.scale.x = this.heroTemplate.attributes.scale;
-            // this.currentModel.scale.y = this.heroTemplate.attributes.scale;
-            // this.currentModel.scale.z = this.heroTemplate.attributes.scale;
-            
+
             this.scene.add( this.currentModel ); // (  );this.cylinder
             this.camera.position.z = 6;
             this.camera.position.y = 2;
@@ -110,11 +100,6 @@ export class CharacterScreen {
      * Recursive method which renders the scene in the canvas.
      */
     render = () => {
-
-        // if (this.cylinder) {
-        //     this.cylinder.rotation.x += 0.01;
-        //     this.cylinder.rotation.y += 0.01;
-        // }
 
         if (this.currentModel) this.currentModel.rotation.y += 0.01;
 
@@ -128,6 +113,16 @@ export class CharacterScreen {
      */
     addCharacterScreenEvents() {
         
+        if (this.heroTemplate.name != "new") {
+            document.getElementById('name').value = this.heroTemplate.name;
+            document.getElementById('height').value = this.heroTemplate.attributes.height;
+            document.getElementById('name').disabled = true;
+            document.getElementById('height').disabled = true;
+        } else {
+            document.getElementById('name').disabled = false;
+            document.getElementById('height').disabled = false;
+        }
+
         document.getElementById('next').addEventListener('click', () => {
             this.selectedTemplate++;
             if (this.selectedTemplate >= this.heroTemplates.length) this.selectedTemplate = 0;
@@ -140,13 +135,17 @@ export class CharacterScreen {
             if (this.heroTemplate) this.refresh();
         });
 
-        document.getElementById('startLevel').addEventListener('click', (e) => {
+        document.getElementById('newGame').addEventListener('click', (e) => {
             e.preventDefault();
+
+            localStorage.setItem('gameProps', JSON.stringify(props));
 
             this.heroTemplate = this.heroTemplates[this.selectedTemplate];
 
             this.heroTemplate.name = document.getElementById('name').value;
             this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
+
+            this.cacheHero();
 
             handleGet('/listActiveGames', (response) => {
 
@@ -166,8 +165,28 @@ export class CharacterScreen {
                     let namespace = '/';
                     this.eventDepot.fire('closeModal', {});
                     this.eventDepot.fire('startLevel', { heroTemplate: this.heroTemplate, props, namespace });
+
                 }
             });
+
+            this.scene.remove( this.currentModel );
+            this.scene.dispose();
+        });
+
+        document.getElementById('loadGame').addEventListener('click', (e) => {
+            e.preventDefault();
+
+            this.heroTemplate = this.heroTemplates[this.selectedTemplate];
+
+            this.heroTemplate.name = document.getElementById('name').value;
+            this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
+
+            this.cacheHero();
+
+            this.modal.gameAPI.listGames();
+
+            this.scene.remove( this.currentModel );
+            this.scene.dispose();
         });
 
         document.getElementById('joinGame').addEventListener('click', (e) => {
@@ -178,6 +197,8 @@ export class CharacterScreen {
             this.heroTemplate.gltf = this.heroTemplates[this.selectedTemplate].gltf;
             this.heroTemplate.attributes.stats = {...this.heroTemplate.attributes.stats, ...this.heroTemplates[this.selectedTemplate].attributes.stats }
             this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
+
+            this.cacheHero();
 
             handleGet('/listActiveGames', (response) => {
 
@@ -191,14 +212,25 @@ export class CharacterScreen {
 
                     let namespace = '/';
                     alert('No games to join!  Starting new game.');
+                    
+                    localStorage.setItem('gameProps', JSON.stringify(props));
+
                     this.eventDepot.fire('closeModal', {});
                     this.eventDepot.fire('startLevel', { heroTemplate: this.heroTemplate, props, namespace });
                 }
             });
 
+            this.scene.remove( this.currentModel );
+            this.scene.dispose();
+
         });
     }
+
+    cacheHero() {
+        localStorage.setItem('gameHeroTemplate', JSON.stringify(this.heroTemplate));
+    }
 }
+
 
 
 function newHeroTemplate(name,height) {

@@ -111,7 +111,12 @@ export const app = () => {
         Array.from(document.querySelectorAll('.loadGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
-                gameAPI.listGames();
+
+                if (characterSelected()) {
+                    gameAPI.listGames();
+                } else {
+                    eventDepot.fire('modal', { type: 'character', title: "Character", context: { } });
+                }
             })
         });
 
@@ -127,6 +132,10 @@ export const app = () => {
 
     addDocumentEventListeners();
     addEventDepotListeners(eventDepot);
+
+    const characterSelected = () => {
+        return (localStorage.getItem('gameHeroTemplate'));
+    }
 
     /** Launch modal to select from activeGames */
     const joinGame = (heroTemplate, activeGames) => {

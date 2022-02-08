@@ -586,6 +586,8 @@ export class SceneController {
         let formTemplate = this.getTemplateByName(formName);
         this.socket.emit('nextLayoutId', this.level, layoutId => {
             formTemplate.attributes.layoutId = layoutId;
+
+            if (formTemplate.type == "spell") addToForms = false;
             this.seedForm(formTemplate, null, addToForms).then(form => {
                callback(form);
             });

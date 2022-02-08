@@ -17,6 +17,24 @@
         <div class="row">Type: {{type}}</div>
         <div class="row pt-3">
             {{description}}
+            <hr class="py-2">
+            <dl class="row">
+                <dt class="col-sm-5 text-primary">Stat</dt>
+                <dd class="col-sm-7 text-primary">cur/max/boost</dd>
+                {{#each attributes.stats}}
+                <dt class="col-sm-5">{{@key}}</dt>
+                <dd class="col-sm-7">{{this}}</dd>
+                {{/each}}
+            </dl>
+            
+            {{#each inventory}}
+                
+            {{/each}}
+
+            {{#each equipped}}
+
+            {{/each}}
+
         </div>
 
     </div>
@@ -32,8 +50,12 @@
             </div>
 
             <div class="row">
-                <button id="startLevel" type="submit" class="btn btn-primary btn-wide">Start</button>
-                <button id="joinGame" type="submit" class="btn btn-primary btn-wide">Join</button>
+                <div class="col m-auto">
+                <button id="newGame" type="submit" class="btn btn-primary btn-wide mt-2 mb-1">New Game</button>
+                <button id="loadGame" type="submit" class="btn btn-primary btn-wide my-1">Load Game</button>
+                <button id="joinGame" type="submit" class="btn btn-primary btn-wide my-1">Join Game</button>
+
+                </div>
             </div>
         </form>
     </div>

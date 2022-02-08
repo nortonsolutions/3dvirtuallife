@@ -42,17 +42,18 @@ export class GameAPI {
         })
     }
 
-    /** load gameName, gameProps, and gameHeroTemplate into localStorage, then launch game */
+    /** load gameName and gameProps into localStorage, then launch game */
     loadGame(gameName) {
         handleGet('/load/' + gameName, response => {
 
             let props = JSON.parse(response).props;
-            let heroTemplate = JSON.parse(response).heroTemplate;
+            // let heroTemplate = JSON.parse(response).heroTemplate;
 
             localStorage.setItem('gameName', gameName);
             localStorage.setItem('gameProps', props);
-            localStorage.setItem('gameHeroTemplate', heroTemplate);
+            // localStorage.setItem('gameHeroTemplate', heroTemplate);
 
+            let heroTemplate = localStorage.getItem('gameHeroTemplate');
             this.eventDepot.fire('startLevel', { heroTemplate: JSON.parse(heroTemplate), props: JSON.parse(props) });
         })
     }

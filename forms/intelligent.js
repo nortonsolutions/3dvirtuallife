@@ -505,6 +505,11 @@ export class IntelligentForm extends AnimatedForm{
     equip(area, itemName, throwable = false, throws = null) {
         this.equipped[area] = [itemName,throwable,throws];
         
+        if (this.objectType == "hero" && this.objectSubtype == "local") {
+            this.cacheHero();
+            this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
+        }
+
         if (area.match('key')) {
             this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
         } else {
@@ -575,10 +580,7 @@ export class IntelligentForm extends AnimatedForm{
             }, false);  // false means do not add to forms
         }
 
-        if (this.objectType == "hero" && this.objectSubtype == "local") {
-            this.cacheHero();
-            this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
-        }
+
 
     }
     
@@ -589,6 +591,11 @@ export class IntelligentForm extends AnimatedForm{
 
             delete this.equipped[area];
             
+            if (this.objectType == "hero" && this.objectSubtype == "local") {
+                this.cacheHero();
+                this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
+            }
+
             if (area.match('key')) {
                 this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
             } else {
@@ -623,14 +630,7 @@ export class IntelligentForm extends AnimatedForm{
                     this.animatedSubforms = this.animatedSubforms.filter(el => { el[0] != area });
                 }
             }
-    
-            if (this.objectType == "hero" && this.objectSubtype == "local") {
-                this.cacheHero();
-                this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
-            }
-    
         }
-
     }
 
     returnTemplate() {

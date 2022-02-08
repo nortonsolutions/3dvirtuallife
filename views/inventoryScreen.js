@@ -195,11 +195,11 @@ class InventoryScreen {
                             this.eventDepot.fire('equipItem', {bodyPart: targetElement.id, itemName, throwable: this.isItemThrowable(itemName), throws: this.itemThrows(itemName) });        
                         }
                         
-
                     }
         
                 }
                 
+                // Hero must be cached before refresh
                 this.refresh();
             }
 
