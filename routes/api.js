@@ -1,5 +1,5 @@
 /*
-* Norton 2021 - CourseApp
+* Norton 2021 - 3D virtual life
 *
 */
 
@@ -40,6 +40,7 @@ module.exports = function (app, db) {
     app.route('/save')
         .post(ensureAuthenticated, (req,res) => {
             let gameName = req.body.gameName;
+            let savedBy = req.user.username;
             let heroTemplate = req.body.gameHeroTemplate;
             let props = req.body.gameProps;
 
@@ -48,6 +49,7 @@ module.exports = function (app, db) {
                    res.json({error: err.message});
                 } else if (savedGame) { // game exists, overwrite
                     savedGame.heroTemplate = heroTemplate;
+                    savedGame.savedBy = savedBy;
                     savedGame.props = props;
                     savedGame.save((err,savedGame) => {
                         res.json(err? {error: err.message} : {success: "saved"});
@@ -55,6 +57,7 @@ module.exports = function (app, db) {
                 } else { // new game
                     db.models.SavedGame.create({ 
                         gameName: gameName,
+                        savedBy: savedBy,
                         heroTemplate: heroTemplate,
                         props: props
                     }, (err, doc) => {
@@ -74,7 +77,7 @@ module.exports = function (app, db) {
 
     app.route('/list')
         .get(ensureAuthenticated, (req,res) => {
-            db.models.SavedGame.find({}, (err,savedGames) => {
+            db.models.SavedGame.find({ savedBy: req.user.username }, (err,savedGames) => {
 
                 let listOfGames = savedGames.map(el => {
                     return {
@@ -102,7 +105,7 @@ module.exports = function (app, db) {
         });
 
     app.route('/clearActiveGames')
-        .get(ensureAuthenticated, (req,res) => {
+        .get(ensureAuthenticated, ensureAdmin, (req,res) => {
             app.games = {};
             app.rooms = {}; 
             app.layouts = {};
@@ -114,7 +117,7 @@ module.exports = function (app, db) {
 
     app.route('/listSavedHeroes')
         .get(ensureAuthenticated, (req,res) => {
-            db.models.SavedGame.find({}, (err,savedGames) => {
+            db.models.SavedGame.find({ savedBy: req.user.username }, (err,savedGames) => {
                 let listOfHeroes = savedGames.map(el => el.heroTemplate);
                 res.json(err? {error: err.message} : listOfHeroes);
             });
@@ -167,19 +170,9 @@ module.exports = function (app, db) {
 
     app.route('/deleteAccount')
         .post(ensureAuthenticated, ensureAdmin, (req,res) => {
-        db.models.User.remove({_id: req.body._id}, (err,body) => {
-            if (err) {
-                res.json({error: err.message});
-            } else {
-            db.models.User.find({}).select('username firstname surname').sort({ surname: 1 }).exec((err,users) => {
-                if (err) {
-                res.json({error: err.message});
-                } else {
-                res.render(process.cwd() + '/views/partials/selectUser.hbs', {users: users});
-                }
+            db.models.User.remove({_id: req.body._id}, (err,body) => {
+                res.json(err? {error: err.message} : {success: "removed"});
             })
-            }
-        })
         })
 
     app.route('/updateAccount')

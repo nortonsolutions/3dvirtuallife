@@ -41,7 +41,7 @@ class Modal {
 
             } else if (data.type == "character") {
 
-                context = this.characterScreen.getContext();
+                context = null;
             
             } else if (data.type == "heroDialog") {
                 this.heroDialogScreen.reset();
@@ -49,9 +49,7 @@ class Modal {
                 context = this.heroDialogScreen.getContext();
                 
             } else {
-
                 context = data.context;
-
             }
             
             this.loadTemplate('modal-body', data.type, context, () => {
@@ -72,9 +70,7 @@ class Modal {
                         this.dialogScreen.addDialogEvents();
                         break;
                     case "character":
-                        this.characterScreen.runOnce(() => {
-                            this.characterScreen.addCharacterScreenEvents();
-                        });
+                        this.characterScreen.initialize();
                         break;
                     case "heroDialog":
                         this.heroDialog = true;

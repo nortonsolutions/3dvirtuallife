@@ -5,6 +5,7 @@ module.exports = function (mongoose, callback) {
 
     const savedGameSchema = mongoose.Schema({
         gameName: {type: String, unique: true, required: true},
+        savedBy: String,
         props: String,
         heroTemplate: String
     });

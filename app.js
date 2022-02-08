@@ -155,5 +155,5 @@ export const app = () => {
         game.start(props.level);
     }
 
-
+    eventDepot.fire('modal', { type: 'character', title: "Character", context: { } });
 }

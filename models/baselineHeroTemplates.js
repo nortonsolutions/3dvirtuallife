@@ -1,4 +1,4 @@
-export const models = [
+export const baselineHeroTemplates = [
 
     {
         type: "Ranger",
