@@ -42,8 +42,9 @@ export class IntelligentForm extends AnimatedForm{
             // this.listPositions(this.model);
             // this.getBoundingSphereHandR(this.model);
             // this.setToDoubleSided(this.model);
-            this.computeVertexNormals(this.model);
-            this.setToCastShadows();
+
+            // this.computeVertexNormals(this.model);
+            // this.setToCastShadows();
 
             if (this.equipped) {
                 // Reduce cached boosts to zero before re-equipping
@@ -272,8 +273,6 @@ export class IntelligentForm extends AnimatedForm{
         if (changeMax) max = max + change;
 
         if (change > 0) {
-            // this.fadeToAction("Yes", 0.2); 
-            // this.fadeToAction("ThumbsUp", 0.2);
             newvalue = Math.min(max, cur + change);
         } else {
             newvalue = cur + change;
@@ -282,11 +281,7 @@ export class IntelligentForm extends AnimatedForm{
 
                 if (this.alive && newvalue <= 0) {
                     this.death();
-                } else if (this.alive) {
-                    
-                } 
-            } else {
-                // 
+                }
             }
         }
 
@@ -294,9 +289,9 @@ export class IntelligentForm extends AnimatedForm{
         
         if (this.objectSubtype == "local") this.updateHeroStats(stat);
 
-        this.sceneController.eventDepot.fire('statusUpdate', { 
-            // message: `${this.objectName} ${stat} stat updated: ${this.attributes.stats[stat]}` 
-        }); 
+        // this.sceneController.eventDepot.fire('statusUpdate', { 
+        //     // message: `${this.objectName} ${stat} stat updated: ${this.attributes.stats[stat]}` 
+        // }); 
 
         switch (stat) {
             case "health":
@@ -347,9 +342,10 @@ export class IntelligentForm extends AnimatedForm{
 
     death(local = true) {
 
-        this.alive = false;
+        
         this.sceneController.entities = this.sceneController.entities.filter(el => el != this);
         this.fadeToAction("Death", 0.2);
+        
 
         if (local) {
             this.sceneController.socket.emit('death', {level: this.sceneController.level, layoutId: this.attributes.layoutId, hero: this.objectType=="hero"});
@@ -375,11 +371,14 @@ export class IntelligentForm extends AnimatedForm{
 
         }
 
+        this.alive = false;
+        
         setTimeout(() => {  // Wait until the death scene has occurred before removal
             this.sceneController.forms = this.sceneController.forms.filter(el => {
                 return el.model.attributes.layoutId != this.attributes.layoutId;
             });
-        }, 1000);
+            
+        }, 2000);
     }
 
     firstInventorySlot() {

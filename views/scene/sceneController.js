@@ -558,6 +558,12 @@ export class SceneController {
     }
 
     deanimateScene(callback) {
+        
+        if (this.scene) {
+            this.scene.unregisterEventListeners();
+            this.scene.deanimate(() => {
+            });
+        }
 
         this.eventDepot.removeListener('takeItemFromScene', 'bound takeItemFromScene');
         this.eventDepot.removeListener('dropItemToScene', 'bound dropItemToScene');
@@ -565,12 +571,6 @@ export class SceneController {
         if (this.hero) this.hero.stop(() => {
             this.hero = null;
         });
-
-        if (this.scene) {
-            this.scene.unregisterEventListeners();
-            this.scene.deanimate(() => {
-            });
-        }
 
         if (this.forms) this.forms.forEach(form => {
             if (form.model.dispose) form.model.dispose();
@@ -697,12 +697,9 @@ export class SceneController {
     }
 
     getHeroByLayoutId(layoutId) {
-        console.log('getting hero ' + layoutId)
         if (layoutId == this.hero.attributes.layoutId) {
-            console.log('found local hero')
             return this.hero;
         } else {
-            console.log('scanning for other hero')
             return this.others.find(el => el.attributes.layoutId == layoutId);
         }
     }

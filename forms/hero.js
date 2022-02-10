@@ -458,7 +458,7 @@ export class Hero extends IntelligentForm {
                         this.sceneController.eventDepot.fire('modal', dialogData);
                     } 
                 } 
-           }
+            }
         })
 
         this.sceneController.eventDepot.addListener('mouse1click', () => {
@@ -773,8 +773,6 @@ export class Hero extends IntelligentForm {
             }
 
             this.sceneController.eventDepot.fire('updateXP', this.attributes.experience); 
-
-            // this.fadeToAction("Dance", 0.2);
         };
     }
 

@@ -19,7 +19,7 @@ export class CharacterScreen {
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
 
         this.loader = new THREE.GLTFLoader();
-        this.running = true;
+        this.running = false;
         this.animationId = null;
         this.cylinder = null;
 
@@ -84,6 +84,7 @@ export class CharacterScreen {
         
         this.scene.remove( this.currentModel );
         this.scene.dispose();
+        this.running = true;
         this.render();
 
         // Which model to add to the scene?
@@ -102,15 +103,14 @@ export class CharacterScreen {
      */
     render = () => {
         
-        this.animationId = requestAnimationFrame( this.render );
-        if (this.currentModel) this.currentModel.rotation.y += 0.01;
         if (this.running) {
+            this.animationId = requestAnimationFrame( this.render );
+            if (this.currentModel) this.currentModel.rotation.y += 0.01;
             this.renderer.render( this.scene, this.camera );
         } else {
             cancelAnimationFrame( this.animationId );      
             this.dispose(this.scene);      
         }
-
     }
     
     dispose(item) {
@@ -154,7 +154,7 @@ export class CharacterScreen {
 
         document.getElementById('newGame').addEventListener('click', (e) => {
             e.preventDefault();
-
+            
             if (document.getElementById('name').value == 'New') {
                 alert('Please enter a unique name for your character.');
             } else {
@@ -167,7 +167,11 @@ export class CharacterScreen {
                 this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
     
                 this.cacheHero();
-                
+
+                this.running = false;
+                this.scene.remove( this.currentModel );
+                this.scene.dispose();
+
                 handleGet('/listActiveGames', (response) => {
     
                     let activeGames = JSON.parse(response);
@@ -190,8 +194,6 @@ export class CharacterScreen {
                     }
                 });
     
-                this.scene.remove( this.currentModel );
-                this.scene.dispose();
             }
         });
 
@@ -207,6 +209,7 @@ export class CharacterScreen {
 
             this.modal.gameAPI.listGames();
 
+            this.running = false;
             this.scene.remove( this.currentModel );
             this.scene.dispose();
         });
@@ -214,6 +217,7 @@ export class CharacterScreen {
         document.getElementById('joinGame').addEventListener('click', (e) => {
             
             e.preventDefault();
+            
 
             this.heroTemplate.name = document.getElementById('name').value;
             this.heroTemplate.gltf = this.heroTemplates[this.selectedTemplate].gltf;
@@ -221,6 +225,10 @@ export class CharacterScreen {
             this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
 
             this.cacheHero();
+
+            this.running = false;
+            this.scene.remove( this.currentModel );
+            this.scene.dispose();
 
             handleGet('/listActiveGames', (response) => {
 
@@ -242,7 +250,6 @@ export class CharacterScreen {
                 }
             });
 
-            this.running = false;
 
         });
 

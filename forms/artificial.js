@@ -177,10 +177,6 @@ export class ArtificialForm extends IntelligentForm{
                     // { level, layoutId, hitPointReduction }                    
                     this.sceneController.socket.emit('changeStat', { level: this.sceneController.level, stat: 'health', layoutId, hitPointReduction: -hitPointReduction });
                 }
-
-                // if (this.sceneController.hero.changeStat('health', -hitPointReduction, false) <= 0) {
-                //     // this.fadeToAction("Dance", 0.2);
-                // };
             }
         }
     }

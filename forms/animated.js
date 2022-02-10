@@ -13,6 +13,7 @@ export class AnimatedForm extends StandardForm{
 
         this.actions = [];
 
+        this.fadingToDeath = false;
         this.states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
         this.emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
@@ -85,7 +86,8 @@ export class AnimatedForm extends StandardForm{
                     this.fadeToAction( 'Running', 0.2);
                 }
             } else {
-                this.fadeToAction('Death', 0.2);
+                if (!this.fadingToDeath) this.fadeToAction('Death', 0.2);
+                this.fadingToDeath = true;
             }
         }
 

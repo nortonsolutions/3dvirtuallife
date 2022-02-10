@@ -534,9 +534,10 @@ class Scene {
 
     animate() {
         
-        this.requestAnimationFrameID = requestAnimationFrame( this.animate );
+        
         if (this.running) {
-
+            
+            this.requestAnimationFrameID = requestAnimationFrame( this.animate );
             if ( this.controls.isLocked === true && this.running ) {
 
                 this.time = performance.now();
