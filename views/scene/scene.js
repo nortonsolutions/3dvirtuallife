@@ -396,7 +396,7 @@ class Scene {
     }
 
     handleAutoZoom = () => {
-
+        // let time = performance.now();
         this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
         this.cameraBackray.ray.origin.y += this.controller.hero.attributes.height-10;
 
@@ -423,9 +423,11 @@ class Scene {
                 if (this.camera.position.y < cameraElevationDefault) this.camera.position.y += cameraElevationDefault / 100;
             }
         }
+        // console.log(`handleAutoZoom: ${performance.now() - time}`);
     }
     
     handleSprites() {
+        // let time = performance.now();
         if (this.requestAnimationFrameID % 3 == 0) {
             this.controller.sprites.forEach(sprite => {
 
@@ -435,6 +437,7 @@ class Scene {
                 sprite.sprite.material.map.offset.x = offsetX;
             })
         }
+        // console.log(`handleSprites: ${performance.now() - time}`);
     }
 
     /* Distribute damage to enemies, make item disappear or fall to ground */
@@ -487,7 +490,7 @@ class Scene {
      *
      */
     handleProjectiles(delta) {
-        
+        // let time = performance.now();
         if (this.controller.projectiles.length > 0) {
             this.controller.projectiles.filter(el => el.distanceTraveled == -1).forEach(projectile => {
                 this.handleAction(projectile, []);
@@ -530,6 +533,7 @@ class Scene {
                 }
             })
         }
+        // console.log(`handleProjectiles: ${performance.now() - time}`);
     }
 
     animate() {
@@ -557,13 +561,13 @@ class Scene {
                 this.prevTime = performance.now();
             }
 
-            
+            // let time = performance.now();
             this.renderer.render( this.scene, this.camera );
-    
-                if (minimap) {
-
-                    this.rendererMinimap.render(this.scene, this.cameraMinimap);
-                    if (this.compass) this.compass.model.lookAt( DUENORTH );
+            // console.log(`render: ${performance.now() - time}`);
+            
+            if (minimap) {
+                this.rendererMinimap.render(this.scene, this.cameraMinimap);
+                if (this.compass) this.compass.model.lookAt( DUENORTH );
             }
     
     

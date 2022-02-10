@@ -186,8 +186,6 @@ export class SceneController {
             structure.updateAttributes(data.payload, false);
         });
 
-        // if (local) this.sceneController.socket.fire('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, payload});
-
         // data: {layoutId: this.attributes.layoutId, hero: this.objectType=="hero"};
         this.socket.on('death', (data) => {
             if (data.hero) {
@@ -508,19 +506,18 @@ export class SceneController {
 
 
     handleMovement(delta) {
-
+        // let time = performance.now();
         if (this.hero) this.hero.move(delta);
         if (this.hero) this.hero.animate(delta);
         
+        // let time2 = performance.now();
         if (this.firstInRoom) { 
-            // this.forms.forEach(form => {
-            //     if (form.attributes.moves) {
+            
             this.entities.forEach(entity => {  
                 if (entity.objectSubType != "remote") entity.move(delta);
             });
-
+            
             if (Math.random() < 0.5) { // Update others 50% of the time
-
                 let positions = this.entities.map(el => {
                     return {
                         layoutId: el.attributes.layoutId,
@@ -532,15 +529,17 @@ export class SceneController {
     
                 this.socket.emit('updateEntityPositions', { level: this.level, positions });
             }
-
         }
+        // console.log(`firstInRoom: ${performance.now() - time2}`);
         
+        // let time3 = performance.now();
         this.forms.forEach(form => {
             if (form.attributes.animates) {
                 form.animate(delta);
             }
         });
-        
+        // console.log(`animates: ${performance.now() - time3}`);
+
         if (this.refractor) {
             this.refractor.material.uniforms[ "time" ].value += this.clock.getDelta();
         }
@@ -554,7 +553,7 @@ export class SceneController {
         }
 
         if (this.hero && this.scene) this.scene.handleAutoZoom();
-
+        // console.log(`handleMovement: ${performance.now() - time}`);
     }
 
     deanimateScene(callback) {
@@ -607,7 +606,7 @@ export class SceneController {
         this.structureModels.forEach(structureModel => {
             if (position.distanceTo(structureModel.position) < shortestDistance) {
                 shortestDistance = position.distanceTo(structureModel.position);
-                response = structureModel.position;
+                response = new THREE.Vector3().copy(structureModel.position);
             }
         })
         return response;

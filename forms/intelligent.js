@@ -169,19 +169,6 @@ export class IntelligentForm extends AnimatedForm{
     
             }
 
-
-            // Essentially set Lx = -wDz and Lz = wDx, then Rx = wDz and Rz = -wDx
-            // let worldDirectionL = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, -Math.PI/2, 0, 'YXZ' ));
-            // let worldDirectionR = new THREE.Vector3().copy(worldDirection).applyEuler( new THREE.Euler( 0, Math.PI/2, 0, 'YXZ' ));
-    
-            // if (worldDirection.x != 0 || worldDirection.z != 0) {
-            //     console.log(`${this.objectName} wD: ${worldDirection.x},${worldDirection.z}`);
-            //     console.log(`${this.objectName} rc: ${this.movementRaycaster.ray.direction.x},${this.movementRaycaster.ray.direction.z}`);
-            //     console.log(`${this.objectName} V: ${this.velocity.x},${this.velocity.z}`);
-            //     console.log(`${this.objectName} D: ${this.direction.x},${this.direction.z}`);
-            //     console.log(`${this.objectName} rotationY: ${this.model.rotation.y}`);
-            // }
-            
             // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
             let fIntersects = this.movementRaycaster.intersectObjects(this.sceneController.structureModels, true);
             
@@ -241,8 +228,8 @@ export class IntelligentForm extends AnimatedForm{
             let newYposition = this.determineElevationFromBase();
 
             if (newYposition == -1) { 
-                this.model.position.x = shiftTowardCenter(this.model.position.x);
-                this.model.position.z = shiftTowardCenter(this.model.position.z);
+                // this.model.position.x = shiftTowardCenter(this.model.position.x);
+                // this.model.position.z = shiftTowardCenter(this.model.position.z);
                 return -1;
             } else if ((this.model.position.y - newYposition) < this.attributes.height) {
                 this.model.position.y = newYposition;
@@ -346,7 +333,7 @@ export class IntelligentForm extends AnimatedForm{
         this.sceneController.entities = this.sceneController.entities.filter(el => el != this);
         this.fadeToAction("Death", 0.2);
         
-
+        
         if (local) {
             this.sceneController.socket.emit('death', {level: this.sceneController.level, layoutId: this.attributes.layoutId, hero: this.objectType=="hero"});
             if (this.attributes.grants) {
@@ -372,7 +359,7 @@ export class IntelligentForm extends AnimatedForm{
         }
 
         this.alive = false;
-        
+
         setTimeout(() => {  // Wait until the death scene has occurred before removal
             this.sceneController.forms = this.sceneController.forms.filter(el => {
                 return el.model.attributes.layoutId != this.attributes.layoutId;

@@ -71,9 +71,6 @@ export class AnimatedForm extends StandardForm{
 
     animate(delta) {
 
-        if (this.objectName == "bow") {
-            // console.log(`test`);
-        }
         if (this.attributes.moves) {
             if (this.alive) {
                 this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
@@ -86,8 +83,10 @@ export class AnimatedForm extends StandardForm{
                     this.fadeToAction( 'Running', 0.2);
                 }
             } else {
-                if (!this.fadingToDeath) this.fadeToAction('Death', 0.2);
-                this.fadingToDeath = true;
+                if (!this.fadingToDeath) {
+                    this.fadeToAction("Death", 0.2);
+                    this.fadingToDeath = true;
+                }
             }
         }
 

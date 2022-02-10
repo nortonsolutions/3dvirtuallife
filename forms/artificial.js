@@ -38,8 +38,10 @@ export class ArtificialForm extends IntelligentForm{
     }
 
     move(delta) {
-
+        // let time = performance.now();
         if (this.alive) {
+
+            
             // INERTIA
             this.velocity.x -= this.velocity.x * 10.0 * delta;
             this.velocity.z -= this.velocity.z * 10.0 * delta;
@@ -58,6 +60,7 @@ export class ArtificialForm extends IntelligentForm{
                 this.velocity.x += this.direction.x * 1000.0 * agility * delta;
             } 
 
+            // let time3 = performance.now();
             this.movementRaycaster.ray.origin.copy( this.model.position );
 
             // Make a random rotation (yaw)
@@ -65,10 +68,12 @@ export class ArtificialForm extends IntelligentForm{
             this.rotation.copy(this.model.rotation);
 
             super.move(delta);
+            // console.log(`super move: ${this.objectName} - ${performance.now() - time3}`);
 
+            // let time4 = performance.now();
             if (this.objectType == "beast") {
                 let closestHeroPosition = this.closestHeroPosition();
-
+                
                 if (closestHeroPosition) {
                     let d = closestHeroPosition.distance;
                     if (d < 60) {
@@ -81,13 +86,16 @@ export class ArtificialForm extends IntelligentForm{
                     } 
                 }
             } 
+            // console.log(`beast specific: ${this.objectName} - ${performance.now() - time4}`);
 
+            // let time2 = performance.now();
             // Set elevation last
             if (this.setElevation() == -1) {
                 this.stopAndBackup(delta);
             };
-
+            // console.log(`setElevation: ${this.objectName} - ${performance.now() - time2}`);
         }
+        // console.log(`move: ${this.objectName} - ${performance.now() - time}`);
     }
 
     stopAndBackup(delta) {
@@ -114,7 +122,7 @@ export class ArtificialForm extends IntelligentForm{
         let distance = Infinity;
         let heroLayoutId = null;
 
-        if (this.sceneController.hero.alive) {
+        if (this.sceneController.hero && this.sceneController.hero.alive) {
             position.copy(this.sceneController.hero.model.position);
             distance = this.model.position.distanceTo(position);
             heroLayoutId = this.sceneController.hero.attributes.layoutId;

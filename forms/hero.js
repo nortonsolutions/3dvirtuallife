@@ -70,8 +70,13 @@ export class Hero extends IntelligentForm {
 
 
     cacheHero(justDied = false) {
-
+        
         if (this.model) this.updateHeroLocationFromPosition(justDied);
+        if (justDied) {
+            this.changeStat("health", this.getStatMax("health") * 2/3);
+            let gameName = localStorage.getItem('gameName');
+            if (gameName) this.sceneController.eventDepot.fire('saveGame', gameName);
+        }
         localStorage.setItem('gameHeroTemplate', JSON.stringify(this.returnTemplate()));
 
     }
@@ -82,8 +87,8 @@ export class Hero extends IntelligentForm {
         var position = new THREE.Vector3();
         if (justDied) {
             position = this.sceneController.positionOfClosestStructure(this.model.position);
-            position.x = shiftTowardCenter(position.x, 4);
-            position.z = shiftTowardCenter(position.z, 4);
+            // position.x = shiftTowardCenter(position.x, 4);
+            // position.z = shiftTowardCenter(position.z, 4);
         } else {
             position.copy(this.model.position);
         }
@@ -695,7 +700,7 @@ export class Hero extends IntelligentForm {
             }
         });
 
-        this.equipped = [];
+        this.inventory = [];
 
         Object.values(this.equipped).forEach(item => {
             /** data: {location ..., itemName..., } */
@@ -706,20 +711,17 @@ export class Hero extends IntelligentForm {
         });
 
         this.equipped = {};
+        this.cacheHero(true);
 
         // setTimeout(() => { // pause before separation
-            let thisModel = this.model.getObjectByProperty("objectType", "hero");
-            thisModel.position.copy(this.model.position);
-            this.sceneController.scene.add(thisModel);
+        //     let thisModel = this.model.getObjectByProperty("objectType", "hero");
+        //     thisModel.position.copy(this.model.position);
+        //     this.sceneController.scene.add(thisModel);
 
-            // auto-save with health so character can't be loaded with all wares
-            this.changeStat("health", this.getStatMax("health") * 2/3);
-            this.cacheHero(true);
+            
 
-            let gameName = localStorage.getItem('gameName');
-            if (gameName) this.sceneController.eventDepot.fire('saveGame', gameName);
-
-        // }, 1000);
+            
+        // }, 2000);
         
     }
 
@@ -729,7 +731,7 @@ export class Hero extends IntelligentForm {
         super.changeStat(stat, change, changeMax);
 
         if (change < 0) {
-            this.fadeToAction("No", 0.2);
+            // this.fadeToAction("No", 0.2);
         } else if (change > 1) {
             this.fadeToAction("Yes", 0.2);
         }

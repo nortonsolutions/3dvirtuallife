@@ -58,6 +58,10 @@ export const levels = [
             { 
                 name: "portal", location: { x: -6.5, y: 0, z: -19.5}, 
                 attributes: { routeTo: { level: 5, location: { x: -40.0, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "portal", location: { x: -6.5, y: 0, z: 19.5}, 
+                attributes: { routeTo: { level: 6, location: { x: -18.0, y: 0, z: -6.5 } } } 
             }
 
         ],
@@ -328,6 +332,46 @@ export const levels = [
             // { name: "lobot" },
             // { name: "blueShirt" }
             // { name: "rosenBot" }
+        ]
+    },
+    {
+        level: 6,
+        width: 26, //26
+        length: 26, //26
+        description: "Snowyland",
+        background: 'clouds.png',
+        terrain: {
+            name: 'floor',
+            type: 'floor',
+            description: 'swamp',
+            gltf: 'snowyland.glb',
+            attributes: {
+                scale: 100,
+                borderTrees: true,
+                light: {
+                    sunLight: true,
+                    overheadPointLight: false,
+                },
+                fog: {
+                    color: 'white',
+                    density: 1.2
+                }
+            }
+        },
+        items: [
+
+        ],
+        structures: [
+            { 
+                name: "portal", location: { x: -21.5, y: 0, z: -6.5},
+                attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: 19.5 } } } 
+            }
+        ],
+        entities: [
+            { name: "crystalMan" },
+            { name: "crystalMan" },
+            { name: "crystalMan" },
+            { name: "crystalMan" }
         ]
     }
  
