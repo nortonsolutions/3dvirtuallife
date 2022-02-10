@@ -13,8 +13,8 @@ export class ArtificialForm extends IntelligentForm{
                 case "evilOne":
                     this.actions['Idle'].setEffectiveTimeScale(20);
                     this.actions['Walking'].setEffectiveTimeScale(20);
-                    this.actions['Punch'].setEffectiveTimeScale(20);
-                    this.actions['Death'].setEffectiveTimeScale(20);
+                    this.actions['Punch'].setEffectiveTimeScale(8);
+                    this.actions['Death'].setEffectiveTimeScale(8);
                     break;
                 case "blueShirt":
                     this.actions['Idle'].setEffectiveTimeScale(2);
@@ -25,12 +25,12 @@ export class ArtificialForm extends IntelligentForm{
                 case "rockyman":
                 case "lavaman":
                 case "crystalman":
-                    this.actions['Idle'].setEffectiveTimeScale(1);
-                    this.actions['Walking'].setEffectiveTimeScale(1);
-                    this.actions['Punch'].setEffectiveTimeScale(1);
-                    this.actions['Punch2'].setEffectiveTimeScale(1);
-                    this.actions['Kick'].setEffectiveTimeScale(1);
-                    this.actions['Death'].setEffectiveTimeScale(1);
+                    this.actions['Idle'].setEffectiveTimeScale(.5);
+                    this.actions['Walking'].setEffectiveTimeScale(.5);
+                    this.actions['Punch'].setEffectiveTimeScale(.5);
+                    this.actions['Punch2'].setEffectiveTimeScale(.5);
+                    this.actions['Kick'].setEffectiveTimeScale(.5);
+                    this.actions['Death'].setEffectiveTimeScale(.5);
                     break;
             }
             if (callback) callback();
@@ -66,22 +66,21 @@ export class ArtificialForm extends IntelligentForm{
 
             super.move(delta);
 
-            if (this.sceneController.hero && this.sceneController.hero.model) {
-                let d = this.distanceToHero();
+            if (this.objectType == "beast") {
+                let closestHeroPosition = this.closestHeroPosition();
 
-                if (this.objectType == "beast" && this.sceneController.hero.alive) {
+                if (closestHeroPosition) {
+                    let d = closestHeroPosition.distance;
                     if (d < 60) {
-                        this.faceHero();
-                        this.attackHero();
+                        this.facePosition(closestHeroPosition.position);
+                        this.attackHero(closestHeroPosition.heroLayoutId);
                         this.stopAndBackup(delta);
-    
-                    } else if (d < 500) {
-                        this.faceHero();
-                        this.moveTowardHero(delta);
+                    } else if (d < 700) {
+                        this.facePosition(closestHeroPosition.position);
+                        this.moveToward(delta);
                     } 
-                } 
-            }
-
+                }
+            } 
 
             // Set elevation last
             if (this.setElevation() == -1) {
@@ -101,19 +100,47 @@ export class ArtificialForm extends IntelligentForm{
         
     }
 
-    moveTowardHero(delta) {
+    moveToward(delta) {
         this.model.translateZ( this.velocity.z * delta );
     }
 
-    faceHero() {
-        this.model.lookAt(this.sceneController.hero.model.position);
+    facePosition(position) {
+        this.model.lookAt(position);
     }
 
-    distanceToHero() {
-        return this.model.position.distanceTo(this.sceneController.hero.model.position);
+    closestHeroPosition() {
+
+        let position = new THREE.Vector3();
+        let distance = Infinity;
+        let heroLayoutId = null;
+
+        if (this.sceneController.hero.alive) {
+            position.copy(this.sceneController.hero.model.position);
+            distance = this.model.position.distanceTo(position);
+            heroLayoutId = this.sceneController.hero.attributes.layoutId;
+        }
+
+        this.sceneController.others.forEach(other => {
+            let p = other.model.position
+            let d = this.model.position.distanceTo(p);
+            if (d < distance) {
+                distance = d;
+                heroLayoutId = other.attributes.layoutId;
+                position.copy(p);
+            }
+        })
+
+        if (distance == Infinity) {
+            return null;
+        } else {
+            // console.table({ distance, heroLayoutId, position });
+            return { distance, heroLayoutId, position };
+        }
+        
     }
 
-    attackHero() {
+    attackHero(layoutId) {
+
         
         switch (this.objectName) {
             case 'rat':
@@ -136,10 +163,25 @@ export class ArtificialForm extends IntelligentForm{
 
         let chanceToHit = this.getEffectiveStat('agility') / 100;
         let hitPointReduction = Math.max(0,getRandomArbitrary(0,this.getEffectiveStat('strength')) - getRandomArbitrary(0,this.sceneController.hero.getEffectiveStat('defense')));
-        if (this.sceneController.hero.getEffectiveStat('health') > 0 && Math.random() < chanceToHit) {
-            if (this.sceneController.hero.changeStat('health', -hitPointReduction, false) <= 0) {
-                // this.fadeToAction("Dance", 0.2);
-            };
+        
+        if (Math.random() < chanceToHit) {
+            let thisHero = this.sceneController.getHeroByLayoutId(layoutId);
+            
+            if (thisHero.alive) {
+                
+                if (layoutId == this.sceneController.hero.attributes.layoutId) {
+                    // console.table({ layoutId, hitPointReduction });
+                    this.sceneController.hero.changeStat('health', -hitPointReduction, false);
+                } else {
+                    // console.log('Should not be here during local play')
+                    // { level, layoutId, hitPointReduction }                    
+                    this.sceneController.socket.emit('changeStat', { level: this.sceneController.level, stat: 'health', layoutId, hitPointReduction: -hitPointReduction });
+                }
+
+                // if (this.sceneController.hero.changeStat('health', -hitPointReduction, false) <= 0) {
+                //     // this.fadeToAction("Dance", 0.2);
+                // };
+            }
         }
     }
 

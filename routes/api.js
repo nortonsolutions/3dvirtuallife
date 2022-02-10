@@ -70,7 +70,7 @@ module.exports = function (app, db) {
 
     app.route('/delete')
         .post(ensureAuthenticated, (req,res) => {
-            db.models.SavedGame.remove({gameName: req.body.gameName}, (err,body) => {
+            db.models.SavedGame.remove({_id: req.body.gameId}, (err,body) => {
                 res.json(err? {error: err.message} : {success: "removed"});
             })
         })
@@ -118,7 +118,11 @@ module.exports = function (app, db) {
     app.route('/listSavedHeroes')
         .get(ensureAuthenticated, (req,res) => {
             db.models.SavedGame.find({ savedBy: req.user.username }, (err,savedGames) => {
-                let listOfHeroes = savedGames.map(el => el.heroTemplate);
+                let listOfHeroes = savedGames.map(el => {
+                    let heroTemplate = JSON.parse(el.heroTemplate);
+                    heroTemplate.id = el._id;
+                    return heroTemplate;
+                });
                 res.json(err? {error: err.message} : listOfHeroes);
             });
         });

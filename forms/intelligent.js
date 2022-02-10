@@ -110,7 +110,7 @@ export class IntelligentForm extends AnimatedForm{
 
     }
 
-    
+
 
     listGeometries(el) {
 
@@ -379,7 +379,7 @@ export class IntelligentForm extends AnimatedForm{
             this.sceneController.forms = this.sceneController.forms.filter(el => {
                 return el.model.attributes.layoutId != this.attributes.layoutId;
             });
-        }, 5000);
+        }, 1000);
     }
 
     firstInventorySlot() {

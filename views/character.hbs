@@ -14,6 +14,7 @@
     </div>
 
     <div class="col-4">
+        <div id="gameId" class="d-none">{{id}}</div>
         <div class="row">Type: {{type}}</div>
         <div class="row pt-3">
             {{description}}
@@ -54,6 +55,7 @@
                 <button id="newGame" type="submit" class="btn btn-primary btn-wide mt-2 mb-1">New Game</button>
                 <button id="loadGame" type="submit" class="btn btn-primary btn-wide my-1">Load Game</button>
                 <button id="joinGame" type="submit" class="btn btn-primary btn-wide my-1">Join Game</button>
+                {{#if id}}<button type="submit" class="deleteChar btn btn-danger btn-wide my-1">Delete</button>{{/if}}
 
                 </div>
             </div>

@@ -221,7 +221,19 @@ export const Items = {
             animates: false,
             scale: 100,
             elevation: 20,
-            effect: "strength/1"
+            effect: "strength/1",
+            effect: "light/15",
+            sprites: [{ 
+                name: "swordFlames",
+                frames: 5,
+                scale: .5,
+                // scaleY: 1.5,
+                translateZ: -.30,
+                flip: true,
+                showOnSeed: false,
+                showOnEquip: true,
+                elevation: 0
+            }],
         } 
     },
     lightSaber: {

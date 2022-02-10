@@ -163,7 +163,7 @@ class Scene {
         }
     }
 
-
+    
     onKeyDown = ( event ) => {
     
         switch ( event.keyCode ) {

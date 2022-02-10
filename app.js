@@ -132,6 +132,39 @@ export const app = () => {
                 e.preventDefault();
             })
         });
+
+
+
+        Array.from(document.querySelectorAll('.joinGame')).forEach(el => {
+            el.addEventListener('click', e => {
+
+            e.preventDefault();
+
+            if (localStorage.getItem('gameHeroTemplate')) {
+                let heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
+                handleGet('/listActiveGames', (response) => {
+
+                    let activeGames = JSON.parse(response);
+                    if (Object.keys(activeGames).length > 0) { // if there are games
+                
+                        eventDepot.fire('joinGame', { heroTemplate, activeGames });
+    
+                    } else { // no games to join, so notify and start new game
+    
+                        let namespace = '/';
+                        alert('No games to join!  Starting new game.');
+                        
+                        var props = { level: 0, layouts: [] }
+                        localStorage.setItem('gameProps', JSON.stringify(props));
+    
+                        eventDepot.fire('startLevel', { heroTemplate, props, namespace });
+                    }
+                });
+            } else {
+                alert('You must first select a game hero.')
+            }
+            })
+        });
     }
 
     addDocumentEventListeners();

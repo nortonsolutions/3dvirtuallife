@@ -17,7 +17,7 @@ export const baselineHeroTemplates = [
         png: "robot_blue.png",
         attributes: {
             stats: {
-                mana: "1/1/0"
+                mana: "4/4/0"
             }
         },
         description: "Above-average intelligence (mana)."

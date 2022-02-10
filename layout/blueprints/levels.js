@@ -30,14 +30,14 @@ export const levels = [
         },
         items: [
             { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
-            // { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
-            // { name: "smallSword" },
-            // { name: "redpotion" },
-            // { name: "greenpotion" },
-            // { name: "gold3" },
-            // { name: "bagOfGems" },
-            // { name: "bow" },
-            // { name: "arrow25" },
+            { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
+            { name: "smallSword", location: { x: -1, y: 0, z: -1} },
+            { name: "redpotion" },
+            { name: "greenpotion" },
+            { name: "gold3" },
+            { name: "bagOfGems" },
+            { name: "bow" },
+            { name: "arrow25" },
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0} },
@@ -62,11 +62,11 @@ export const levels = [
 
         ],
         entities: [
-            // { name: "john" },
+            { name: "john" },
+            { name: "evilOne" },
             // { name: "evilOne" },
-            // { name: "evilOne" },
-            // { name: "shopkeep" },
-            // { name: "rat" }
+            { name: "shopkeep" },
+            { name: "rat" }
             
         ]
     },

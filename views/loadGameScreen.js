@@ -14,7 +14,7 @@ export class LoadGameScreen {
                 this.modal.gameAPI.loadGame(gameName);
                 this.modal.closeModal();
             })
-        })
+        });
 
         document.querySelectorAll('.delete').forEach(el => {
             el.addEventListener('click', e => {
@@ -24,7 +24,7 @@ export class LoadGameScreen {
                     this.refresh;
                 });
             })
-        })
+        });
     }
 
     refresh() {

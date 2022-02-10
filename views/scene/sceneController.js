@@ -158,6 +158,11 @@ export class SceneController {
     
 
     addEventListeners() {
+        
+        // data { level, stat, layoutId, hitPointReduction });
+        this.socket.on('changeStat', data => {
+            this.hero.changeStat(data.stat, data.hitPointReduction, false);
+        })
 
         // data: { level: this.sceneController.level, spriteConfig, spritePosition });
         // addSprites = (model, spriteConfig, scene = null, broadcast = false, position = null) => {
@@ -187,9 +192,11 @@ export class SceneController {
         this.socket.on('death', (data) => {
             if (data.hero) {
                 let other = this.others.find(el => el.attributes.layoutId == data.layoutId);
+                this.others = this.others.filter(el => el.attributes.layoutId != data.layoutId);
                 other.death(false);
             } else {
                 let entity = this.entities.find(el => el.attributes.layoutId == data.layoutId);
+                this.entities = this.entities.filter(el => el.attributes.layoutId != data.layoutId);
                 entity.death(false);
             }
         });
@@ -688,5 +695,21 @@ export class SceneController {
         location.z = position.z / multiplier
         return location;
     }
+
+    getHeroByLayoutId(layoutId) {
+        console.log('getting hero ' + layoutId)
+        if (layoutId == this.hero.attributes.layoutId) {
+            console.log('found local hero')
+            return this.hero;
+        } else {
+            console.log('scanning for other hero')
+            return this.others.find(el => el.attributes.layoutId == layoutId);
+        }
+    }
+
+    getObjectNameByLayoutId(layoutId) {
+        this.scene.getObjectByName()
+    }
+
 
 }

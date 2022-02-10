@@ -58,8 +58,8 @@ export class GameAPI {
         })
     }
 
-    deleteGame(gameName, callback) {
-        handlePost('/delete', { gameName }, response => {
+    deleteGame(gameId, callback) {
+        handlePost('/delete', { gameId }, response => {
             callback();
         })
     }

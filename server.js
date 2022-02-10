@@ -357,7 +357,13 @@ database(mongoose, (db) => {
     socket.on('heroDialogProposeDeal', data => {
       let socketNumber = getSocketByLayoutId(data.level, data.otherLayoutId);
       if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('heroDialogProposeDeal', { } );
-    });    
+    });
+    
+    // socket.emit('changeStat', { level, layoutId, hitPointReduction });
+    socket.on('changeStat', data => {
+      let socketNumber = getSocketByLayoutId(data.level, data.layoutId);
+      if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('changeStat', data );
+    });
   })
 })
 

@@ -707,7 +707,7 @@ export class Hero extends IntelligentForm {
 
         this.equipped = {};
 
-        setTimeout(() => { // pause before separation
+        // setTimeout(() => { // pause before separation
             let thisModel = this.model.getObjectByProperty("objectType", "hero");
             thisModel.position.copy(this.model.position);
             this.sceneController.scene.add(thisModel);
@@ -719,7 +719,7 @@ export class Hero extends IntelligentForm {
             let gameName = localStorage.getItem('gameName');
             if (gameName) this.sceneController.eventDepot.fire('saveGame', gameName);
 
-        }, 1000);
+        // }, 1000);
         
     }
 

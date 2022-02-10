@@ -19,6 +19,7 @@ export class CharacterScreen {
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
 
         this.loader = new THREE.GLTFLoader();
+        this.running = true;
         this.animationId = null;
         this.cylinder = null;
 
@@ -54,7 +55,7 @@ export class CharacterScreen {
 
     initialize = () => {
         handleGet('/listSavedHeroes', (response) => {
-            let savedHeroes = JSON.parse(response).map(el => JSON.parse(el));
+            let savedHeroes = JSON.parse(response); // .map(el => JSON.parse(el));
             this.heroTemplates = [...this.heroTemplates, ...savedHeroes];
             this.refresh();
         });
@@ -100,12 +101,28 @@ export class CharacterScreen {
      * Recursive method which renders the scene in the canvas.
      */
     render = () => {
-
-        if (this.currentModel) this.currentModel.rotation.y += 0.01;
-
+        
         this.animationId = requestAnimationFrame( this.render );
-        this.renderer.render( this.scene, this.camera );
+        if (this.currentModel) this.currentModel.rotation.y += 0.01;
+        if (this.running) {
+            this.renderer.render( this.scene, this.camera );
+        } else {
+            cancelAnimationFrame( this.animationId );      
+            this.dispose(this.scene);      
+        }
 
+    }
+    
+    dispose(item) {
+        if (item.children.length == 0) {
+            if (item.dispose) item.dispose();
+            return;
+        } else {
+            item.children.forEach(child => {
+                this.dispose(child);
+            })
+        }
+        if (item.dispose) item.dispose();
     }
 
     /**
@@ -138,39 +155,44 @@ export class CharacterScreen {
         document.getElementById('newGame').addEventListener('click', (e) => {
             e.preventDefault();
 
-            localStorage.setItem('gameProps', JSON.stringify(props));
+            if (document.getElementById('name').value == 'New') {
+                alert('Please enter a unique name for your character.');
+            } else {
+                localStorage.clear();
+                localStorage.setItem('gameProps', JSON.stringify(props));
 
-            this.heroTemplate = this.heroTemplates[this.selectedTemplate];
-
-            this.heroTemplate.name = document.getElementById('name').value;
-            this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
-
-            this.cacheHero();
-
-            handleGet('/listActiveGames', (response) => {
-
-                let activeGames = JSON.parse(response);
-                if (Object.keys(activeGames).length > 0) { // if there are games
-
-                    /** 
-                     * TODO (future): allow creation of new game namespace.
-                     * For now only one namespace is allowed ('/') so the
-                     * only option is to join game.
-                     */
-                    this.eventDepot.fire('closeModal', {});
-                    this.eventDepot.fire('joinGame', { heroTemplate: this.heroTemplate, activeGames });
-
-                } else { // no games, so start a new one
-                    
-                    let namespace = '/';
-                    this.eventDepot.fire('closeModal', {});
-                    this.eventDepot.fire('startLevel', { heroTemplate: this.heroTemplate, props, namespace });
-
-                }
-            });
-
-            this.scene.remove( this.currentModel );
-            this.scene.dispose();
+                this.heroTemplate = this.heroTemplates[this.selectedTemplate];
+    
+                this.heroTemplate.name = document.getElementById('name').value;
+                this.heroTemplate.attributes.height = Number(document.getElementById('height').value);
+    
+                this.cacheHero();
+                
+                handleGet('/listActiveGames', (response) => {
+    
+                    let activeGames = JSON.parse(response);
+                    if (Object.keys(activeGames).length > 0) { // if there are games
+    
+                        /** 
+                         * TODO (future): allow creation of new game namespace.
+                         * For now only one namespace is allowed ('/') so the
+                         * only option is to join game.
+                         */
+                        this.eventDepot.fire('closeModal', {});
+                        this.eventDepot.fire('joinGame', { heroTemplate: this.heroTemplate, activeGames });
+    
+                    } else { // no games, so start a new one
+                        
+                        let namespace = '/';
+                        this.eventDepot.fire('closeModal', {});
+                        this.eventDepot.fire('startLevel', { heroTemplate: this.heroTemplate, props, namespace });
+    
+                    }
+                });
+    
+                this.scene.remove( this.currentModel );
+                this.scene.dispose();
+            }
         });
 
         document.getElementById('loadGame').addEventListener('click', (e) => {
@@ -220,10 +242,24 @@ export class CharacterScreen {
                 }
             });
 
-            this.scene.remove( this.currentModel );
-            this.scene.dispose();
+            this.running = false;
 
         });
+
+        Array.from(document.querySelectorAll('.deleteChar')).forEach(el => {
+            el.addEventListener('click', (e) => {
+            
+                e.preventDefault();
+    
+                let gameId = document.getElementById('gameId').innerText;
+                if (confirm("Are you sure you want to delete this character?")) {
+                    this.modal.gameAPI.deleteGame(gameId, () => {
+                        this.selectedTemplate = 0;
+                        this.initialize();
+                    });
+                }
+            });
+        })
     }
 
     cacheHero() {
@@ -250,7 +286,7 @@ function newHeroTemplate(name,height) {
             experience: 0,
             stats: {
                 health: "3/5/0",  // min/max/boost
-                mana: "10/10/0",
+                mana: "3/3/0",
                 strength: "1/1/0",
                 agility: "3/3/0",
                 defense: "0/0/0"
