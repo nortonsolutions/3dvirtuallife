@@ -74,7 +74,14 @@
     .then(r => r.text())
     .then(text => {
       Handlebars.registerPartial("navbar", text);
+      
     });
 
+  fetch("/views/dialogActive.hbs")
+    .then(r => r.text())
+    .then(text => {
+      Handlebars.registerPartial("dialogActive", text);
+      
+    });
 </script>
 {{/if}}

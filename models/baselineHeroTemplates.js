@@ -33,5 +33,19 @@ export const baselineHeroTemplates = [
             }
         },
         description: "Above-average strength, slower agility."
-    }
+    },
+    {
+        type: "RodBot",
+        gltf: "herobot.glb",
+        png: "herobot.png",
+        attributes: {
+            handScaleFactor: 50,
+            stats: {
+                strength: "2/2/0",
+                
+            }
+        },
+        description: "Above-average strength."
+    },
+
 ]

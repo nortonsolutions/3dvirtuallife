@@ -509,6 +509,7 @@ export class IntelligentForm extends AnimatedForm{
                 item.model.rotation.y = Math.PI;
 
                 let scale = item.attributes.equippedScale? item.attributes.equippedScale: 0.1;
+                scale *= this.attributes.handScaleFactor;
                 item.model.scale.copy(new THREE.Vector3( scale, scale, scale ));
 
                 // if (itemName == "torch") {

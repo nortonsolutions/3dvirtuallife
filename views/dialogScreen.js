@@ -13,6 +13,12 @@ export class DialogScreen {
         this.negotiation = false;
 
         this.currentModel = null;
+        this.actions = [];
+        this.emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
+        this.currentlyFadingToAction = false;
+        this.activeActionName
+
+        this.prevTime = performance.now();
 
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, 2/3, 0.25, 100 );
@@ -32,9 +38,21 @@ export class DialogScreen {
         light = new THREE.DirectionalLight( 0xffffff );
         light.position.set( 0, 20, 10 );
         this.scene.add( light );
+
+        var closer = document.getElementsByClassName("close")[0];
+        closer.onclick = () => {
+            this.closeModal();
+        }
     }
 
-    updateCanvas = () => {
+    closeModal = () => {
+        this.running = false;
+        // var modal = document.getElementById('myModal');
+        // modal.style.display = "none";
+        // this.eventDepot.fire('lockControls', {});
+    }
+
+    initCanvas = () => {
 
         // stop the existing animation cycle
         if (this.animationId) cancelAnimationFrame( this.animationId );
@@ -51,26 +69,103 @@ export class DialogScreen {
         // Which model to add to the scene?
         this.loader.load( '/models/3d/gltf/' + this.entity.template.gltf, (gltf) => {
             this.currentModel = gltf.scene;
+            this.animations = gltf.animations;
+            this.mixer = new THREE.AnimationMixer( this.currentModel );
 
             this.scene.add( this.currentModel ); // (  );this.cylinder
-            this.camera.position.z = 6;
-            this.camera.position.y = 2;
+            this.camera.position.z = 1.1;
+            this.camera.position.y = 1.9;
+
+            this.animations.forEach((animation,index) => {
+                var action = this.mixer.clipAction( animation );
+                
+                if ( this.emotes.indexOf( animation.name ) >= 0) {
+                    action.clampWhenFinished = true;
+                    action.loop = THREE.LoopOnce;
+                }
+
+                this.actions[ animation.name ] = action;
+            });
+
+            this.activeActionName = 'Idle';
+            this.activeAction = this.actions[ 'Idle' ];
+            this.actions['Idle'].setEffectiveTimeScale(.1);
+            this.previousActionName = '';
+            this.previousAction = null;
+    
+            this.activeAction.play();
 
         })
     }
 
-        /**
+    /**
      * Recursive method which renders the scene in the canvas.
      */
     render = () => {
         
         if (this.running) {
+            this.time = performance.now();
+            this.delta = ( this.time - this.prevTime ) / 1000;
+
+            if (this.mixer) this.mixer.update( this.delta );
             this.animationId = requestAnimationFrame( this.render );
             // if (this.currentModel) this.currentModel.rotation.y += 0.01;
             this.renderer.render( this.scene, this.camera );
+            this.prevTime = this.time;
+
         } else {
             cancelAnimationFrame( this.animationId );      
             this.dispose(this.scene);      
+        }
+    }
+
+    fadeToAction( actionName, duration ) {
+        
+        if ( ! this.currentlyFadingToAction && this.activeActionName !== actionName ) { // 
+            
+            this.currentlyFadingToAction = true;
+            
+            let newAction = this.actions[ actionName ];
+
+            this.previousActionName = this.activeActionName;
+            this.previousAction = this.activeAction;
+            this.activeActionName = actionName;
+            this.activeAction = newAction;
+
+            if (this.previousAction) this.previousAction.fadeOut( duration );
+
+            if (this.activeAction) {
+                this.activeAction
+                    .reset()
+                    // .setEffectiveTimeScale( 1 )
+                    // .setEffectiveWeight( 1 )
+                    .fadeIn( duration )
+                    .play();
+
+                const restoreState = () => {
+                    this.currentlyFadingToAction = false;
+                    this.mixer.removeEventListener('finished', restoreState );
+                    this.fadeToAction( this.previousActionName, 0.1 );
+                }
+
+                if (this.emotes.includes(actionName)) {
+                    this.mixer.addEventListener( 'finished', restoreState );
+                } else {
+                    this.currentlyFadingToAction = false;
+                }
+            }
+        }
+    }
+
+    runActiveAction(duration) {
+
+        if (this.activeAction) {
+            this.activeAction
+                .reset()
+                .setEffectiveTimeScale( 1 )
+                .setEffectiveWeight( 1 )
+                .fadeIn( duration )
+                .play();
         }
     }
 
@@ -137,8 +232,10 @@ export class DialogScreen {
 
                 var response;
                 if (Array.from(el.classList).includes("disabled")) {
+                    this.fadeToAction('No', 0.2);
                     response = "You'll have to do better than that, my friend."
                 } else {
+                    
                     response = this.acceptDeal();
                 }
 
@@ -163,7 +260,7 @@ export class DialogScreen {
     }
 
     refresh = (tempSpeech) => {
-
+        this.currentlyFadingToAction = false;
         if (tempSpeech) {
             this.updateSpeech(tempSpeech);
         } else this.tempSpeech = null;
@@ -172,6 +269,7 @@ export class DialogScreen {
         if (this.negotiation) {
             if (this.goodDeal()) {
                 this.acceptDisabled = false;
+                this.fadeToAction('Yes', 1);
                 this.updateSpeech("This looks like a fair deal!");
     
             } else {
@@ -182,9 +280,9 @@ export class DialogScreen {
 
         let context = this.getContext();
 
-        this.modal.loadTemplate('modal-body', "dialog", context, () => {
+        this.modal.loadTemplate('dialogActive', "dialogActive", context, () => {
             this.addDialogEvents();
-            if (this.entity) this.updateCanvas();
+            // if (this.entity) this.updateCanvas();
         });
 
     }
@@ -270,7 +368,6 @@ export class DialogScreen {
                 this.payment[itemName] = 1; 
             }
         }
-        this.refresh();
         return this.payment;
     }
 
@@ -284,7 +381,6 @@ export class DialogScreen {
                 if (this.payment[itemName]) delete this.payment[itemName];
             }
         }
-        this.refresh();
         return this.payment;        
     }
 
@@ -368,6 +464,7 @@ export class DialogScreen {
         this.hero.cacheHero();
         // TODO: Adjust the wants of the entity
         this.reset();
+        this.fadeToAction('Yes', 0.2);
         return "We have a deal!";
     }
 

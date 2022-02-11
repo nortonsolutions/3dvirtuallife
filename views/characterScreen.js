@@ -44,6 +44,9 @@ export class CharacterScreen {
         baselineHeroTemplates.forEach(template => {
             let newTemplate = newHeroTemplate();
             newTemplate.attributes.stats = {...newTemplate.attributes.stats, ...template.attributes.stats};
+            newTemplate.attributes.xpLevels = {...newTemplate.attributes.xpLevels, ...template.attributes.xpLevels};
+            newTemplate.attributes.scale = template.attributes.scale? template.attributes.scale : newTemplate.attributes.scale;
+            newTemplate.attributes.handScaleFactor = template.attributes.handScaleFactor? template.attributes.handScaleFactor : 1;
             newTemplate.gltf = template.gltf;
             newTemplate.png = template.png;
             newTemplate.description = template.description;
@@ -90,10 +93,13 @@ export class CharacterScreen {
         // Which model to add to the scene?
         this.loader.load( '/models/3d/gltf/' + this.heroTemplate.gltf, (gltf) => {
             this.currentModel = gltf.scene;
+            this.currentModel.scale.x = this.heroTemplate.attributes.scale;
+            this.currentModel.scale.y = this.heroTemplate.attributes.scale;
+            this.currentModel.scale.z = this.heroTemplate.attributes.scale;
 
             this.scene.add( this.currentModel ); // (  );this.cylinder
-            this.camera.position.z = 6;
-            this.camera.position.y = 2;
+            this.camera.position.z = 60;
+            this.camera.position.y = 20;
 
         })
     }

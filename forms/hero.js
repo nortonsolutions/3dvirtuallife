@@ -58,7 +58,7 @@ export class Hero extends IntelligentForm {
                 this.model.position.y = this.determineElevationFromBase();
             }
 
-            this.actions['Punch'].setEffectiveTimeScale(1);
+            if (this.actions['Punch']) this.actions['Punch'].setEffectiveTimeScale(1);
 
             callback();
 
