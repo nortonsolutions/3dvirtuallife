@@ -70,7 +70,7 @@ class Scene {
         this.addControls();
         this.addBackground();
         this.addEventListeners();
-        this.addHelper();
+        // this.addHelper();
 
         if (callback) setTimeout(() => {
             callback();

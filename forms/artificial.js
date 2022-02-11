@@ -91,6 +91,7 @@ export class ArtificialForm extends IntelligentForm{
             // let time2 = performance.now();
             // Set elevation last
             if (this.setElevation() == -1) {
+                console.log(`${this.objectName} is out of bounds`)
                 this.stopAndBackup(delta);
             };
             // console.log(`setElevation: ${this.objectName} - ${performance.now() - time2}`);

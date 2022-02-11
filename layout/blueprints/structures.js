@@ -52,7 +52,7 @@ export const Structures = {
     },
 
     portal: {
-        name: 'swampPortal',
+        name: 'portal',
         gltf: 'portal.glb',
         description: 'Portal to swamp',
         type: 'structure',
@@ -60,7 +60,7 @@ export const Structures = {
             visible: false,
             animates: true,
             scale: 40,
-            elevation: -20,
+            elevation: 0,
             unlocked: true,
         }
     },

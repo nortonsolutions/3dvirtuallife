@@ -31,7 +31,7 @@ export const levels = [
         items: [
             { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
             { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
-            // { name: "smallSword", location: { x: -1, y: 0, z: -1} },
+            { name: "smallSword", location: { x: -1, y: 0, z: -1} },
             { name: "redpotion" },
             { name: "greenpotion" },
             { name: "gold3" },
@@ -66,9 +66,9 @@ export const levels = [
 
         ],
         entities: [
-            { name: "john" },
+            // { name: "john" },
             { name: "evilOne" },
-            { name: "evilOne" },
+            // { name: "evilOne" },
             { name: "shopkeep" },
             { name: "rat" }
             

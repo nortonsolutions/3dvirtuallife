@@ -223,17 +223,96 @@ export const Items = {
             elevation: 20,
             effect: "strength/1",
             effect: "light/15",
-            sprites: [{ 
-                name: "swordFlames",
-                frames: 5,
-                scale: .5,
-                // scaleY: 1.5,
-                translateZ: -.30,
-                flip: true,
-                showOnSeed: false,
-                showOnEquip: true,
-                elevation: 0
-            }],
+            sprites: [
+                { 
+                    name: "flame",
+                    frames: 40,
+                    scale: .05,
+                    scaleY: 1.5,
+                    translateZ: -.10,
+                    flip: true,
+                    showOnSeed: false,
+                    showOnEquip: true,
+                    elevation: 0
+                },
+                { 
+                    name: "flame",
+                    frames: 40,
+                    scale: .05,
+                    scaleY: 1.5,
+                    translateZ: -.20,
+                    flip: true,
+                    showOnSeed: false,
+                    showOnEquip: true,
+                    elevation: 0
+                },
+                { 
+                    name: "flame",
+                    frames: 40,
+                    scale: .05,
+                    scaleY: 1.5,
+                    translateZ: -.30,
+                    flip: true,
+                    showOnSeed: false,
+                    showOnEquip: true,
+                    elevation: 0
+                },
+                { 
+                    name: "flame",
+                    frames: 40,
+                    scale: .05,
+                    scaleY: 1.5,
+                    translateZ: -.40,
+                    flip: true,
+                    showOnSeed: false,
+                    showOnEquip: true,
+                    elevation: 0
+                },                { 
+                    name: "flame",
+                    frames: 40,
+                    scale: .05,
+                    scaleY: 1.5,
+                    translateZ: -.15,
+                    flip: true,
+                    showOnSeed: false,
+                    showOnEquip: true,
+                    elevation: 0
+                },
+                { 
+                    name: "flame",
+                    frames: 40,
+                    scale: .05,
+                    scaleY: 1.5,
+                    translateZ: -.25,
+                    flip: true,
+                    showOnSeed: false,
+                    showOnEquip: true,
+                    elevation: 0
+                },
+                { 
+                    name: "flame",
+                    frames: 40,
+                    scale: .05,
+                    scaleY: 1.5,
+                    translateZ: -.35,
+                    flip: true,
+                    showOnSeed: false,
+                    showOnEquip: true,
+                    elevation: 0
+                },
+                { 
+                    name: "flame",
+                    frames: 40,
+                    scale: .05,
+                    scaleY: 1.5,
+                    translateZ: -.45,
+                    flip: true,
+                    showOnSeed: false,
+                    showOnEquip: true,
+                    elevation: 0
+                }
+
+            ],
         } 
     },
     lightSaber: {

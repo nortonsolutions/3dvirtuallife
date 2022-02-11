@@ -43,8 +43,8 @@ export class IntelligentForm extends AnimatedForm{
             // this.getBoundingSphereHandR(this.model);
             // this.setToDoubleSided(this.model);
 
-            // this.computeVertexNormals(this.model);
-            // this.setToCastShadows();
+            this.computeVertexNormals(this.model);
+            this.setToCastShadows();
 
             if (this.equipped) {
                 // Reduce cached boosts to zero before re-equipping
@@ -158,9 +158,9 @@ export class IntelligentForm extends AnimatedForm{
                 
                 if (this.model.position.y < this.sceneController.waterElevation) {
                     let distanceBelowWater = Math.abs(this.sceneController.waterElevation - this.model.position.y);
-                    this.velocity.x *= Math.max((100-(distanceBelowWater*3))/100,.01);
-                    this.velocity.y *= Math.max((100-(distanceBelowWater*3))/100,.01);
-                    this.velocity.z *= Math.max((100-(distanceBelowWater*3))/100,.01);
+                    this.velocity.x *= Math.max((100-(distanceBelowWater*3))/100,.5);
+                    this.velocity.y *= Math.max((100-(distanceBelowWater*3))/100,.5);
+                    this.velocity.z *= Math.max((100-(distanceBelowWater*3))/100,.5);
 
                     if (this.sceneController.water.attributes.lava && this.objectName != "lavaMan") {
                         this.changeStat('health',-distanceBelowWater/1000);
@@ -190,7 +190,7 @@ export class IntelligentForm extends AnimatedForm{
                 this.velocity.y = 0;
                 this.velocity.z = 0;
     
-                this.sceneController.eventDepot.fire('updateHelper', { position: fIntersects[0].point, color: { r: 0, g: 1, b: 0 }});
+                // this.sceneController.eventDepot.fire('updateHelper', { position: fIntersects[0].point, color: { r: 0, g: 1, b: 0 }});
                 
             }
             this.intermittentRecharge();
@@ -210,12 +210,16 @@ export class IntelligentForm extends AnimatedForm{
             if (this.model.position.y <= topOfObject) {
                 
                 this.model.position.y = topOfObject;
-                let standingUpon = getRootObject3D(downwardIntersections[0].object);
-                this.standingUpon = {
-                    objectName: standingUpon.objectName,
-                    objectType: standingUpon.objectType,
-                    attributes: standingUpon.attributes
+
+                if (this.objectType == "hero") {
+                    let standingUpon = getRootObject3D(downwardIntersections[0].object);
+                    this.standingUpon = {
+                        objectName: standingUpon.objectName,
+                        objectType: standingUpon.objectType,
+                        attributes: standingUpon.attributes
+                    }
                 }
+
                 this.velocity.y = Math.max( 0, this.velocity.y );
                 this.canJump = true;
                 this.justJumped = false;
