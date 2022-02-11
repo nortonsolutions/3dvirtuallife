@@ -4,13 +4,17 @@
             <div id="speech" class="col-12">{{#if tempSpeech}}{{tempSpeech}}{{else}}{{speech}}{{/if}}</div>
         </div>
         <hr class="m-2">
-        {{#if wares}}
+        
         <div class="row">
             
-            <div class="col-6 px-2">
+            <div class="col-4 px-2" id="playerPreview">
+            </div>
+            {{#if wares}}
+            <div class="col-4 px-2">
                 <div class="row mx-1">
                     <div class="col-5 pl-1"><h4>Wares:</h4></div>
                 </div>
+                
                 <div class="row mx-1">
 
                         {{#each inventory}}
@@ -29,11 +33,11 @@
                     
                 </div>
             </div>
-            <div class="col-6 px-2">
+            <div class="col-4 px-2">
                 <div class="row mx-1">
                     <div class="col-4 pl-1"><h4>Wants:</h4></div>
-                    <div class="col-7">
-                        <small>[One bag of gems = {{goldExchange}} gold]</small>
+                    <div class="col-8 d-flex justify-content-end pr-0">
+                        <small>[{{goldExchange}} gold/gems]</small>
                     </div>
                 </div>
                 <div class="row mx-1">
@@ -53,12 +57,13 @@
                         {{/each}}
                 </div>
             </div>
-
+            {{/if}}
         </div>
         <hr class="m-2">
         <div class="row">
-            
-            <div class="col-6 px-2">
+            {{#if wares}}
+            <div class="col-4 px-2"></div>
+            <div class="col-4 px-2">
                 <div class="row mx-1">
                     <div class="col-5 pl-1"><h4>Tab:</h4></div>
                 </div>
@@ -79,10 +84,10 @@
                     </div> 
                 </div>
             </div>
-            <div class="col-6 px-2">
+            <div class="col-4 px-2">
                 <div class="row mx-1">
-                    <div class="col-5 pl-1"><h4>Payment:</h4></div>
-                    <div class="col-7">
+                    <div class="col-4 pl-1"><h4>Pay:</h4></div>
+                    <div class="col-8">
                         <button type="button" class="btn btn-secondary btn-sm matchTab">Match</button>
                         <button type="button" id="acceptDeal" class="btn btn-primary btn-sm acceptDeal {{#if acceptDisabled}}disabled{{/if}}">Accept</button>
                     </div>
@@ -97,9 +102,10 @@
                     </div> 
                 </div>
             </div>
+            {{/if}}
         </div>
 
-        {{/if}}
+        
 
         {{#each responses}}
         <div class="row">

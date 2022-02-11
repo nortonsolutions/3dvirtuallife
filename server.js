@@ -1,5 +1,5 @@
 /**
- * Norton 2021 - CourseApp App
+ * Norton 2022 - 3D Virtual Life Game
  */
 
 'use strict';

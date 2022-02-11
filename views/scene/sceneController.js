@@ -173,7 +173,7 @@ export class SceneController {
         this.socket.on('updateHeroTemplate', heroTemplate => {
             this.scene.removeFromScenebyLayoutId(heroTemplate.attributes.layoutId);
             heroTemplate.subtype = "remote";
-            this.seedForm(heroTemplate, true, false); // no need to re-add to forms
+            this.seedForm(heroTemplate, true, true); // no need to re-add to forms?
         });
 
         // data: { itemName, position: item.model.position, rotation: item.model.rotation })

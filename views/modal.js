@@ -68,6 +68,7 @@ class Modal {
                         break;
                     case "dialog":
                         this.dialogScreen.addDialogEvents();
+                        this.dialogScreen.updateCanvas();
                         break;
                     case "character":
                         this.characterScreen.initialize();

@@ -11,6 +11,67 @@ export class DialogScreen {
         this.acceptDisabled = true;
         this.tempSpeech = null;
         this.negotiation = false;
+
+        this.currentModel = null;
+
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera( 75, 2/3, 0.25, 100 );
+        this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+
+        this.loader = new THREE.GLTFLoader();
+        this.running = false;
+        this.animationId = null;
+        this.cylinder = null;
+
+        // lights
+
+        var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+        light.position.set( 0, 20, 0 );
+        this.scene.add( light );
+
+        light = new THREE.DirectionalLight( 0xffffff );
+        light.position.set( 0, 20, 10 );
+        this.scene.add( light );
+    }
+
+    updateCanvas = () => {
+
+        // stop the existing animation cycle
+        if (this.animationId) cancelAnimationFrame( this.animationId );
+        
+        // Re-add the playerPreview panel
+        let playerPreview = document.getElementById('playerPreview');
+        playerPreview.appendChild( this.renderer.domElement );
+        
+        this.scene.remove( this.currentModel );
+        this.scene.dispose();
+        this.running = true;
+        this.render();
+
+        // Which model to add to the scene?
+        this.loader.load( '/models/3d/gltf/' + this.entity.template.gltf, (gltf) => {
+            this.currentModel = gltf.scene;
+
+            this.scene.add( this.currentModel ); // (  );this.cylinder
+            this.camera.position.z = 6;
+            this.camera.position.y = 2;
+
+        })
+    }
+
+        /**
+     * Recursive method which renders the scene in the canvas.
+     */
+    render = () => {
+        
+        if (this.running) {
+            this.animationId = requestAnimationFrame( this.render );
+            // if (this.currentModel) this.currentModel.rotation.y += 0.01;
+            this.renderer.render( this.scene, this.camera );
+        } else {
+            cancelAnimationFrame( this.animationId );      
+            this.dispose(this.scene);      
+        }
     }
 
     addDialogEvents() {
@@ -123,6 +184,7 @@ export class DialogScreen {
 
         this.modal.loadTemplate('modal-body', "dialog", context, () => {
             this.addDialogEvents();
+            if (this.entity) this.updateCanvas();
         });
 
     }

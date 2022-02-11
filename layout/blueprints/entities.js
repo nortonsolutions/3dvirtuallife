@@ -282,7 +282,7 @@ export const Entities = {
     },
     shopkeep: {
         name: 'shopkeep',
-        gltf: 'robot_blue.glb',
+        gltf: 'shopkeep.glb',
         description: 'Robust shopkeeper',
         type: 'friendly',
         inventory: [
@@ -297,7 +297,7 @@ export const Entities = {
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 10,
+            scale: 30,
             goldValue: 1.1, // Slightly higher value of gold on exchanges
             conversation: {
                 conversationState: "intro",
