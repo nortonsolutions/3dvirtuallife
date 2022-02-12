@@ -29,9 +29,6 @@ export class IntelligentForm extends AnimatedForm{
         this.equipped = this.template.equipped;
 
         this.movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.length/2 + 35 );
-        // this.movementRaycasterR = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.width/2 + 20 )
-        // this.movementRaycasterL = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.width/2 + 20 )
-        
     }
 
     /** load is for loading the model and animations specifically */
@@ -70,7 +67,6 @@ export class IntelligentForm extends AnimatedForm{
 
         // let temp = this.model.getObjectByName('HandR'); // .children[1];
         // temp.computeBoundingSphere();
-        // console.log("Test")
 
     }
 
@@ -169,7 +165,6 @@ export class IntelligentForm extends AnimatedForm{
     
             }
 
-            // Can I avoid the filter here using object attributes.length and width as the starting point for the ray?
             let fIntersects = this.movementRaycaster.intersectObjects(this.sceneController.structureModels, true);
             
             if (fIntersects.length == 0 || (fIntersects[0] && fIntersects[0].object.type == "Sprite")) { // Nothing is in the front, so move forward at given velocity
@@ -335,7 +330,7 @@ export class IntelligentForm extends AnimatedForm{
         this.alive = false;
         
         this.sceneController.entities = this.sceneController.entities.filter(el => el != this);
-        // this.fadeToAction("Death", 0.2);
+        this.fadeToAction("Death", 0.2);
         
         if (local) {
             this.sceneController.socket.emit('death', {level: this.sceneController.level, layoutId: this.attributes.layoutId, hero: this.objectType=="hero"});
@@ -479,14 +474,9 @@ export class IntelligentForm extends AnimatedForm{
     }
 
     inventoryContainsAll(items) {
-        // var found = true;
-
         for (const item of items) {
             if (!(this.inventory.map(el => el? el.itemName: null).includes(item))) return false;
         }
-        // items.forEach(item => {
-            
-        // })
         return true;
     }
 

@@ -192,7 +192,7 @@ export class StandardForm {
     setToCastShadows(root) {
         if (!root) root = this.model;
         if (typeof root.castShadow == "boolean") {
-            // console.log((root.name));
+            
             if (root.name.match(new RegExp('pointlight|torch|torso|head|table|house|body|boy|cube', 'i'))) {  //
                 root.castShadow = true;
 
@@ -200,7 +200,7 @@ export class StandardForm {
                 if (root.shadow) {
 
                     // root.decay = 2;
-                    // // root.intensity = 10;
+                    // root.intensity = 10;
                     // root.distance = 600;
 
                     root.shadow.bias = - 0.005;  

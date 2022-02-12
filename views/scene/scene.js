@@ -261,11 +261,7 @@ class Scene {
     }
 
     onMouseClick = (e) => {
-        // console.log(`Controls object:`);
         console.dir(this.controls.getObject().position);
-
-        // console.log(`Objects3D object:`);
-        // console.dir(this.controller.objects3D);
     }
 
     onMouseDown = (e) => {
@@ -396,7 +392,6 @@ class Scene {
     }
 
     handleAutoZoom = () => {
-        // let time = performance.now();
         this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
         this.cameraBackray.ray.origin.y += this.controller.hero.attributes.height-10;
 
@@ -410,11 +405,9 @@ class Scene {
         let backrayIntersections = this.cameraBackray.intersectObjects(this.controller.structureModels, true);
 
         if (backrayIntersections[0] && backrayIntersections[0].object.type != "Sprite") {
-            // console.log("backray intersection:")
-            // console.dir(backrayIntersections[0]);
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
-                this.camera.position.z = distance - 20; // -= cameraDistanceDefault / 30;
+                this.camera.position.z = distance - 20;
                 if (this.camera.position.y > cameraElevationDefault + this.controller.hero.attributes.height) this.camera.position.y -= cameraElevationDefault / 30;
             }
         } else {
@@ -423,21 +416,17 @@ class Scene {
                 if (this.camera.position.y < cameraElevationDefault) this.camera.position.y += cameraElevationDefault / 100;
             }
         }
-        // console.log(`handleAutoZoom: ${performance.now() - time}`);
     }
     
     handleSprites() {
-        // let time = performance.now();
         if (this.requestAnimationFrameID % 3 == 0) {
             this.controller.sprites.forEach(sprite => {
 
                 let offsetX = sprite.sprite.material.map.offset.x + (1 / sprite.frames);
-                // if (offsetX > (sprite.frames - 1) / sprite.frames) offsetX = 0;
                 if (offsetX >= .99) offsetX = 0;
                 sprite.sprite.material.map.offset.x = offsetX;
             })
         }
-        // console.log(`handleSprites: ${performance.now() - time}`);
     }
 
     /* Distribute damage to enemies, make item disappear or fall to ground */
@@ -490,7 +479,6 @@ class Scene {
      *
      */
     handleProjectiles(delta) {
-        // let time = performance.now();
         if (this.controller.projectiles.length > 0) {
             this.controller.projectiles.filter(el => el.distanceTraveled == -1).forEach(projectile => {
                 this.handleAction(projectile, []);
@@ -533,7 +521,6 @@ class Scene {
                 }
             })
         }
-        // console.log(`handleProjectiles: ${performance.now() - time}`);
     }
 
     animate() {
@@ -548,8 +535,6 @@ class Scene {
                 this.delta = ( this.time - this.prevTime ) / 1000;
     
                 this.controller.handleMovement(this.delta);
-                // this.controller.handleEntityMovement(this.delta);
-                // this.controller.handleMixers(this.delta);
                 this.handleSprites();
                 this.handleProjectiles(this.delta);
 
@@ -561,9 +546,7 @@ class Scene {
                 this.prevTime = performance.now();
             }
 
-            // let time = performance.now();
             this.renderer.render( this.scene, this.camera );
-            // console.log(`render: ${performance.now() - time}`);
             
             if (minimap) {
                 this.rendererMinimap.render(this.scene, this.cameraMinimap);

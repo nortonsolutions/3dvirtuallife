@@ -2,7 +2,8 @@ import { StandardForm } from './standard.js'
 
 
 
-/** AnimatedForms are forms that have animation actions
+/**
+ * AnimatedForms are forms that have animation actions
  * and a mixer.
  */
 export class AnimatedForm extends StandardForm{
@@ -13,9 +14,7 @@ export class AnimatedForm extends StandardForm{
 
         this.actions = [];
         
-        // this.fadingToDeath = false;
         this.states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
-
         
         this.currentlyFadingToAction = false;
         this.animatedSubforms = [];
@@ -120,11 +119,6 @@ export class AnimatedForm extends StandardForm{
                 } else if (this.absVelocity >= 199 && this.activeActionName == 'Walking') {
                     this.fadeToAction( 'Running', 0.2);
                 }
-            } else {
-                // if (!this.fadingToDeath) {
-                    this.fadeToAction("Death", 0.2);
-                    // this.fadingToDeath = true;
-                // }
             }
         }
 
@@ -133,7 +127,7 @@ export class AnimatedForm extends StandardForm{
 
     fadeToAction( actionName, duration ) {
         console.log(`${this.objectName}: fadeToAction ${actionName}`);
-        if ( ! this.currentlyFadingToAction && this.activeActionName !== actionName ) { // 
+        if ( (actionName == "Death" || ! this.currentlyFadingToAction) && this.activeActionName !== actionName ) { // 
             console.log(`${this.objectName}: fadingToAction ${actionName}`);
             this.currentlyFadingToAction = true;
             

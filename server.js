@@ -137,7 +137,6 @@ database(mongoose, (db) => {
           return null;
         } else {
           let others = app.rooms[nsp][roomNumber].filter(el => el[0] != sender).map(el => el[1]);
-          // console.log(`room ${room}: `);
           return others;
         }
       } else return null;
@@ -265,12 +264,10 @@ database(mongoose, (db) => {
 
     socket.on('updateEntityPositions', (data) => {
       notifyRoomMembers(data.level, 'updateEntityPositions', data.positions);
-      // console.log(`${app.rooms[socket.nsp.name][data.level]}`);
     });
 
     /** data: { layoutId: ..., rotation: ..., velocity: ..., position: ..., level: ...} */
     socket.on('updateHeroPosition', (data) => {
-      // console.log(`${socket.id} with ${data.layoutId} updating position`);
       notifyRoomMembers(data.level, 'updateHeroPosition', data);
     })
 

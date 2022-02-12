@@ -87,7 +87,7 @@ export class Hero extends IntelligentForm {
         var position = new THREE.Vector3();
         if (justDied) {
             position = this.sceneController.positionOfClosestStructure(this.model.position);
-            // position.x = shiftTowardCenter(position.x, 4);
+            // position.x = shiftTowardCenter(position.x, 4); // Causes performance leak somehow
             // position.z = shiftTowardCenter(position.z, 4);
         } else {
             position.copy(this.model.position);
@@ -414,17 +414,12 @@ export class Hero extends IntelligentForm {
     
                     } else if (objectType == "friendly") {
                         
-                        // TODO: conversation
                         this.sceneController.eventDepot.fire('unlockControls', {});
                         this.sceneController.eventDepot.fire('modal', { type: 'dialog', title: this.selectedObject.objectName, entity: this.selectedObject, hero: this });
                     
                     } else if (objectType == "beast") {
     
-                        if (this.selectedObject.alive) {
-    
-                            // this.fadeToAction("Punch", 0.3);
-                            this.attack();
-                        }
+                        if (this.selectedObject.alive) this.attack();
     
                     } else if (objectType == "structure") {
                         
@@ -438,7 +433,6 @@ export class Hero extends IntelligentForm {
 
                     } else if ( objectType == "hero") {
                         
-                        // TODO: conversation
                         this.sceneController.eventDepot.fire('unlockControls', {});
 
                         let dialogData = { 
@@ -533,11 +527,6 @@ export class Hero extends IntelligentForm {
      * Choose from the available attack moves
      */
     attack() {
-        // this.punchAttacksR = [];
-        // this.swordAttacksR = [];
-        // this.swordAttacksL = [];
-        // this.blocksL = [];
-        // this.blocksR = [];
 
         // Choose an attack
         let possibleAttacks = [...this.punchAttacksR, ...this.swordAttacksR, ...this.swordAttacksL];
@@ -548,7 +537,6 @@ export class Hero extends IntelligentForm {
         let chanceToHit = this.getEffectiveStat('agility') / 10;
         let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
 
-        // console.dir(this.selectedObject);
         if (Math.random() < chanceToHit) {
             this.selectedObject.model.translateZ(-10);
             this.inflictDamage(this.selectedObject, hitPointReduction);

@@ -98,7 +98,7 @@ export class CharacterScreen {
             this.currentModel.scale.y = this.heroTemplate.attributes.scale;
             this.currentModel.scale.z = this.heroTemplate.attributes.scale;
 
-            this.scene.add( this.currentModel ); // (  );this.cylinder
+            this.scene.add( this.currentModel );
             this.camera.position.z = 60;
             this.camera.position.y = 20;
 

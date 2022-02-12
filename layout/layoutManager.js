@@ -24,7 +24,6 @@ class LayoutManager {
         this.addEventListeners();
 
         // if (!localStorage.getItem('gameObjects')) { //
-            
             this.allItems = Items;
             this.allStructures = Structures;
             this.allEntities = Entities;
@@ -32,7 +31,6 @@ class LayoutManager {
             this.allObjects = {...Items, ...Structures, ...Entities, ...Spells, ...{ floor: { description: "floor"}}, ...{ xpLevels } };
 
             localStorage.setItem('gameObjects', JSON.stringify(this.allObjects));
-
         // }
 
         this.props = localStorage.getItem('gameProps')? JSON.parse(localStorage.getItem('gameProps')): { level: 0, layouts: [] };

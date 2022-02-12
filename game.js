@@ -14,7 +14,6 @@ class Game {
 
     constructor(heroTemplate, eventDepot, socket) {
 
-        // this.props = props;
         this.heroTemplate = heroTemplate;
         this.eventDepot = eventDepot;
         this.socket = socket;

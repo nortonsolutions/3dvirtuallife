@@ -47,9 +47,6 @@ export class DialogScreen {
 
     closeModal = () => {
         this.running = false;
-        // var modal = document.getElementById('myModal');
-        // modal.style.display = "none";
-        // this.eventDepot.fire('lockControls', {});
     }
 
     initCanvas = () => {
@@ -76,9 +73,9 @@ export class DialogScreen {
             this.currentModel.scale.y = this.entity.template.attributes.scale;
             this.currentModel.scale.z = this.entity.template.attributes.scale;
 
-            this.scene.add( this.currentModel ); // (  );this.cylinder
-            this.camera.position.z = 40;// 1.1;
-            this.camera.position.y = this.entity.template.attributes.height; // 1.9;
+            this.scene.add( this.currentModel );
+            this.camera.position.z = 40;
+            this.camera.position.y = this.entity.template.attributes.height;
 
             this.animations.forEach((animation,index) => {
                 var action = this.mixer.clipAction( animation );
@@ -113,7 +110,7 @@ export class DialogScreen {
 
             if (this.mixer) this.mixer.update( this.delta );
             this.animationId = requestAnimationFrame( this.render );
-            // if (this.currentModel) this.currentModel.rotation.y += 0.01;
+            
             this.renderer.render( this.scene, this.camera );
             this.prevTime = this.time;
 
@@ -141,8 +138,6 @@ export class DialogScreen {
             if (this.activeAction) {
                 this.activeAction
                     .reset()
-                    // .setEffectiveTimeScale( 1 )
-                    // .setEffectiveWeight( 1 )
                     .fadeIn( duration )
                     .play();
 
@@ -286,7 +281,6 @@ export class DialogScreen {
 
         this.modal.loadTemplate('dialogActive', "dialogActive", context, () => {
             this.addDialogEvents();
-            // if (this.entity) this.updateCanvas();
         });
 
     }

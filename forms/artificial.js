@@ -38,7 +38,6 @@ export class ArtificialForm extends IntelligentForm{
     }
 
     move(delta) {
-        // let time = performance.now();
         if (this.alive) {
 
             
@@ -60,7 +59,6 @@ export class ArtificialForm extends IntelligentForm{
                 this.velocity.x += this.direction.x * 1000.0 * agility * delta;
             } 
 
-            // let time3 = performance.now();
             this.movementRaycaster.ray.origin.copy( this.model.position );
 
             // Make a random rotation (yaw)
@@ -68,9 +66,7 @@ export class ArtificialForm extends IntelligentForm{
             this.rotation.copy(this.model.rotation);
 
             super.move(delta);
-            // console.log(`super move: ${this.objectName} - ${performance.now() - time3}`);
 
-            // let time4 = performance.now();
             if (this.objectType == "beast") {
                 let closestHeroPosition = this.closestHeroPosition();
                 
@@ -86,17 +82,12 @@ export class ArtificialForm extends IntelligentForm{
                     } 
                 }
             } 
-            // console.log(`beast specific: ${this.objectName} - ${performance.now() - time4}`);
 
-            // let time2 = performance.now();
-            // Set elevation last
             if (this.setElevation() == -1) {
                 console.log(`${this.objectName} is out of bounds`)
                 this.stopAndBackup(delta);
             };
-            // console.log(`setElevation: ${this.objectName} - ${performance.now() - time2}`);
         }
-        // console.log(`move: ${this.objectName} - ${performance.now() - time}`);
     }
 
     stopAndBackup(delta) {
@@ -142,7 +133,6 @@ export class ArtificialForm extends IntelligentForm{
         if (distance == Infinity) {
             return null;
         } else {
-            // console.table({ distance, heroLayoutId, position });
             return { distance, heroLayoutId, position };
         }
         
@@ -179,25 +169,14 @@ export class ArtificialForm extends IntelligentForm{
             if (thisHero.alive) {
                 
                 if (layoutId == this.sceneController.hero.attributes.layoutId) {
-                    // console.table({ layoutId, hitPointReduction });
                     this.sceneController.hero.changeStat('health', -hitPointReduction, false);
                 } else {
-                    // console.log('Should not be here during local play')
-                    // { level, layoutId, hitPointReduction }                    
+                    // { level, stat, layoutId, hitPointReduction }                    
                     this.sceneController.socket.emit('changeStat', { level: this.sceneController.level, stat: 'health', layoutId, hitPointReduction: -hitPointReduction });
                 }
             }
         }
     }
-
-    // getConversationState() {
-    //     return [this.attributes.conversation.conversationState, this.attributes.conversation.engagementState];
-    // }
-    
-    // setConversationState(conversationState, engagementState) {
-    //     this.attributes.conversation.conversationState = conversationState;
-    //     if (engagementState) this.attributes.conversation.engagementState = engagementState;
-    // }
 
     engageConversation() {
 
