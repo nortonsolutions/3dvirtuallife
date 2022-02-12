@@ -70,7 +70,8 @@ export const levels = [
             { name: "evilOne" },
             // { name: "evilOne" },
             { name: "shopkeep" },
-            { name: "rat" }
+            { name: "rat" },
+            { name: "murderBear" }
             
         ]
     },

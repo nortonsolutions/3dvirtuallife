@@ -342,7 +342,7 @@ export const Items = {
         attributes: {
             equippable: ['Torso'],
             animates: false,
-            scale: 100,
+            scale: 20,
             equippedScale: 0.02,
             elevation: 20,
             effect: "defense/1"
@@ -532,5 +532,20 @@ export const Items = {
             effect: "mana/2",
             animatesRecurring: true
         }
+    },
+    katana: {
+        name: 'katana',
+        gltf: 'katana.glb',
+        image: 'katana.png',
+        description: 'Blood-stained weapon of the Samurai',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 100,
+            elevation: 0,
+            effect: "strength/3"
+        } 
     }
 }

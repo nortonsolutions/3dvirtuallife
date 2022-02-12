@@ -26,7 +26,7 @@ export class AnimatedForm extends StandardForm{
         this.blocksR = [];
         this.bowAttacks = [];
 
-        this.possiblePunchAttacksR = ["Punch", "Punching R"]
+        this.possiblePunchAttacksR = ["Punch", "Attack", "Punch2", "Kick", "Punching R"]
         this.possibleSwordAttacksR = ["Punch", "Striking R", "Swing R"]
         this.possibleSwordAttacksL = ["Punching L", "Swing L"]
         this.possibleBlocksR = ["Blocking R"];
@@ -126,9 +126,9 @@ export class AnimatedForm extends StandardForm{
     }
 
     fadeToAction( actionName, duration ) {
-        console.log(`${this.objectName}: fadeToAction ${actionName}`);
-        if ( (actionName == "Death" || ! this.currentlyFadingToAction) && this.activeActionName !== actionName ) { // 
-            console.log(`${this.objectName}: fadingToAction ${actionName}`);
+        // console.log(`${this.objectName}: fadeToAction ${actionName}`);
+        if ( this.activeActionName != "Death" && (actionName == "Death" || ! this.currentlyFadingToAction) && this.activeActionName !== actionName ) { // 
+            // console.log(`${this.objectName}: fadingToAction ${actionName}`);
             this.currentlyFadingToAction = true;
             
             let newAction = this.actions[ actionName ];

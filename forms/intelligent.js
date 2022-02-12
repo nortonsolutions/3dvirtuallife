@@ -362,7 +362,7 @@ export class IntelligentForm extends AnimatedForm{
                 return el.model.attributes.layoutId != this.attributes.layoutId;
             });
             
-        }, 5000);
+        }, 2000);
     }
 
     firstInventorySlot() {

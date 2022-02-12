@@ -36,8 +36,8 @@ export const baselineHeroTemplates = [
     },
     {
         type: "RodBot",
-        gltf: "herobot.glb",
-        png: "herobot.png",
+        gltf: "rodbot.glb",
+        png: "rodbot.png",
         attributes: {
             handScaleFactor: 50,
             flipWeapon: true,
@@ -47,6 +47,6 @@ export const baselineHeroTemplates = [
             }
         },
         description: "Above-average strength."
-    },
+    }
 
 ]

@@ -140,25 +140,29 @@ export class ArtificialForm extends IntelligentForm{
 
     attackHero(layoutId) {
 
+        // Choose an attack
+        let possibleAttacks = [...this.punchAttacksR, ...this.swordAttacksR, ...this.swordAttacksL];
+        let attack = possibleAttacks[getRndInteger(0,possibleAttacks.length-1)];
         
-        switch (this.objectName) {
-            case 'rat':
-            case 'spiderQueen':
-                this.fadeToAction("Attack", 0.2);
-                break;
-            case 'crystalman':
-            case 'lavaman':
-            case 'rockyman':
+        // switch (this.objectName) {
+        //     case 'rat':
+        //     case 'spiderQueen':
+        //         this.fadeToAction("Attack", 0.2);
+        //         break;
+        //     case 'crystalman':
+        //     case 'lavaman':
+        //     case 'rockyman':
 
-                let attackArray = ['Punch','Punch2','Kick'];
-                let attack = getRndInteger(0,attackArray.length - 1);
-                this.fadeToAction(attackArray[attack], 0.2);
+        //         let attackArray = ['Punch','Punch2','Kick'];
+        //         let attack = getRndInteger(0,attackArray.length - 1);
+        //         this.fadeToAction(attackArray[attack], 0.2);
 
-                break;
-            default:
-                this.fadeToAction("Punch", 0.2);
-                break;
-        }
+        //         break;
+        //     default:
+        //         this.fadeToAction("Punch", 0.2);
+        //         break;
+        // }
+        this.fadeToAction(attack, 0.2);
 
         let chanceToHit = this.getEffectiveStat('agility') / 100;
         let hitPointReduction = Math.max(0,getRandomArbitrary(0,this.getEffectiveStat('strength')) - getRandomArbitrary(0,this.sceneController.hero.getEffectiveStat('defense')));

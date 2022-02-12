@@ -195,6 +195,29 @@ export const Entities = {
             grants: ["gold10"]
         }
     },
+    murderBear: {
+        name: 'murderBear',
+        gltf: 'murderBear.glb',
+        description: 'Crazy yet agile man dressed in a bear suit',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 30,
+            length: 20,
+            width: 20,
+            elevation: 0,
+            scale: 15,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10","katana"]
+        }
+    },
     spiderQueen: {
         name: 'spiderQueen',
         gltf: 'rat.glb',
