@@ -216,6 +216,7 @@ export const Items = {
         image: 'broadsword.png',
         description: 'A metallic blade, strong yet flexible',
         type: 'item',
+        subtype: 'sword',
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
@@ -321,6 +322,7 @@ export const Items = {
         image: 'lightSaber.png',
         description: 'Red light saber',
         type: 'item',
+        subtype: 'sword',
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: true,
@@ -382,6 +384,7 @@ export const Items = {
         image: 'bow.png',
         description: 'A buster bow',
         type: 'item',
+        subtype: 'bow',
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: true,
@@ -437,6 +440,7 @@ export const Items = {
         image: 'busterblade.png',
         description: 'A buster blade',
         type: 'item',
+        subtype: 'sword',
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
@@ -451,6 +455,7 @@ export const Items = {
         image: 'busterbuckler.png',
         description: 'A buster buckler',
         type: 'item',
+        subtype: 'shield',
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
@@ -490,6 +495,7 @@ export const Items = {
         image: 'mace.png',
         description: 'A metallic mace',
         type: 'item',
+        subtype: 'sword',
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,

@@ -293,7 +293,7 @@ export const Entities = {
         attributes: {
             moves: true,
             animates: true,
-            height: 30,
+            height: 60,
             length: 20,
             width: 20,
             elevation: 0,

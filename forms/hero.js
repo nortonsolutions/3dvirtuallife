@@ -422,16 +422,8 @@ export class Hero extends IntelligentForm {
     
                         if (this.selectedObject.alive) {
     
-                            this.fadeToAction("Punch", 0.3);
-    
-                            let chanceToHit = this.getEffectiveStat('agility') / 10;
-                            let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
-    
-                            // console.dir(this.selectedObject);
-                            if (Math.random() < chanceToHit) {
-                                this.selectedObject.model.translateZ(-10);
-                                this.inflictDamage(this.selectedObject, hitPointReduction);
-                            }
+                            // this.fadeToAction("Punch", 0.3);
+                            this.attack();
                         }
     
                     } else if (objectType == "structure") {
@@ -477,7 +469,8 @@ export class Hero extends IntelligentForm {
                         // animate weapon (if applicable) and launch item
                         let tool = this.animatedSubforms.find(el => el[0] == bodyPart)[1];
                         if (tool) tool.runActiveAction(2);
-                        this.fadeToAction('ThumbsUp', 0.2);
+                        
+                        this.fadeToAction(this.bowAttacks[0], 0.2);
                         
                         setTimeout(() => {
                             this.launch(item, null, [bodyPart, tool.objectName]);
@@ -536,7 +529,31 @@ export class Hero extends IntelligentForm {
         
     }
 
+    /**
+     * Choose from the available attack moves
+     */
+    attack() {
+        // this.punchAttacksR = [];
+        // this.swordAttacksR = [];
+        // this.swordAttacksL = [];
+        // this.blocksL = [];
+        // this.blocksR = [];
 
+        // Choose an attack
+        let possibleAttacks = [...this.punchAttacksR, ...this.swordAttacksR, ...this.swordAttacksL];
+        let attack = possibleAttacks[getRndInteger(0,possibleAttacks.length-1)];
+    
+        this.fadeToAction(attack, 0.2);
+        
+        let chanceToHit = this.getEffectiveStat('agility') / 10;
+        let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
+
+        // console.dir(this.selectedObject);
+        if (Math.random() < chanceToHit) {
+            this.selectedObject.model.translateZ(-10);
+            this.inflictDamage(this.selectedObject, hitPointReduction);
+        }
+    }
 
 
     dispose(item) {

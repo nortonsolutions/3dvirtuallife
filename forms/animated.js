@@ -12,14 +12,38 @@ export class AnimatedForm extends StandardForm{
         super(template, sceneController);
 
         this.actions = [];
-
-        this.fadingToDeath = false;
+        
+        // this.fadingToDeath = false;
         this.states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
-        this.emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
+        
         this.currentlyFadingToAction = false;
-
         this.animatedSubforms = [];
+
+        this.punchAttacksR = [];
+        this.swordAttacksR = [];
+        this.swordAttacksL = [];
+        this.blocksL = [];
+        this.blocksR = [];
+        this.bowAttacks = [];
+
+        this.possiblePunchAttacksR = ["Punch", "Punching R"]
+        this.possibleSwordAttacksR = ["Punch", "Striking R", "Swing R"]
+        this.possibleSwordAttacksL = ["Punching L", "Swing L"]
+        this.possibleBlocksR = ["Blocking R"];
+        this.possibleBlocksL = ["Blocking L"];
+        this.possibleBowAttacks = ["ThumbsUp", "Givining the bird"];
+
+
+        this.emotes = [ 
+            'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp',
+            ...this.possibleBlocksL, 
+            ...this.possibleBlocksR, 
+            ...this.possibleBowAttacks, 
+            ...this.possiblePunchAttacksR, 
+            ...this.possibleSwordAttacksL, 
+            ...this.possibleSwordAttacksR
+        ];
     }
     
     load(callback) {
@@ -30,7 +54,21 @@ export class AnimatedForm extends StandardForm{
 
             let firstAnimationName = '';
             this.animations.forEach((animation,index) => {
-    
+                
+                if (this.possiblePunchAttacksR.includes(animation.name)) {
+                    this.punchAttacksR.push(animation.name);
+                } else if (this.possibleSwordAttacksR.includes(animation.name)) {
+                    this.swordAttacksR.push(animation.name);
+                } else if (this.possibleSwordAttacksL.includes(animation.name)) {
+                    this.swordAttacksL.push(animation.name);
+                } else if (this.possibleBlocksL.includes(animation.name)) {
+                    this.blocksL.push(animation.name);
+                } else if (this.possibleBlocksR.includes(animation.name)) {
+                    this.blocksR.push(animation.name);
+                } else if (this.possibleBowAttacks.includes(animation.name)) {
+                    this.bowAttacks.push(animation.name);
+                }
+
                 var action = this.mixer.clipAction( animation );
                 if (index == 0) { firstAnimationName = animation.name };
     
@@ -83,10 +121,10 @@ export class AnimatedForm extends StandardForm{
                     this.fadeToAction( 'Running', 0.2);
                 }
             } else {
-                if (!this.fadingToDeath) {
+                // if (!this.fadingToDeath) {
                     this.fadeToAction("Death", 0.2);
-                    this.fadingToDeath = true;
-                }
+                    // this.fadingToDeath = true;
+                // }
             }
         }
 
@@ -94,9 +132,9 @@ export class AnimatedForm extends StandardForm{
     }
 
     fadeToAction( actionName, duration ) {
-        
+        console.log(`${this.objectName}: fadeToAction ${actionName}`);
         if ( ! this.currentlyFadingToAction && this.activeActionName !== actionName ) { // 
-            
+            console.log(`${this.objectName}: fadingToAction ${actionName}`);
             this.currentlyFadingToAction = true;
             
             let newAction = this.actions[ actionName ];

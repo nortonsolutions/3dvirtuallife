@@ -72,9 +72,13 @@ export class DialogScreen {
             this.animations = gltf.animations;
             this.mixer = new THREE.AnimationMixer( this.currentModel );
 
+            this.currentModel.scale.x = this.entity.template.attributes.scale;
+            this.currentModel.scale.y = this.entity.template.attributes.scale;
+            this.currentModel.scale.z = this.entity.template.attributes.scale;
+
             this.scene.add( this.currentModel ); // (  );this.cylinder
-            this.camera.position.z = 1.1;
-            this.camera.position.y = 1.9;
+            this.camera.position.z = 40;// 1.1;
+            this.camera.position.y = this.entity.template.attributes.height; // 1.9;
 
             this.animations.forEach((animation,index) => {
                 var action = this.mixer.clipAction( animation );

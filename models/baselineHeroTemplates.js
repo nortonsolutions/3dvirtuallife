@@ -40,6 +40,7 @@ export const baselineHeroTemplates = [
         png: "herobot.png",
         attributes: {
             handScaleFactor: 50,
+            flipWeapon: true,
             stats: {
                 strength: "2/2/0",
                 

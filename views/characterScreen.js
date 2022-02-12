@@ -47,6 +47,7 @@ export class CharacterScreen {
             newTemplate.attributes.xpLevels = {...newTemplate.attributes.xpLevels, ...template.attributes.xpLevels};
             newTemplate.attributes.scale = template.attributes.scale? template.attributes.scale : newTemplate.attributes.scale;
             newTemplate.attributes.handScaleFactor = template.attributes.handScaleFactor? template.attributes.handScaleFactor : 1;
+            newTemplate.attributes.flipWeapon = template.attributes.flipWeapon? template.attributes.flipWeapon : false;
             newTemplate.gltf = template.gltf;
             newTemplate.png = template.png;
             newTemplate.description = template.description;
