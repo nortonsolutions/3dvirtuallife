@@ -80,9 +80,7 @@ export const app = () => {
         Array.from(document.querySelectorAll('.startGame')).forEach(el => {
             el.addEventListener('click', e => {
                 e.preventDefault();
-                // startLevel(heroTemplate, props);
                 eventDepot.fire('modal', { type: 'character', title: "Character", context: { } });
-                
             })
         });
 
@@ -127,9 +125,10 @@ export const app = () => {
         Array.from(document.querySelectorAll('.quitGame')).forEach(el => {
             el.addEventListener('click', e => {
                 localStorage.clear();
-                if (game) game.stop();
-                window.location = '/logout';
-                e.preventDefault();
+                if (game) game.stop(() => {
+                    window.location = '/logout';
+                    e.preventDefault();
+                });
             })
         });
 
@@ -156,7 +155,7 @@ export const app = () => {
                         
                         var props = { level: 0, layouts: [] }
                         localStorage.setItem('gameProps', JSON.stringify(props));
-    
+
                         eventDepot.fire('startLevel', { heroTemplate, props, namespace });
                     }
                 });
@@ -196,9 +195,15 @@ export const app = () => {
         sidebar = new Sidebar(eventDepot);
         chatbar = new Chatbar(eventDepot, socket);
 
-        if (game) game.stop();
-        game = new Game(heroTemplate, eventDepot, socket);
-        game.start(props.level);
+        if (game) {
+            game.stop(() => {
+                game = new Game(heroTemplate, eventDepot, socket);
+                game.start(props.level);
+            });
+        } else {
+            game = new Game(heroTemplate, eventDepot, socket);
+            game.start(props.level);
+        }
     }
 
     eventDepot.fire('modal', { type: 'character', title: "Character", context: { } });

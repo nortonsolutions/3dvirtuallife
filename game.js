@@ -28,26 +28,27 @@ class Game {
     addEventListeners() {
         this.eventDepot.addListener('loadLevel', (data) => {
             this.eventDepot.fire('unlockControls', {});
-            this.stop();
-
-            this.heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
-            if (data.location) this.heroTemplate.location = data.location;
-
-            this.heroTemplate.location.x -= 1;
-
-            this.eventDepot.fire('startLevel', {
-                heroTemplate: this.heroTemplate,
-                props: { level: data.level }
-            })
+            this.stop(() => {
+                this.heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
+                if (data.location) this.heroTemplate.location = data.location;
+    
+                this.heroTemplate.location.x -= 1;
+    
+                this.eventDepot.fire('startLevel', {
+                    heroTemplate: this.heroTemplate,
+                    props: { level: data.level }
+                })
+            });
         });
     }
 
-    stop() {
+    stop(callback) {
         if (this.layoutManager) {
             this.layoutManager.shutdown(() => {
                 this.layoutManager = null;
+                callback();
             });
-        }
+        } else callback();
     }
 
     start(level) {

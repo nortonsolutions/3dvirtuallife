@@ -204,7 +204,7 @@ export class CharacterScreen {
             }
         });
 
-        document.getElementById('loadGame').addEventListener('click', (e) => {
+        if (document.getElementById('loadGame')) document.getElementById('loadGame').addEventListener('click', (e) => {
             e.preventDefault();
 
             this.heroTemplate = this.heroTemplates[this.selectedTemplate];

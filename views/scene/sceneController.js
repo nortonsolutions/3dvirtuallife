@@ -96,7 +96,8 @@ export class SceneController {
                         this.seedForms(this.firstInRoom, () => {
                             this.introduce();
                             this.scene.animate();
-                        })
+                            this.scene.readyForLock = true;
+                        });
                     });
                 });
             });

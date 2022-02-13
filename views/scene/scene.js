@@ -28,7 +28,8 @@ class Scene {
 
 
         this.prevTime = performance.now();
-
+        this.readyForLock = false;
+        
         // SceneController has access to layoutManager, which has levelBuilder
         this.controller = controller;
         this.running = true;
@@ -358,7 +359,9 @@ class Scene {
 
         this.instructions.addEventListener( 'click', () => {
 
-            this.controls.lock();
+            if (this.readyForLock) {
+                this.controls.lock();
+            }
         
         }, false );
 

@@ -35,22 +35,46 @@ export class GameAPI {
 
     }
 
+    
+    /**
+     * listGames is part of the 'loadGame' workflow.
+     * Character has been selected/cached before calling this.
+     * TODO: after /listActiveGames, allow the player to select a game to join,
+     * or allow the creation of a new nameSpace with an existing saved game.
+     */ 
     listGames() {
-        handleGet('/list', response => {
-            // Launch the loadGame template with the list of games
-            this.eventDepot.fire('modal', { type: 'loadGame', title: 'Load Game', context: JSON.parse(response) });
-        })
+
+        handleGet('/listActiveGames', (response) => {
+
+            let activeGames = JSON.parse(response);
+            if (Object.keys(activeGames).length > 0) { // if there are games
+        
+                alert('Game is already running!  Joining the game with your character.');
+                let heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
+                this.eventDepot.fire('joinGame', { heroTemplate, activeGames });
+
+            } else { // no games to join, so call /list and the loadGame modal
+
+                handleGet('/list', response => {
+                    // Launch the loadGame template with the list of games
+                    this.eventDepot.fire('modal', { type: 'loadGame', title: 'Load Game', context: JSON.parse(response) });
+                })
+           }
+        });
     }
 
-    /** load gameName and gameProps into localStorage, then launch game */
+    /** 
+     * load gameName and gameProps into localStorage, then launch game.
+     * Using default '/' namespace for now.
+     */
     loadGame(gameName) {
         handleGet('/load/' + gameName, response => {
-
-            let props = JSON.parse(response).props;
+            let namespace = '/';
+            let props = JSON.parse(JSON.parse(response).props);
             localStorage.setItem('gameName', gameName);
-            localStorage.setItem('gameProps', props);
-            let heroTemplate = localStorage.getItem('gameHeroTemplate');
-            this.eventDepot.fire('startLevel', { heroTemplate: JSON.parse(heroTemplate), props: JSON.parse(props) });
+            localStorage.setItem('gameProps', JSON.stringify(props));
+            let heroTemplate = JSON.parse(localStorage.getItem('gameHeroTemplate'));
+            this.eventDepot.fire('startLevel', { heroTemplate, props, namespace });
         })
     }
 

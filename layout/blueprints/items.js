@@ -541,9 +541,11 @@ export const Items = {
         type: 'item',
         subtype: 'sword',
         attributes: {
+            flipWeapon: true,
             equippable: ['Middle2R', 'Middle2L'],
+            equippedScale: 0.015,
             animates: false,
-            scale: 100,
+            scale: 15,
             elevation: 0,
             effect: "strength/3"
         } 
