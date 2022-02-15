@@ -33,7 +33,7 @@ export const levels = [
             { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
             { name: "smallSword", location: { x: -1, y: 0, z: -1} },
             { name: "redpotion" },
-            { name: "greenpotion" },
+            { name: "blackpotion" },
             { name: "gold3" },
             { name: "bagOfGems" },
             { name: "bow" },
@@ -68,10 +68,11 @@ export const levels = [
         entities: [
             { name: "john" },
             { name: "evilOne" },
-            // { name: "evilOne" },
             { name: "shopkeep" },
-            { name: "rat" },
-            { name: "murderBear" }
+            { name: "bat" },
+            { name: "murderBear" },
+            { name: "ghoul" },
+            { name: "dragon"}
             
         ]
     },
@@ -131,7 +132,10 @@ export const levels = [
             { name: "evilOne" },
             { name: "evilOne" },
             { name: "rat" },
-            { name: "rat" }
+            { name: "rat" },
+            { name: "bat" },
+            { name: "bat" },
+            { name: "ghoul" }
 
         ]
     },
@@ -178,7 +182,10 @@ export const levels = [
         ],
         entities: [
             { name: "rat", location: { x: 10, y: 0, z: 0 }},
-            { name: "spiderQueen", location: { x: 10, y: 0, z: 0 }}
+            { name: "spiderQueen", location: { x: 10, y: 0, z: 0 }},
+            { name: "ghoul", location: { x: 10, y: 0, z: 0 } },
+            { name: "ghoul", location: { x: 10, y: 0, z: 0 } },
+            { name: "elfgirl" }
         ]
     },
     {
@@ -230,7 +237,8 @@ export const levels = [
             { name: "crystalMan" },
             { name: "crystalMan" },
             { name: "crystalMan" },
-            { name: "crystalMan" }
+            { name: "crystalMan" },
+            { name: "viking" },
         ]
     },
     {
@@ -284,6 +292,9 @@ export const levels = [
             { name: "lavaMan" },
             { name: "lavaMan" },
             { name: "lavaMan" },
+            { name: "ghoul" },
+            { name: "ghoul" },
+            { name: "ghoul" }
             
         ]
     },
@@ -314,7 +325,7 @@ export const levels = [
         },
         items: [
             // { name: "crystalBall" },
-            // { name: "mushroom" },
+            { name: "mushroom" },
         ],
         structures: [
             { 
@@ -327,6 +338,8 @@ export const levels = [
         entities: [
             { name: "shopkeep" },
             { name: "rockyMan" },
+            { name: "ghoul" },
+            { name: "ghoul" }
             // { name: "rockyMan" },
             // { name: "rockyMan" },
             // { name: "rockyMan" },
@@ -336,7 +349,7 @@ export const levels = [
         ]
     },
     {
-        level: 6,
+        level: 7,
         width: 26, //26
         length: 26, //26
         description: "Snowyland",
@@ -372,7 +385,51 @@ export const levels = [
             { name: "crystalMan" },
             { name: "crystalMan" },
             { name: "crystalMan" },
-            { name: "crystalMan" }
+            { name: "crystalMan" },
+            { name: "ghoul" },
+            { name: "ghoul" }
+        ]
+    },
+    {
+        level: 6,
+        width: 14, //26
+        length: 12, //26
+        description: "Ruins",
+        background: 'clouds.png',
+        terrain: {
+            name: 'floor',
+            type: 'floor',
+            description: 'ruins',
+            gltf: 'ruins.glb',
+            attributes: {
+                scale: 40,
+                borderTrees: true,
+                light: {
+                    sunLight: true,
+                    overheadPointLight: false,
+                },
+                fog: {
+                    color: 'white',
+                    density: 1.2
+                }
+            }
+        },
+        items: [
+
+        ],
+        structures: [
+            { 
+                name: "portal", location: { x: -21.5, y: 0, z: -6.5},
+                attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: 19.5 } } } 
+            }
+        ],
+        entities: [
+            { name: "crystalMan" },
+            { name: "crystalMan" },
+            { name: "crystalMan" },
+            { name: "crystalMan" },
+            { name: "ghoul" },
+            { name: "ghoul" }
         ]
     }
  

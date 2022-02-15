@@ -31,6 +31,8 @@ export class Hero extends IntelligentForm {
         this.moveLeft = false;
         this.moveRight = false;
 
+        this.positionHandR = new THREE.Vector3();
+
         // Proximity Light is used for object selection/identification
         this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 30 );
         
@@ -133,7 +135,7 @@ export class Hero extends IntelligentForm {
                     })
 
                 } else { // standard attack upon 'selectedObject'
-                    this.inflictDamage(this.selectedObject, change);
+                    if (this.selectedObject.alive) this.inflictDamage(this.selectedObject, change);
                 }
 
                 break;
@@ -312,7 +314,7 @@ export class Hero extends IntelligentForm {
 
             // Item or spell use
             let keyString = 'f' + data.key + 'key';
-            let itemName = this.equipped[keyString][0];
+            let itemName = this.equipped[keyString]? this.equipped[keyString][0] : null;
 
             if (itemName) {
                 let itemTemplate = this.gameObjects[itemName];
@@ -532,15 +534,16 @@ export class Hero extends IntelligentForm {
         let possibleAttacks = [...this.punchAttacksR, ...this.swordAttacksR, ...this.swordAttacksL];
         let attack = possibleAttacks[getRndInteger(0,possibleAttacks.length-1)];
     
+        /** During action runtime, this.handAttack==true */
         this.fadeToAction(attack, 0.2);
-        
-        let chanceToHit = this.getEffectiveStat('agility') / 10;
-        let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
 
-        if (Math.random() < chanceToHit) {
-            this.selectedObject.model.translateZ(-10);
-            this.inflictDamage(this.selectedObject, hitPointReduction);
-        }
+        // let chanceToHit = this.getEffectiveStat('agility') / 10;
+        // let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
+
+        // if (Math.random() < chanceToHit) {
+        //     // this.selectedObject.model.translateZ(-10);
+        //     this.inflictDamage(this.selectedObject, hitPointReduction);
+        // }
     }
 
 
@@ -674,6 +677,8 @@ export class Hero extends IntelligentForm {
 
             this.identifySelectedForm();
 
+            if (this.handAttack) this.handleHandAttack();
+
             /** data: { layoutId: ..., rotation: ..., velocity: ..., position: ..., level: ...} */
 
             let heroData = {
@@ -687,6 +692,29 @@ export class Hero extends IntelligentForm {
 
             this.sceneController.socket.emit('updateHeroPosition', heroData);
 
+        }
+
+    }
+
+    handleHandAttack() {
+
+        // What is the world position of my hands or their associated weapons?  Start with right hand.
+        let handR = this.equipped.Middle2R? this.equipped.Middle2R[0] : "Middle2R";
+        this.positionHandR = handR=="Middle2R"? this.model.getObjectByName(handR).getWorldPosition(this.positionHandR) : this.model.getObjectByProperty("objectName", handR).getWorldPosition(this.positionHandR);
+        
+        for (const entity of this.sceneController.allEnemiesInRange(100, this.model.position)) {
+
+            console.log(`${entity.objectName} center: ${entity.principalBoundingBox.getCenter()}`)
+            // What is the principalGeometry's bounding box?
+            if (entity.principalBoundingBox.containsPoint(this.positionHandR)) {
+                // let chanceToHit = this.getEffectiveStat('agility') / 10;
+                let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
+
+                // if (Math.random() < chanceToHit) {
+                    // this.selectedObject.model.translateZ(-10);
+                    this.inflictDamage(entity, hitPointReduction);
+                // })
+            }
         }
 
     }
@@ -775,8 +803,7 @@ export class Hero extends IntelligentForm {
             if (this.levelUpEligibility().length > 0) {
                 setTimeout(() => {
                     this.sceneController.eventDepot.fire('modal', { type: 'levelUp', title: 'Level Up', context: this.levelUpEligibility() });
-                    this.sceneController.eventDepot.fire('disableCloser', {});
-                }, 2000);
+                }, 1500);
             }
 
             this.sceneController.eventDepot.fire('updateXP', this.attributes.experience); 

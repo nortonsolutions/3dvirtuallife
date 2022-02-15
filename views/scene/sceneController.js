@@ -126,35 +126,37 @@ export class SceneController {
         
         let itemTemplate = this.getTemplateByName(data.itemName);
 
-        if (data.attributes) itemTemplate.attributes = {...itemTemplate.attributes, ...data.attributes};
+        if (itemTemplate.objectType == 'item') {
+            if (data.attributes) itemTemplate.attributes = {...itemTemplate.attributes, ...data.attributes};
 
-        if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
-        this.seedForm(itemTemplate).then(form => {
-
-            if (data.position) {
-                form.model.position.copy(data.position);
-            } else {
-                form.model.position.copy(this.hero.model.position);
-                form.model.position.y = this.hero.determineElevationFromBase();
-            }
-            
-
-            if (local) {
-                this.socket.emit('nextLayoutId', this.level, layoutId => {
-                    data.layoutId = form.model.attributes.layoutId = layoutId;
+            if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
+            this.seedForm(itemTemplate).then(form => {
+    
+                if (data.position) {
+                    form.model.position.copy(data.position);
+                } else {
+                    form.model.position.copy(this.hero.model.position);
+                    form.model.position.y = this.hero.determineElevationFromBase();
+                }
+                
+    
+                if (local) {
+                    this.socket.emit('nextLayoutId', this.level, layoutId => {
+                        data.layoutId = form.model.attributes.layoutId = layoutId;
+                        this.eventDepot.fire('addItemToLayout', data);
+        
+                        // if (this.multiplayer) {
+                            data.level = this.level;
+                            data.position = form.model.position;
+                            this.socket.emit('dropItemToScene', data);
+                        // }
+                    })
+        
+                } else {
                     this.eventDepot.fire('addItemToLayout', data);
-    
-                    // if (this.multiplayer) {
-                        data.level = this.level;
-                        data.position = form.model.position;
-                        this.socket.emit('dropItemToScene', data);
-                    // }
-                })
-    
-            } else {
-                this.eventDepot.fire('addItemToLayout', data);
-            }
-        })
+                }
+            })
+        }
     }
     
 

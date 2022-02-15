@@ -81,6 +81,12 @@ class Modal {
                         this.joinGameScreen.addJoinGameEvents(context);
                         break;
                 }
+
+                if (data.type == 'levelUp') {
+                    this.eventDepot.fire('disableCloser', {});
+                } else {
+                    this.eventDepot.fire('enableCloser', {});
+                }
             });
             
             var modal = document.getElementById('myModal');

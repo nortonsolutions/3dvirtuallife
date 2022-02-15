@@ -142,14 +142,12 @@ export class StandardForm {
 
         let yOffset = 40;
 
-        this.upRaycaster.ray.origin.x = this.model.position.x;
-        this.upRaycaster.ray.origin.z = this.model.position.z;
+        this.upRaycaster.ray.origin.copy(this.model.position);
         this.upRaycaster.ray.origin.y = -yOffset;
         
-
         if (this.upRaycaster.intersectObject(this.sceneController.floor.model, true)[0]) {
+            
             let distanceFromBase = this.upRaycaster.intersectObject(this.sceneController.floor.model, true)[0].distance;
-
             this.downRaycaster.ray.origin.copy (this.upRaycaster.ray.origin);
             this.downRaycaster.ray.origin.y += (distanceFromBase + yOffset);
             
@@ -159,7 +157,7 @@ export class StandardForm {
         } else {
             // console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
             // console.error(this.sceneController.floor);
-            // console.error(`${this.objectName} = ${this.model.position.x},${this.model.position.z}`);
+            console.error(`${this.objectName} = ${this.model.position.x},${this.model.position.z}`);
             return -1;
         }
 

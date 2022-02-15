@@ -39,31 +39,40 @@ export class ArtificialForm extends IntelligentForm{
 
     move(delta) {
         if (this.alive) {
-
             
-            // INERTIA
-            this.velocity.x -= this.velocity.x * 10.0 * delta;
-            this.velocity.z -= this.velocity.z * 10.0 * delta;
-            this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+            // TODO: If the velocity is already close to zero, maintain idle
+            this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
-            if (Math.random() < .4) { // percentage of changing direction
-                this.direction.z = getRandomArbitrary(0,10);
-                this.direction.x = getRandomArbitrary(-1,1);
-                this.direction.normalize();
+            if (this.absVelocity < .1 && Math.random() < .95) {
+                // DO NOTHING, maintain idle state
+
+            } else {
+
+                // INERTIA
+                this.velocity.x -= this.velocity.x * 10.0 * delta;
+                this.velocity.z -= this.velocity.z * 10.0 * delta;
+                this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+
+                if (Math.random() < .4) { // percentage of changing direction
+                    this.direction.z = getRandomArbitrary(0,10);
+                    this.direction.x = getRandomArbitrary(-1,1);
+                    this.direction.normalize();
+                }
+
+                let agility = this.getEffectiveStat('agility');
+
+                if (Math.random() < .2) { // percentage of moving
+                    this.velocity.z += this.direction.z * 1000.0 * agility * delta;
+                    this.velocity.x += this.direction.x * 1000.0 * agility * delta;
+                } 
+
+                this.movementRaycaster.ray.origin.copy( this.model.position );
+
+                // Make a random rotation (yaw)
+                this.model.rotateY(getRndInteger(-5,5)/100);
+                this.rotation.copy(this.model.rotation);
+
             }
-
-            let agility = this.getEffectiveStat('agility');
-
-            if (Math.random() < .2) { // percentage of moving
-                this.velocity.z += this.direction.z * 1000.0 * agility * delta;
-                this.velocity.x += this.direction.x * 1000.0 * agility * delta;
-            } 
-
-            this.movementRaycaster.ray.origin.copy( this.model.position );
-
-            // Make a random rotation (yaw)
-            this.model.rotateY(getRndInteger(-5,5)/100);
-            this.rotation.copy(this.model.rotation);
 
             super.move(delta);
 
@@ -144,24 +153,6 @@ export class ArtificialForm extends IntelligentForm{
         let possibleAttacks = [...this.punchAttacksR, ...this.swordAttacksR, ...this.swordAttacksL];
         let attack = possibleAttacks[getRndInteger(0,possibleAttacks.length-1)];
         
-        // switch (this.objectName) {
-        //     case 'rat':
-        //     case 'spiderQueen':
-        //         this.fadeToAction("Attack", 0.2);
-        //         break;
-        //     case 'crystalman':
-        //     case 'lavaman':
-        //     case 'rockyman':
-
-        //         let attackArray = ['Punch','Punch2','Kick'];
-        //         let attack = getRndInteger(0,attackArray.length - 1);
-        //         this.fadeToAction(attackArray[attack], 0.2);
-
-        //         break;
-        //     default:
-        //         this.fadeToAction("Punch", 0.2);
-        //         break;
-        // }
         this.fadeToAction(attack, 0.2);
 
         let chanceToHit = this.getEffectiveStat('agility') / 100;

@@ -40,6 +40,11 @@ export class IntelligentForm extends AnimatedForm{
             // this.getBoundingSphereHandR(this.model);
             // this.setToDoubleSided(this.model);
 
+            this.principalGeometry = this.identifyPrincipalGeometry(this.model);
+            this.principalGeometry.computeBoundingBox();
+            this.principalBoundingBox = this.principalGeometry.boundingBox;
+            
+            // console.log(`${this.objectName}: ${this.principalGeometry}`);
             this.computeVertexNormals(this.model);
             this.setToCastShadows();
 
@@ -62,12 +67,28 @@ export class IntelligentForm extends AnimatedForm{
 
     }
 
+    /**
+     * The purpose of identifyPrincipalGeometry is to set this.principalGeometry,
+     * which will be used throughout the life of the intelligence to identify its
+     * bounding box (used for collision detection).
+     * 
+     * Lobato's models use the 'IcoSphere' geometry as its basis;
+     * Tidwell's models use the 'Body'.
+     * Default robot model uses 'Head_*' for head and 'Torso_*' for its torso.
+     * Otherwise find the FIRST geometry.
+     */
+    identifyPrincipalGeometry(el)  {
+        let possibleNames = ['Head_0', 'Torso_0', 'Icosphere', 'Body'];
+        for (const name of possibleNames) {
+            if (el.getObjectByName(name)) {
+                return el.getObjectByName(name).geometry;
+            }
+        }
+    }
+
     getBoundingSphereHandR(el) {
-        // if (el.geometry)
-
-        // let temp = this.model.getObjectByName('HandR'); // .children[1];
-        // temp.computeBoundingSphere();
-
+        let temp = this.model.getObjectByName('HandR').geometry; // .children[1];
+        temp.computeBoundingSphere();
     }
 
     spriteScaleX(stat) { // can't be zero
@@ -106,8 +127,6 @@ export class IntelligentForm extends AnimatedForm{
         this.manaSprite.scale.x = this.spriteScaleX("mana");
 
     }
-
-
 
     listGeometries(el) {
 
@@ -227,8 +246,8 @@ export class IntelligentForm extends AnimatedForm{
             let newYposition = this.determineElevationFromBase();
 
             if (newYposition == -1) { 
-                this.model.position.x = shiftTowardCenter(this.model.position.x);
-                this.model.position.z = shiftTowardCenter(this.model.position.z);
+                this.model.position.x = shiftTowardCenter(this.model.position.x, 1);
+                this.model.position.z = shiftTowardCenter(this.model.position.z, 1);
                 return -1;
             } else if ((this.model.position.y - newYposition) < this.attributes.height) {
                 this.model.position.y = newYposition;
@@ -249,7 +268,7 @@ export class IntelligentForm extends AnimatedForm{
 
     /** returns the new value */
     changeStat(stat, change, changeMax = false) {
-
+        
         change = Number(change);
         let currentStat = this.attributes.stats[stat].split('/');
         let cur = Number(currentStat[0]);
@@ -340,7 +359,7 @@ export class IntelligentForm extends AnimatedForm{
 
                     let position = new THREE.Vector3();
                     position.copy(this.model.position);
-                    position.y = this.determineElevationFromBase();
+                    // position.y = this.determineElevationFromBase(); // causes disappearing floor!
 
                     let data = {
                         itemName,
@@ -497,7 +516,7 @@ export class IntelligentForm extends AnimatedForm{
                 if (!this.attributes.flipWeapon) item.model.rotation.y = Math.PI;
 
                 let scale = item.attributes.equippedScale? item.attributes.equippedScale: 0.1;
-                scale *= this.attributes.handScaleFactor;
+                if (this.attributes.handScaleFactor) scale *= this.attributes.handScaleFactor;
                 item.model.scale.copy(new THREE.Vector3( scale, scale, scale ));
 
                 // if (itemName == "torch") {

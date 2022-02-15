@@ -188,6 +188,46 @@ export const Items = {
             }]
         }
     },
+    blackpotion: {
+        name: 'blackpotion',
+        gltf: 'greenpotion.glb',
+        image: 'greenpotion.png',
+        description: 'A bubbling black potion',
+        type: 'item',
+        attributes: {
+            animates: false,
+            throwable: true,
+            throwableAttributes: {
+                pitch: .7, // angle up (percentage of 90 degrees)
+                weight: 2, // lbs
+                distance: 700, // px
+                speed: 4 // 1 = full walking speed
+            },
+            scale: 5,
+            equippedScale: 0.005,
+            elevation: 10,
+            effect: "damage/3",
+            range: 40,
+            sprites: [{ 
+                name: "hitEffect",
+                regex: "",
+                frames: 9,
+                scale: 1200,
+                elevation: 30,
+                flip: false,
+                time: 3
+            },
+            { 
+                name: "Heal",
+                regex: "",
+                frames: 15,
+                scale: 500,
+                elevation: 30,
+                flip: false,
+                time: 3
+            }]
+        }
+    },
     mushroom: {
         name: 'mushroom',
         gltf: 'mushroom.glb',
@@ -331,6 +371,40 @@ export const Items = {
             elevation: 20,
             effect: "strength/1",
             animationOnEquip: true
+        } 
+    },
+    axe: {
+        name: 'axe',
+        gltf: 'axe.glb',
+        image: 'axe.png',
+        description: 'Pokeman axe',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 3,
+            equippedScale: 0.003,
+            elevation: 20,
+            effect: "strength/1",
+            animationOnEquip: false
+        } 
+    },
+    axe2: {
+        name: 'axe2',
+        gltf: 'axe2.glb',
+        image: 'axe2.png',
+        description: 'Viking war axe',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 1,
+            equippedScale: 0.001,
+            elevation: 20,
+            effect: "strength/1",
+            animationOnEquip: false
         } 
     },
     armor: {

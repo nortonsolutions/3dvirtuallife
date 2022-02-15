@@ -28,11 +28,10 @@ export class AnimatedForm extends StandardForm{
 
         this.possiblePunchAttacksR = ["Punch", "Attack", "Punch2", "Kick", "Punching R"]
         this.possibleSwordAttacksR = ["Punch", "Striking R", "Swing R"]
-        this.possibleSwordAttacksL = ["Punching L", "Swing L"]
+        this.possibleSwordAttacksL = ["Punching L", "Striking L", "Swing L"]
         this.possibleBlocksR = ["Blocking R"];
         this.possibleBlocksL = ["Blocking L"];
         this.possibleBowAttacks = ["ThumbsUp", "Givining the bird"];
-
 
         this.emotes = [ 
             'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp',
@@ -92,6 +91,8 @@ export class AnimatedForm extends StandardForm{
     
             });
     
+            this.handAttacks = [...this.punchAttacksR, ...this.swordAttacksR, ...this.swordAttacksL];
+    
             this.activeActionName = 'Idle'; // Default for intelligent/walking beings
             this.activeAction = this.actions[ firstAnimationName ];
             this.previousActionName = '';
@@ -116,7 +117,7 @@ export class AnimatedForm extends StandardForm{
                     this.fadeToAction( 'Idle', 0.2);
                 } else if (this.absVelocity >= .1 && this.activeActionName == 'Idle') {
                     this.fadeToAction( 'Walking', 0.2);
-                } else if (this.absVelocity >= 199 && this.activeActionName == 'Walking') {
+                } else if (this.absVelocity >= 250 && this.activeActionName == 'Walking') {
                     this.fadeToAction( 'Running', 0.2);
                 }
             }
@@ -141,6 +142,9 @@ export class AnimatedForm extends StandardForm{
             if (this.previousAction) this.previousAction.fadeOut( duration );
 
             if (this.activeAction) {
+
+                if (this.handAttacks.includes(this.activeActionName)) this.handAttack = true;
+                
                 this.activeAction
                     .reset()
                     // .setEffectiveTimeScale( 1 )
@@ -149,6 +153,7 @@ export class AnimatedForm extends StandardForm{
                     .play();
 
                 const restoreState = () => {
+                    this.handAttack = false;
                     this.currentlyFadingToAction = false;
                     this.mixer.removeEventListener('finished', restoreState );
                     this.fadeToAction( this.previousActionName, 0.1 );
