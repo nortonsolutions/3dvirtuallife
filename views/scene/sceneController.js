@@ -126,7 +126,7 @@ export class SceneController {
         
         let itemTemplate = this.getTemplateByName(data.itemName);
 
-        if (itemTemplate.objectType == 'item') {
+        if (itemTemplate.type == 'item') {
             if (data.attributes) itemTemplate.attributes = {...itemTemplate.attributes, ...data.attributes};
 
             if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
@@ -179,9 +179,9 @@ export class SceneController {
             this.seedForm(heroTemplate, true, true); // no need to re-add to forms?
         });
 
-        // data: { itemName, position: item.model.position, rotation: item.model.rotation })
+        // data: { itemName, position: item.model.position, rotation: item.model.rotation, hostile })
         this.socket.on('launch', data => {
-            this.hero.launch(data.itemName, null, [], false, data);
+            this.hero.launch(data.itemName, null, [], false, data, data.hostile);
         });
 
         this.socket.on('updateStructureAttributes', (data) => {
@@ -630,7 +630,7 @@ export class SceneController {
     allEnemiesInRange(range, position) {
         var response = [];
         this.entities.filter(el => el.objectType == "beast").forEach(entity => {
-            console.log(`distanceTo ${entity.objectName} is ${position.distanceTo(entity.model.position)}`);
+            // console.log(`distanceTo ${entity.objectName} is ${position.distanceTo(entity.model.position)}`);
             
             // apply height
             let enemyPosition = new THREE.Vector3();
@@ -638,14 +638,18 @@ export class SceneController {
             enemyPosition.y += entity.attributes.height;
             
             if (position.distanceTo(enemyPosition) < range) {
-                console.log(`in range`)
+                // console.log(`in range`)
                 response.push(entity);
             }
         })
         return response;
     }
 
-    addToProjectiles(item, local = true) {
+    heroInRange(range, position) {
+        return (position.distanceTo(this.hero.model.position) < range);
+    }
+
+    addToProjectiles(item, local = true, hostile = false) {
 
         /**
          * 
@@ -668,17 +672,14 @@ export class SceneController {
                 this.formFactory.addSprites(item.model, spriteConfig);
             })
         }
-
-        // Starting direction
-        let direction = this.scene.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
-        direction.y += item.attributes.throwableAttributes.pitch;
         
         this.projectiles.push( {
             item,
-            direction,
+            direction: item.direction,
             velocity: new THREE.Vector3(),
             distanceTraveled: 0,
-            local
+            local,
+            hostile
         } );
         this.scene.add( item.model );
     }

@@ -39,7 +39,7 @@ export class FormFactory {
                 form = new AnimatedForm(template, this.sceneController);
                 break;
             case "water":
-                form = new WaterForm(template, this.sceneController ); // ,"Water" ); // , "Refractor");
+                form = new WaterForm(template, this.sceneController,"Water" ); // ,"Water" ); // , "Refractor");
                 break;
             default:
                 form = new StandardForm(template, this.sceneController);
@@ -94,7 +94,7 @@ export class FormFactory {
      */
 
     addSprites = (model, spriteConfig, scene = null, broadcast = false, position = null) => {
-        
+
         // Either position was passed OR there is no regex defined; position requires scene
         if (position || !spriteConfig.regex) {
 
@@ -104,6 +104,7 @@ export class FormFactory {
             
             if (position) {
                 sprite.position.copy(position);
+                sprite.position.y += spriteConfig.elevation;
                 scene.add(sprite);
             } else {
                 sprite.position.y += spriteConfig.elevation;
@@ -113,12 +114,15 @@ export class FormFactory {
                 if (spriteConfig.scaleY) sprite.scale.y = sprite.scale.y * spriteConfig.scaleY;
 
                 model.add(sprite);
-                
             }
 
             this.sceneController.sprites.push({ sprite, frames: spriteForm.getFrames() });
 
-            if (broadcast) this.broadcastSprite(spriteConfig, model.position);
+            if (broadcast) {
+                let wp = new THREE.Vector3();
+                wp = sprite.getWorldPosition(wp);
+                this.broadcastSprite(spriteConfig, wp);
+            }
 
             if (spriteConfig.time) {
                 setTimeout(() => {

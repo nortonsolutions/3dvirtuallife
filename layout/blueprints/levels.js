@@ -288,9 +288,9 @@ export const levels = [
             }
         ],
         entities: [
-            { name: "lavaMan" },
-            { name: "lavaMan" },
-            { name: "lavaMan" },
+            { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5} },
+            { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5} },
+            { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5} },
             { name: "lavaMan" },
             { name: "ghoul" },
             { name: "ghoul" },

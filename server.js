@@ -315,7 +315,7 @@ database(mongoose, (db) => {
     // data: { level: this.sceneController.level, layoutId: entity.attributes.layoutId, spell });    
     socket.on('castSpell', data => {
       let socketNumber = getSocketByLayoutId(data.level, data.layoutId);
-      if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('castSpell', data.spell);
+      if (socketNumber && socketNumber != socket.id) socket.to(socketNumber).emit('castSpell', data);
     });
 
     // data:  { level: this.sceneController.level, spriteConfig, spritePosition });

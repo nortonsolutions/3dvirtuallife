@@ -434,7 +434,7 @@ class Scene {
 
     /* Distribute damage to enemies, make item disappear or fall to ground */
     /* 'local' items exert an effect while non-local are just for appearances */
-    handleAction(projectile, entitiesInRange) {
+    handleAction(projectile, entitiesInRange, hostile = false) {
 
         // Sprite effects:
         if (projectile.local && projectile.item.attributes.sprites) {
@@ -444,9 +444,14 @@ class Scene {
                 spriteConfig.elevation = spriteConfig.elevation-20;
 
                 this.controller.formFactory.addSprites(projectile.item.model, spriteConfig, this, true, projectile.item.model.position);
-                entitiesInRange.forEach(entity => {
-                    this.controller.formFactory.addSprites(entity.model, spriteConfig, this, true, projectile.item.model.position);
-                })
+
+                if (hostile) {
+                    this.controller.formFactory.addSprites(this.controller.hero.model, spriteConfig, this, true, projectile.item.model.position);
+                } else {
+                    entitiesInRange.forEach(entity => {
+                        this.controller.formFactory.addSprites(entity.model, spriteConfig, this, true, projectile.item.model.position);
+                    })
+                }
             });
 
         }
@@ -454,9 +459,14 @@ class Scene {
         if (projectile.local) {
             let [stat, change] = projectile.item.attributes.effect.split("/");
 
-            entitiesInRange.forEach(entity => {
-                this.controller.hero.inflictDamage(entity, change);
-            })
+            if (hostile) {
+                this.controller.hero.changeStat('health', -change, false);
+            } else {
+                entitiesInRange.forEach(entity => {
+                    this.controller.hero.inflictDamage(entity, change);
+                })
+            }
+
         }
 
         if (projectile.item.objectType == 'item' && 
@@ -477,7 +487,8 @@ class Scene {
             direction,
             velocity: new THREE.Vector3(),
             distanceTraveled: 0,
-            local
+            local,
+            hostile
         }
      *
      */
@@ -493,7 +504,7 @@ class Scene {
     
                 if (projectile.distanceTraveled == 0) { // first iteration, set velocitiess
     
-                    projectile.velocity.y = (projectile.direction.y) * 500;
+                    projectile.velocity.y = (projectile.item.direction.y) * 500;
                     projectile.velocity.z = projectile.item.attributes.throwableAttributes.speed * 500;
                     
                 } else { // subsequent iterations
@@ -505,20 +516,22 @@ class Scene {
     
                 projectile.item.model.translateY( projectile.velocity.y * delta );
                 projectile.item.model.translateZ( -projectile.velocity.z * delta );
-    
-                let entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
-    
-                if (entitiesInRange.length > 0) {
-                    this.handleAction(projectile, entitiesInRange);
-                    this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
+
+                if (projectile.hostile && this.controller.heroInRange(projectile.item.attributes.range, projectile.item.model.position)) {
+                    this.handleAction(projectile, null, true);
+                } else if (!projectile.hostile) {
+                    var entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
+                    if (entitiesInRange.length > 0) {
+                        this.handleAction(projectile, entitiesInRange);
+                        this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
+                    }
                 }
     
                 projectile.distanceTraveled += (Math.abs(projectile.velocity.z * delta) + Math.abs(projectile.velocity.y * delta));
-    
                 let maxDistance = projectile.item.attributes.throwableAttributes.distance;
     
                 // console.log(`traveled: ${projectile.distanceTraveled}, position: ${projectile.item.model.position.x}, ${projectile.item.model.position.y},${projectile.item.model.position.z }`);
-                console.log(`${projectile.item.model.position.y}`)
+                // console.log(`${projectile.item.model.position.y}`)
                 if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+5) {
                     projectile.distanceTraveled = -1;
                 }

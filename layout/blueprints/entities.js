@@ -1,5 +1,3 @@
-import { Items } from './items.js'
-
 let convo = {
     accept: { text: "Yes, I accept", type: "engage" },
     decline: { text: "No, thank you", type: "disengage" },
@@ -210,12 +208,13 @@ export const Entities = {
             scale: 60,
             stats: {
                 health: "4/4/0",
-                mana: "0/0/0",
+                mana: "60/60/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
                 defense: "1/1/0"
             },
-            grants: ["gold10"]
+            grants: ["gold10"],
+            rangedSpell: 'fireProjectileSpell'
         }
     },
     bat: {

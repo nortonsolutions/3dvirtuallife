@@ -1,5 +1,15 @@
 import { IntelligentForm } from './intelligent.js'
 
+let hitSpriteConfig = { 
+    name: "hitEffect",
+    regex: "",
+    frames: 9,
+    scale: 100, 
+    elevation: 20,
+    flip: false,
+    time: 1
+}
+
 /**
  * The Hero is a significant extension of the
  * IntelligentForm which has hooks for all the
@@ -24,8 +34,7 @@ export class Hero extends IntelligentForm {
 
         // Actually just a starting/saved location
         this.location = this.template.location? this.template.location : { x: 0, y: 0, z: 0 };
-        this.gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
-
+        
         this.moveForward = false;
         this.moveBackward = false;
         this.moveLeft = false;
@@ -150,67 +159,7 @@ export class Hero extends IntelligentForm {
         }
     }
 
-    /**
-     * e.g.
-     * attributes: {
-            manaCost: 1,
-            effect: "damage/3",
-            range: 80,
-            throwable: true,
-            throwableAttributes: {
-                pitch: .5, // angle up (percentage of 90 degrees)
-                weight: 1, // lbs
-                distance: 1200, // px
-                speed: 4 // 1 = full walking speed
-            },
-            sprites: [{ 
-                name: "greenExplosion",
-                regex: "",
-                frames: 10,
-                scale: 300,
-                elevation: 30,
-                flip: false,
-                time: 1
-            },
-            { 
-                name: "Heal",
-                regex: "",
-                frames: 15,
-                scale: 50,
-                elevation: 30,
-                flip: false,
-                time: 1
-            }]
-        }
-     */
 
-    castSpell(spell, local = true) {
-        
-        if (local) {
-            if (this.getStat("mana") < spell.attributes.manaCost) return;
-            this.changeStat('mana', -spell.attributes.manaCost);
-        }
-
-        if (spell.attributes.throwable) {
-            this.launch(spell.name);
-        } else {
-            if (local && spell.attributes.affectAllInParty) { // general effect against all in range
-                let inRange = this.sceneController.allFriendliesInRange(spell.attributes.range, this.model.position);
-                inRange.forEach(entity => {
-                    this.sceneController.socket.emit('castSpell', { level: this.sceneController.level, layoutId: entity.attributes.layoutId, spell });    
-                });
-            }
-
-            this.takeEffect(spell);
-
-            // Sprite effects:
-            if (spell.attributes.sprites) {
-                spell.attributes.sprites.forEach(spriteConfig => {
-                    this.sceneController.formFactory.addSprites(this.model, spriteConfig, null, true);
-                })
-            }
-        }
-    }
 
     useItem(item, keyString) {
         
@@ -228,59 +177,6 @@ export class Hero extends IntelligentForm {
             }
         }
     }
-
-    /** 
-     * launch is used for throwables, like greenpotion, arrows, spells, etc.
-     * Every throwable item has specific properties including quantity,
-     * raised pitch, and weight (which affects how the trajectory declines).
-     * 
-     * Throwing an item affects inventory similarly to using a hotkey potion,
-     * pulling from inventory until the last item is used (or all mana is used).
-     * 
-     * When local = false, data is expected to define rotation/position.
-     */
-    launch(itemName, bodyPart = null, [parentBodyPart, parentItemName] = [], local = true, data) {
-
-        if (local) {
-            // If this is a child item, check inventory first and bail if needed
-            if (parentBodyPart && this.getInventoryQuantity(itemName) == 0) {
-                this.unequip(parentBodyPart);
-                this.addToInventory(parentItemName, 0, 1);
-            } else {
-                // load the object model to the scene, copy the position/rotation of hero
-                this.sceneController.loadFormByName(itemName, (item) => {
-
-                    item.model.position.copy(this.model.position);
-                    item.model.rotation.copy(this.model.rotation);
-                    item.model.position.y += this.attributes.height;
-
-                    this.sceneController.socket.emit('launch', { level: this.sceneController.level, itemName, position: item.model.position, rotation: item.model.rotation })
-                    this.sceneController.addToProjectiles(item);
-                    
-                    if (bodyPart || parentBodyPart) { // remove from inventory, unequip when out
-                        if (this.removeFromInventory(itemName) == -1) {
-                            this.unequip(parentBodyPart? parentBodyPart : bodyPart);
-    
-                            // re-equip parent item to inventory if applicable
-                            if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
-                        }
-                    }
-                }); // false means do not addToForms
-
-            }
-
-        } else {
-            this.sceneController.loadFormByName(itemName, (item) => {
-
-                item.model.position.copy(data.position);
-                item.model.rotation.copy(data.rotation);
-
-                this.sceneController.addToProjectiles(item, local);
-            }, false);
-        }
-
-    }
-
 
     addEventListeners() {
 
@@ -306,8 +202,8 @@ export class Hero extends IntelligentForm {
 
         });
 
-        this.sceneController.socket.on('castSpell', spell => {
-            this.castSpell(spell, false);
+        this.sceneController.socket.on('castSpell', data => {
+            this.castSpell(data.spell, false, data.hostile);
         })
 
         this.sceneController.eventDepot.addListener('hotkey', (data) => { // key = number, i.e. 1 => equipped.f1key
@@ -317,7 +213,7 @@ export class Hero extends IntelligentForm {
             let itemName = this.equipped[keyString]? this.equipped[keyString][0] : null;
 
             if (itemName) {
-                let itemTemplate = this.gameObjects[itemName];
+                let itemTemplate = this.sceneController.getTemplateByName(itemName);
                 let itemType = itemTemplate.type;
 
                 switch (itemType) {
@@ -507,8 +403,8 @@ export class Hero extends IntelligentForm {
             this.sceneController.eventDepot.fire('statusUpdate', { message: `Advanced in ${data.category} to level ${data.nextLevel}`});
             
             // Lookup up xpLevels in gameObjects, then apply the effect:
-            let effect = this.gameObjects.xpLevels[data.category][data.nextLevel]? this.gameObjects.xpLevels[data.category][data.nextLevel].effect : `${data.category}/1`;
-            let spell = this.gameObjects.xpLevels[data.category][data.nextLevel]? this.gameObjects.xpLevels[data.category][data.nextLevel].spell : null;
+            let effect = this.sceneController.getTemplateByName('xpLevels')[data.category][data.nextLevel]? this.sceneController.getTemplateByName('xpLevels')[data.category][data.nextLevel].effect : `${data.category}/1`;
+            let spell = this.sceneController.getTemplateByName('xpLevels')[data.category][data.nextLevel]? this.sceneController.getTemplateByName('xpLevels')[data.category][data.nextLevel].spell : null;
 
             if (effect) {
                 let [stat, change] = effect.split("/");
@@ -698,22 +594,28 @@ export class Hero extends IntelligentForm {
 
     handleHandAttack() {
 
+        let diff = new THREE.Vector3();
         // What is the world position of my hands or their associated weapons?  Start with right hand.
         let handR = this.equipped.Middle2R? this.equipped.Middle2R[0] : "Middle2R";
         this.positionHandR = handR=="Middle2R"? this.model.getObjectByName(handR).getWorldPosition(this.positionHandR) : this.model.getObjectByProperty("objectName", handR).getWorldPosition(this.positionHandR);
         
         for (const entity of this.sceneController.allEnemiesInRange(100, this.model.position)) {
 
-            console.log(`${entity.objectName} center: ${entity.principalBoundingBox.getCenter()}`)
-            // What is the principalGeometry's bounding box?
-            if (entity.principalBoundingBox.containsPoint(this.positionHandR)) {
-                // let chanceToHit = this.getEffectiveStat('agility') / 10;
-                let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
+            diff.subVectors(this.positionHandR, entity.model.position);
 
-                // if (Math.random() < chanceToHit) {
-                    // this.selectedObject.model.translateZ(-10);
-                    this.inflictDamage(entity, hitPointReduction);
-                // })
+            // console.log(`diff length: ${diff.length()}; radius: ${entity.radius}`);
+            if ( diff.length() < entity.radius ) {
+                // console.log('hit!');
+				// collided
+				// diff.normalize(); // .multiplyScalar( ballSize );
+				// pos.copy( ballPosition ).add( diff );
+                let hitPointReduction = (getRandomArbitrary(0,this.getEffectiveStat('strength'))/10);
+                this.inflictDamage(entity, hitPointReduction);
+
+                // Add hit sprites at the location of the hand:
+                this.sceneController.formFactory.addSprites(null, hitSpriteConfig, this.sceneController.scene, true, this.positionHandR);
+
+                // this.selectedObject.model.translateZ(-10);
             }
         }
 
@@ -786,7 +688,7 @@ export class Hero extends IntelligentForm {
     }
 
     grantSpell(spellName) {
-        let spell = this.gameObjects[spellName];
+        let spell = this.sceneController.getTemplateByName(spellName);
         if (!this.spells.map(el => el.itemName).includes(spellName)) {
             this.spells.push({
                 itemName: spell.name

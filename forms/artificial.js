@@ -85,6 +85,18 @@ export class ArtificialForm extends IntelligentForm{
                         this.facePosition(closestHeroPosition.position);
                         this.attackHero(closestHeroPosition.heroLayoutId);
                         this.stopAndBackup(delta);
+                    } else if (d < 400 && this.attributes.rangedSpell) {
+                        this.facePosition(closestHeroPosition.position);
+                        
+                        if (Math.random()<.05) {
+                            this.fadeToAction('Striking L', 0.2);
+                            setTimeout(() => {
+                                 this.castSpell(this.sceneController.getTemplateByName(this.attributes.rangedSpell), true, true);
+                            }, 1000);
+                        } else {
+                            this.moveToward(delta);
+                        }
+
                     } else if (d < 700) {
                         this.facePosition(closestHeroPosition.position);
                         this.moveToward(delta);
@@ -94,11 +106,14 @@ export class ArtificialForm extends IntelligentForm{
 
             if (this.setElevation() == -1) {
                 console.log(`${this.objectName} is out of bounds`)
-                this.stopAndBackup(delta);
+                this.model.position.x = shiftTowardCenter(this.model.position.x, 1);
+                this.model.position.z = shiftTowardCenter(this.model.position.z, 1);
+
+                // this.stopAndBackup(delta);
             };
         }
     }
-
+    
     stopAndBackup(delta) {
 
         this.model.translateX( -this.velocity.x * delta );

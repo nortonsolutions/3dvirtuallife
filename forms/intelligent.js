@@ -29,20 +29,22 @@ export class IntelligentForm extends AnimatedForm{
         this.equipped = this.template.equipped;
 
         this.movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.length/2 + 35 );
+        
     }
 
     /** load is for loading the model and animations specifically */
     load(callback) {
         
         super.load(() => {
-            // this.listGeometries(this.model);
+            this.listGeometries(this.model);
             // this.listPositions(this.model);
             // this.getBoundingSphereHandR(this.model);
             // this.setToDoubleSided(this.model);
 
             this.principalGeometry = this.identifyPrincipalGeometry(this.model);
-            this.principalGeometry.computeBoundingBox();
-            this.principalBoundingBox = this.principalGeometry.boundingBox;
+            this.principalGeometry.computeBoundingSphere();
+            this.principalBoundingSphere = this.principalGeometry.boundingSphere;
+            this.radius = this.principalBoundingSphere.radius * this.attributes.scale;
             
             // console.log(`${this.objectName}: ${this.principalGeometry}`);
             this.computeVertexNormals(this.model);
@@ -74,11 +76,12 @@ export class IntelligentForm extends AnimatedForm{
      * 
      * Lobato's models use the 'IcoSphere' geometry as its basis;
      * Tidwell's models use the 'Body'.
+     * Rodney's models use 'Cube' or some variant like 'Cube.001_0'
      * Default robot model uses 'Head_*' for head and 'Torso_*' for its torso.
      * Otherwise find the FIRST geometry.
      */
     identifyPrincipalGeometry(el)  {
-        let possibleNames = ['Head_0', 'Torso_0', 'Icosphere', 'Body'];
+        let possibleNames = ['Torso_0', 'Head_0', 'Icosphere', 'Body', "Cube.001_0", "Cube"];
         for (const name of possibleNames) {
             if (el.getObjectByName(name)) {
                 return el.getObjectByName(name).geometry;
@@ -360,6 +363,8 @@ export class IntelligentForm extends AnimatedForm{
                     let position = new THREE.Vector3();
                     position.copy(this.model.position);
                     // position.y = this.determineElevationFromBase(); // causes disappearing floor!
+                    
+                    console.log(`Granting ${itemName} @ ${position.x},${position.y},${position.z}`);
 
                     let data = {
                         itemName,
@@ -381,7 +386,7 @@ export class IntelligentForm extends AnimatedForm{
                 return el.model.attributes.layoutId != this.attributes.layoutId;
             });
             
-        }, 2000);
+        }, 4000);
     }
 
     firstInventorySlot() {
@@ -402,8 +407,7 @@ export class IntelligentForm extends AnimatedForm{
 
     getGoldValue(itemName) {
 
-        let gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
-        let obj = gameObjects[itemName];
+        let obj = this.sceneController.getTemplateByName(itemName);
         if (obj.attributes.value) {
 
             let goldValue = this.attributes.goldValue? this.attributes.goldValue: 1;
@@ -598,8 +602,7 @@ export class IntelligentForm extends AnimatedForm{
                 this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
             } else {
                 
-                let gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
-                let item = gameObjects[itemName];
+                let item = this.sceneController.getTemplateByName(itemName);
     
                 if (area != "special") { // special = no model to remove
                     let thisItem = this.model.getObjectByProperty("objectName", itemName);
@@ -644,6 +647,133 @@ export class IntelligentForm extends AnimatedForm{
             spells: this.spells,
             equipped: this.equipped
         }
+    }
+
+    /**
+     * e.g.
+     * attributes: {
+            manaCost: 1,
+            effect: "damage/3",
+            range: 80,
+            throwable: true,
+            throwableAttributes: {
+                pitch: .5, // angle up (percentage of 90 degrees)
+                weight: 1, // lbs
+                distance: 1200, // px
+                speed: 4 // 1 = full walking speed
+            },
+            sprites: [{ 
+                name: "greenExplosion",
+                regex: "",
+                frames: 10,
+                scale: 300,
+                elevation: 30,
+                flip: false,
+                time: 1
+            },
+            { 
+                name: "Heal",
+                regex: "",
+                frames: 15,
+                scale: 50,s
+                elevation: 30,
+                flip: false,
+                time: 1
+            }]
+        }
+     */
+
+    castSpell(spell, local = true, hostile = false) {
+        
+        if (local && !hostile) {
+            if (this.getStat("mana") < spell.attributes.manaCost) return;
+            this.changeStat('mana', -spell.attributes.manaCost);
+        }
+
+        if (spell.attributes.throwable) {
+            this.launch(spell.name, null, [], local, null, hostile);
+        } else {
+            if (local && spell.attributes.affectAllInParty) { // general effect against all in range
+                let inRange = this.sceneController.allFriendliesInRange(spell.attributes.range, this.model.position);
+                inRange.forEach(entity => {
+                    this.sceneController.socket.emit('castSpell', { level: this.sceneController.level, layoutId: entity.attributes.layoutId, spell, hostile });    
+                });
+            }
+
+            this.takeEffect(spell);
+
+            // Sprite effects:
+            if (spell.attributes.sprites) {
+                spell.attributes.sprites.forEach(spriteConfig => {
+                    this.sceneController.formFactory.addSprites(this.model, spriteConfig, null, true);
+                })
+            }
+        }
+    }
+
+    /** 
+     * launch is used for throwables, like greenpotion, arrows, spells, etc.
+     * Every throwable item has specific properties including quantity,
+     * raised pitch, and weight (which affects how the trajectory declines).
+     * 
+     * Throwing an item affects inventory similarly to using a hotkey potion,
+     * pulling from inventory until the last item is used (or all mana is used).
+     * 
+     * When local = false, data is expected to define rotation/position.
+     */
+    launch(itemName, bodyPart = null, [parentBodyPart, parentItemName] = [], local = true, data, hostile = false) {
+
+        if (local) {
+            // If this is a child item, check inventory first and bail if needed
+            if (parentBodyPart && this.getInventoryQuantity(itemName) == 0) {
+                this.unequip(parentBodyPart);
+                this.addToInventory(parentItemName, 0, 1);
+            } else {
+                // load the object model to the scene, copy the position/rotation of hero
+                this.sceneController.loadFormByName(itemName, (item) => {
+
+                    item.model.position.copy(this.model.position);
+                    item.model.rotation.copy(this.model.rotation);
+                    item.model.position.y += this.attributes.height;
+                    
+                    // Starting direction
+                    console.log(`Launching with direction: ${this.direction.x},${this.direction.y},${this.direction.z}`)
+                    let direction = new THREE.Vector3().copy(this.direction); // this.sceneController.scene.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
+                    
+                    if (hostile) {
+                        item.model.rotateY(Math.PI);
+                    }
+                    
+                    direction.y += item.attributes.throwableAttributes.pitch;
+
+                    item.direction = direction;
+
+                    this.sceneController.socket.emit('launch', { level: this.sceneController.level, itemName, position: item.model.position, rotation: item.model.rotation, direction, hostile })
+                    this.sceneController.addToProjectiles(item, local, hostile);
+                    
+                    if (bodyPart || parentBodyPart) { // remove from inventory, unequip when out
+                        if (this.removeFromInventory(itemName) == -1) {
+                            this.unequip(parentBodyPart? parentBodyPart : bodyPart);
+    
+                            // re-equip parent item to inventory if applicable
+                            if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
+                        }
+                    }
+                }); // false means do not addToForms
+
+            }
+
+        } else {
+            this.sceneController.loadFormByName(itemName, (item) => {
+
+                item.model.position.copy(data.position);
+                item.model.rotation.copy(data.rotation);
+                item.direction = data.direction;
+                
+                this.sceneController.addToProjectiles(item, local, hostile);
+            }, false);
+        }
+
     }
 
 }
