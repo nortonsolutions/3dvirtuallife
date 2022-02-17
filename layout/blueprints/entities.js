@@ -101,10 +101,10 @@ export const Entities = {
             grants: ["gold25"]
         }
     },
-    rosenBot: {
-        name: 'rosenBot',
-        gltf: 'robot2.glb',
-        description: 'Flying tin can',
+    rosen: {
+        name: 'rosen',
+        gltf: 'rosen.glb',
+        description: 'UDC Inmate',
         type: 'beast',
         attributes: {
             moves: true,
@@ -306,6 +306,29 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10"]
+        }
+    },
+    horse: {
+        name: 'horse',
+        gltf: 'horse.glb',
+        description: 'Strong horse',
+        type: 'friendly',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 30,
+            length: 50,
+            width: 20,
+            elevation: -10,
+            scale: .5,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "0/0/0",
+                agility: "7/7/0",
                 defense: "1/1/0"
             },
             grants: ["gold10"]

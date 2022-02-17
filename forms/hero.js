@@ -178,6 +178,63 @@ export class Hero extends IntelligentForm {
         }
     }
 
+    // e.g. this.handleMouseClick('L', shift)
+    handleMouseClick(side, shift) {
+        if (this.alive) {
+                
+            if (this.selectedObject) {
+
+                let objectType = this.selectedObject.objectType;
+                let objectSubtype = this.selectedObject.objectSubtype;
+                
+                if (objectType == "item") {
+                    this.sceneController.eventDepot.fire('takeItemFromScene', {
+                        itemName: this.selectedObject.attributes.baseItemName? this.selectedObject.attributes.baseItemName : this.selectedObject.objectName, 
+                        quantity: this.selectedObject.attributes.quantity? this.selectedObject.attributes.quantity : 1,
+                        layoutId: this.selectedObject.model.attributes.layoutId
+                    });
+
+                } else if (objectType == "friendly") {
+                    
+                    this.sceneController.eventDepot.fire('unlockControls', {});
+                    this.sceneController.eventDepot.fire('modal', { type: 'dialog', title: this.selectedObject.objectName, entity: this.selectedObject, hero: this });
+                
+                } else if (objectType == "beast") {
+
+                    if (this.selectedObject.alive) this.attack(side, shift);
+
+                } else if (objectType == "structure") {
+                    
+                    var accessible = this.selectedObject.attributes.key ? 
+                        this.inventory.map(el => el? el.itemName: null).includes(this.selectedObject.attributes.key) :
+                        true;
+                    
+                    if (accessible) {
+                        this.selectedObject.updateAttributes({unlocked: true});
+                    }
+
+                } else if ( objectType == "hero") {
+                    
+                    this.sceneController.eventDepot.fire('unlockControls', {});
+
+                    let dialogData = { 
+                        type: 'heroDialog', 
+                        title: this.selectedObject.objectName, 
+                        heroInventory: this.inventory, 
+                        otherLayoutId: this.selectedObject.attributes.layoutId, 
+                        socket: this.sceneController.socket, 
+                        initiator: this.objectName, 
+                        level: this.sceneController.level,
+                        layoutId: this.attributes.layoutId
+                    };
+
+                    this.sceneController.eventDepot.fire('modal', dialogData);
+                } 
+            } 
+        }
+    }
+
+
     addEventListeners() {
 
         // data: { otherLayoutId: data.layoutId, otherInventory: data.heroInventory, initiator: ...}
@@ -294,61 +351,9 @@ export class Hero extends IntelligentForm {
             }
         });
 
-        this.sceneController.eventDepot.addListener('mouse0click', () => {
 
-            if (this.alive) {
-                
-                if (this.selectedObject) {
-
-                    let objectType = this.selectedObject.objectType;
-                    let objectSubtype = this.selectedObject.objectSubtype;
-                    
-                    if (objectType == "item") {
-                        this.sceneController.eventDepot.fire('takeItemFromScene', {
-                            itemName: this.selectedObject.attributes.baseItemName? this.selectedObject.attributes.baseItemName : this.selectedObject.objectName, 
-                            quantity: this.selectedObject.attributes.quantity? this.selectedObject.attributes.quantity : 1,
-                            layoutId: this.selectedObject.model.attributes.layoutId
-                        });
-    
-                    } else if (objectType == "friendly") {
-                        
-                        this.sceneController.eventDepot.fire('unlockControls', {});
-                        this.sceneController.eventDepot.fire('modal', { type: 'dialog', title: this.selectedObject.objectName, entity: this.selectedObject, hero: this });
-                    
-                    } else if (objectType == "beast") {
-    
-                        if (this.selectedObject.alive) this.attack();
-    
-                    } else if (objectType == "structure") {
-                        
-                        var accessible = this.selectedObject.attributes.key ? 
-                            this.inventory.map(el => el? el.itemName: null).includes(this.selectedObject.attributes.key) :
-                            true;
-                        
-                        if (accessible) {
-                            this.selectedObject.updateAttributes({unlocked: true});
-                        }
-
-                    } else if ( objectType == "hero") {
-                        
-                        this.sceneController.eventDepot.fire('unlockControls', {});
-
-                        let dialogData = { 
-                            type: 'heroDialog', 
-                            title: this.selectedObject.objectName, 
-                            heroInventory: this.inventory, 
-                            otherLayoutId: this.selectedObject.attributes.layoutId, 
-                            socket: this.sceneController.socket, 
-                            initiator: this.objectName, 
-                            level: this.sceneController.level,
-                            layoutId: this.attributes.layoutId
-                        };
-
-                        this.sceneController.eventDepot.fire('modal', dialogData);
-                    } 
-                } 
-            }
-        })
+        this.sceneController.eventDepot.addListener('mouse0click', (shift) => { this.handleMouseClick('L', shift)} );
+        this.sceneController.eventDepot.addListener('mouse2click', (shift) => { this.handleMouseClick('R', shift)} );
 
         this.sceneController.eventDepot.addListener('mouse1click', () => {
 
@@ -422,13 +427,29 @@ export class Hero extends IntelligentForm {
     }
 
     /**
-     * Choose from the available attack moves
+     * side is L or R; shift is true (kick) or false (hand)
      */
-    attack() {
+    attack(side, shift) {
+        
+        if (side=='R' && !shift && this.handAttacksR.length == 0) {
+            side = 'L';
+        } else if (side=='L' && !shift && this.handAttacksL.length == 0) {
+            side = 'R';
+        } else if (side=='R' && shift && this.kickAttacksR.length == 0) {
+            side = 'L';
+        } else if (side=='L' && shift && this.kickAttacksL.length == 0) {
+            side = 'R';
+        }
+        
+        // this.handAttacksR = [];
+        // this.kickAttacksR = [];
+        // this.handAttacksL = [];
+        // this.kickAttacksL = [];
 
+        let possibleAttacks = shift ? "kickAttacks" + side: "handAttacks" + side;
+        
         // Choose an attack
-        let possibleAttacks = [...this.punchAttacksR, ...this.swordAttacksR, ...this.swordAttacksL];
-        let attack = possibleAttacks[getRndInteger(0,possibleAttacks.length-1)];
+        let attack = this[possibleAttacks][getRndInteger(0,this[possibleAttacks].length-1)];
     
         /** During action runtime, this.handAttack==true */
         this.fadeToAction(attack, 0.2);
@@ -469,6 +490,7 @@ export class Hero extends IntelligentForm {
         this.sceneController.eventDepot.removeListeners('dropItemToScene');
         this.sceneController.eventDepot.removeListeners('mouse0click');
         this.sceneController.eventDepot.removeListeners('mouse1click');
+        this.sceneController.eventDepot.removeListeners('mouse2click');
         this.sceneController.eventDepot.removeListeners('unlockControls');
         this.sceneController.eventDepot.removeListeners('jump');
         this.sceneController.eventDepot.removeListeners('levelUp');
@@ -573,7 +595,15 @@ export class Hero extends IntelligentForm {
 
             this.identifySelectedForm();
 
-            if (this.handAttack) this.handleHandAttack();
+            if (this.handAttackR){
+                this.handleAttack('Middle2R');
+            } else if (this.handAttackL){
+                this.handleAttack('Middle2L');
+            } else if (this.kickAttackR){
+                this.handleAttack('FootR');
+            } else if (this.kickAttackL){
+                this.handleAttack('FootL');
+            }
 
             /** data: { layoutId: ..., rotation: ..., velocity: ..., position: ..., level: ...} */
 
@@ -592,29 +622,24 @@ export class Hero extends IntelligentForm {
 
     }
 
-    handleHandAttack() {
+    handleAttack(bodyPart) {
 
         let diff = new THREE.Vector3();
         // What is the world position of my hands or their associated weapons?  Start with right hand.
-        let handR = this.equipped.Middle2R? this.equipped.Middle2R[0] : "Middle2R";
-        this.positionHandR = handR=="Middle2R"? this.model.getObjectByName(handR).getWorldPosition(this.positionHandR) : this.model.getObjectByProperty("objectName", handR).getWorldPosition(this.positionHandR);
+        let weapon = this.equipped[bodyPart]? this.equipped[bodyPart][0] : bodyPart;
+        this.positionWeapon = weapon==bodyPart? this.model.getObjectByName(bodyPart).getWorldPosition(this.positionWeapon) : this.model.getObjectByProperty("objectName", weapon).getWorldPosition(this.positionWeapon);
         
         for (const entity of this.sceneController.allEnemiesInRange(100, this.model.position)) {
 
-            diff.subVectors(this.positionHandR, entity.model.position);
+            diff.subVectors(this.positionWeapon, entity.model.position);
 
             // console.log(`diff length: ${diff.length()}; radius: ${entity.radius}`);
             if ( diff.length() < entity.radius ) {
-                // console.log('hit!');
-				// collided
-				// diff.normalize(); // .multiplyScalar( ballSize );
-				// pos.copy( ballPosition ).add( diff );
                 let hitPointReduction = (getRandomArbitrary(0,this.getEffectiveStat('strength'))/10);
                 this.inflictDamage(entity, hitPointReduction);
 
                 // Add hit sprites at the location of the hand:
-                this.sceneController.formFactory.addSprites(null, hitSpriteConfig, this.sceneController.scene, true, this.positionHandR);
-
+                this.sceneController.formFactory.addSprites(null, hitSpriteConfig, this.sceneController.scene, true, this.positionWeapon);
                 // this.selectedObject.model.translateZ(-10);
             }
         }
@@ -670,10 +695,6 @@ export class Hero extends IntelligentForm {
         //     let thisModel = this.model.getObjectByProperty("objectType", "hero");
         //     thisModel.position.copy(this.model.position);
         //     this.sceneController.scene.add(thisModel);
-
-            
-
-            
         // }, 2000);
         
     }

@@ -75,13 +75,15 @@ export class IntelligentForm extends AnimatedForm{
      * bounding box (used for collision detection).
      * 
      * Lobato's models use the 'IcoSphere' geometry as its basis;
-     * Tidwell's models use the 'Body'.
+     * Tidwell's models use the 'Body' or 'Rat_Geometry'.
      * Rodney's models use 'Cube' or some variant like 'Cube.001_0'
      * Default robot model uses 'Head_*' for head and 'Torso_*' for its torso.
-     * Otherwise find the FIRST geometry.
+     * Horse uses 'mesh_0'
+     *
+     * TODO: Otherwise find the FIRST geometry...?
      */
     identifyPrincipalGeometry(el)  {
-        let possibleNames = ['Torso_0', 'Head_0', 'Icosphere', 'Body', "Cube.001_0", "Cube", "Body_0", "Rat_Geometry"];
+        let possibleNames = ['Torso_0', 'Head_0', 'Icosphere', 'Body', "Cube.001_0", "Cube", "Body_0", "Rat_Geometry", 'Mesh_0'];
         for (const name of possibleNames) {
             if (el.getObjectByName(name)) {
                 return el.getObjectByName(name).geometry;
@@ -552,8 +554,12 @@ export class IntelligentForm extends AnimatedForm{
                         break;
                     case "feet":
                         let itemCopy = new THREE.Object3D().copy(item.model);
-                        this.model.getObjectByName("FootR").add(item.model);
-                        this.model.getObjectByName("FootL").add(itemCopy);
+                        if (this.model.getObjectByName("FootR")) {
+                            this.model.getObjectByName("FootR").add(item.model);
+                        } else if (this.model.getObjectByName("footR")) this.model.getObjectByName("footR").add(item.model);
+                        if (this.model.getObjectByName("FootL")) {
+                            this.model.getObjectByName("FootL").add(itemCopy);
+                        }  else if (this.model.getObjectByName("footL")) this.model.getObjectByName("footL").add(itemCopy);
                         break;
                     default:
                         this.model.getObjectByName(area).add(item.model);

@@ -165,7 +165,7 @@ export class ArtificialForm extends IntelligentForm{
     attackHero(layoutId) {
 
         // Choose an attack
-        let possibleAttacks = [...this.punchAttacksR, ...this.swordAttacksR, ...this.swordAttacksL];
+        let possibleAttacks = [...this.handAttacks, ...this.kickAttacks];
         let attack = possibleAttacks[getRndInteger(0,possibleAttacks.length-1)];
         
         this.fadeToAction(attack, 0.2);

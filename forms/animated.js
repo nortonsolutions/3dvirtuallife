@@ -19,28 +19,28 @@ export class AnimatedForm extends StandardForm{
         this.currentlyFadingToAction = false;
         this.animatedSubforms = [];
 
-        this.punchAttacksR = [];
-        this.swordAttacksR = [];
-        this.swordAttacksL = [];
-        this.blocksL = [];
-        this.blocksR = [];
+        this.handAttacksR = [];
+        this.kickAttacksR = [];
+        this.handAttacksL = [];
+        this.kickAttacksL = [];
+        this.blocks = [];
         this.bowAttacks = [];
 
-        this.possiblePunchAttacksR = ["Punch", "Attack", "Punch2", "Kick", "Punching R"]
-        this.possibleSwordAttacksR = ["Punch", "Striking R", "Swing R"]
-        this.possibleSwordAttacksL = ["Punching L", "Striking L", "Swing L"]
-        this.possibleBlocksR = ["Blocking R"];
-        this.possibleBlocksL = ["Blocking L"];
+        this.possibleHandAttacksR = ["Punch", "Attack", "Punch2", "Punching R", "Striking R", "Swing R"];
+        this.possibleHandAttacksL = ["Punching L", "Striking L", "Swing L"];
+        this.possibleKickAttacksR = ["Kick", "Kick R"];
+        this.possibleKickAttacksL = ["Kick L"]
+        this.possibleBlocks = ["Blocking R", "Blocking L"];
         this.possibleBowAttacks = ["ThumbsUp", "Givining the bird"];
 
         this.emotes = [ 
             'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp',
-            ...this.possibleBlocksL, 
-            ...this.possibleBlocksR, 
+            ...this.possibleBlocks,
             ...this.possibleBowAttacks, 
-            ...this.possiblePunchAttacksR, 
-            ...this.possibleSwordAttacksL, 
-            ...this.possibleSwordAttacksR
+            ...this.possibleHandAttacksR, 
+            ...this.possibleKickAttacksR,
+            ...this.possibleHandAttacksL, 
+            ...this.possibleKickAttacksL
         ];
     }
     
@@ -53,16 +53,16 @@ export class AnimatedForm extends StandardForm{
             let firstAnimationName = '';
             this.animations.forEach((animation,index) => {
                 
-                if (this.possiblePunchAttacksR.includes(animation.name)) {
-                    this.punchAttacksR.push(animation.name);
-                } else if (this.possibleSwordAttacksR.includes(animation.name)) {
-                    this.swordAttacksR.push(animation.name);
-                } else if (this.possibleSwordAttacksL.includes(animation.name)) {
-                    this.swordAttacksL.push(animation.name);
-                } else if (this.possibleBlocksL.includes(animation.name)) {
-                    this.blocksL.push(animation.name);
-                } else if (this.possibleBlocksR.includes(animation.name)) {
-                    this.blocksR.push(animation.name);
+                if (this.possibleHandAttacksR.includes(animation.name)) {
+                    this.handAttacksR.push(animation.name);
+                } else if (this.possibleHandAttacksL.includes(animation.name)) {
+                    this.handAttacksL.push(animation.name);
+                } else if (this.possibleKickAttacksR.includes(animation.name)) {
+                    this.kickAttacksR.push(animation.name);
+                } else if (this.possibleKickAttacksL.includes(animation.name)) {
+                    this.kickAttacksL.push(animation.name);
+                } else if (this.possibleBlocks.includes(animation.name)) {
+                    this.blocks.push(animation.name);
                 } else if (this.possibleBowAttacks.includes(animation.name)) {
                     this.bowAttacks.push(animation.name);
                 }
@@ -91,8 +91,9 @@ export class AnimatedForm extends StandardForm{
     
             });
     
-            this.handAttacks = [...this.punchAttacksR, ...this.swordAttacksR, ...this.swordAttacksL];
-    
+            this.handAttacks = [...this.handAttacksR, ...this.handAttacksL];
+            this.kickAttacks = [...this.kickAttacksR, ...this.kickAttacksL];
+
             this.activeActionName = 'Idle'; // Default for intelligent/walking beings
             this.activeAction = this.actions[ 'Idle' ]? this.actions[ 'Idle' ] : this.actions[ firstAnimationName ];
             this.previousActionName = '';
@@ -100,7 +101,7 @@ export class AnimatedForm extends StandardForm{
     
             if (this.attributes.unlocked) {
                 if (this.activeAction) this.activeAction.play();
-            }
+            } else if (this.actions[ 'Idle' ]) this.activeAction.play();
 
             callback();
 
@@ -116,7 +117,11 @@ export class AnimatedForm extends StandardForm{
                 if (this.absVelocity < .1 && (this.activeActionName == 'Walking' || this.activeActionName == 'Running')) {
                     this.fadeToAction( 'Idle', 0.2);
                 } else if (this.absVelocity >= .1 && this.activeActionName == 'Idle') {
-                    this.fadeToAction( 'Walking', 0.2);
+                    if (this.objectName == 'horse') {
+                        this.fadeToAction( 'horse_A_', 0.2);
+                    } else {
+                        this.fadeToAction( 'Walking', 0.2);
+                    }
                 } else if (this.absVelocity >= 250 && this.activeActionName == 'Walking') {
                     this.fadeToAction( 'Running', 0.2);
                 }
@@ -143,7 +148,15 @@ export class AnimatedForm extends StandardForm{
 
             if (this.activeAction) {
 
-                if (this.handAttacks.includes(this.activeActionName)) this.handAttack = true;
+                if (this.handAttacksR.includes(this.activeActionName)) {
+                    this.handAttackR = true;
+                } else if (this.handAttacksL.includes(this.activeActionName)) {
+                    this.handAttackL = true;
+                } else if (this.kickAttacksR.includes(this.activeActionName)) {
+                    this.kickAttackR = true;
+                } else if (this.kickAttacksR.includes(this.activeActionName)) {
+                    this.kickAttackL = true;
+                } 
                 
                 this.activeAction
                     .reset()
@@ -153,7 +166,11 @@ export class AnimatedForm extends StandardForm{
                     .play();
 
                 const restoreState = () => {
-                    this.handAttack = false;
+                    this.handAttackR = false;
+                    this.handAttackL = false;
+                    this.kickAttackR = false;
+                    this.kickAttackL = false;
+
                     this.currentlyFadingToAction = false;
                     this.mixer.removeEventListener('finished', restoreState );
                     this.fadeToAction( this.previousActionName, 0.1 );

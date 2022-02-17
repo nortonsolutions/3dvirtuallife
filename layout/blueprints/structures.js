@@ -23,6 +23,18 @@ export const Structures = {
     
     },
 
+    bridge: {
+        name: 'bridge',
+        gltf: 'bridge.glb',
+        description: 'Sturdy bridge',
+        type: 'structure',
+        attributes: {
+            animates: false,
+            scale: 30,
+            elevation: -40,
+        }
+    },
+
     tavern: {
         name: 'tavern',
         gltf: 'tavern.glb',

@@ -271,13 +271,14 @@ class Scene {
             switch (e.button) {
 
                 case 0:
-                    this.controller.eventDepot.fire('mouse0click', {});
+                    this.controller.eventDepot.fire('mouse0click', event.shiftKey );
                     break;
                 case 1:
                     this.controller.eventDepot.fire('mouse1click', {});
                     break;
                 case 2:
-                    this.controller.hero.moveForward = true;
+                    this.controller.eventDepot.fire('mouse2click', event.shiftKey );
+                    // this.controller.hero.moveForward = true;
                     break;
             }
         }

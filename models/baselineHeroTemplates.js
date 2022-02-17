@@ -24,9 +24,10 @@ export const baselineHeroTemplates = [
     },
     {
         type: "Rosen",
-        gltf: "robot2.glb",
+        gltf: "rosen.glb",
         png: "robot2.png",
         attributes: {
+            handScaleFactor: 50,
             stats: {
                 agility: "1/1/0",
                 strength: "2/2/0"

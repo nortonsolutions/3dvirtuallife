@@ -32,6 +32,7 @@ export const levels = [
             // { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
             { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
             { name: "smallSword", location: { x: -1, y: 0, z: -1} },
+            { name: "busterboot", location: { x: -1, y: 0, z: -1} },
             { name: "redpotion" },
             { name: "blackpotion" },
             { name: "gold3" },
@@ -41,6 +42,7 @@ export const levels = [
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0} },
+            
             
             { name: "rock1" },
             { 
@@ -75,8 +77,10 @@ export const levels = [
             { name: "shopkeep" },
             // { name: "bat" },
             // { name: "murderBear" },
-            { name: "ghoul" }
-            
+            { name: "ghoul" },
+            { name: "rosen" },
+            { name: "horse" },
+            { name: "viking" }
         ]
     },
     {
@@ -231,9 +235,19 @@ export const levels = [
             { name: "lightSaber", location: { x: -1, y: 0, z: -1} }
         ],
         structures: [
+            { name: "bridge", location: { x: 5.3, y: 0, z: -18} },
+            { name: "bridge", location: { x: 10.8, y: 0, z: 18} },
             { 
                 name: "portal", location: { x: -21.5, y: 0, z: -6.5},
                 attributes: { routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "grate", location: { x: 8.4, y: 0, z: 21.1},
+                attributes: { unlocked: true, elevation: 20, routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "grate", location: { x: 3.2, y: 0, z: -21}, 
+                attributes: { unlocked: true, elevation: 60, routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } 
             }
         ],
         entities: [

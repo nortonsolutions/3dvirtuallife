@@ -33,7 +33,11 @@ export const app = () => {
             if (data.objectType == "hero") {
                 description = data.objectName;
             } else {
-                description = JSON.parse(localStorage.getItem('gameObjects'))[data.objectName].description;
+                if (JSON.parse(localStorage.getItem('gameObjects'))[data.objectName]) {
+                    description = JSON.parse(localStorage.getItem('gameObjects'))[data.objectName].description;
+                } else {
+                    console.error(`${data.objectName} not found in gameObjects?`);
+                }
             }
             document.getElementById('message').innerHTML = description;
         });
