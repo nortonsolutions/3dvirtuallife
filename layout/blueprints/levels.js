@@ -29,7 +29,7 @@ export const levels = [
             }
         },
         items: [
-            { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
+            // { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
             { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
             { name: "smallSword", location: { x: -1, y: 0, z: -1} },
             { name: "redpotion" },
@@ -62,6 +62,10 @@ export const levels = [
             { 
                 name: "portal", location: { x: -6.5, y: 0, z: 19.5}, 
                 attributes: { routeTo: { level: 6, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "portal", location: { x: 6.5, y: 0, z: 19.5}, 
+                attributes: { routeTo: { level: 7, location: { x: -18.0, y: 0, z: -6.5 } } } 
             }
 
         ],
@@ -69,10 +73,9 @@ export const levels = [
             { name: "john" },
             { name: "evilOne" },
             { name: "shopkeep" },
-            { name: "bat" },
-            { name: "murderBear" },
-            { name: "ghoul" },
-            { name: "dragon"}
+            // { name: "bat" },
+            // { name: "murderBear" },
+            { name: "ghoul" }
             
         ]
     },
@@ -294,7 +297,8 @@ export const levels = [
             { name: "lavaMan" },
             { name: "ghoul" },
             { name: "ghoul" },
-            { name: "ghoul" }
+            { name: "ghoul" },
+            { name: "dragon"}
             
         ]
     },
@@ -340,12 +344,6 @@ export const levels = [
             { name: "rockyMan" },
             { name: "ghoul" },
             { name: "ghoul" }
-            // { name: "rockyMan" },
-            // { name: "rockyMan" },
-            // { name: "rockyMan" },
-            // { name: "lobot" },
-            // { name: "blueShirt" }
-            // { name: "rosenBot" }
         ]
     },
     {
@@ -378,7 +376,7 @@ export const levels = [
         structures: [
             { 
                 name: "portal", location: { x: -21.5, y: 0, z: -6.5},
-                attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: 19.5 } } } 
+                attributes: { routeTo: { level: 0, location: { x: 6.5, y: 0, z: 19.5 } } } 
             }
         ],
         entities: [

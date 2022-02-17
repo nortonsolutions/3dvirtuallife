@@ -81,7 +81,7 @@ export class IntelligentForm extends AnimatedForm{
      * Otherwise find the FIRST geometry.
      */
     identifyPrincipalGeometry(el)  {
-        let possibleNames = ['Torso_0', 'Head_0', 'Icosphere', 'Body', "Cube.001_0", "Cube"];
+        let possibleNames = ['Torso_0', 'Head_0', 'Icosphere', 'Body', "Cube.001_0", "Cube", "Body_0", "Rat_Geometry"];
         for (const name of possibleNames) {
             if (el.getObjectByName(name)) {
                 return el.getObjectByName(name).geometry;

@@ -94,7 +94,7 @@ export class AnimatedForm extends StandardForm{
             this.handAttacks = [...this.punchAttacksR, ...this.swordAttacksR, ...this.swordAttacksL];
     
             this.activeActionName = 'Idle'; // Default for intelligent/walking beings
-            this.activeAction = this.actions[ firstAnimationName ];
+            this.activeAction = this.actions[ 'Idle' ]? this.actions[ 'Idle' ] : this.actions[ firstAnimationName ];
             this.previousActionName = '';
             this.previousAction = null;
     

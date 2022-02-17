@@ -91,11 +91,11 @@ export class SceneController {
         this.scene.init(() => {
             this.addFloor(() => {
                 this.addWater(() => {
+                    this.scene.animate();
                     this.addLights();
                     this.addHero(() => {
                         this.seedForms(this.firstInRoom, () => {
                             this.introduce();
-                            this.scene.animate();
                             this.scene.readyForLock = true;
                         });
                     });

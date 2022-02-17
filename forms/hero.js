@@ -63,11 +63,11 @@ export class Hero extends IntelligentForm {
             this.model.add( modelCopy );
             this.model.add( this.proximityLight );
 
-            if (this.template.location) {
-                this.model.position.x = this.template.location.x * multiplier;
-                this.model.position.z = this.template.location.z * multiplier;
-                this.model.position.y = this.determineElevationFromBase();
-            }
+            // if (this.template.location) {
+            //     this.model.position.x = this.template.location.x * multiplier;
+            //     this.model.position.z = this.template.location.z * multiplier;
+            //     this.model.position.y = this.determineElevationFromBase();
+            // }
 
             if (this.actions['Punch']) this.actions['Punch'].setEffectiveTimeScale(1);
 
@@ -626,11 +626,29 @@ export class Hero extends IntelligentForm {
 
         // drop all wares, then cache
         this.inventory.forEach(item => {
-            
+
             if (item) {
-                for (let x = 0; x < item.quantity; x++) {
-                    /** data: {location ..., itemName..., } */
-                    this.sceneController.dropItemToScene({itemName: item.itemName, location: this.location});
+                if (item.itemName == "gold" || item.itemName == "arrow") {
+                    if (item.quantity >= 25) {
+                        for (let x = 0; x < item.quantity / 25; x++) {
+                            this.sceneController.dropItemToScene({itemName: item.itemName + "25", location: this.location});
+                        }
+                    } else if (item.quantity >= 10) {
+                        for (let x = 0; x < item.quantity / 10; x++) { 
+                            this.sceneController.dropItemToScene({itemName: item.itemName + "10", location: this.location});
+                        }
+                    } else if (item.quantity >= 3) {
+                        for (let x = 0; x < item.quantity / 3; x++) {
+                            this.sceneController.dropItemToScene({itemName: item.itemName + "3", location: this.location});
+                        }
+                    } else {
+                        this.sceneController.dropItemToScene({itemName: item.itemName, location: this.location});
+                    }
+                } else {
+                    for (let x = 0; x < item.quantity; x++) {   
+                        /** data: {location ..., itemName..., } */
+                        this.sceneController.dropItemToScene({itemName: item.itemName, location: this.location});
+                    }
                 }
             }
         });

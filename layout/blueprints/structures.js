@@ -54,7 +54,7 @@ export const Structures = {
     portal: {
         name: 'portal',
         gltf: 'portal.glb',
-        description: 'Portal to swamp',
+        description: 'Portal',
         type: 'structure',
         attributes: {
             visible: false,
