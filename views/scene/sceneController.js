@@ -143,6 +143,7 @@ export class SceneController {
                 if (local) {
                     this.socket.emit('nextLayoutId', this.level, layoutId => {
                         data.layoutId = form.model.attributes.layoutId = layoutId;
+                        data.location = this.getLocationFromPosition(data.position);
                         this.eventDepot.fire('addItemToLayout', data);
         
                         // if (this.multiplayer) {

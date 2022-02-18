@@ -63,11 +63,11 @@ export class Hero extends IntelligentForm {
             this.model.add( modelCopy );
             this.model.add( this.proximityLight );
 
-            // if (this.template.location) {
-            //     this.model.position.x = this.template.location.x * multiplier;
-            //     this.model.position.z = this.template.location.z * multiplier;
-            //     this.model.position.y = this.determineElevationFromBase();
-            // }
+            if (this.template.location) {
+                this.model.position.x = this.template.location.x * multiplier;
+                this.model.position.z = this.template.location.z * multiplier;
+                this.model.position.y = this.determineElevationFromBase();
+            }
 
             if (this.actions['Punch']) this.actions['Punch'].setEffectiveTimeScale(1);
 
@@ -98,8 +98,8 @@ export class Hero extends IntelligentForm {
         var position = new THREE.Vector3();
         if (justDied) {
             position = this.sceneController.positionOfClosestStructure(this.model.position);
-            // position.x = shiftTowardCenter(position.x, 4); // Causes performance leak somehow
-            // position.z = shiftTowardCenter(position.z, 4);
+            position.x = position.x - 40;// shiftTowardCenter(position.x, 4); // Causes performance leak somehow
+            
         } else {
             position.copy(this.model.position);
         }
@@ -656,23 +656,23 @@ export class Hero extends IntelligentForm {
                 if (item.itemName == "gold" || item.itemName == "arrow") {
                     if (item.quantity >= 25) {
                         for (let x = 0; x < item.quantity / 25; x++) {
-                            this.sceneController.dropItemToScene({itemName: item.itemName + "25", location: this.location});
+                            this.sceneController.dropItemToScene({itemName: item.itemName + "25", position: this.model.position});
                         }
                     } else if (item.quantity >= 10) {
                         for (let x = 0; x < item.quantity / 10; x++) { 
-                            this.sceneController.dropItemToScene({itemName: item.itemName + "10", location: this.location});
+                            this.sceneController.dropItemToScene({itemName: item.itemName + "10", position: this.model.position});
                         }
                     } else if (item.quantity >= 3) {
                         for (let x = 0; x < item.quantity / 3; x++) {
-                            this.sceneController.dropItemToScene({itemName: item.itemName + "3", location: this.location});
+                            this.sceneController.dropItemToScene({itemName: item.itemName + "3", position: this.model.position});
                         }
                     } else {
-                        this.sceneController.dropItemToScene({itemName: item.itemName, location: this.location});
+                        this.sceneController.dropItemToScene({itemName: item.itemName, position: this.model.position});
                     }
                 } else {
                     for (let x = 0; x < item.quantity; x++) {   
                         /** data: {location ..., itemName..., } */
-                        this.sceneController.dropItemToScene({itemName: item.itemName, location: this.location});
+                        this.sceneController.dropItemToScene({itemName: item.itemName, position: this.model.position});
                     }
                 }
             }
@@ -684,7 +684,7 @@ export class Hero extends IntelligentForm {
             /** data: {location ..., itemName..., } */
             if (item) {
                 this.unequip(item[1]);
-                this.sceneController.dropItemToScene({itemName: item[0], location: this.location});
+                this.sceneController.dropItemToScene({itemName: item[0], position: this.model.position});
             }
         });
 

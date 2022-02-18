@@ -29,21 +29,16 @@ export const levels = [
             }
         },
         items: [
-            // { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
             { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
-            { name: "smallSword", location: { x: -1, y: 0, z: -1} },
-            { name: "busterboot", location: { x: -1, y: 0, z: -1} },
             { name: "redpotion" },
-            { name: "blackpotion" },
             { name: "gold3" },
-            { name: "bagOfGems" },
             { name: "bow" },
             { name: "arrow25" },
+
+            
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0} },
-            
-            
             { name: "rock1" },
             { 
                 name: "grate", location: { x: 3, y: 0, z: 4}, 
@@ -75,12 +70,11 @@ export const levels = [
             { name: "john" },
             { name: "evilOne" },
             { name: "shopkeep" },
-            // { name: "bat" },
-            // { name: "murderBear" },
             { name: "ghoul" },
+            // { name: "horse" },
+            // { name: "murderBear" },
             { name: "rosen" },
-            { name: "horse" },
-            { name: "viking" }
+            // { name: "viking" }
         ]
     },
     {
@@ -117,7 +111,7 @@ export const levels = [
             { name: "gold25" },
             { name: "gold1" },
             { name: "gold10" },
-            { name: "arrow25", location: { x: 0, y: 0, z: 0}}
+            { name: "arrow25" }
         ],
         structures: [
             { 
@@ -140,6 +134,10 @@ export const levels = [
             { name: "evilOne" },
             { name: "rat" },
             { name: "rat" },
+            { name: "bat" },
+            { name: "bat" },
+            { name: "bat" },
+            { name: "bat" },
             { name: "bat" },
             { name: "bat" },
             { name: "ghoul" }
@@ -191,8 +189,8 @@ export const levels = [
             { name: "rat", location: { x: 10, y: 0, z: 0 }},
             { name: "spiderQueen", location: { x: 10, y: 0, z: 0 }},
             { name: "ghoul", location: { x: 10, y: 0, z: 0 } },
-            { name: "ghoul", location: { x: 10, y: 0, z: 0 } },
-            { name: "elfgirl" }
+            { name: "ghoul", location: { x: 10, y: 0, z: 0 } }
+            
         ]
     },
     {
@@ -232,7 +230,11 @@ export const levels = [
             { name: "gold25", location: { x: 10, y: 0, z: -1 }},
             { name: "redpotion" },
             { name: "greenpotion" },
-            { name: "lightSaber", location: { x: -1, y: 0, z: -1} }
+            { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
+            { name: "rosenRelic" },
+            { name: "smallSword" },
+            { name: "blackpotion" },
+            { name: "bagOfGems" },
         ],
         structures: [
             { name: "bridge", location: { x: 5.3, y: 0, z: -18} },
@@ -243,11 +245,11 @@ export const levels = [
             },
             { 
                 name: "grate", location: { x: 8.4, y: 0, z: 21.1},
-                attributes: { unlocked: true, elevation: 20, routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } 
+                attributes: { unlocked: true, elevation: 10, routeTo: { level: 5, location: { x: 19.5, y: 0, z: -6.5 } } } 
             },
             { 
                 name: "grate", location: { x: 3.2, y: 0, z: -21}, 
-                attributes: { unlocked: true, elevation: 60, routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } 
+                attributes: { unlocked: true, elevation: 60, routeTo: { level: 7, location: { x: 19.5, y: 0, z: -6.5 } } } 
             }
         ],
         entities: [
@@ -307,7 +309,7 @@ export const levels = [
         entities: [
             { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5} },
             { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5} },
-            { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5} },
+            { name: "lavaMan" },
             { name: "lavaMan" },
             { name: "ghoul" },
             { name: "ghoul" },
@@ -352,12 +354,23 @@ export const levels = [
             },
             // { name: "tree1" },
             // { name: "tavern", location: { x: -45, y: 0, z: -4.5} },
+
+            { 
+                name: "grate", location: { x: 19.5, y: 0, z: -6.5 },
+                attributes: { unlocked: true, elevation: 5, routeTo: { level: 3, location: { x: 8.4, y: 0, z: 21.1} } } 
+            }
         ],
         entities: [
-            { name: "shopkeep" },
+            { name: "blacksmith" },
+            { name: "rockyMan" },
             { name: "rockyMan" },
             { name: "ghoul" },
-            { name: "ghoul" }
+            { name: "ghoul" },
+            { name: "ghoul" },
+            { name: "ghoul" },
+            { name: "ghoul" },
+            { name: "ghoul" },
+            { name: "elfgirl" }
         ]
     },
     {
@@ -391,6 +404,10 @@ export const levels = [
             { 
                 name: "portal", location: { x: -21.5, y: 0, z: -6.5},
                 attributes: { routeTo: { level: 0, location: { x: 6.5, y: 0, z: 19.5 } } } 
+            },
+            { 
+                name: "grate", location: { x: 21.5, y: 0, z: -6.5 },
+                attributes: { unlocked: true, elevation: 60, routeTo: { level: 3, location: { x: 5.2, y: 0, z: -21} } } 
             }
         ],
         entities: [

@@ -191,7 +191,7 @@ export class StandardForm {
         if (!root) root = this.model;
         if (typeof root.castShadow == "boolean") {
             
-            if (root.name.match(new RegExp('pointlight|torch|torso|head|table|house|body|boy|cube', 'i'))) {  //
+            if (root.name.match(new RegExp('pointlight|torch|torso|head|table|house|body|boy|cube|Icosphere', 'i'))) {  //
                 root.castShadow = true;
 
                 let showShadowCamera = false;

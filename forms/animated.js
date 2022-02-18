@@ -119,6 +119,8 @@ export class AnimatedForm extends StandardForm{
                 } else if (this.absVelocity >= .1 && this.activeActionName == 'Idle') {
                     if (this.objectName == 'horse') {
                         this.fadeToAction( 'horse_A_', 0.2);
+                    // } else if (this.objectName == 'blacksmith') {
+                    //     this.fadeToAction( 'Smiting', 0.2);
                     } else {
                         this.fadeToAction( 'Walking', 0.2);
                     }

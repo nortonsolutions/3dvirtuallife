@@ -87,10 +87,18 @@ export class DialogScreen {
 
                 this.actions[ animation.name ] = action;
             });
+        
+            // if (this.entity.objectName == "blacksmith") {
+            //     this.activeActionName = 'Smiting';
+            //     this.activeAction = this.actions[ 'Smiting' ];
+            //     this.actions['Smiting'].setEffectiveTimeScale(1);
 
-            this.activeActionName = 'Idle';
-            this.activeAction = this.actions[ 'Idle' ];
-            this.actions['Idle'].setEffectiveTimeScale(.1);
+            // } else {
+                this.activeActionName = 'Idle';
+                this.activeAction = this.actions[ 'Idle' ];
+                this.actions['Idle'].setEffectiveTimeScale(.1);
+    
+            // }
             this.previousActionName = '';
             this.previousAction = null;
     

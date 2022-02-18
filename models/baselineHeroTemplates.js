@@ -29,7 +29,7 @@ export const baselineHeroTemplates = [
         attributes: {
             handScaleFactor: 50,
             stats: {
-                agility: "1/1/0",
+                agility: "2/2/0",
                 strength: "2/2/0"
             }
         },
@@ -40,6 +40,7 @@ export const baselineHeroTemplates = [
         gltf: "rodbot.glb",
         png: "rodbot.png",
         attributes: {
+            scale: 5,
             handScaleFactor: 50,
             flipWeapon: true,
             stats: {

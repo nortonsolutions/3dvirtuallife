@@ -521,5 +521,46 @@ export const Entities = {
                 defense: "0/0/0"
             }
         }
+    },
+    blacksmith: {
+        name: 'blacksmith',
+        gltf: 'blacksmith.glb',
+        description: 'Hearty blacksmith',
+        type: 'friendly',
+        inventory: [
+            {itemName:"armor",quantity:1,price:"gold/30"},
+            {itemName:"bluepotion",quantity:3,price:"gold/10"},
+            {itemName:"redpotion",quantity:3,price:"gold/10"}
+        ],
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 60,
+            length: 20,
+            width: 20,
+            elevation: 0,
+            scale: 30,
+            goldValue: 1.1, // Slightly higher value of gold on exchanges
+            conversation: {
+                conversationState: "intro",
+                engagementState: 0,
+                special: {
+                    condition: ["bagOfGems","gold"],
+                    speech: 'Welcome to my shop, my friend.',
+                    action: 'showWares'
+                },
+                intro: {
+                    speech: "Hello there, stranger.  Come back when you have something to trade.", 
+                    responses: [convo.wellwish]
+                }
+            },
+            stats: {
+                health: "2/2/0",
+                mana: "0/0/0",
+                strength: "1/1/0",
+                agility: "1/2/0",
+                defense: "0/0/0"
+            }
+        }
     }
 }

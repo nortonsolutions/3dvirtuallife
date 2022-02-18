@@ -64,6 +64,18 @@ export const Items = {
             elevation: 20
         }
     },
+    rosenRelic: {
+        name: 'rosenRelic',
+        gltf: 'rosenRelic.glb',
+        image: 'rosenRelic.png',
+        description: 'A mystical figurine....',
+        type: 'item',
+        attributes: {
+            animates: false,
+            scale: 10,
+            elevation: 20
+        }
+    },
     keyToShed: {
         name: 'keyToShed',
         gltf: 'key.gltf',
