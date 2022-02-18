@@ -1,13 +1,13 @@
 import { IntelligentForm } from './intelligent.js'
 
 let hitSpriteConfig = { 
-    name: "hitEffect",
+    name: "hit2",
     regex: "",
-    frames: 9,
-    scale: 100, 
-    elevation: 20,
+    frames: 4,
+    scale: 50, 
+    elevation: 30,
     flip: false,
-    time: 1
+    time: .25
 }
 
 /**

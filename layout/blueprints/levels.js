@@ -9,7 +9,7 @@ export const levels = [
         width: 26, //26
         length: 26, //26
         description: "Valley of Mist",
-        background: 'clouds.png',
+        background: 'clouds.png', // 'clouds.png',
         terrain: {
             name: 'floor',
             type: 'floor',
@@ -58,7 +58,7 @@ export const levels = [
             },
             { 
                 name: "portal", location: { x: -6.5, y: 0, z: 19.5}, 
-                attributes: { routeTo: { level: 6, location: { x: -18.0, y: 0, z: -6.5 } } } 
+                attributes: { routeTo: { level: 6, location: { x: -15.5, y: 0, z: -18.5 } } }
             },
             { 
                 name: "portal", location: { x: 6.5, y: 0, z: 19.5}, 
@@ -69,11 +69,11 @@ export const levels = [
         entities: [
             { name: "john" },
             { name: "evilOne" },
-            { name: "shopkeep" },
+            { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
             { name: "ghoul" },
             // { name: "horse" },
             // { name: "murderBear" },
-            { name: "rosen" },
+            // { name: "rosen" },
             // { name: "viking" }
         ]
     },
@@ -238,7 +238,7 @@ export const levels = [
         ],
         structures: [
             { name: "bridge", location: { x: 5.3, y: 0, z: -18} },
-            { name: "bridge", location: { x: 10.8, y: 0, z: 18} },
+            { name: "bridge", location: { x: 10.8, y: 0, z: 17.5} },
             { 
                 name: "portal", location: { x: -21.5, y: 0, z: -6.5},
                 attributes: { routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } 
@@ -253,7 +253,6 @@ export const levels = [
             }
         ],
         entities: [
-            { name: "crystalMan" },
             { name: "crystalMan" },
             { name: "crystalMan" },
             { name: "crystalMan" },
@@ -314,7 +313,7 @@ export const levels = [
             { name: "ghoul" },
             { name: "ghoul" },
             { name: "ghoul" },
-            { name: "dragon"}
+            { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}}
             
         ]
     },
@@ -330,7 +329,7 @@ export const levels = [
             description: 'kingdom',
             gltf: 'kingdom.glb',
             attributes: {
-                scale: 140,
+                scale: 200,
                 borderTrees: true,
                 light: {
                     sunLight: true,
@@ -374,9 +373,51 @@ export const levels = [
         ]
     },
     {
+        level: 6,
+        width: 78, //26
+        length: 78, //26
+        description: "Ruins",
+        background: 'ruinsSky.jpg',
+        terrain: {
+            name: 'floor',
+            type: 'floor',
+            description: 'ruins',
+            gltf: 'ruins.glb',
+            attributes: {
+                scale: 100,
+                borderTrees: true,
+                light: {
+                    sunLight: true,
+                    overheadPointLight: true,
+                },
+                fog: {
+                    color: 'white',
+                    density: 1.2
+                }
+            }
+        },
+        items: [
+
+        ],
+        structures: [
+            { 
+                name: "portal", location: { x: -13.5, y: 0, z: -18.5},
+                attributes: { routeTo: { level: 0, location: { x: -8.5, y: 0, z: 18.5 } } } 
+            }
+        ],
+        entities: [
+            { name: "crystalMan" },
+            { name: "crystalMan" },
+            { name: "crystalMan" },
+            { name: "crystalMan" },
+            { name: "ghoul" },
+            { name: "ghoul" }
+        ]
+    },
+    {
         level: 7,
-        width: 26, //26
-        length: 26, //26
+        width: 72, //26
+        length: 72, //26
         description: "Snowyland",
         background: 'clouds.png',
         terrain: {
@@ -408,48 +449,6 @@ export const levels = [
             { 
                 name: "grate", location: { x: 21.5, y: 0, z: -6.5 },
                 attributes: { unlocked: true, elevation: 60, routeTo: { level: 3, location: { x: 5.2, y: 0, z: -21} } } 
-            }
-        ],
-        entities: [
-            { name: "crystalMan" },
-            { name: "crystalMan" },
-            { name: "crystalMan" },
-            { name: "crystalMan" },
-            { name: "ghoul" },
-            { name: "ghoul" }
-        ]
-    },
-    {
-        level: 6,
-        width: 14, //26
-        length: 12, //26
-        description: "Ruins",
-        background: 'clouds.png',
-        terrain: {
-            name: 'floor',
-            type: 'floor',
-            description: 'ruins',
-            gltf: 'ruins.glb',
-            attributes: {
-                scale: 40,
-                borderTrees: true,
-                light: {
-                    sunLight: true,
-                    overheadPointLight: false,
-                },
-                fog: {
-                    color: 'white',
-                    density: 1.2
-                }
-            }
-        },
-        items: [
-
-        ],
-        structures: [
-            { 
-                name: "portal", location: { x: -21.5, y: 0, z: -6.5},
-                attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: 19.5 } } } 
             }
         ],
         entities: [

@@ -53,7 +53,7 @@ export class FormFactory {
 
         let spriteConfig = {
             name: 'flame',
-            regex: new RegExp('sconce', 'i'),
+            regex: new RegExp('sconce|torch', 'i'),
             frames: 40,
             scale: .25,
             elevation: .1,

@@ -45,6 +45,8 @@ export class SceneController {
         this.scene = null;
         this.floor = null;
 
+        if (this.firstInRoom) this.layout.dayTime = Math.random() < .5;
+        
         this.sprites = [];
         this.projectiles = [];
 
@@ -345,10 +347,15 @@ export class SceneController {
                 shadowCameraFar: 4000,
                 shadowCameraFov: 90,
                 shadowBias: - 0.008
-    
             };
 
-            var sunLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 2 );
+            var sunLight;
+            if (this.layout.dayTime) {
+                sunLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 2 );
+            } else {
+                sunLight = new THREE.SpotLight( 0x7777ff, 1.4, 0, Math.PI / 2 );
+            }
+
             sunLight.position.set( 500, 1000, 500);
 
             sunLight.castShadow = true;
@@ -364,9 +371,10 @@ export class SceneController {
 
                 this.scene.add( shadowCameraHelper );
             }
+            console.log(`dayTime: ${this.layout.dayTime}`)
         }
 
-        if (this.layout.terrain.attributes.light.overheadPointLight) {
+        if (this.layout.terrain.attributes.light.overheadPointLight || this.layout.dayTime == false) {
             this.overheadPointLight = new THREE.PointLight( 0xf37509, 5, 350, 3 );
             this.overheadPointLight.position.set( 0, 0, 0 );
             this.scene.add( this.overheadPointLight );

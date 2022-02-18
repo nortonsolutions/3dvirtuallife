@@ -104,7 +104,7 @@ class Scene {
     
     addBackground() {
 
-        if (this.background && this.background.length > 0) {
+        if (this.background && this.background.length > 0 && this.controller.layout.dayTime) {
 
             // simplistic equirectangular mapping to the inverse of a sphere geometry:
             var geometry = new THREE.SphereBufferGeometry(cameraReach - 200);
@@ -121,9 +121,15 @@ class Scene {
             this.scene.background = BLACK;
         }
 
-        if (this.controller.layout.terrain.attributes.fog) {
+        if (this.controller.layout.terrain.attributes.fog && this.controller.layout.dayTime) {
             this.scene.fog = new THREE.Fog( 
                 this.controller.layout.terrain.attributes.fog.color, 
+                700/(this.controller.layout.terrain.attributes.fog.density? 
+                    this.controller.layout.terrain.attributes.fog.density : 1), 
+                cameraReach );
+        } else if (this.controller.layout.dayTime == false) {
+            this.scene.fog = new THREE.Fog( 
+                'black', 
                 700/(this.controller.layout.terrain.attributes.fog.density? 
                     this.controller.layout.terrain.attributes.fog.density : 1), 
                 cameraReach );

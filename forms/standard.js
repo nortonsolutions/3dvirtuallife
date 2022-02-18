@@ -157,7 +157,7 @@ export class StandardForm {
         } else {
             // console.error(`DEBUG for 'Cannot read property 'distance'...  FLOOR:`)
             // console.error(this.sceneController.floor);
-            console.error(`${this.objectName} = ${this.model.position.x},${this.model.position.z}`);
+            // console.error(`${this.objectName} = ${this.model.position.x},${this.model.position.z}`);
             return -1;
         }
 
