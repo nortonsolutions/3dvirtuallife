@@ -1,13 +1,13 @@
 import { IntelligentForm } from './intelligent.js'
 
 let hitSpriteConfig = { 
-    name: "hit2",
+    name: "hit1",
     regex: "",
-    frames: 4,
-    scale: 50, 
+    frames: 8,
+    scale: 40, 
     elevation: 30,
     flip: false,
-    time: .25
+    time: .1
 }
 
 /**
@@ -98,7 +98,7 @@ export class Hero extends IntelligentForm {
         var position = new THREE.Vector3();
         if (justDied) {
             position = this.sceneController.positionOfClosestStructure(this.model.position);
-            position.x = position.x - 40;// shiftTowardCenter(position.x, 4); // Causes performance leak somehow
+            // position.x = position.x - 40;// shiftTowardCenter(position.x, 4); // Causes performance leak somehow
             
         } else {
             position.copy(this.model.position);
@@ -525,7 +525,7 @@ export class Hero extends IntelligentForm {
 
             if (o.attributes.contentItems) distance -= 20;
 
-            if (distance <= 50 && distance < closest) {
+            if (distance <= 70 && distance < closest) {
                 
                 if (!o.attributes.contentItems || (o.attributes.contentItems && !o.attributes.unlocked)) {
                     closest = distance;
@@ -535,7 +535,7 @@ export class Hero extends IntelligentForm {
             }
         })
 
-        if (closest > 50) {
+        if (closest > 70) {
             this.selectedObject = null;
             this.sceneController.eventDepot.fire('hideDescription', {}); 
         }
@@ -579,7 +579,7 @@ export class Hero extends IntelligentForm {
             
             if (this.standingUpon && this.standingUpon.attributes.routeTo && typeof this.standingUpon.attributes.routeTo.level == "number") {
                 if (this.standingUpon.attributes.unlocked) {
-                    
+                    this.sceneController.eventDepot.fire('unlockControls', {});
                     this.sceneController.eventDepot.fire('cacheLayout', {});
 
                     let loadData = {

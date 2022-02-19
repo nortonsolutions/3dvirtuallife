@@ -162,7 +162,6 @@ export class SceneController {
         }
     }
     
-
     addEventListeners() {
         
         // data { level, stat, layoutId, hitPointReduction });
@@ -325,7 +324,7 @@ export class SceneController {
 
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
         this.floor.load(() => {
-            this.formFactory.addSconces(this.floor.model);
+            this.formFactory.addSconces(this.floor.model, (100/this.layout.terrain.attributes.scale));
             if (this.layout.terrain.attributes.borderTrees) {
                 this.formFactory.addBorderTrees(this.scene, this.floor.model);
             }
@@ -516,50 +515,51 @@ export class SceneController {
     })    
 }
 
-
     handleMovement(delta) {
-        if (this.hero) this.hero.move(delta);
-        if (this.hero) this.hero.animate(delta);
-        
-        if (this.firstInRoom) { 
+        if (this.hero && this.scene.controls) {
+            if (this.hero) this.hero.move(delta);
+            if (this.hero) this.hero.animate(delta);
             
-            this.entities.forEach(entity => {  
-                if (entity.objectSubType != "remote") entity.move(delta);
+            if (this.firstInRoom) { 
+                
+                this.entities.forEach(entity => {  
+                    if (entity.objectSubType != "remote") entity.move(delta);
+                });
+                
+                if (Math.random() < 0.5) { // Update others 50% of the time
+                    let positions = this.entities.map(el => {
+                        return {
+                            layoutId: el.attributes.layoutId,
+                            position: el.model.position,
+                            rotation: el.model.rotation,
+                            velocity: el.velocity
+                        }
+                    });
+        
+                    this.socket.emit('updateEntityPositions', { level: this.level, positions });
+                }
+            }
+            
+            this.forms.forEach(form => {
+                if (form.attributes.animates) {
+                    form.animate(delta);
+                }
             });
             
-            if (Math.random() < 0.5) { // Update others 50% of the time
-                let positions = this.entities.map(el => {
-                    return {
-                        layoutId: el.attributes.layoutId,
-                        position: el.model.position,
-                        rotation: el.model.rotation,
-                        velocity: el.velocity
-                    }
-                });
+            if (this.refractor) {
+                this.refractor.material.uniforms[ "time" ].value += this.clock.getDelta();
+            }
     
-                this.socket.emit('updateEntityPositions', { level: this.level, positions });
+            if (this.overheadPointLight && this.scene.controls) {
+                let controlsObject = this.scene.controls.getObject();
+                this.overheadPointLight.position.copy(controlsObject.position);
+                this.overheadPointLight.rotation.copy(controlsObject.rotation);
+                this.overheadPointLight.position.y = controlsObject.position.y + 60;
+                this.overheadPointLight.translateZ(-80);
             }
+    
+            if (this.scene && this.scene.controls) this.scene.handleAutoZoom();
         }
-        
-        this.forms.forEach(form => {
-            if (form.attributes.animates) {
-                form.animate(delta);
-            }
-        });
-        
-        if (this.refractor) {
-            this.refractor.material.uniforms[ "time" ].value += this.clock.getDelta();
-        }
-
-        if (this.overheadPointLight) {
-            let controlsObject = this.scene.controls.getObject();
-            this.overheadPointLight.position.copy(controlsObject.position);
-            this.overheadPointLight.rotation.copy(controlsObject.rotation);
-            this.overheadPointLight.position.y = controlsObject.position.y + 60;
-            this.overheadPointLight.translateZ(-80);
-        }
-
-        if (this.hero && this.scene) this.scene.handleAutoZoom();
     }
 
     deanimateScene(callback) {
@@ -567,6 +567,7 @@ export class SceneController {
         if (this.scene) {
             this.scene.unregisterEventListeners();
             this.scene.deanimate(() => {
+                // this.scene = null;
             });
         }
 
@@ -713,6 +714,5 @@ export class SceneController {
     getObjectNameByLayoutId(layoutId) {
         this.scene.getObjectByName()
     }
-
 
 }

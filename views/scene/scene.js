@@ -35,11 +35,19 @@ class Scene {
         this.running = true;
 
         this.background = controller.layout.background;
+        this.backgroundNight = controller.layout.backgroundNight;
         
         this.animate = this.animate.bind(this);
         this.deanimate = this.deanimate.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
         this.addControls = this.addControls.bind(this);
+
+        this.onMouseClick = this.onMouseClick.bind(this);
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
+        this.controlsLocked = this.controlsLocked.bind(this);
+        this.controlsUnlocked = this.controlsUnlocked.bind(this);
+        this.instructionsLock = this.instructionsLock.bind(this);
 
         this.controls = null;
         this.scene = null;
@@ -104,7 +112,23 @@ class Scene {
     
     addBackground() {
 
-        if (this.background && this.background.length > 0 && this.controller.layout.dayTime) {
+        
+        if (this.backgroundNight && this.backgroundNight.length > 0 && !this.controller.layout.dayTime) {
+
+            // simplistic equirectangular mapping to the inverse of a sphere geometry:
+            var geometry = new THREE.SphereBufferGeometry(cameraReach - 200);
+            geometry.scale (-1,1,1);
+
+
+            var material = new THREE.MeshBasicMaterial( {
+                map: new THREE.TextureLoader().load("/textures/" + this.backgroundNight)
+            });
+
+            this.backgroundMesh = new THREE.Mesh(geometry, material);
+            this.backgroundMesh.rotateZ(Math.PI);
+            this.controls.getObject().add( this.backgroundMesh );
+
+        } else if (this.background && this.background.length > 0 && this.controller.layout.dayTime) {
 
             // simplistic equirectangular mapping to the inverse of a sphere geometry:
             var geometry = new THREE.SphereBufferGeometry(cameraReach - 200);
@@ -114,7 +138,7 @@ class Scene {
                 map: new THREE.TextureLoader().load("/textures/" + this.background)
             });
 
-            this.backgroundMesh = new THREE.Mesh(geometry, material)
+            this.backgroundMesh = new THREE.Mesh(geometry, material);
             this.controls.getObject().add( this.backgroundMesh );
 
         } else {
@@ -161,244 +185,12 @@ class Scene {
 
     }
 
-    /** Separate keyhandling for F8 because it controls other keyhandler */
-    onF8 = ( event ) => {
-
-        if (event.keyCode == 119 || (event.altKey && event.keyCode == 84)) {  //F8 or Alt-T
-            chatbar = !chatbar;
-            this.controller.eventDepot.fire('toggleChatbar', { show: chatbar }); 
-        }
-    }
-
-    
-    onKeyDown = ( event ) => {
-    
-        switch ( event.keyCode ) {
-
-            case 38: // up
-            case 87: // w
-                if (this.controller.hero) this.controller.hero.moveForward = true;
-                break;
-
-            case 37: // left
-            case 65: // a
-                if (this.controller.hero) this.controller.hero.moveLeft = true;
-                break;
-
-            case 40: // down
-            case 83: // s
-                if (this.controller.hero) this.controller.hero.moveBackward = true;
-                break;
-
-            case 39: // right
-            case 68: // d
-                if (this.controller.hero) this.controller.hero.moveRight = true;
-                break;
-
-            case 32: // space
-                this.controller.eventDepot.fire('jump', {});
-                break;
-
-            case 73: // i
-                this.controller.hero.cacheHero(); // saves updated location in template
-                this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
-                this.controller.eventDepot.fire('halt', {});
-                break;
-                
-            case 77: // m
-                minimap = !minimap;
-                this.controller.eventDepot.fire('minimap', {});
-                break;
-
-            case 72: // h
-                sidebar = !sidebar;
-               
-                if (sidebar) this.controller.eventDepot.fire('refreshSidebar', { equipped: this.controller.hero.equipped });
-                this.controller.eventDepot.fire('toggleSidebar', { show: sidebar });
-                break;
-            case 49: // 1
-            case 50:
-            case 51:
-            case 52:
-            case 53:
-            case 54:
-            case 55:
-            case 56: // 8
-                this.controller.eventDepot.fire('hotkey', { key: event.keyCode - 48 })
-                break;
-
-        }
-
-    };
-
-    onKeyUp = ( event ) => {
-
-        switch ( event.keyCode ) {
-
-            case 38: // up
-            case 87: // w
-                if (this.controller.hero) this.controller.hero.moveForward = false;
-                break;
-
-            case 37: // left
-            case 65: // a
-                if (this.controller.hero) this.controller.hero.moveLeft = false;
-                break;
-
-            case 40: // down
-            case 83: // s
-                if (this.controller.hero) this.controller.hero.moveBackward = false;
-                break;
-
-            case 39: // right
-            case 68: // d
-                if (this.controller.hero) this.controller.hero.moveRight = false;
-                break;
-
-        }
-
-    };
-
     addHelper() {
 
         this.helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(10), new THREE.MeshBasicMaterial({ color: 'blue' }));
         this.helper.visible = true;
         this.scene.add( this.helper );
 
-    }
-
-    onMouseClick = (e) => {
-        console.dir(this.controls.getObject().position);
-    }
-
-    onMouseDown = (e) => {
-        if (this.controller.hero) {
-
-            switch (e.button) {
-
-                case 0:
-                    this.controller.eventDepot.fire('mouse0click', event.shiftKey );
-                    break;
-                case 1:
-                    this.controller.eventDepot.fire('mouse1click', {});
-                    break;
-                case 2:
-                    this.controller.eventDepot.fire('mouse2click', event.shiftKey );
-                    // this.controller.hero.moveForward = true;
-                    break;
-            }
-        }
-    }
-
-    onMouseUp = (e) => {
-        if (this.controller.hero) {
-            switch (e.button) {
-
-                case 0:
-                    // this.helper.visible = false;
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    this.controller.hero.moveForward = false;
-                    break;
-            }
-        }
-    }
-
-    addEventListeners() {
-        let main = document.querySelector('main');
-        main.innerHTML = `<div id="blocker" style="display: block;">
-
-        <div id="instructions" style="">
-            <span style="font-size:40px">Click to play</span>
-            <br>
-            (W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
-        </div>
-
-        </div>`;
-
-        this.blocker = document.getElementById( 'blocker' );
-        this.instructions = document.getElementById( 'instructions' );
-
-        this.controller.eventDepot.addListener('setHeroStat', (data) => {
-            if (data.type == "health" || data.type == "mana") {
-                let el = document.getElementById(data.type);
-                el.value = data.points;
-                el.innerText = data.points;
-            }
-        })
-
-        this.controller.eventDepot.addListener('setHeroStatMax', (data) => {
-            if (data.type == "health" || data.type == "mana") {
-                let el = document.getElementById(data.type);
-                el.max = data.points;
-                el.optimum = Math.floor(data.points*.9);
-                el.low = Math.floor(data.points*.3);
-                el.high = Math.floor(data.points*.7);
-            }
-        })
-
-        this.controller.eventDepot.addListener('updateXP', (data) => {
-            document.getElementById('xp').innerText = data;
-        })
-
-        this.controller.eventDepot.addListener('lockControls', () => {
-            this.controls.lock();
-        })
-
-        this.controller.eventDepot.addListener('unlockControls', () => {
-            this.controls.unlock();
-        })
-
-        this.controller.eventDepot.addListener('updateHelper', (data) => {
-            this.helper.position.copy(data.position);
-            this.helper.material.color = data.color;
-        })
-
-        this.controller.eventDepot.addListener('disableKeyDownListener', () => {
-            document.removeEventListener( 'keydown', this.onKeyDown, false );
-        })
-
-        this.controller.eventDepot.addListener('enableKeyDownListener', () => {
-            document.addEventListener( 'keydown', this.onKeyDown, false );
-        })
-
-        this.instructions.addEventListener( 'click', () => {
-
-            if (this.readyForLock) {
-                this.controls.lock();
-            }
-        
-        }, false );
-
-        this.controls.addEventListener( 'lock', () => {
-
-            this.instructions.style.display = 'none';
-            this.blocker.style.display = 'none';
-            document.addEventListener( 'mousedown', this.onMouseDown, false );
-            document.addEventListener( 'mouseup', this.onMouseUp, false );
-            document.addEventListener( 'click', this.onMouseClick, false );
-        } );
-
-        this.controls.addEventListener( 'unlock', () => {
-
-            this.blocker.style.display = 'block';
-            this.instructions.style.display = '';
-            document.removeEventListener( 'mousedown', this.onMouseDown, false );
-            document.removeEventListener( 'mouseup', this.onMouseUp, false );
-            document.removeEventListener( 'click', this.onMouseClick, false );
-
-        } );
-
-        main.appendChild(this.renderer.domElement);
-        window.addEventListener( 'resize', this.onWindowResize, false );
-    }
-
-    onWindowResize() {
-        this.camera.aspect = window.innerWidth / (window.innerHeight - navbarHeight);
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight) );
     }
 
     handleAutoZoom = () => {
@@ -486,7 +278,6 @@ class Scene {
         }
     }
 
-
     /** 
      * Each projectile looks like this:
      * {
@@ -561,7 +352,7 @@ class Scene {
                 this.handleSprites();
                 this.handleProjectiles(this.delta);
 
-                if (this.controller.backgroundMesh) this.controller.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
+                // if (this.backgroundMesh) this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
     
                 this.prevTime = this.time;
             
@@ -601,24 +392,265 @@ class Scene {
     deanimate(callback) {
         this.running = false;
         if (document.getElementById('minimap').firstElementChild) document.getElementById('minimap').firstElementChild.remove();
+        this.controls = null;
         callback();
     }
 
+
+
     unregisterEventListeners = () => {
-        if (this.instructions) this.instructions.removeEventListener( 'click', this.controls.lock, false );
-        
+
+        this.instructions.removeEventListener( 'click', this.instructionsLock, false );
+        this.controls.removeEventListener( 'lock', this.controlsLocked );
+        // this.controls.removeEventListener( 'unlock', this.controlsUnlocked );
+
         document.removeEventListener( 'keydown', this.onKeyDown, false );
         document.removeEventListener( 'keydown', this.onF8, false );
         document.removeEventListener( 'keyup', this.onKeyUp, false );
         window.removeEventListener( 'resize', this.onWindowResize, false );
-        this.controller.eventDepot.removeListeners('lockControls');
-        this.controller.eventDepot.removeListeners('unlockControls');
+
         this.controller.eventDepot.removeListeners('setHeroStat');
         this.controller.eventDepot.removeListeners('setHeroStatMax');
         this.controller.eventDepot.removeListeners('updateHelper');
         this.controller.eventDepot.removeListeners('updateXP');
+        this.controller.eventDepot.removeListeners('lockControls');
+        this.controller.eventDepot.removeListeners('unlockControls');
+        this.controller.eventDepot.removeListeners('disableKeyDownListener');
+        this.controller.eventDepot.removeListeners('enableKeyDownListener');
     }
 
+    addEventListeners() {
+        let main = document.querySelector('main');
+        main.innerHTML = `<div id="blocker" style="display: block;">
+
+        <div id="instructions" style="">
+            <span style="font-size:40px">Click to play</span>
+            <br>
+            (W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
+        </div>
+
+        </div>`;
+
+        this.blocker = document.getElementById( 'blocker' );
+        this.instructions = document.getElementById( 'instructions' );
+
+        this.controller.eventDepot.addListener('setHeroStat', (data) => {
+            if (data.type == "health" || data.type == "mana") {
+                let el = document.getElementById(data.type);
+                el.value = data.points;
+                el.innerText = data.points;
+            }
+        })
+
+        this.controller.eventDepot.addListener('setHeroStatMax', (data) => {
+            if (data.type == "health" || data.type == "mana") {
+                let el = document.getElementById(data.type);
+                el.max = data.points;
+                el.optimum = Math.floor(data.points*.9);
+                el.low = Math.floor(data.points*.3);
+                el.high = Math.floor(data.points*.7);
+            }
+        })
+
+        this.controller.eventDepot.addListener('updateXP', (data) => {
+            document.getElementById('xp').innerText = data;
+        })
+
+        this.controller.eventDepot.addListener('lockControls', () => {
+            this.controls.lock();
+        })
+
+        this.controller.eventDepot.addListener('unlockControls', () => {
+            this.controls.unlock();
+        })
+
+        this.controller.eventDepot.addListener('updateHelper', (data) => {
+            this.helper.position.copy(data.position);
+            this.helper.material.color = data.color;
+        })
+
+        this.controller.eventDepot.addListener('disableKeyDownListener', () => {
+            document.removeEventListener( 'keydown', this.onKeyDown, false );
+        })
+
+        this.controller.eventDepot.addListener('enableKeyDownListener', () => {
+            document.addEventListener( 'keydown', this.onKeyDown, false );
+        })
+
+        this.instructions.addEventListener( 'click', this.instructionsLock, false );
+        this.controls.addEventListener( 'lock', this.controlsLocked);
+        this.controls.addEventListener( 'unlock', this.controlsUnlocked );
+
+        main.appendChild(this.renderer.domElement);
+        window.addEventListener( 'resize', this.onWindowResize, false );
+    }
+
+    instructionsLock() {
+        if (this.readyForLock && !this.controls.isLocked) {
+            this.controls.lock();
+        }
+    }
+
+    controlsLocked() {
+        this.instructions.style.display = 'none';
+        this.blocker.style.display = 'none';
+        document.addEventListener( 'mousedown', this.onMouseDown, false );
+        document.addEventListener( 'mouseup', this.onMouseUp, false );
+        document.addEventListener( 'click', this.onMouseClick, false );
+    }
+
+    controlsUnlocked() {
+        this.blocker.style.display = 'block';
+        this.instructions.style.display = '';
+        document.removeEventListener( 'mousedown', this.onMouseDown, false );
+        document.removeEventListener( 'mouseup', this.onMouseUp, false );
+        document.removeEventListener( 'click', this.onMouseClick, false );
+    }
+
+    /** Separate keyhandling for F8 because it controls other keyhandler */
+    onF8 = ( event ) => {
+
+        if (event.keyCode == 119 || (event.altKey && event.keyCode == 84)) {  //F8 or Alt-T
+            chatbar = !chatbar;
+            this.controller.eventDepot.fire('toggleChatbar', { show: chatbar }); 
+        }
+    }
+    
+    onKeyDown = ( event ) => {
+    
+        switch ( event.keyCode ) {
+
+            case 38: // up
+            case 87: // w
+                if (this.controller.hero) this.controller.hero.moveForward = true;
+                break;
+
+            case 37: // left
+            case 65: // a
+                if (this.controller.hero) this.controller.hero.moveLeft = true;
+                break;
+
+            case 40: // down
+            case 83: // s
+                if (this.controller.hero) this.controller.hero.moveBackward = true;
+                break;
+
+            case 39: // right
+            case 68: // d
+                if (this.controller.hero) this.controller.hero.moveRight = true;
+                break;
+
+            case 32: // space
+                this.controller.eventDepot.fire('jump', {});
+                break;
+
+            case 73: // i
+                this.controller.hero.cacheHero(); // saves updated location in template
+                this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
+                this.controller.eventDepot.fire('halt', {});
+                break;
+                
+            case 77: // m
+                minimap = !minimap;
+                this.controller.eventDepot.fire('minimap', {});
+                break;
+
+            case 72: // h
+                sidebar = !sidebar;
+                
+                if (sidebar) this.controller.eventDepot.fire('refreshSidebar', { equipped: this.controller.hero.equipped });
+                this.controller.eventDepot.fire('toggleSidebar', { show: sidebar });
+                break;
+            case 49: // 1
+            case 50:
+            case 51:
+            case 52:
+            case 53:
+            case 54:
+            case 55:
+            case 56: // 8
+                this.controller.eventDepot.fire('hotkey', { key: event.keyCode - 48 })
+                break;
+
+        }
+
+    };
+
+    onKeyUp = ( event ) => {
+
+        switch ( event.keyCode ) {
+
+            case 38: // up
+            case 87: // w
+                if (this.controller.hero) this.controller.hero.moveForward = false;
+                break;
+
+            case 37: // left
+            case 65: // a
+                if (this.controller.hero) this.controller.hero.moveLeft = false;
+                break;
+
+            case 40: // down
+            case 83: // s
+                if (this.controller.hero) this.controller.hero.moveBackward = false;
+                break;
+
+            case 39: // right
+            case 68: // d
+                if (this.controller.hero) this.controller.hero.moveRight = false;
+                break;
+
+        }
+
+    };
+
+    onMouseClick() {
+        if (this.controls) {
+            let x = this.controls.getObject().position;
+            console.log(`${this.controller.level}: ${x.x}, ${x.z}`);
+        }
+    }
+
+    onMouseDown(e) {
+        if (this.controller.hero) {
+
+            switch (e.button) {
+
+                case 0:
+                    this.controller.eventDepot.fire('mouse0click', event.shiftKey );
+                    break;
+                case 1:
+                    this.controller.eventDepot.fire('mouse1click', {});
+                    break;
+                case 2:
+                    this.controller.eventDepot.fire('mouse2click', event.shiftKey );
+                    // this.controller.hero.moveForward = true;
+                    break;
+            }
+        }
+    }
+
+    onMouseUp(e) {
+        if (this.controller.hero) {
+            switch (e.button) {
+
+                case 0:
+                    // this.helper.visible = false;
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    this.controller.hero.moveForward = false;
+                    break;
+            }
+        }
+    }
+
+    onWindowResize() {
+        this.camera.aspect = window.innerWidth / (window.innerHeight - navbarHeight);
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight) );
+    }
 }
 
 export {Scene};

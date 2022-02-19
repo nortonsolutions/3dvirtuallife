@@ -36,7 +36,7 @@ export class IntelligentForm extends AnimatedForm{
     load(callback) {
         
         super.load(() => {
-            this.listGeometries(this.model);
+            // this.listGeometries(this.model);
             // this.listPositions(this.model);
             // this.getBoundingSphereHandR(this.model);
             // this.setToDoubleSided(this.model);

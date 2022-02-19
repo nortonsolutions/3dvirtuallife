@@ -25,6 +25,7 @@ class LevelBuilder {
             width: this.level.width,
             length: this.level.length,   
             background: this.level.background,
+            backgroundNight: this.level.backgroundNight,
             description: this.level.description
         }
     }

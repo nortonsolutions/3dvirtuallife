@@ -10,6 +10,7 @@ export const levels = [
         length: 26, //26
         description: "Valley of Mist",
         background: 'clouds.png', // 'clouds.png',
+        backgroundNight: 'stars.png',
         terrain: {
             name: 'floor',
             type: 'floor',
@@ -33,9 +34,7 @@ export const levels = [
             { name: "redpotion" },
             { name: "gold3" },
             { name: "bow" },
-            { name: "arrow25" },
-
-            
+            { name: "arrow25" }
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0} },
@@ -54,7 +53,7 @@ export const levels = [
             },
             { 
                 name: "portal", location: { x: -6.5, y: 0, z: -19.5}, 
-                attributes: { routeTo: { level: 5, location: { x: -40.0, y: 0, z: -6.5 } } } 
+                attributes: { routeTo: { level: 5, location: { x: -14.5, y: 0, z: 35.2 } } } 
             },
             { 
                 name: "portal", location: { x: -6.5, y: 0, z: 19.5}, 
@@ -74,7 +73,9 @@ export const levels = [
             // { name: "horse" },
             // { name: "murderBear" },
             // { name: "rosen" },
-            // { name: "viking" }
+            // { name: "viking" },
+            // { name: "blacksmith" },
+            { name: "elfgirl" }
         ]
     },
     {
@@ -199,6 +200,7 @@ export const levels = [
         length: 26, //26
         description: "Swamp",
         background: 'clouds.png',
+        backgroundNight: 'stars.png',
         terrain: {
             name: 'floor',
             type: 'floor',
@@ -265,6 +267,7 @@ export const levels = [
         length: 26, //26
         description: "Lavafield",
         background: 'clouds.png',
+        backgroundNight: 'stars.png',
         terrain: {
             name: 'floor',
             type: 'floor',
@@ -323,6 +326,7 @@ export const levels = [
         length: 52, //26
         description: "Kingdom",
         background: 'clouds.png',
+        backgroundNight: 'stars.png',
         terrain: {
             name: 'floor',
             type: 'floor',
@@ -348,19 +352,16 @@ export const levels = [
         ],
         structures: [
             { 
-                name: "portal", location: { x: -43, y: 0, z: -6.5},
+                name: "portal", location: { x: -12.5, y: 0, z: 35.2 },
                 attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: -18.5 } } } 
             },
-            // { name: "tree1" },
-            // { name: "tavern", location: { x: -45, y: 0, z: -4.5} },
-
             { 
                 name: "grate", location: { x: 19.5, y: 0, z: -6.5 },
                 attributes: { unlocked: true, elevation: 5, routeTo: { level: 3, location: { x: 8.4, y: 0, z: 21.1} } } 
             }
         ],
         entities: [
-            { name: "blacksmith" },
+            { name: "blacksmith", location: { x: -5, y: 0, z: -41.1 } },
             { name: "rockyMan" },
             { name: "rockyMan" },
             { name: "ghoul" },
@@ -378,6 +379,7 @@ export const levels = [
         length: 78, //26
         description: "Ruins",
         background: 'ruinsSky.jpg',
+        backgroundNight: 'stars.png',
         terrain: {
             name: 'floor',
             type: 'floor',
@@ -420,6 +422,7 @@ export const levels = [
         length: 72, //26
         description: "Snowyland",
         background: 'clouds.png',
+        backgroundNight: 'stars.png',
         terrain: {
             name: 'floor',
             type: 'floor',

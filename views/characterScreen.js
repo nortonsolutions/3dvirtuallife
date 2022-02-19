@@ -196,6 +196,7 @@ export class CharacterScreen {
                         
                         let namespace = '/';
                         this.eventDepot.fire('closeModal', {});
+                        this.heroTemplate.location = {x: 0, y: 0, z:0};
                         this.eventDepot.fire('startLevel', { heroTemplate: this.heroTemplate, props, namespace });
     
                     }
@@ -252,6 +253,7 @@ export class CharacterScreen {
                     
                     localStorage.setItem('gameProps', JSON.stringify(props));
 
+                    this.heroTemplate.location = {x: 0, y: 0, z:0};
                     this.eventDepot.fire('closeModal', {});
                     this.eventDepot.fire('startLevel', { heroTemplate: this.heroTemplate, props, namespace });
                 }

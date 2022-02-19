@@ -49,13 +49,13 @@ export class FormFactory {
         return form;
     }
 
-    addSconces = (model) => {
+    addSconces = (model, scaleAdjust) => {
 
         let spriteConfig = {
             name: 'flame',
-            regex: new RegExp('sconce|torch', 'i'),
+            regex: new RegExp('sconce', 'i'),
             frames: 40,
-            scale: .25,
+            scale: .25 * scaleAdjust,
             elevation: .1,
             flip: true,
             animates: true,

@@ -75,7 +75,7 @@ export class DialogScreen {
 
             this.scene.add( this.currentModel );
             this.camera.position.z = 40;
-            this.camera.position.y = this.entity.template.attributes.height;
+            this.camera.position.y = this.entity.template.attributes.dialogHeight;
 
             this.animations.forEach((animation,index) => {
                 var action = this.mixer.clipAction( animation );

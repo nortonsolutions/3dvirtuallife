@@ -402,6 +402,91 @@ export const Items = {
             animationOnEquip: false
         } 
     },
+    blackBlade: {
+        name: 'blackBlade',
+        gltf: 'blackBladeaxe.glb',
+        image: 'blackBlade.png',
+        description: 'Black blade',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 3,
+            equippedScale: 0.003,
+            elevation: 20,
+            effect: "strength/1",
+            animationOnEquip: false
+        } 
+    },
+    hammer: {
+        name: 'hammer',
+        gltf: 'hammer.glb',
+        image: 'hammer.png',
+        description: 'Hammer',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 3,
+            equippedScale: 0.003,
+            elevation: 20,
+            effect: "strength/1",
+            animationOnEquip: false
+        } 
+    },
+    blazingBlade: {
+        name: 'blazingBlade',
+        gltf: 'blazingBlade.glb',
+        image: 'blazingBlade.png',
+        description: 'Blazing Blade',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 3,
+            equippedScale: 0.003,
+            elevation: 20,
+            effect: "strength/1",
+            animationOnEquip: false
+        } 
+    },
+    natureBlade: {
+        name: 'natureBlade',
+        gltf: 'natureBlade.glb',
+        image: 'natureBlade.png',
+        description: 'Nature Blade',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 3,
+            equippedScale: 0.003,
+            elevation: 20,
+            effect: "strength/1",
+            animationOnEquip: false
+        } 
+    },
+    waterBlade: {
+        name: 'waterBlade',
+        gltf: 'waterBlade.glb',
+        image: 'waterBlade.png',
+        description: 'Water Blade',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 3,
+            equippedScale: 0.003,
+            elevation: 20,
+            effect: "strength/1",
+            animationOnEquip: false
+        } 
+    },
     axe2: {
         name: 'axe2',
         gltf: 'axe2.glb',
@@ -432,6 +517,51 @@ export const Items = {
             equippedScale: 0.02,
             elevation: 20,
             effect: "defense/1"
+        } 
+    },
+    supermanArmor: {
+        name: 'supermanArmor',
+        gltf: 'supermanArmor.glb',
+        image: 'supermanArmor.png',
+        description: 'Heavy-duty armor',
+        type: 'item',
+        attributes: {
+            equippable: ['Torso'],
+            animates: false,
+            scale: 20,
+            equippedScale: 0.02,
+            elevation: 20,
+            effect: "defense/3"
+        } 
+    },
+    legacyArmor: {
+        name: 'legacyArmor',
+        gltf: 'legacyArmor.glb',
+        image: 'legacyArmor.png',
+        description: 'Heavy-duty armor',
+        type: 'item',
+        attributes: {
+            equippable: ['Torso'],
+            animates: false,
+            scale: 20,
+            equippedScale: 0.02,
+            elevation: 20,
+            effect: "defense/3"
+        } 
+    },
+    chevyArmor: {
+        name: 'chevyArmor',
+        gltf: 'chevyArmor.glb',
+        image: 'chevyArmor.png',
+        description: 'Heavy-duty armor',
+        type: 'item',
+        attributes: {
+            equippable: ['Torso'],
+            animates: false,
+            scale: 20,
+            equippedScale: 0.02,
+            elevation: 20,
+            effect: "defense/2"
         } 
     },
     busterboot: {
@@ -548,6 +678,51 @@ export const Items = {
             scale: 100,
             elevation: 20,
             effect: "defense/1"
+        } 
+    },
+    waterShield: {
+        name: 'waterShield',
+        gltf: 'waterShield.glb',
+        image: 'waterShield.png',
+        description: 'A water shield',
+        type: 'item',
+        subtype: 'shield',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 100,
+            elevation: 20,
+            effect: "defense/2"
+        } 
+    },
+    thunderShield: {
+        name: 'thunderShield',
+        gltf: 'thunderShield.glb',
+        image: 'thunderShield.png',
+        description: 'A thunder shield',
+        type: 'item',
+        subtype: 'shield',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 100,
+            elevation: 20,
+            effect: "defense/3"
+        } 
+    },
+    blazingShield: {
+        name: 'blazingShield',
+        gltf: 'blazingShield.glb',
+        image: 'blazingShield.png',
+        description: 'A blazing shield',
+        type: 'item',
+        subtype: 'shield',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: 100,
+            elevation: 20,
+            effect: "defense/3"
         } 
     },
     torch: {

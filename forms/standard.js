@@ -61,7 +61,7 @@ export class StandardForm {
 
                 this.tweakPosition();
 
-                console.log(`Placing ${this.objectName} @ ${this.model.position.x},${this.model.position.y},${this.model.position.z}` );
+                // console.log(`Placing ${this.objectName} @ ${this.model.position.x},${this.model.position.y},${this.model.position.z}` );
             
             } else if (this.objectName == "floor") { // floor is the only form without location
                 this.setRoofToSingleSided();
