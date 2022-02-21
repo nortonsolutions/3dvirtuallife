@@ -273,7 +273,9 @@ class Scene {
             Math.random() < projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround) {
             projectile.item.model.position.y = projectile.item.determineElevationFromBase() + projectile.item.attributes.elevation;
         } else {  // remove the item
-            // if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
+            // Uncommented for lightning:
+            if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
+            this.controller.forms = this.controller.forms.filter(el => el != projectile.item);
             this.removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
         }
     }
@@ -352,7 +354,7 @@ class Scene {
                 this.handleSprites();
                 this.handleProjectiles(this.delta);
 
-                // if (this.backgroundMesh) this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
+                if (this.backgroundMesh && this.controls) this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
     
                 this.prevTime = this.time;
             

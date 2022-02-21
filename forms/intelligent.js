@@ -83,7 +83,7 @@ export class IntelligentForm extends AnimatedForm{
      * TODO: Otherwise find the FIRST geometry...?
      */
     identifyPrincipalGeometry(el)  {
-        let possibleNames = ['Torso_0', 'Head_0', 'Icosphere', 'Body', "Cube.001_0", "Cube", "Body_0", "Rat_Geometry", 'Mesh_0', "Leg.R_0", "Elf01_posed.002_0"];
+        let possibleNames = ['Torso_0', 'Head_0', 'Icosphere', 'Body', "Cube.001_0", "Cube", "Body_0", "Rat_Geometry", 'Mesh_0', "Leg.R_0", "Elf_0", "Elf01_posed.002_0"];
         for (const name of possibleNames) {
             if (el.getObjectByName(name)) {
                 return el.getObjectByName(name).geometry;
@@ -738,6 +738,9 @@ export class IntelligentForm extends AnimatedForm{
                 // load the object model to the scene, copy the position/rotation of hero
                 this.sceneController.loadFormByName(itemName, (item) => {
 
+                    if (item.activeAction) {
+                        item.activeAction.play();
+                    }
                     item.model.position.copy(this.model.position);
                     item.model.rotation.copy(this.model.rotation);
                     item.model.position.y += this.attributes.height;

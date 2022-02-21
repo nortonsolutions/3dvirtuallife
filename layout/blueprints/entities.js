@@ -438,7 +438,7 @@ export const Entities = {
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 20,
+            scale: 30,
             conversation: {
                 conversationState: "intro",
                 engagementState: 0,
@@ -532,7 +532,7 @@ export const Entities = {
         description: 'Hearty blacksmith',
         type: 'friendly',
         inventory: [
-            {itemName:"blackBlade",quantity:1,price:"gold/300"},
+            {itemName:"blackBlade",quantity:1,price:"gold/3,smallSword/1,aluminium/1"},
             {itemName:"blazingBlade",quantity:1,price:"gold/700"},
             {itemName:"natureBlade",quantity:1,price:"gold/900"},
             {itemName:"waterBlade",quantity:1,price:"gold/500"},
@@ -558,7 +558,7 @@ export const Entities = {
                 conversationState: "intro",
                 engagementState: 0,
                 special: {
-                    condition: ["bagOfGems","gold"],
+                    condition: ["bagOfGems","gold","aluminium","smallSword"],
                     speech: 'Welcome to my shop, my friend.',
                     action: 'showWares'
                 },

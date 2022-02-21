@@ -325,6 +325,7 @@ function newHeroTemplate(name,height) {
             {"itemName":"poisonProjectileSpell"},
             {"itemName":"fireProjectileSpell"},
             {"itemName":"iceProjectileSpell"},
+            {"itemName":"lightningBoltSpell"}
         ],
         equipped: {},
         conversation: {

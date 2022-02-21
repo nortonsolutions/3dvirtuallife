@@ -85,6 +85,10 @@ export const xpLevels = {
         9: {
             effect: "mana/1",
             spell: "iceProjectileSpell"
+        },
+        10: {
+            effect: "mana/1",
+            spell: "lightningBoltSpell"
         }
         
     },

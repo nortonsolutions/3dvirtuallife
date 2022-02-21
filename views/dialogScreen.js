@@ -320,23 +320,24 @@ export class DialogScreen {
         let currentNumberCommitted = this.tab.items[itemName]? this.tab.items[itemName] : 0;
         if (currentNumberCommitted < this.entity.getInventoryQuantity(itemName)) {
 
-            let [paymentItem,paymentQuantity] = price.split('/');
-            
-            var paymentItemTotal;
-
-            if (this.tab.totalPrice[paymentItem]) { // increment
-                paymentItemTotal  = Number(this.tab.totalPrice[paymentItem]) + Number(paymentQuantity);
-            }  else { // create
-                paymentItemTotal = Number(paymentQuantity);
-            }
-
             if (this.tab.items[itemName]) { // increment
                 this.tab.items[itemName] = Number(this.tab.items[itemName]) + 1;
             }  else { // create
                 this.tab.items[itemName] = 1
             }
 
-            this.tab.totalPrice[paymentItem] = paymentItemTotal;
+            price.split(',').forEach(subprice => {
+                let [paymentItem,paymentQuantity] = subprice.split('/');
+            
+                var paymentItemTotal;
+    
+                if (this.tab.totalPrice[paymentItem]) { // increment
+                    paymentItemTotal  = Number(this.tab.totalPrice[paymentItem]) + Number(paymentQuantity);
+                }  else { // create
+                    paymentItemTotal = Number(paymentQuantity);
+                }
+                this.tab.totalPrice[paymentItem] = paymentItemTotal;
+            });
         }
         return this.tab;
     }
@@ -351,14 +352,16 @@ export class DialogScreen {
                 this.tab.items[itemName] = Number(this.tab.items[itemName]) - 1;
             }
     
-            let [paymentItem,paymentQuantity] = price.split('/');
+            price.split(',').forEach(subprice => {
+                let [paymentItem,paymentQuantity] = subprice.split('/');
     
-            if (paymentItem == 'gold') {
-                this.tab.totalPrice.gold -= Number(paymentQuantity);
-            } else {
-                this.tab.totalPrice[paymentItem] = Number(this.tab.totalPrice[paymentItem]) - Number(paymentQuantity);
-                if (this.tab.totalPrice[paymentItem] == 0) delete this.tab.totalPrice[paymentItem];
-            }
+                if (paymentItem == 'gold') {
+                    this.tab.totalPrice.gold -= Number(paymentQuantity);
+                } else {
+                    this.tab.totalPrice[paymentItem] = Number(this.tab.totalPrice[paymentItem]) - Number(paymentQuantity);
+                    if (this.tab.totalPrice[paymentItem] == 0) delete this.tab.totalPrice[paymentItem];
+                }
+            })
         }
 
         return this.tab;        

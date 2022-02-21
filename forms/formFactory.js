@@ -27,7 +27,11 @@ export class FormFactory {
                 form = new Hero(template, this.sceneController, controls);
                 break;
             case "floor":
-                form = new StandardForm(template, this.sceneController);
+                if (template.attributes.animates) {
+                    form = new AnimatedForm(template, this.sceneController);
+                } else {
+                    form = new StandardForm(template, this.sceneController);
+                }
                 break;
             case "compass":
                 form = new StandardForm(template, this.sceneController);

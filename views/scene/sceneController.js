@@ -134,13 +134,13 @@ export class SceneController {
             if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
             this.seedForm(itemTemplate).then(form => {
     
-                if (data.position) {
-                    form.model.position.copy(data.position);
-                } else {
-                    form.model.position.copy(this.hero.model.position);
-                    form.model.position.y = this.hero.determineElevationFromBase();
+                if (!data.position) {
+                    data.position = new THREE.Vector3();
+                    data.position.copy(this.hero.model.position);
+                    data.position.y = this.hero.determineElevationFromBase();
                 }
-                
+
+                form.model.position.copy(data.position);
     
                 if (local) {
                     this.socket.emit('nextLayoutId', this.level, layoutId => {
@@ -540,7 +540,9 @@ export class SceneController {
                 }
             }
             
+            // console.dir(this.forms);
             this.forms.forEach(form => {
+                
                 if (form.attributes.animates) {
                     form.animate(delta);
                 }
@@ -600,7 +602,7 @@ export class SceneController {
         this.socket.emit('nextLayoutId', this.level, layoutId => {
             formTemplate.attributes.layoutId = layoutId;
 
-            if (formTemplate.type == "spell") addToForms = false;
+            // if (formTemplate.type == "spell") addToForms = false;
             this.seedForm(formTemplate, null, addToForms).then(form => {
                callback(form);
             });

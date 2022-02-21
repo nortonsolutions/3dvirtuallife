@@ -63,6 +63,20 @@ export const Structures = {
     
     },
 
+    balloon: {
+        name: 'balloon',
+        gltf: 'balloon.glb',
+        description: 'Festive hot-air balloon',
+        type: 'structure',
+        attributes: {
+            animates: false,
+            key: '',
+            scale: 30,
+            elevation: 30,
+            unlocked: true
+        }
+    },
+
     portal: {
         name: 'portal',
         gltf: 'portal.glb',
@@ -76,7 +90,7 @@ export const Structures = {
             unlocked: true,
         }
     },
-    
+
     archway: {
         name: 'archway',
         gltf: 'archway.gltf',

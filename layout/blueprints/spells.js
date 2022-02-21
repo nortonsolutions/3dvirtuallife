@@ -181,5 +181,27 @@ export const Spells = {
                 time: 1
             }]
         }
+    },
+    lightningBoltSpell: {
+        name: 'lightningBoltSpell',
+        gltf: 'lightningBolt.glb',
+        image: 'lightningBolt.png',
+        description: 'A projectile bolt to inflict lightning damage',
+        type: 'spell',
+        attributes: {
+            manaCost: 1,
+            effect: "damage/3",
+            range: 80,
+            animates: true,
+            scale: 10,
+            throwable: true,
+            throwableAttributes: {
+                pitch: .5, // angle up (percentage of 90 degrees)
+                weight: .5, // lbs
+                distance: 1200, // px
+                speed: 3 // 1 = full walking speed
+            },
+            continuousSprites: false
+        }
     }
 }

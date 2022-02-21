@@ -84,7 +84,6 @@ export class AnimatedForm extends StandardForm{
                 } else if (this.model.objectType=='item' && this.attributes.animatesRecurring) {
                     console.log("test")
                     this.model.children[1].material.opacity = 0.5;
-
                 }
     
                 this.actions[ animation.name ] = action;

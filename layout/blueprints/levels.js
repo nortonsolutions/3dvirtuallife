@@ -5,7 +5,7 @@
 export const levels = [
 
     {
-        level: 0,
+        level: 5,   
         width: 26, //26
         length: 26, //26
         description: "Valley of Mist",
@@ -34,7 +34,14 @@ export const levels = [
             { name: "redpotion" },
             { name: "gold3" },
             { name: "bow" },
-            { name: "arrow25" }
+            { name: "arrow25" },
+            { name: "smallSword" },
+            { name: "aluminium", location: { x: -1, y: 0, z: -1}},
+            { name: "gold" },
+            { name: "iron" },
+            { name: "silver" },
+            { name: "cavalier", location: { x: -1, y: 0, z: -1} }
+
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0} },
@@ -75,7 +82,7 @@ export const levels = [
             // { name: "rosen" },
             // { name: "viking" },
             // { name: "blacksmith" },
-            { name: "elfgirl" }
+            // { name: "elfgirl" }
         ]
     },
     {
@@ -112,7 +119,9 @@ export const levels = [
             { name: "gold25" },
             { name: "gold1" },
             { name: "gold10" },
-            { name: "arrow25" }
+            { name: "arrow25" },
+            { name: "aluminium" },
+            { name: "iron" }
         ],
         structures: [
             { 
@@ -173,7 +182,10 @@ export const levels = [
             { name: "busterblade", location: { x: 10, y: 0, z: -2 }},
             { name: "gold25", location: { x: 10, y: 0, z: -2 }},
             { name: "redpotion" },
-            { name: "greenpotion" }
+            { name: "greenpotion" },
+            { name: "aluminium" },
+            { name: "chromium" },
+            { name: "iron" }
         ],
         structures: [
             { 
@@ -237,6 +249,8 @@ export const levels = [
             { name: "smallSword" },
             { name: "blackpotion" },
             { name: "bagOfGems" },
+            { name: "chromium" },
+            { name: "copper" }
         ],
         structures: [
             { name: "bridge", location: { x: 5.3, y: 0, z: -18} },
@@ -300,7 +314,10 @@ export const levels = [
             { name: "gold25", location: { x: 10, y: 0, z: -1 }},
             { name: "redpotion" },
             { name: "greenpotion" },
-            { name: "helmet" }
+            { name: "helmet" },
+            { name: "copper" },
+            { name: "iron" },
+            { name: "silver" }
         ],
         structures: [
             { 
@@ -321,7 +338,7 @@ export const levels = [
         ]
     },
     {
-        level: 5,
+        level: 0,
         width: 52, //26
         length: 52, //26
         description: "Kingdom",
@@ -333,6 +350,7 @@ export const levels = [
             description: 'kingdom',
             gltf: 'kingdom.glb',
             attributes: {
+                animates: true,
                 scale: 200,
                 borderTrees: true,
                 light: {
@@ -349,6 +367,16 @@ export const levels = [
         items: [
             // { name: "crystalBall" },
             { name: "mushroom" },
+            { name: "copper" },
+            { name: "iron" },
+            { name: "silver" },
+            { name: "titanium" },
+            { name: "wolfram" },
+            { name: "silver" },
+            { 
+                name: "lever", location: { x: -10.8, y: 0, z: 26.1 },
+                attributes: { controls: "door" }
+            }
         ],
         structures: [
             { 
@@ -358,7 +386,12 @@ export const levels = [
             { 
                 name: "grate", location: { x: 19.5, y: 0, z: -6.5 },
                 attributes: { unlocked: true, elevation: 5, routeTo: { level: 3, location: { x: 8.4, y: 0, z: 21.1} } } 
-            }
+            },
+            { 
+                name: "balloon", location: { x: -6, y: 0, z: -.35},
+                // attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: -18.5 } } } 
+            },
+            
         ],
         entities: [
             { name: "blacksmith", location: { x: -5, y: 0, z: -41.1 } },
@@ -399,7 +432,16 @@ export const levels = [
             }
         },
         items: [
-
+            { name: "iron" },
+            { name: "silver" },
+            { name: "titanium" },
+            { name: "wolfram" },
+            { name: "silver" },
+            { name: "iron" },
+            { name: "silver" },
+            { name: "titanium" },
+            { name: "wolfram" },
+            { name: "silver" }
         ],
         structures: [
             { 
@@ -442,6 +484,12 @@ export const levels = [
             }
         },
         items: [
+            { name: "iron" },
+            { name: "silver" },
+            { name: "titanium" },
+            { name: "wolfram" },
+            { name: "silver" },
+            { name: "cavalier" }
 
         ],
         structures: [

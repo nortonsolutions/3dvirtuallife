@@ -270,6 +270,7 @@ export const Items = {
         type: 'item',
         subtype: 'sword',
         attributes: {
+            value: 1,
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
             scale: 100,
@@ -395,8 +396,8 @@ export const Items = {
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
-            scale: 3,
-            equippedScale: 0.003,
+            scale: 30,
+            equippedScale: 0.03,
             elevation: 20,
             effect: "strength/1",
             animationOnEquip: false
@@ -404,7 +405,7 @@ export const Items = {
     },
     blackBlade: {
         name: 'blackBlade',
-        gltf: 'blackBladeaxe.glb',
+        gltf: 'blackBlade.glb',
         image: 'blackBlade.png',
         description: 'Black blade',
         type: 'item',
@@ -412,8 +413,8 @@ export const Items = {
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
-            scale: 3,
-            equippedScale: 0.003,
+            scale: 60,
+            equippedScale: 0.06,
             elevation: 20,
             effect: "strength/1",
             animationOnEquip: false
@@ -429,8 +430,8 @@ export const Items = {
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
-            scale: 3,
-            equippedScale: 0.003,
+            scale: 30,
+            equippedScale: 0.03,
             elevation: 20,
             effect: "strength/1",
             animationOnEquip: false
@@ -446,8 +447,8 @@ export const Items = {
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
-            scale: 3,
-            equippedScale: 0.003,
+            scale: 60,
+            equippedScale: 0.06,
             elevation: 20,
             effect: "strength/1",
             animationOnEquip: false
@@ -463,8 +464,8 @@ export const Items = {
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
-            scale: 3,
-            equippedScale: 0.003,
+            scale: 60,
+            equippedScale: 0.06,
             elevation: 20,
             effect: "strength/1",
             animationOnEquip: false
@@ -480,8 +481,8 @@ export const Items = {
         attributes: {
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
-            scale: 3,
-            equippedScale: 0.003,
+            scale: 60,
+            equippedScale: 0.06,
             elevation: 20,
             effect: "strength/1",
             animationOnEquip: false
@@ -810,5 +811,243 @@ export const Items = {
             elevation: 0,
             effect: "strength/3"
         } 
+    },
+    zyphosSword: {
+        name: 'zyphosSword',
+        gltf: 'zyphosSword.glb',
+        image: 'zyphosSword.png',
+        description: 'Ancient sword',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            flipWeapon: true,
+            equippable: ['Middle2R', 'Middle2L'],
+            equippedScale: 0.003,
+            animates: false,
+            scale: 3,
+            elevation: 0,
+            effect: "strength/3"
+        } 
+    },    
+    gladiusSword: {
+        name: 'gladiusSword',
+        gltf: 'gladiusSword.glb',
+        image: 'gladiusSword.png',
+        description: 'Ancient Long Sword',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            flipWeapon: true,
+            equippable: ['Middle2R', 'Middle2L'],
+            equippedScale: 0.002,
+            animates: false,
+            scale: 2,
+            elevation: 0,
+            effect: "strength/3"
+        } 
+    },
+    cavalier: {
+        name: 'cavalier',
+        gltf: 'cavalier.glb',
+        image: 'cavalier.png',
+        description: 'Cavalier Sword',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            flipWeapon: true,
+            equippable: ['Middle2R', 'Middle2L'],
+            equippedScale: 0.0015,
+            animates: false,
+            scale: 1.5,
+            elevation: 0,
+            effect: "strength/3"
+        } 
+    },
+    crusader: {
+        name: 'crusader',
+        gltf: 'crusader.glb',
+        image: 'crusader.png',
+        description: 'The crusader sword',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            flipWeapon: true,
+            equippable: ['Middle2R', 'Middle2L'],
+            equippedScale: 0.003,
+            animates: false,
+            scale: 3,
+            elevation: 0,
+            effect: "strength/3"
+        } 
+
+    },
+    aluminium: {
+        name: 'aluminium',
+        gltf: 'aluminium.glb',
+        image: 'aluminium.png',
+        description: 'Aluminium',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    chromium: {
+        name: 'chromium',
+        gltf: 'chromium.glb',
+        image: 'chromium.png',
+        description: 'Chromium',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    copper: {
+        name: 'copper',
+        gltf: 'copper.glb',
+        image: 'copper.png',
+        description: 'Copper',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    iron: {
+        name: 'iron',
+        gltf: 'iron.glb',
+        image: 'iron.png',
+        description: 'Iron',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    manganese: {
+        name: 'manganese',
+        gltf: 'manganese.glb',
+        image: 'manganese.png',
+        description: 'Manganese',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    molybdenum: {
+        name: 'molybdenum',
+        gltf: 'molybdenum.glb',
+        image: 'molybdenum.png',
+        description: 'Molybdenum',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    platinum: {
+        name: 'platinum',
+        gltf: 'platinum.glb',
+        image: 'platinum.png',
+        description: 'Platinum',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    rhenium: {
+        name: 'rhenium',
+        gltf: 'rhenium.glb',
+        image: 'rhenium.png',
+        description: 'Rhenium',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    ruthenium: {
+        name: 'ruthenium',
+        gltf: 'ruthenium.glb',
+        image: 'ruthenium.png',
+        description: 'Ruthenium',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    silver: {
+        name: 'silver',
+        gltf: 'silver.glb',
+        image: 'silver.png',
+        description: 'Silver',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    titanium: {
+        name: 'titanium',
+        gltf: 'titanium.glb',
+        image: 'titanium.png',
+        description: 'Titanium',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    wolfram: {
+        name: 'wolfram',
+        gltf: 'wolfram.glb',
+        image: 'wolfram.png',
+        description: 'Wolfram',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 400,
+            elevation: 20
+        }
+    },
+    lever: {
+        name: 'lever',
+        gltf: 'grate.gltf',
+        description: 'Control switch',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            key: '',
+            scale: 100,
+            elevation: 0,
+        }
+    
     }
 }
