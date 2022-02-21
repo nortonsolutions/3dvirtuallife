@@ -51,18 +51,31 @@ export const Structures = {
     grate: {
         name: 'grate',
         gltf: 'grate.gltf',
-        description: 'Locked rusty iron grate',
+        description: 'Rusty iron grate',
         type: 'structure',
         attributes: {
             animates: true,
             key: 'keyToShed',
             scale: 100,
             elevation: 0,
-            unlocked: false,
+            locked: true,
+            position: "down"
         }
     
     },
-
+    lever: {
+        name: 'lever',
+        gltf: 'grate.gltf',
+        description: 'Control switch',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 100,
+            elevation: 0,
+            position: "down"
+        }
+    
+    },
     balloon: {
         name: 'balloon',
         gltf: 'balloon.glb',
@@ -70,10 +83,8 @@ export const Structures = {
         type: 'structure',
         attributes: {
             animates: false,
-            key: '',
             scale: 30,
             elevation: 30,
-            unlocked: true
         }
     },
 
@@ -87,7 +98,6 @@ export const Structures = {
             animates: true,
             scale: 40,
             elevation: 0,
-            unlocked: true,
         }
     },
 
@@ -100,9 +110,7 @@ export const Structures = {
             animates: false,
             scale: 100,
             elevation: 1,
-            unlocked: true
         }
-    
     },
 
     rock1: {
@@ -138,7 +146,8 @@ export const Structures = {
             scale: 60,
             elevation: 0,
             animates: true,
-            unlocked: false,
+            locked: true,
+            position: "down"
         }
     }
 }

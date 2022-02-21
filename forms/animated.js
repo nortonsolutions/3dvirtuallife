@@ -98,7 +98,7 @@ export class AnimatedForm extends StandardForm{
             this.previousActionName = '';
             this.previousAction = null;
     
-            if (this.attributes.unlocked) {
+            if (typeof this.attributes.locked == "boolean" && !this.attributes.locked) {
                 if (this.activeAction) this.activeAction.play();
             } else if (this.actions[ 'Idle' ]) this.activeAction.play();
 
@@ -189,9 +189,15 @@ export class AnimatedForm extends StandardForm{
     runActiveAction(duration) {
 
         if (this.activeAction) {
+
+            if (this.attributes.position == "down") {
+                this.activeAction.setEffectiveTimeScale( -1 );
+            } else {
+                this.activeAction.setEffectiveTimeScale( 1 );
+            }
+
             this.activeAction
                 .reset()
-                .setEffectiveTimeScale( 1 )
                 .setEffectiveWeight( 1 )
                 .fadeIn( duration )
                 .play();

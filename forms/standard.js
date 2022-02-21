@@ -231,7 +231,7 @@ export class StandardForm {
         this.sceneController.eventDepot.fire('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, attributes: payload});
 
         if (this.activeAction) {
-            this.runActiveAction(0.2);
+           this.runActiveAction(0.2);
         }
 
         if (local) this.sceneController.socket.emit('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level });

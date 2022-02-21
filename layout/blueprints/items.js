@@ -1037,17 +1037,5 @@ export const Items = {
             elevation: 20
         }
     },
-    lever: {
-        name: 'lever',
-        gltf: 'grate.gltf',
-        description: 'Control switch',
-        type: 'structure',
-        attributes: {
-            animates: true,
-            key: '',
-            scale: 100,
-            elevation: 0,
-        }
-    
-    }
+
 }

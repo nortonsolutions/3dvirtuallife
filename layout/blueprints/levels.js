@@ -5,7 +5,7 @@
 export const levels = [
 
     {
-        level: 5,   
+        level: 0,   
         width: 26, //26
         length: 26, //26
         description: "Valley of Mist",
@@ -261,11 +261,11 @@ export const levels = [
             },
             { 
                 name: "grate", location: { x: 8.4, y: 0, z: 21.1},
-                attributes: { unlocked: true, elevation: 10, routeTo: { level: 5, location: { x: 19.5, y: 0, z: -6.5 } } } 
+                attributes: { locked: false, elevation: 10, routeTo: { level: 5, location: { x: 19.5, y: 0, z: -6.5 } } } 
             },
             { 
                 name: "grate", location: { x: 3.2, y: 0, z: -21}, 
-                attributes: { unlocked: true, elevation: 60, routeTo: { level: 7, location: { x: 19.5, y: 0, z: -6.5 } } } 
+                attributes: { locked: false, elevation: 60, routeTo: { level: 7, location: { x: 19.5, y: 0, z: -6.5 } } } 
             }
         ],
         entities: [
@@ -338,7 +338,7 @@ export const levels = [
         ]
     },
     {
-        level: 0,
+        level: 5,
         width: 52, //26
         length: 52, //26
         description: "Kingdom",
@@ -373,10 +373,7 @@ export const levels = [
             { name: "titanium" },
             { name: "wolfram" },
             { name: "silver" },
-            { 
-                name: "lever", location: { x: -10.8, y: 0, z: 26.1 },
-                attributes: { controls: "door" }
-            }
+
         ],
         structures: [
             { 
@@ -385,13 +382,16 @@ export const levels = [
             },
             { 
                 name: "grate", location: { x: 19.5, y: 0, z: -6.5 },
-                attributes: { unlocked: true, elevation: 5, routeTo: { level: 3, location: { x: 8.4, y: 0, z: 21.1} } } 
+                attributes: { locked: false, elevation: 5, routeTo: { level: 3, location: { x: 8.4, y: 0, z: 21.1} } } 
             },
             { 
                 name: "balloon", location: { x: -6, y: 0, z: -.35},
                 // attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: -18.5 } } } 
             },
-            
+            { 
+                name: "lever", location: { x: -10.8, y: 0, z: 26.1 },
+                attributes: { controls: "door" }
+            }
         ],
         entities: [
             { name: "blacksmith", location: { x: -5, y: 0, z: -41.1 } },
@@ -499,7 +499,7 @@ export const levels = [
             },
             { 
                 name: "grate", location: { x: 21.5, y: 0, z: -6.5 },
-                attributes: { unlocked: true, elevation: 60, routeTo: { level: 3, location: { x: 5.2, y: 0, z: -21} } } 
+                attributes: { locked: false, elevation: 60, routeTo: { level: 3, location: { x: 5.2, y: 0, z: -21} } } 
             }
         ],
         entities: [

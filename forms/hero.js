@@ -210,7 +210,14 @@ export class Hero extends IntelligentForm {
                         true;
                     
                     if (accessible) {
-                        this.selectedObject.updateAttributes({unlocked: true});
+                        if (typeof this.selectedObject.attributes.locked == "boolean") {
+                            let newLockstate = !this.selectedObject.attributes.locked; 
+                            let newPosition = this.selectedObject.attributes.position == "down" ? "up" : "down";
+                            this.selectedObject.updateAttributes({locked: newLockstate, position: newPosition});
+                        } else if (this.selectedObject.attributes.position) { // if it has a position, alternate
+                            let newPosition = this.selectedObject.attributes.position == "down" ? "up" : "down";
+                            this.selectedObject.updateAttributes({position: newPosition});
+                        }
                     }
 
                 } else if ( objectType == "hero") {
@@ -527,7 +534,7 @@ export class Hero extends IntelligentForm {
 
             if (distance <= 70 && distance < closest) {
                 
-                if (!o.attributes.contentItems || (o.attributes.contentItems && !o.attributes.unlocked)) {
+                if (!o.attributes.contentItems || (o.attributes.contentItems && o.attributes.locked)) {
                     closest = distance;
                     this.selectedObject = o;
                     this.sceneController.eventDepot.fire('showDescription', { objectType: o.objectType, objectName: o.objectName }); 
@@ -578,7 +585,7 @@ export class Hero extends IntelligentForm {
             };
             
             if (this.standingUpon && this.standingUpon.attributes.routeTo && typeof this.standingUpon.attributes.routeTo.level == "number") {
-                if (this.standingUpon.attributes.unlocked) {
+                if (!this.standingUpon.attributes.locked) {
                     this.sceneController.eventDepot.fire('unlockControls', {});
                     this.sceneController.eventDepot.fire('cacheLayout', {});
 
