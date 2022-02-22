@@ -324,6 +324,9 @@ export class SceneController {
 
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
         this.floor.load(() => {
+
+            if (this.floor.attributes.emissiveIntensity) this.floor.model.children[32].material.emissiveIntensity = this.floor.attributes.emissiveIntensity;
+            
             this.formFactory.addSconces(this.floor.model, (100/this.layout.terrain.attributes.scale));
             if (this.layout.terrain.attributes.borderTrees) {
                 this.formFactory.addBorderTrees(this.scene, this.floor.model);
@@ -350,9 +353,9 @@ export class SceneController {
 
             var sunLight;
             if (this.layout.dayTime) {
-                sunLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 2 );
+                sunLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 1.5 );
             } else {
-                sunLight = new THREE.SpotLight( 0x7777ff, 1.4, 0, Math.PI / 2 );
+                sunLight = new THREE.SpotLight( 0x7777ff, 1.4, 0, Math.PI / 1.5 );
             }
 
             sunLight.position.set( 500, 1000, 500);

@@ -40,12 +40,17 @@ export const levels = [
             { name: "gold" },
             { name: "iron" },
             { name: "silver" },
-            { name: "cavalier", location: { x: -1, y: 0, z: -1} }
+            { name: "cavalier", location: { x: -1, y: 0, z: -1} },
+            { name: "direMace", location: { x: -1, y: 0, z: -1} },
+            { name: "iceSword", location: { x: -1, y: 0, z: -1} },
+            { name: "heavyAxe", location: { x: -1, y: 0, z: -1} },
+            
 
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0} },
             { name: "rock1" },
+            { name: "cart" },
             { 
                 name: "grate", location: { x: 3, y: 0, z: 4}, 
                 attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } 
@@ -69,6 +74,10 @@ export const levels = [
             { 
                 name: "portal", location: { x: 6.5, y: 0, z: 19.5}, 
                 attributes: { routeTo: { level: 7, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "portal", location: { x: 0, y: 0, z: -3}, 
+                attributes: { routeTo: { level: 8, location: { x: -5.7, y: 0, z: 40 } } } 
             }
 
         ],
@@ -77,12 +86,17 @@ export const levels = [
             { name: "evilOne" },
             { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
             { name: "ghoul" },
+            { name: "demonLord"},
             // { name: "horse" },
             // { name: "murderBear" },
             // { name: "rosen" },
             // { name: "viking" },
             // { name: "blacksmith" },
             // { name: "elfgirl" }
+            { name: "iceGhoul" },
+            { name: "iceGhoul" },
+            { name: "shockGhoul" },
+            { name: "shockGhoul" },
         ]
     },
     {
@@ -200,7 +214,7 @@ export const levels = [
         ],
         entities: [
             { name: "rat", location: { x: 10, y: 0, z: 0 }},
-            { name: "spiderQueen", location: { x: 10, y: 0, z: 0 }},
+            { name: "demonLord", location: { x: 10, y: 0, z: 0 }},
             { name: "ghoul", location: { x: 10, y: 0, z: 0 } },
             { name: "ghoul", location: { x: 10, y: 0, z: 0 } }
             
@@ -351,7 +365,7 @@ export const levels = [
             gltf: 'kingdom.glb',
             attributes: {
                 animates: true,
-                scale: 200,
+                scale: 1000,
                 borderTrees: true,
                 light: {
                     sunLight: true,
@@ -390,7 +404,7 @@ export const levels = [
             },
             { 
                 name: "lever", location: { x: -10.8, y: 0, z: 26.1 },
-                attributes: { controls: "door" }
+                attributes: { controls: "floor:Open/Close" }
             }
         ],
         entities: [
@@ -509,6 +523,51 @@ export const levels = [
             { name: "crystalMan" },
             { name: "ghoul" },
             { name: "ghoul" }
+        ]
+    },
+    
+    {
+        level: 8,
+        width: 72, //26
+        length: 72, //26
+        description: "Lava Labyrinth",
+        background: 'clouds.png',
+        backgroundNight: 'stars.png',
+        terrain: {
+            name: 'floor',
+            type: 'floor',
+            description: 'Lava Labyrinth',
+            gltf: 'lavalabyrinth.glb',
+            attributes: {
+                emissiveIntensity: 10,
+                scale: 100,
+                borderTrees: false,
+                light: {
+                    sunLight: true,
+                    overheadPointLight: false,
+                },
+                fog: {
+                    color: 'white',
+                    density: 1.2
+                }
+            }
+        },
+        items: [
+            
+        ],
+        structures: [
+            { name: "balloon", location: { x: -7.2, y: 0, z: 40 }  },
+            { 
+                name: "portal", location: { x: -5.5, y: 0, z: 40 }, 
+                attributes: { routeTo: { level: 0, location: { x: -1, y: 0, z: -1} } } 
+            }
+        ],
+        entities: [
+            { name: "lavaGhoul" },
+            { name: "lavaGhoul" },
+            { name: "lavaGhoul" },
+            { name: "lavaGhoul" },
+
         ]
     }
  

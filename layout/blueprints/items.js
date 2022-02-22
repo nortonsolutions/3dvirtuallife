@@ -766,6 +766,22 @@ export const Items = {
             effect: "strength/2"
         } 
     },
+    direMace: {
+        name: 'direMace',
+        gltf: 'direMace.glb',
+        image: 'direMace.png',
+        description: 'A dire mace',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            equippedScale: 0.003,
+            scale: 3,
+            elevation: 0,
+            effect: "strength/2"
+        } 
+    },
     crystalBall: {
         name: 'crystalBall',
         gltf: 'crystalball.glb',
@@ -1037,5 +1053,38 @@ export const Items = {
             elevation: 20
         }
     },
-
+    iceSword: {
+        name: 'iceSword',
+        gltf: 'iceSword.glb',
+        image: 'iceSword.png',
+        description: 'Ice sword of the north',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            flipWeapon: true,
+            equippable: ['Middle2R', 'Middle2L'],
+            equippedScale: 0.003,
+            animates: false,
+            scale: 3,
+            elevation: 0,
+            effect: "strength/3"
+        } 
+    },    
+    heavyAxe: {
+        name: 'heavyAxe',
+        gltf: 'heavyAxe.glb',
+        image: 'heavyAxe.png',
+        description: 'Deadly piercing weapon',
+        type: 'item',
+        subtype: 'sword',
+        attributes: {
+            flipWeapon: true,
+            equippable: ['Middle2R', 'Middle2L'],
+            equippedScale: 0.003,
+            animates: false,
+            scale: 3,
+            elevation: 0,
+            effect: "strength/3"
+        } 
+    }
 }

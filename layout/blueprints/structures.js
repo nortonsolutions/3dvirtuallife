@@ -63,9 +63,22 @@ export const Structures = {
         }
     
     },
+
+    platform: {
+        name: 'platform',
+        gltf: 'platform.gltf',
+        description: 'Simple platform',
+        type: 'structure',
+        attributes: {
+            animates: false,
+            scale: 100,
+            elevation: 0
+        }
+    },
+
     lever: {
         name: 'lever',
-        gltf: 'grate.gltf',
+        gltf: 'lever.glb',
         description: 'Control switch',
         type: 'structure',
         attributes: {
@@ -121,6 +134,18 @@ export const Structures = {
         attributes: {
             animates: false,
             scale: 1,
+            elevation: 0
+        }
+    },
+
+    cart: {
+        name: 'cart',
+        gltf: 'cart.glb',
+        description: 'Old Cart',
+        type: 'structure',
+        attributes: {
+            animates: false,
+            scale: 10,
             elevation: 0
         }
     },

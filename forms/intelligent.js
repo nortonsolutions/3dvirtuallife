@@ -227,15 +227,29 @@ export class IntelligentForm extends AnimatedForm{
         if (downwardIntersections[0]) { 
             var topOfObject = downRayOriginHeight - downwardIntersections[0].distance + 2;
             if (this.model.position.y <= topOfObject) {
-                
+                // console.log(`position: ${this.model.position.y}, topOfObject: ${topOfObject}`);
                 this.model.position.y = topOfObject;
 
                 if (this.objectType == "hero") {
                     let standingUpon = getRootObject3D(downwardIntersections[0].object);
-                    this.standingUpon = {
-                        objectName: standingUpon.objectName,
-                        objectType: standingUpon.objectType,
-                        attributes: standingUpon.attributes
+                    
+                    if (standingUpon.objectName == 'balloon') {
+                        
+                        this.balloonModel = standingUpon;
+                        this.balloonFloat = true;
+                        this.model.add(this.balloonModel);
+                        standingUpon.position.copy(new THREE.Vector3());
+                        standingUpon.position.y = this.attributes.height;
+
+                        this.sceneController.structureModels = this.sceneController.structureModels.filter(el => el != this.balloonModel);
+
+                        this.balloonRide = true;
+                    } else {
+                        this.standingUpon = {
+                            objectName: standingUpon.objectName,
+                            objectType: standingUpon.objectType,
+                            attributes: standingUpon.attributes
+                        }
                     }
                 }
 
@@ -258,6 +272,9 @@ export class IntelligentForm extends AnimatedForm{
                 this.model.position.y = newYposition;
             }
         }
+
+        // console.log(`${this.model.position.y}`);
+        // if (this.standingUpon) console.log(`${this.standingUpon.objectName}`);
     }
 
     /** Intermittently recharge mana and health for the player based on strength and agility */

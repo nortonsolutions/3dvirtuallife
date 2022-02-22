@@ -45,6 +45,9 @@ export class Hero extends IntelligentForm {
         // Proximity Light is used for object selection/identification
         this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 30 );
         
+        this.balloonModel = null;
+        this.balloonFloat = true;
+        this.balloonFloatStart = 0;
         this.cacheHero();
 
     }
@@ -210,14 +213,27 @@ export class Hero extends IntelligentForm {
                         true;
                     
                     if (accessible) {
+                        let newPosition = this.selectedObject.attributes.position == "down" ? "up" : "down";
+
                         if (typeof this.selectedObject.attributes.locked == "boolean") {
                             let newLockstate = !this.selectedObject.attributes.locked; 
-                            let newPosition = this.selectedObject.attributes.position == "down" ? "up" : "down";
                             this.selectedObject.updateAttributes({locked: newLockstate, position: newPosition});
                         } else if (this.selectedObject.attributes.position) { // if it has a position, alternate
-                            let newPosition = this.selectedObject.attributes.position == "down" ? "up" : "down";
                             this.selectedObject.updateAttributes({position: newPosition});
                         }
+
+                        // Check to see if this switch/lever controls something:
+                        // attributes: { controls: "floor:Open/Close" }  -> Open/Close correspond to up/down
+                        if (this.selectedObject.attributes.controls) {
+                            var [controlItem,animations] = this.selectedObject.attributes.controls.split(":");
+                            var animation = animations.split('/')[newPosition == "up" ? 0 : 1];
+                            switch (controlItem) {
+
+                                case 'floor': 
+                                    this.sceneController.floor.fadeToAction(animation, 0.2);
+                                    break;
+                            }
+                        } 
                     }
 
                 } else if ( objectType == "hero") {
@@ -243,6 +259,31 @@ export class Hero extends IntelligentForm {
 
 
     addEventListeners() {
+
+        this.sceneController.eventDepot.addListener('descend', (data) => {
+            
+            if (this.model.position.y <= this.determineElevationFromBase() + this.attributes.height) {
+                this.sceneController.eventDepot.fire('dismount', data);
+            } else {
+                this.model.position.y -= 3;
+            }
+        })
+
+        // data: { vehicle: 'balloon' }
+        this.sceneController.eventDepot.addListener('dismount', (data) => {
+            
+            // Place the riding vehicle back on the ground and back up
+            let vehicle = this.model.getObjectByProperty('objectName',data.vehicle);
+            this.sceneController.scene.add(vehicle);
+            this.sceneController.structureModels.push(vehicle);
+
+            vehicle.position.copy(this.model.position);
+            vehicle.position.y += this.attributes.height;
+
+
+            this.model.translateZ(70);
+            this.balloonRide = false;
+        })
 
         // data: { otherLayoutId: data.layoutId, otherInventory: data.heroInventory, initiator: ...}
         this.sceneController.socket.on('heroDialogNew', data => { // request for heroDialog; open modal
@@ -461,13 +502,6 @@ export class Hero extends IntelligentForm {
         /** During action runtime, this.handAttack==true */
         this.fadeToAction(attack, 0.2);
 
-        // let chanceToHit = this.getEffectiveStat('agility') / 10;
-        // let hitPointReduction = getRandomArbitrary(0,this.getEffectiveStat('strength'));
-
-        // if (Math.random() < chanceToHit) {
-        //     // this.selectedObject.model.translateZ(-10);
-        //     this.inflictDamage(this.selectedObject, hitPointReduction);
-        // }
     }
 
 
@@ -555,7 +589,10 @@ export class Hero extends IntelligentForm {
             // INERTIA
             this.velocity.x -= this.velocity.x * 10.0 * delta;
             this.velocity.z -= this.velocity.z * 10.0 * delta;
-            this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+
+            if (!this.balloonRide) {
+                this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+            }
 
             this.direction.z = Number( this.moveBackward ) - Number( this.moveForward );
             this.direction.x = Number( this.moveRight ) - Number( this.moveLeft );
@@ -565,6 +602,11 @@ export class Hero extends IntelligentForm {
 
             if ( this.moveForward || this.moveBackward ) this.velocity.z += this.direction.z * 1000.0 * agility * delta;
             if ( this.moveLeft || this.moveRight ) this.velocity.x += this.direction.x * 1000.0 * agility * delta;
+
+            if (this.balloonRide) {
+                this.velocity.z *= .4;
+                this.velocity.x *= .4;
+            }
 
             this.movementRaycaster.ray.origin.copy( this.model.position );
             this.rotation.copy(this.model.rotation);
@@ -647,7 +689,6 @@ export class Hero extends IntelligentForm {
 
                 // Add hit sprites at the location of the hand:
                 this.sceneController.formFactory.addSprites(null, hitSpriteConfig, this.sceneController.scene, true, this.positionWeapon);
-                // this.selectedObject.model.translateZ(-10);
             }
         }
 
@@ -777,4 +818,22 @@ export class Hero extends IntelligentForm {
         context.wares = this.inventory;
     }
 
+    setElevation() {
+        if (this.balloonRide) {
+            
+            let baseline = 500;
+            if (this.balloonFloat) {
+                this.model.position.y += 1;
+                if (this.model.position.y >= baseline) {
+                    this.balloonFloat = false;
+                    this.balloonFloatStart = performance.now();
+                }
+            } else {
+                this.model.position.y += (Math.sin((performance.now() - this.balloonFloatStart)/1000));
+                if (this.model.position.y <= baseline - 200) this.balloonFloat = true;
+            }
+        } else {
+            super.setElevation();
+        }
+    }
 }

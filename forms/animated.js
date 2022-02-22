@@ -75,8 +75,7 @@ export class AnimatedForm extends StandardForm{
                     action.loop = THREE.LoopOnce;
                 } else if (this.model.objectType=='structure') {
                     action.clampWhenFinished = true;
-                    action.loop = THREE.LoopPingPong;
-                    action.repetitions = 1;
+                    action.loop = THREE.LoopOnce;
                 } else if (this.model.objectType=='item' && (!this.attributes.animatesRecurring)) {
                     action.clampWhenFinished = true;
                     action.loop = THREE.LoopPingPong;
@@ -98,7 +97,7 @@ export class AnimatedForm extends StandardForm{
             this.previousActionName = '';
             this.previousAction = null;
     
-            if (typeof this.attributes.locked == "boolean" && !this.attributes.locked) {
+            if (typeof this.attributes.position && this.attributes.position == "up") {
                 if (this.activeAction) this.activeAction.play();
             } else if (this.actions[ 'Idle' ]) this.activeAction.play();
 
@@ -111,20 +110,23 @@ export class AnimatedForm extends StandardForm{
 
         if (this.attributes.moves) {
             if (this.alive) {
-                this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
-
-                if (this.absVelocity < .1 && (this.activeActionName == 'Walking' || this.activeActionName == 'Running')) {
+                
+                if (this.objectType == "hero" && this.balloonRide) {
                     this.fadeToAction( 'Idle', 0.2);
-                } else if (this.absVelocity >= .1 && this.activeActionName == 'Idle') {
-                    if (this.objectName == 'horse') {
-                        this.fadeToAction( 'horse_A_', 0.2);
-                    // } else if (this.objectName == 'blacksmith') {
-                    //     this.fadeToAction( 'Smiting', 0.2);
-                    } else {
-                        this.fadeToAction( 'Walking', 0.2);
+                } else {
+                    this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
+
+                    if (this.absVelocity < .1 && (this.activeActionName == 'Walking' || this.activeActionName == 'Running')) {
+                        this.fadeToAction( 'Idle', 0.2);
+                    } else if (this.absVelocity >= .1 && this.activeActionName == 'Idle') {
+                        if (this.objectName == 'horse') {
+                            this.fadeToAction( 'horse_A_', 0.2);
+                        } else {
+                            this.fadeToAction( 'Walking', 0.2);
+                        }
+                    } else if (this.absVelocity >= 250 && this.activeActionName == 'Walking') {
+                        this.fadeToAction( 'Running', 0.2);
                     }
-                } else if (this.absVelocity >= 250 && this.activeActionName == 'Walking') {
-                    this.fadeToAction( 'Running', 0.2);
                 }
             }
         }
@@ -190,17 +192,20 @@ export class AnimatedForm extends StandardForm{
 
         if (this.activeAction) {
 
+            let action = this.activeAction;
+            action.loop = THREE.LoopOnce;
+            action.repetitions = 1;
+            action.setEffectiveTimeScale( 1 );
+                
             if (this.attributes.position == "down") {
-                this.activeAction.setEffectiveTimeScale( -1 );
+                action.fadeOut( duration );
             } else {
-                this.activeAction.setEffectiveTimeScale( 1 );
+                action.reset();
+                action.setEffectiveTimeScale( 1 );
+                action.fadeIn( duration );
             }
 
-            this.activeAction
-                .reset()
-                .setEffectiveWeight( 1 )
-                .fadeIn( duration )
-                .play();
+            action.play();
         }
     }
 

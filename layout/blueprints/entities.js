@@ -312,6 +312,78 @@ export const Entities = {
             grants: ["gold10"]
         }
     },
+    lavaGhoul: {
+        name: 'lavaGhoul',
+        gltf: 'lavaGhoul.glb',
+        description: 'Menacing red lava ghoul',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 30,
+            length: 20,
+            width: 20,
+            elevation: 600,
+            scale: 15,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10"],
+            rangedSpell: 'fireProjectileSpell'
+        }
+    },
+    shockGhoul: {
+        name: 'shockGhoul',
+        gltf: 'shockGhoul.glb',
+        description: 'Menacing blue shock ghoul',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 30,
+            length: 20,
+            width: 20,
+            elevation: 600,
+            scale: 15,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10"],
+            rangedSpell: 'lightningBoltSpell'
+        }
+    },
+    iceGhoul: {
+        name: 'iceGhoul',
+        gltf: 'iceGhoul.glb',
+        description: 'Menacing ice ghoul',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 30,
+            length: 20,
+            width: 20,
+            elevation: 600,
+            scale: 15,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10"],
+            rangedSpell: 'iceProjectileSpell'
+        }
+    },
     horse: {
         name: 'horse',
         gltf: 'horse.glb',
@@ -335,10 +407,10 @@ export const Entities = {
             grants: ["gold10"]
         }
     },
-    spiderQueen: {
-        name: 'spiderQueen',
-        gltf: 'rat.glb',
-        description: 'A deadly spider queen',
+    demonLord: {
+        name: 'demonLord',
+        gltf: 'demonLord.glb',
+        description: 'A deadly demon Lord',
         type: 'beast',
         attributes: {
             moves: true,
@@ -347,15 +419,16 @@ export const Entities = {
             length: 80,
             width: 80,
             elevation: 0,
-            scale: 100,
+            scale: 20,
             stats: {
                 health: "10/10/0",
                 mana: "0/0/0",
-                strength: "4/4/0",
+                strength: "10/10/0",
                 agility: "3/3/0",
                 defense: "2/2/0"
             },
-            grants: ["keyToChest2"]
+            grants: ["keyToChest2"],
+            rangedSpell: 'fireProjectileSpell'
         }
     },
     john: {

@@ -68,6 +68,11 @@ export class StandardForm {
                 this.setFloorToReceiveShadow();
                 
             }
+
+            if (this.objectName == "balloon") {
+                this.setToFrontSided(this.model);
+            }
+
             // this.computeVertexNormals(this.model);
             // this.setToCastShadows();
             callback();
@@ -184,6 +189,18 @@ export class StandardForm {
 
         if (root.children) {
             root.children.forEach(e => this.setToDoubleSided(e)); 
+        }
+    }
+
+    setToFrontSided(root) {
+        
+        if (!root) root = this.model;
+        if (root.material) { 
+                root.material.side = THREE.FrontSide;
+        }
+
+        if (root.children) {
+            root.children.forEach(e => this.setToFrontSided(e)); 
         }
     }
 

@@ -200,19 +200,30 @@ class Scene {
         // NEEDS PITCH as well
         let cameraDirection = this.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
 
-        this.cameraBackray.ray.direction.x = -cameraDirection.x
-        this.cameraBackray.ray.direction.y = -cameraDirection.y + 0.2
-        this.cameraBackray.ray.direction.z = -cameraDirection.z
+        this.cameraBackray.ray.direction.x = -cameraDirection.x;
+        this.cameraBackray.ray.direction.y = -cameraDirection.y + 0.25;
+        this.cameraBackray.ray.direction.z = -cameraDirection.z;
 
-        let backrayIntersections = this.cameraBackray.intersectObjects(this.controller.structureModels, true);
+        var backrayIntersections;
+        backrayIntersections = this.cameraBackray.intersectObjects(this.controller.structureModels, true);
+
+        // if (!backrayIntersections[0] && this.controller.hero.balloonRide) {
+        //     backrayIntersections = this.cameraBackray.intersectObject(this.controller.hero.balloonModel, true);
+        // }
 
         if (backrayIntersections[0] && backrayIntersections[0].object.type != "Sprite") {
+            
+            this.controller.hero.healthSprite.visible = false;
+            this.controller.hero.manaSprite.visible = false;
             let distance = backrayIntersections[0].distance;
             if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
                 this.camera.position.z = distance - 20;
                 if (this.camera.position.y > cameraElevationDefault + this.controller.hero.attributes.height) this.camera.position.y -= cameraElevationDefault / 30;
             }
         } else {
+            this.controller.hero.healthSprite.visible = true;
+            this.controller.hero.manaSprite.visible = true;
+
             if (this.camera.position.z <= cameraDistanceDefault) {
                 this.camera.position.z += cameraDistanceDefault / 100;
                 if (this.camera.position.y < cameraElevationDefault) this.camera.position.y += cameraElevationDefault / 100;
@@ -543,7 +554,12 @@ class Scene {
                 break;
 
             case 32: // space
-                this.controller.eventDepot.fire('jump', {});
+                
+                if (this.controller.hero.balloonRide) {
+                    this.controller.eventDepot.fire('descend', { vehicle: "balloon" });
+                } else {
+                    this.controller.eventDepot.fire('jump', {});
+                }
                 break;
 
             case 73: // i
@@ -609,7 +625,7 @@ class Scene {
     onMouseClick() {
         if (this.controls) {
             let x = this.controls.getObject().position;
-            console.log(`${this.controller.level}: ${x.x}, ${x.z}`);
+            console.log(`${this.controller.level}: ${x.x}, ${x.y}, ${x.z}`);
         }
     }
 
