@@ -92,11 +92,51 @@ export const Spells = {
                 time: 1
             },
             { 
+                name: "greencloud",
+                regex: "",
+                frames: 8,
+                scale: 300,
+                elevation: 20,
+                flip: false,
+                time: 1
+            },
+            { 
                 name: "Heal",
                 regex: "",
                 frames: 15,
                 scale: 50,
                 elevation: 20,
+                flip: false,
+                time: 1
+            }]
+        }
+    },
+    rockProjectileSpell: {
+        name: 'rockProjectileSpell',
+        gltf: 'greenpotion.glb',
+        image: 'rockProjectileSpell.png',
+        description: 'A rock projectile spell',
+        type: 'spell',
+        attributes: {
+            manaCost: 1,
+            effect: "damage/3",
+            range: 80,
+            animates: false,
+            scale: .5,
+            throwable: true,
+            throwableAttributes: {
+                pitch: .5, // angle up (percentage of 90 degrees)
+                weight: .5, // lbs
+                distance: 1200, // px
+                speed: 3 // 1 = full walking speed
+            },
+            continuousSprites: true,
+            sprites: [{ 
+                name: "rock1",
+                regex: "",
+                frames: 8,
+                scale: 200,
+                elevation: 0,
                 flip: false,
                 time: 1
             }]
@@ -132,6 +172,15 @@ export const Spells = {
                 time: 1
             },
             { 
+                name: "fireball",
+                regex: "",
+                frames: 8,
+                scale: 300,
+                elevation: 20,
+                flip: false,
+                time: 1
+            },
+            { 
                 name: "Heal",
                 regex: "",
                 frames: 15,
@@ -142,11 +191,60 @@ export const Spells = {
             }]
         }
     },
+    fireSpell: {
+        name: 'fireSpell',
+        gltf: 'redpotion.glb',
+        image: 'fireSpell.png',
+        description: 'A projectile spell to inflict fire damage',
+        type: 'spell',
+        attributes: {
+            manaCost: 1,
+            effect: "damage/3",
+            range: 80,
+            animates: false,
+            scale: .5,
+            throwable: true,
+            throwableAttributes: {
+                pitch: .5, // angle up (percentage of 90 degrees)
+                weight: .5, // lbs
+                distance: 1200, // px
+                speed: 3 // 1 = full walking speed
+            },
+            continuousSprites: true,
+            sprites: [{ 
+                name: "reddeath",
+                regex: "",
+                frames: 8,
+                scale: 300,
+                elevation: 20,
+                flip: false,
+                time: 1
+            },
+            // { 
+            //     name: "fireball",
+            //     regex: "",
+            //     frames: 8,
+            //     scale: 300,
+            //     elevation: 20,
+            //     flip: false,
+            //     time: 1
+            // },
+            { 
+                name: "hit2",
+                regex: "",
+                frames: 15,
+                scale: 8,
+                elevation: 20,
+                flip: false,
+                time: 1
+            }]
+        }
+    },
     iceProjectileSpell: {
         name: 'iceProjectileSpell',
         gltf: 'bluepotion.glb',
         image: 'iceProjectileSpell.png',
-        description: 'A projectile spell to inflict poisonous damage',
+        description: 'A projectile spell to inflict ice damage',
         type: 'spell',
         attributes: {
             manaCost: 1,

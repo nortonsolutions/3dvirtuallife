@@ -325,7 +325,7 @@ export class SceneController {
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
         this.floor.load(() => {
 
-            if (this.floor.attributes.emissiveIntensity) this.floor.model.children[32].material.emissiveIntensity = this.floor.attributes.emissiveIntensity;
+            if (this.floor.attributes.emissiveIntensity) this.floor.model.children[0].material.emissiveIntensity = this.floor.attributes.emissiveIntensity;
             
             this.formFactory.addSconces(this.floor.model, (100/this.layout.terrain.attributes.scale));
             if (this.layout.terrain.attributes.borderTrees) {

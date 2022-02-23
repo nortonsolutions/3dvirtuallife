@@ -34,7 +34,7 @@ export class AnimatedForm extends StandardForm{
         this.possibleBowAttacks = ["ThumbsUp", "Givining the bird"];
 
         this.emotes = [ 
-            'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp',
+            'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp', 'Walking in', 'Walking out',
             ...this.possibleBlocks,
             ...this.possibleBowAttacks, 
             ...this.possibleHandAttacksR, 
@@ -70,7 +70,10 @@ export class AnimatedForm extends StandardForm{
                 var action = this.mixer.clipAction( animation );
                 if (index == 0) { firstAnimationName = animation.name };
     
-                if ( this.emotes.indexOf( animation.name ) >= 0 || this.states.indexOf( animation.name ) >= 4) {
+                if (this.objectName == "tavernShop") {
+                    action.clampWhenFinished = false;
+                    action.loop = THREE.LoopOnce;
+                } else if ( this.emotes.indexOf( animation.name ) >= 0 || this.states.indexOf( animation.name ) >= 4) {
                     action.clampWhenFinished = true;
                     action.loop = THREE.LoopOnce;
                 } else if (this.model.objectType=='structure') {
@@ -81,8 +84,9 @@ export class AnimatedForm extends StandardForm{
                     action.loop = THREE.LoopPingPong;
                     action.repetitions = 1;
                 } else if (this.model.objectType=='item' && this.attributes.animatesRecurring) {
-                    console.log("test")
                     this.model.children[1].material.opacity = 0.5;
+                } else if (this.model.objectName=='ghostGhoul') {
+                    this.model.children[0].children[1].material.opacity = 0.5;
                 }
     
                 this.actions[ animation.name ] = action;
@@ -135,9 +139,10 @@ export class AnimatedForm extends StandardForm{
     }
 
     fadeToAction( actionName, duration ) {
-        // console.log(`${this.objectName}: fadeToAction ${actionName}`);
+
         if ( this.activeActionName != "Death" && (actionName == "Death" || ! this.currentlyFadingToAction) && this.activeActionName !== actionName ) { // 
             // console.log(`${this.objectName}: fadingToAction ${actionName}`);
+
             this.currentlyFadingToAction = true;
             
             let newAction = this.actions[ actionName ];
@@ -147,7 +152,9 @@ export class AnimatedForm extends StandardForm{
             this.activeActionName = actionName;
             this.activeAction = newAction;
 
-            if (this.previousAction) this.previousAction.fadeOut( duration );
+            if (this.previousActionName && this.actions[this.previousActionName]) {
+                this.previousAction.fadeOut( duration );
+            }
 
             if (this.activeAction) {
 
@@ -160,7 +167,7 @@ export class AnimatedForm extends StandardForm{
                 } else if (this.kickAttacksR.includes(this.activeActionName)) {
                     this.kickAttackL = true;
                 } 
-                
+
                 this.activeAction
                     .reset()
                     // .setEffectiveTimeScale( 1 )
@@ -176,7 +183,11 @@ export class AnimatedForm extends StandardForm{
 
                     this.currentlyFadingToAction = false;
                     this.mixer.removeEventListener('finished', restoreState );
-                    this.fadeToAction( this.previousActionName, 0.1 );
+                    if (this.actions[this.previousActionName]) {
+                        this.fadeToAction( this.previousActionName, 0.1 );
+                    } else {
+                        this.activeActionName = "Idle";
+                    }
                 }
 
                 if (this.emotes.includes(actionName)) {

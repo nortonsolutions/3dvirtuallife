@@ -64,14 +64,49 @@ export const Structures = {
     
     },
 
-    platform: {
-        name: 'platform',
-        gltf: 'platform.gltf',
-        description: 'Simple platform',
+    platformWood: {
+        name: 'platformWood',
+        gltf: 'platformWood.glb',
+        description: 'Platform',
+        type: 'structure',
+        attributes: {
+            scale: 100,
+            elevation: 0
+        }
+    },
+
+    platformBlock: {
+        name: 'platformBlock',
+        gltf: 'platformBlock.glb',
+        description: 'Platform',
+        type: 'structure',
+        attributes: {
+            scale: 100,
+            elevation: 0
+        }
+    },
+
+    tavernShop: {
+        name: 'tavernShop',
+        gltf: 'tavernShop.glb',
+        description: 'Tavern and shop',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 30,
+            elevation: 20
+        }
+    
+    },
+
+    ricketyPlatform: {
+        name: 'ricketyPlatform',
+        gltf: 'ricketyPlatform.glb',
+        description: 'Rickety Platform',
         type: 'structure',
         attributes: {
             animates: false,
-            scale: 100,
+            scale: 30,
             elevation: 0
         }
     },
@@ -95,6 +130,8 @@ export const Structures = {
         description: 'Festive hot-air balloon',
         type: 'structure',
         attributes: {
+            staticStartingElevation: true,
+            rotateY: true,
             animates: false,
             scale: 30,
             elevation: 30,

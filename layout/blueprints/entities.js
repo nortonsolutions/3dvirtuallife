@@ -75,7 +75,8 @@ export const Entities = {
                 agility: "2/2/0",
                 defense: "2/2/0"
             },
-            grants: ["gold25"]
+            grants: ["gold25"],
+            rangedSpell: 'rockProjectileSpell'
         }
     },
     crystalMan: {
@@ -289,6 +290,30 @@ export const Entities = {
         },
         equipped: {"Middle2R":["axe2",false,null]}
     },
+    zombie: {
+        name: 'zombie',
+        gltf: 'zombie.glb',
+        description: 'Zombie',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 30,
+            dialogHeight: 30,
+            length: 20,
+            width: 20,
+            elevation: 0,
+            scale: 15,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10"]
+        },
+    },
     ghoul: {
         name: 'ghoul',
         gltf: 'ghoul.glb',
@@ -309,7 +334,8 @@ export const Entities = {
                 agility: "3/3/0",
                 defense: "1/1/0"
             },
-            grants: ["gold10"]
+            grants: ["gold10"],
+            rangedSpell: 'poisonProjectileSpell'
         }
     },
     lavaGhoul: {
@@ -382,6 +408,54 @@ export const Entities = {
             },
             grants: ["gold10"],
             rangedSpell: 'iceProjectileSpell'
+        }
+    },
+    ghostGhoul: {
+        name: 'ghostGhoul',
+        gltf: 'ghostGhoul.glb',
+        description: 'Menacing ghost ghoul',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 30,
+            length: 20,
+            width: 20,
+            elevation: 600,
+            scale: 15,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10"],
+            rangedSpell: 'lightningBoltSpell'
+        }
+    },
+    gasGhoul: {
+        name: 'gasGhoul',
+        gltf: 'gasGhoul.glb',
+        description: 'Menacing gas ghoul',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 30,
+            length: 20,
+            width: 20,
+            elevation: 600,
+            scale: 15,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10"],
+            rangedSpell: 'poisonProjectileSpell'
         }
     },
     horse: {

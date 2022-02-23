@@ -48,7 +48,7 @@ export const levels = [
 
         ],
         structures: [
-            { name: "shed", location: { x: 0, y: 0, z: 0} },
+            // { name: "shed", location: { x: 0, y: 0, z: 0} },
             { name: "rock1" },
             { name: "cart" },
             { 
@@ -78,25 +78,36 @@ export const levels = [
             { 
                 name: "portal", location: { x: 0, y: 0, z: -3}, 
                 attributes: { routeTo: { level: 8, location: { x: -5.7, y: 0, z: 40 } } } 
+            },
+            { name: "tavernShop", location: { x: -5, y: 0, z: 0} },
+            { 
+                name: "platformBlock", location: { x: -2.2, y: 0, z: .15 },
+                attributes: { controls: "tavernShop:Walking in" }
+            },
+            { 
+                name: "platformWood", location: { x: -3.4, y: 0, z: .1 },
+                attributes: { elevation: 5, controls: "tavernShop:Walking out" }
             }
 
         ],
         entities: [
-            { name: "john" },
-            { name: "evilOne" },
-            { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
-            { name: "ghoul" },
-            { name: "demonLord"},
-            // { name: "horse" },
-            // { name: "murderBear" },
-            // { name: "rosen" },
-            // { name: "viking" },
-            // { name: "blacksmith" },
-            // { name: "elfgirl" }
-            { name: "iceGhoul" },
-            { name: "iceGhoul" },
-            { name: "shockGhoul" },
-            { name: "shockGhoul" },
+            { name: "rockyMan"},
+            // { name: "john" },
+            // { name: "evilOne" },
+            // { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
+            // { name: "ghoul" },
+            // // { name: "demonLord"},
+            // // { name: "horse" },
+            // // { name: "murderBear" },
+            // // { name: "rosen" },
+            // // { name: "viking" },
+            // // { name: "blacksmith" },
+            // // { name: "elfgirl" }
+            // { name: "iceGhoul" },
+            // { name: "shockGhoul" },
+            // { name: "gasGhoul" },
+            // { name: "ghostGhoul" },
+            // { name: "zombie" },
         ]
     },
     {
@@ -556,7 +567,8 @@ export const levels = [
             
         ],
         structures: [
-            { name: "balloon", location: { x: -7.2, y: 0, z: 40 }  },
+            { name: "ricketyPlatform", location: { x: -7.2, y: 0, z: 40 }  },
+            { name: "balloon", location: { x: -7.2, y: 5.85, z: 40 }  },
             { 
                 name: "portal", location: { x: -5.5, y: 0, z: 40 }, 
                 attributes: { routeTo: { level: 0, location: { x: -1, y: 0, z: -1} } } 

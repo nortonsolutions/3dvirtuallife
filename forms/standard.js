@@ -50,15 +50,19 @@ export class StandardForm {
             model.scale.y = this.template.attributes.scale;
             model.scale.z = this.template.attributes.scale;
 
+            if (this.template.attributes.rotateY) model.rotateY(Math.PI);
             this.model = model;
             this.animations = gltf.animations;
            
-
             if (this.template.location) {
                 this.model.position.x = this.template.location.x * multiplier;
                 this.model.position.z = this.template.location.z * multiplier;
-                this.model.position.y = this.determineElevationFromBase() + this.attributes.elevation;
 
+                if (!this.template.attributes.staticStartingElevation) {
+                    this.model.position.y = this.determineElevationFromBase() + this.attributes.elevation;
+                } else {
+                    this.model.position.y = this.template.location.y * multiplier;
+                }
                 this.tweakPosition();
 
                 // console.log(`Placing ${this.objectName} @ ${this.model.position.x},${this.model.position.y},${this.model.position.z}` );
