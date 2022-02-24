@@ -69,8 +69,11 @@ export class ArtificialForm extends IntelligentForm{
                 this.movementRaycaster.ray.origin.copy( this.model.position );
 
                 // Make a random rotation (yaw)
-                this.model.rotateY(getRndInteger(-5,5)/100);
-                this.rotation.copy(this.model.rotation);
+
+                if (this.getEffectiveStat('agility') > 0) {
+                    this.model.rotateY(getRndInteger(-5,5)/100);
+                    this.rotation.copy(this.model.rotation);
+                }
 
             }
 
@@ -214,10 +217,18 @@ export class ArtificialForm extends IntelligentForm{
 
     getCurrentConversation() {
 
+        let challenge = this.attributes.conversation.challenge;
         let special = this.attributes.conversation.conversationState != "complete" && this.attributes.conversation.special;
 
         // If special condition is already met and jumpToState is set, set to complete
-        if (special && this.inventoryContainsAll(special.condition) && this.attributes.conversation.special.jumpToState) {
+
+        if (challenge) {
+            if (this.sceneController.hero.inventoryContains(challenge.condition)) {
+                return this.attributes.conversation[this.attributes.conversation.conversationState];
+            } else {
+                return challenge;
+            }
+        } else if (special && this.inventoryContainsAll(special.condition) && this.attributes.conversation.special.jumpToState) {
             switch (this.attributes.conversation.special.jumpToState) {
                 case "complete": 
                     this.completeConversation();

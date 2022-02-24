@@ -63,7 +63,7 @@ export const Entities = {
         attributes: {
             moves: true,
             animates: true,
-            height: 80,
+            height: 30,
             length: 20,
             width: 20,
             elevation: 0,
@@ -268,16 +268,38 @@ export const Entities = {
         name: 'viking',
         gltf: 'viking.glb',
         description: 'Viking with violent tendencies',
-        type: 'beast',
+        type: 'friendly',
+        inventory: [
+            {itemName:"zyphosSword",quantity:1,price:"gold/3,smallSword/1,aluminium/1"},
+            {itemName:"gladiusSword",quantity:1,price:"gold/700"},
+            {itemName:"cavalier",quantity:1,price:"gold/900"},
+            {itemName:"crusader",quantity:1,price:"gold/500"},
+            {itemName:"iceSword",quantity:1,price:"gold/250"},
+            {itemName:"heavyAxe",quantity:1,price:"gold/300"},
+        ],
         attributes: {
             moves: true,
             animates: true,
             height: 30,
-            dialogHeight: 30,
+            dialogHeight: 100,
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 15,
+            scale: 25,
+            goldValue: 1.1, // Slightly higher value of gold on exchanges
+            conversation: {
+                conversationState: "intro",
+                engagementState: 0,
+                special: {
+                    condition: ["bagOfGems","gold","aluminium","smallSword"],
+                    speech: 'Welcome to my shop, my friend.',
+                    action: 'showWares'
+                },
+                intro: {
+                    speech: "Hello there, stranger.  Come back when you have something to trade.", 
+                    responses: [convo.wellwish]
+                }
+            },
             stats: {
                 health: "4/4/0",
                 mana: "0/0/0",
@@ -669,6 +691,46 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "1/1/0",
                 agility: "1/2/0",
+                defense: "0/0/0"
+            }
+        }
+    },
+    centurion: {
+        name: 'centurion',
+        gltf: 'soldier.glb',
+        description: 'Robust Centurion',
+        type: 'friendly',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 30,
+            dialogHeight: 60,
+            length: 20,
+            width: 20,
+            elevation: 0,
+            scale: 45,
+            rotateY: true,
+            conversation: {
+                conversationState: "intro",
+                engagementState: 0,
+                challenge: {
+                    condition: ["keyToKingdom"],
+                    speech: 'Please provide the passphrase.',
+                    challenge: 'shibboleth',
+                    grants: 'keyToKingdom',
+                    fail: 'That is not the pass.',
+                    success: 'The pass is right.  Here is your key to operate the lever.'
+                },
+                intro: {
+                    speech: "Hello there, fine sir.  Have a glorious day.", 
+                    responses: [convo.wellwish]
+                }
+            },
+            stats: {
+                health: "2/2/0",
+                mana: "0/0/0",
+                strength: "1/1/0",
+                agility: "0/0/0", // stands in place
                 defense: "0/0/0"
             }
         }

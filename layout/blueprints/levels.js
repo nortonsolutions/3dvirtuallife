@@ -48,7 +48,7 @@ export const levels = [
 
         ],
         structures: [
-            // { name: "shed", location: { x: 0, y: 0, z: 0} },
+            { name: "shed", location: { x: 0, y: 0, z: 0} },
             { name: "rock1" },
             { name: "cart" },
             { 
@@ -64,7 +64,7 @@ export const levels = [
                 attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
             },
             { 
-                name: "portal", location: { x: -6.5, y: 0, z: -19.5}, 
+                name: "portal", location: { x: -2, y: 0, z: -0}, //  { x: -6.5, y: 0, z: -19.5}, 
                 attributes: { routeTo: { level: 5, location: { x: -14.5, y: 0, z: 35.2 } } } 
             },
             { 
@@ -79,28 +79,17 @@ export const levels = [
                 name: "portal", location: { x: 0, y: 0, z: -3}, 
                 attributes: { routeTo: { level: 8, location: { x: -5.7, y: 0, z: 40 } } } 
             },
-            { name: "tavernShop", location: { x: -5, y: 0, z: 0} },
-            { 
-                name: "platformBlock", location: { x: -2.2, y: 0, z: .15 },
-                attributes: { controls: "tavernShop:Walking in" }
-            },
-            { 
-                name: "platformWood", location: { x: -3.4, y: 0, z: .1 },
-                attributes: { elevation: 5, controls: "tavernShop:Walking out" }
-            }
-
         ],
         entities: [
             { name: "rockyMan"},
-            // { name: "john" },
-            // { name: "evilOne" },
-            // { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
-            // { name: "ghoul" },
+            { name: "john" },
+            { name: "evilOne" },
+            { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
+            { name: "ghoul" },
             // // { name: "demonLord"},
             // // { name: "horse" },
-            // // { name: "murderBear" },
+            { name: "murderBear" },
             // // { name: "rosen" },
-            // // { name: "viking" },
             // // { name: "blacksmith" },
             // // { name: "elfgirl" }
             // { name: "iceGhoul" },
@@ -297,7 +286,7 @@ export const levels = [
             { name: "crystalMan" },
             { name: "crystalMan" },
             { name: "crystalMan" },
-            { name: "viking" },
+            
         ]
     },
     {
@@ -376,7 +365,7 @@ export const levels = [
             gltf: 'kingdom.glb',
             attributes: {
                 animates: true,
-                scale: 1000,
+                scale: 200,
                 borderTrees: true,
                 light: {
                     sunLight: true,
@@ -385,8 +374,8 @@ export const levels = [
                 fog: {
                     color: 'white',
                     density: 1
-                }
-
+                },
+                position: "down"
             }
         },
         items: [
@@ -414,21 +403,30 @@ export const levels = [
                 // attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: -18.5 } } } 
             },
             { 
-                name: "lever", location: { x: -10.8, y: 0, z: 26.1 },
-                attributes: { controls: "floor:Open/Close" }
+                name: "kingdomGate", location: { x: -15.2, y: 0, z: 27.4 },
+                attributes: { locked: true, elevation: 5 }
+            },
+            { 
+                name: "lever", location: { x: -11.2, y: 0, z: 26.1 },
+                attributes: { locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL+OpenR+OpenBars" }
+            },
+            { 
+                name: "lever", location: { x: -11.2, y: 0, z: 28.4 },
+                attributes: { rotateY: true, locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL+OpenR+OpenBars" }
             }
         ],
         entities: [
             { name: "blacksmith", location: { x: -5, y: 0, z: -41.1 } },
-            { name: "rockyMan" },
-            { name: "rockyMan" },
-            { name: "ghoul" },
-            { name: "ghoul" },
-            { name: "ghoul" },
-            { name: "ghoul" },
-            { name: "ghoul" },
-            { name: "ghoul" },
-            { name: "elfgirl" }
+            { name: "centurion", location: { x: -10.8, y: 0, z: 28.4 } },
+            // { name: "rockyMan" },
+            // { name: "rockyMan" },
+            // { name: "ghoul" },
+            // { name: "ghoul" },
+            // { name: "ghoul" },
+            // { name: "ghoul" },
+            // { name: "ghoul" },
+            // { name: "ghoul" },
+            // { name: "elfgirl" }
         ]
     },
     {
@@ -485,8 +483,8 @@ export const levels = [
     },
     {
         level: 7,
-        width: 72, //26
-        length: 72, //26
+        width: 26, //26
+        length: 26, //26
         description: "Snowyland",
         background: 'clouds.png',
         backgroundNight: 'stars.png',
@@ -525,15 +523,23 @@ export const levels = [
             { 
                 name: "grate", location: { x: 21.5, y: 0, z: -6.5 },
                 attributes: { locked: false, elevation: 60, routeTo: { level: 3, location: { x: 5.2, y: 0, z: -21} } } 
+            },
+            { name: "tavernShop", location: { x: -5, y: 0, z: 0} },
+            { 
+                name: "platformBlock", location: { x: -.85, y: 0, z: .25 },
+                attributes: { controls: "tavernShop:Walking in" }
+            },
+            { 
+                name: "platformWood", location: { x: -2.1, y: 0, z: .25 },
+                attributes: { elevation: 5, controls: "tavernShop:Walking out" }
             }
         ],
         entities: [
-            { name: "crystalMan" },
-            { name: "crystalMan" },
-            { name: "crystalMan" },
-            { name: "crystalMan" },
-            { name: "ghoul" },
-            { name: "ghoul" }
+            { name: "viking", location: { x: -10.4, y: 0, z: 3.85 } },
+            // { name: "crystalMan" },
+            // { name: "crystalMan" },
+            // { name: "ghoul" },
+            // { name: "ghoul" }
         ]
     },
     

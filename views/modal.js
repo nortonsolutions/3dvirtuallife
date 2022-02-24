@@ -28,7 +28,8 @@ class Modal {
         eventDepot.addListener('modal', (data) => {
 
             eventDepot.fire('unlockControls', {});
-
+            eventDepot.fire('disableKeyDownListener', {});
+            
             var context;
             if (data.type == "inventory") {
 
@@ -124,6 +125,7 @@ class Modal {
         var modal = document.getElementById('myModal');
         modal.style.display = "none";
         this.eventDepot.fire('lockControls', {});
+        this.eventDepot.fire('enableKeyDownListener', {});
     }
 
     loadTemplate = (elementId, template, data, callback) => {

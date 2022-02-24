@@ -53,6 +53,8 @@ export class SceneController {
         this.clock = new THREE.Clock();
         this.refractor = null;
 
+        this.noEnemySpawnZones = [];
+
         // Bindings:
         this.addEventListeners = this.addEventListeners.bind(this);
         this.deanimateScene = this.deanimateScene.bind(this);
@@ -331,11 +333,31 @@ export class SceneController {
             if (this.layout.terrain.attributes.borderTrees) {
                 this.formFactory.addBorderTrees(this.scene, this.floor.model);
             }
+
+            this.demarcateBlankZones(this.floor.model);
+
             this.addToScene(this.floor);
             setTimeout(() => {
                 callback();
             }, 500);
         });
+    }
+
+    /**
+     * Iterate through the objects which match 'blank' regex, add their
+     * bounding boxes to noEnemySpawnZones where enemies cannot appear.
+     */
+    demarcateBlankZones(model) {
+        if (/blank/i.test(model.name)) {
+            if (model.geometry) model.geometry.computeBoundingBox();
+            this.noEnemySpawnZones.push(model.geometry.boundingBox);
+        } else {
+            if (model.children) {
+                model.children.forEach(m => {
+                    this.demarcateBlankZones(m);
+                })
+            }
+        }
     }
 
     addLights() {

@@ -64,6 +64,22 @@ export const Structures = {
     
     },
 
+    kingdomGate: {
+        name: 'kingdomGate',
+        gltf: 'kingdomGate.glb',
+        description: 'Large Gate',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 200,
+            elevation: 0,
+            key: 'passphrase', // switch to passphrase
+            locked: true, // lock and require password
+            position: "down"
+        }
+    
+    },
+
     platformWood: {
         name: 'platformWood',
         gltf: 'platformWood.glb',
@@ -93,7 +109,7 @@ export const Structures = {
         type: 'structure',
         attributes: {
             animates: true,
-            scale: 30,
+            scale: 50,
             elevation: 20
         }
     

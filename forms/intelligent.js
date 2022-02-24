@@ -42,9 +42,12 @@ export class IntelligentForm extends AnimatedForm{
             // this.setToDoubleSided(this.model);
 
             this.principalGeometry = this.identifyPrincipalGeometry(this.model);
-            this.principalGeometry.computeBoundingSphere();
-            this.principalBoundingSphere = this.principalGeometry.boundingSphere;
-            this.radius = this.principalBoundingSphere.radius * this.attributes.scale;
+            if (this.principalGeometry) {
+                this.principalGeometry.computeBoundingSphere();
+                this.principalBoundingSphere = this.principalGeometry.boundingSphere;
+                this.radius = this.principalBoundingSphere.radius * this.attributes.scale;
+                // this.principalGeometry = this.findFirstGeometry(this.model);
+            }
             
             // console.log(`${this.objectName}: ${this.principalGeometry}`);
             this.computeVertexNormals(this.model);
@@ -132,6 +135,16 @@ export class IntelligentForm extends AnimatedForm{
         this.manaSprite.scale.x = this.spriteScaleX("mana");
 
     }
+
+    // findFirstGeometry(el) {
+    //     if (el.geometry) {
+    //         return el.geometry;
+    //     } else {
+    //         for (let i = 0; i < el.children.length; i++) {
+    //             return this.findFirstGeometry(el.children[i]);
+    //         }
+    //     }
+    // }
 
     listGeometries(el) {
 
@@ -519,6 +532,11 @@ export class IntelligentForm extends AnimatedForm{
         for (const item of items) {
             if (!(this.inventory.map(el => el? el.itemName: null).includes(item))) return false;
         }
+        return true;
+    }
+
+    inventoryDoesNotContain(item) {
+        if ((this.inventory.map(el => el? el.itemName: null).includes(item))) return false;
         return true;
     }
 

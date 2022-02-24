@@ -34,7 +34,7 @@ export class AnimatedForm extends StandardForm{
         this.possibleBowAttacks = ["ThumbsUp", "Givining the bird"];
 
         this.emotes = [ 
-            'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp', 'Walking in', 'Walking out',
+            'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp', 'Walking in', 'Walking out', 'Open', 'Close',
             ...this.possibleBlocks,
             ...this.possibleBowAttacks, 
             ...this.possibleHandAttacksR, 
@@ -76,7 +76,7 @@ export class AnimatedForm extends StandardForm{
                 } else if ( this.emotes.indexOf( animation.name ) >= 0 || this.states.indexOf( animation.name ) >= 4) {
                     action.clampWhenFinished = true;
                     action.loop = THREE.LoopOnce;
-                } else if (this.model.objectType=='structure') {
+                } else if (this.model.objectType=='structure' || this.objectName == "floor") {
                     action.clampWhenFinished = true;
                     action.loop = THREE.LoopOnce;
                 } else if (this.model.objectType=='item' && (!this.attributes.animatesRecurring)) {
@@ -102,7 +102,11 @@ export class AnimatedForm extends StandardForm{
             this.previousAction = null;
     
             if (typeof this.attributes.position && this.attributes.position == "up") {
-                if (this.activeAction) this.activeAction.play();
+                // if (this.activeAction) this.activeAction.play();
+                    if (this.activeAction) this.animations.forEach(animation => {
+                        this.runAction(animation.name, 0.2);
+                    })
+                
             } else if (this.actions[ 'Idle' ]) this.activeAction.play();
 
             callback();
@@ -220,4 +224,21 @@ export class AnimatedForm extends StandardForm{
         }
     }
 
+    runAction(actionName, duration) {
+
+        let action = this.actions[actionName];
+        action.loop = THREE.LoopOnce;
+        action.repetitions = 1;
+        action.setEffectiveTimeScale( 1 );
+            
+        if (this.attributes.position == "down") {
+            action.fadeOut( duration );
+        } else {
+            action.reset();
+            action.setEffectiveTimeScale( 1 );
+            action.fadeIn( duration );
+        }
+
+        action.play();
+    }
 }

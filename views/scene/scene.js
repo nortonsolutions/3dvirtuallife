@@ -255,13 +255,13 @@ class Scene {
 
                 this.controller.formFactory.addSprites(projectile.item.model, spriteConfig, this, true, projectile.item.model.position);
 
-                if (hostile) {
-                    this.controller.formFactory.addSprites(this.controller.hero.model, spriteConfig, this, true, projectile.item.model.position);
-                } else {
-                    entitiesInRange.forEach(entity => {
-                        this.controller.formFactory.addSprites(entity.model, spriteConfig, this, true, projectile.item.model.position);
-                    })
-                }
+                // if (hostile) {
+                //     this.controller.formFactory.addSprites(this.controller.hero.model, spriteConfig, this, true, projectile.item.model.position);
+                // } else {
+                //     entitiesInRange.forEach(entity => {
+                //         this.controller.formFactory.addSprites(entity.model, spriteConfig, this, true, projectile.item.model.position);
+                //     })
+                // }
             });
 
         }

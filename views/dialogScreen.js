@@ -73,6 +73,10 @@ export class DialogScreen {
             this.currentModel.scale.y = this.entity.template.attributes.scale;
             this.currentModel.scale.z = this.entity.template.attributes.scale;
 
+            if (this.entity.template.attributes.rotateY) {
+                this.currentModel.rotateY(Math.PI);
+            }
+
             this.scene.add( this.currentModel );
             this.camera.position.z = 40;
             this.camera.position.y = this.entity.template.attributes.dialogHeight;
@@ -177,6 +181,33 @@ export class DialogScreen {
     }
 
     addDialogEvents() {
+
+        /**
+         *  challenge: {
+                condition: ["keyToKingdom"],
+                speech: 'Please provide the passphrase.',
+                challenge: 'shibboleth',
+                grants: 'keyToKingdom',
+                fail: 'That is not the pass.  Return when you have the password.',
+                success: 'The pass is right.  Here is your key to operate the lever.'
+            },
+         */
+        Array.from(document.querySelectorAll('#challengePasswordSubmit')).forEach(el => {
+            el.addEventListener('click', e => { 
+                
+                let challengeResponse = '';
+                let passEntered = document.getElementById('challengePassword').value;
+
+                if (passEntered == this.getContext().challenge) {
+                    challengeResponse = this.getContext().success;
+                    this.hero.addToInventory(this.getContext().grants, 0, 1);
+                } else {
+                    challengeResponse = this.getContext().fail;
+                }
+
+                this.refresh(challengeResponse);
+            });
+        });
 
         Array.from(document.querySelectorAll('.response')).forEach(el => {
             el.addEventListener('click', e => {
@@ -530,6 +561,8 @@ export class DialogScreen {
                 };
 
             }
+        } else if (context.challenge) {
+
         }
 
         context.payment = this.payment;

@@ -112,6 +112,18 @@ export const Items = {
             elevation: 10
         }
     },
+    keyToKingdom: {
+        name: 'keyToKingdom',
+        gltf: 'key.gltf',
+        image: 'keyGolden.png',
+        description: 'Key to the Kingdom',
+        type: 'item',
+        attributes: {
+            animates: false,
+            scale: 20,
+            elevation: 10
+        }
+    },
     bagOfGems: {
         name: 'bagOfGems',
         gltf: 'bagOfGems.glb',
