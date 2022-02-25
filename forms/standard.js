@@ -9,7 +9,7 @@
  */
 
 var upRaycasterTestLength = 700; 
-var downRaycasterTestLength = 70;
+var downRaycasterTestLength = 80;
 
 
 export class StandardForm {
@@ -254,14 +254,14 @@ export class StandardForm {
 
         if (payload.animations && this.activeAction) {
             payload.animations.forEach(animation => {
-                this.runAction(animation, 3, 3, 1);
+                this.runAction(animation, 3, 4, 1);
             })
         } else if (this.activeAction) { // for objects with a singular default action
-            this.runAction(this.activeAction._clip.name, 3, 3, 1);
+            this.runAction(this.activeAction._clip.name, 3, 4, 1);
         }
 
         if (local) this.sceneController.socket.emit('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level });
     }
 
-    
+
 }

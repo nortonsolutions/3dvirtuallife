@@ -823,6 +823,9 @@ export const Entities = {
                     responses: [convo.wellwish]
                 }
             },
+            cutScenes: {
+                acceptDeal: "smithing.mkv"    
+            },
             stats: {
                 health: "2/2/0",
                 mana: "0/0/0",

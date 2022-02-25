@@ -275,6 +275,10 @@ export class DialogScreen {
                 } else {
                     
                     response = this.acceptDeal();
+
+                    setTimeout(() => {
+                        this.eventDepot.fire('modal', { type: 'cutScene', title: 'Good deal!', context: { videoName: this.entity.attributes.cutScenes.acceptDeal } });
+                    },2000);
                 }
 
                 this.refresh(response);
@@ -480,6 +484,7 @@ export class DialogScreen {
     }
 
     acceptDeal() { // item exchange
+
         Object.keys(this.tab.items).forEach(item => {
             this.hero.addToInventory(item, 0, this.tab.items[item]);
         });
@@ -505,6 +510,7 @@ export class DialogScreen {
         // TODO: Adjust the wants of the entity
         this.reset();
         this.fadeToAction('Yes', 0.2);
+
         return "We have a deal!";
     }
 

@@ -465,7 +465,7 @@ export class Hero extends IntelligentForm {
 
         this.sceneController.eventDepot.addListener('jump', () => {
             if ( this.canJump === true ) {
-                this.velocity.y += 350;
+                this.velocity.y += 1050;
                 this.fadeToAction('Jump', 0.2)
             }
             this.canJump = false;
@@ -614,7 +614,7 @@ export class Hero extends IntelligentForm {
             this.velocity.z -= this.velocity.z * 10.0 * delta;
 
             if (!this.balloonRide) {
-                this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+                this.velocity.y -= 39.8 * 100.0 * delta; // 100.0 = mass
             }
 
             this.direction.z = Number( this.moveBackward ) - Number( this.moveForward );
@@ -627,8 +627,8 @@ export class Hero extends IntelligentForm {
             if ( this.moveLeft || this.moveRight ) this.velocity.x += this.direction.x * 1000.0 * agility * delta;
 
             if (this.balloonRide) {
-                this.velocity.z *= .4;
-                this.velocity.x *= .4;
+                this.velocity.z *= .7;
+                this.velocity.x *= .7;
             }
 
             this.movementRaycaster.ray.origin.copy( this.model.position );

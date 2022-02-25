@@ -5,6 +5,10 @@ body {
     min-width: 655px;
 }
 
+video {
+    width: 100%;
+}
+
 img {
     max-width: 100% !important;
 }

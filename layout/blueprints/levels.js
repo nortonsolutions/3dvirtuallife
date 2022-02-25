@@ -62,7 +62,7 @@ export const levels = [
             },
             { 
                 name: "portalStone", location: { x: 9.15, y: 0, z: 5.3}, 
-                attributes: { routeTo: { level: 7, location: { x: -18.0, y: 0, z: -6.5 } } } 
+                attributes: { routeTo: { level: 7, location: { x: 3.5, y: 0, z: 21.1 } } } 
             },
             { 
                 name: "portalStone", location: { x: 7.4, y: 0, z: 7.5 },
@@ -122,43 +122,38 @@ export const levels = [
             { name: "rock1" },
             { name: "cart" },
             { 
-                name: "grate", location: { x: 3, y: 0, z: 4}, 
-                attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } 
+                name: "grate", location: { x: 3, y: 0, z: 4},
+                attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } //dungeon
             },
             { 
-                name: "portal", location: { x: 19.5, y: 0, z: -6.5}, 
-                attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } 
+                name: "platformBlock", location: { x: 19.5, y: 0, z: -6.5}, 
+                attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } //swamp
             },
             { 
-                name: "portal", location: { x: -19.5, y: 0, z: -6.5}, 
-                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
+                name: "platformBlock", location: { x: -17.0, y: 0, z: -6.0 },
+                attributes: { routeTo: { level: 4, location: { x: -23.5, y: 0, z: -6.5} } } //lavafield
             },
             { 
-                name: "portal", location: { x: -2, y: 0, z: -0}, //  { x: -6.5, y: 0, z: -19.5}, 
-                attributes: { routeTo: { level: 5, location: { x: -14.5, y: 0, z: 35.2 } } } 
+                name: "elevatorS_1m", location: { x: -4.9, y: 0, z: 5.1 },
             },
             { 
-                name: "portal", location: { x: -6.5, y: 0, z: 19.5}, 
-                attributes: { routeTo: { level: 6, location: { x: -15.5, y: 0, z: -18.5 } } }
+                name: "lever", location: { x: -4, y: 0, z: 3.1 },
+                attributes: { controls: "elevatorS_1m:Move" }
             },
             { 
-                name: "portal", location: { x: 6.5, y: 0, z: 19.5}, 
-                attributes: { routeTo: { level: 7, location: { x: -18.0, y: 0, z: -6.5 } } } 
-            },
-            { 
-                name: "portal", location: { x: 0, y: 0, z: -3}, 
-                attributes: { routeTo: { level: 8, location: { x: -5.7, y: 0, z: 40 } } } 
+                name: "lever", location: { x: -4.2, y: 2.6, z: 3.3 },
+                attributes: { controls: "elevatorS_1m:Move", staticStartingElevation: true, position: "up" }
             },
         ],
         entities: [
-            { name: "rockyMan"},
+            // { name: "rockyMan"},
             { name: "john" },
-            { name: "evilOne" },
+            // { name: "evilOne" },
             { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
-            { name: "ghoul" },
+            // { name: "ghoul" },
             // // { name: "demonLord"},
             // // { name: "horse" },
-            { name: "murderBear" },
+            // { name: "murderBear" },
             // // { name: "rosen" },
             // // { name: "blacksmith" },
             // // { name: "elfgirl" }
@@ -167,8 +162,9 @@ export const levels = [
             // { name: "gasGhoul" },
             // { name: "ghostGhoul" },
             // { name: "zombie" },
-            { name: "daveDragon" },
-            { name: "jelly", location: { x: -1, y: 0, z: -1}}
+            { name: "daveDragon"},
+
+            // { name: "jelly", location: { x: -1, y: 0, z: -1}}
         ]
     },
     {
@@ -216,12 +212,13 @@ export const levels = [
             },
             { 
                 name: "archway", location: { x: 16, y: 0, z: 4 },
-                attributes: { routeTo: { level: 0, location: { x: 3, y: 0, z: 4} } } 
+                attributes: { routeTo: { level: 0, location: { x: 3, y: 0, z: 4} } } //valley
             },
             { 
                 name: "archway", location: { x: 16, y: 0, z: -4 },
-                attributes: { routeTo: { level: 2, location: { x: 0, y: 0, z: 0} } } 
-            }
+                attributes: { routeTo: { level: 2, location: { x: 0, y: 0, z: 0} } } //catacomb
+            },
+            
         ],
         entities: [
             { name: "john" },
@@ -276,7 +273,7 @@ export const levels = [
         structures: [
             { 
                 name: "archway", location: { x: 1, y: 0, z: 0},
-                attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: -4 } } }
+                attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: -4 } } } //dungeon
             },
             { 
                 name: "ancientChest", location: { x: 10, y: 0, z: -1 },
@@ -342,16 +339,16 @@ export const levels = [
             { name: "bridge", location: { x: 5.3, y: 0, z: -18} },
             { name: "bridge", location: { x: 10.8, y: 0, z: 17.5} },
             { 
-                name: "portal", location: { x: -21.5, y: 0, z: -6.5},
-                attributes: { routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } 
+                name: "platformBlock", location: { x: -21.5, y: 0, z: -6.5},
+                attributes: { elevation: 5, routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } //valley
             },
             { 
-                name: "grate", location: { x: 8.4, y: 0, z: 21.1},
-                attributes: { locked: false, elevation: 10, routeTo: { level: 5, location: { x: 19.5, y: 0, z: -6.5 } } } 
+                name: "platformBlock", location: { x: 8.4, y: 0, z: 21.1},
+                attributes: { locked: false, elevation: 10, routeTo: { level: 5, location: { x: -14.5, y: 0, z: 35.5 } } } //kingdom
             },
             { 
-                name: "grate", location: { x: 3.2, y: 0, z: -21}, 
-                attributes: { locked: false, elevation: 60, routeTo: { level: 7, location: { x: 19.5, y: 0, z: -6.5 } } } 
+                name: "platformBlock", location: { x: 3.2, y: 0, z: -21}, 
+                attributes: { locked: false, elevation: 60, routeTo: { level: 7, location: { x: 16.9, y: 0, z: -25.5 } } } //snowyland
             }
         ],
         entities: [
@@ -407,8 +404,16 @@ export const levels = [
         ],
         structures: [
             { 
-                name: "portal", location: { x: -21.5, y: 0, z: -6.5},
-                attributes: { routeTo: { level: 0, location: { x: -17.0, y: 0, z: -6.0 } } } 
+                name: "platformBlock", location: { x: -21.5, y: 0, z: -6.5},
+                attributes: { routeTo: { level: 0, location: { x: -17.0, y: 0, z: -6.0 } } } //valley
+            },
+            { 
+                name: "platformBlock", location: { x: -17.0, y: 0, z: -6.5 },
+                attributes: { routeTo: { level: 8, location: { x: -17.5, y: 0, z: -6.5} } } //lavaLabyrinth
+            },
+            { 
+                name: "platformBlock", location: { x: -7.5, y: 0, z: 18.5 },
+                attributes: { routeTo: { level: 6, location: { x: -11.5, y: 0, z: -18.5} } } // ruins
             }
         ],
         entities: [
@@ -419,7 +424,8 @@ export const levels = [
             { name: "ghoul" },
             { name: "ghoul" },
             { name: "ghoul" },
-            { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}}
+            { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}},
+            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}}
             
         ]
     },
@@ -462,6 +468,19 @@ export const levels = [
 
         ],
         structures: [
+
+            { 
+                name: "platformBlock", location: { x: -13.5, y: 0, z: 35.5 },
+                attributes: { locked: false, elevation: 10, routeTo: { level: 3, location: { x: 6.4, y: 0, z: 21.1} } } //swamp
+            },
+            { 
+                name: "platformBlock", location: { x: -92.4, y: 0, z: 100.8 },
+                attributes: { locked: false, elevation: 5, routeTo: { level: 7, location: { x: 6.4, y: 0, z: 21.1} } } //snowyLand
+            },
+            { 
+                name: "balloon", location: { x: -5.3, y: 0, z: -67.5 }, 
+                attributes: { staticStartingElevation: false, routeTo: { level: 8, location: { x: -3.5, y: 0, z: 40 } } } //lavaLabyrinth
+            },
             { 
                 name: "tavernShop", location: { x: 1.1, y: 0, z: -34.5 },
                 attributes: { rotateY: true }
@@ -474,18 +493,7 @@ export const levels = [
                 name: "platformWood", location: { x: -.7, y: 0, z: -34.6 },
                 attributes: { elevation: 0, controls: "tavernShop:Walking out" }
             },
-            { 
-                name: "portal", location: { x: -12.5, y: 0, z: 35.2 },
-                attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: -18.5 } } } 
-            },
-            { 
-                name: "grate", location: { x: 19.5, y: 0, z: -6.5 },
-                attributes: { locked: false, elevation: 5, routeTo: { level: 3, location: { x: 8.4, y: 0, z: 21.1} } } 
-            },
-            { 
-                name: "balloon", location: { x: -6, y: 0, z: -.35},
-                attributes: { elevation: 80, routeTo: { level: 8, location: { x: -6.5, y: 0, z: 40 } } } 
-            },
+
             { 
                 name: "kingdomGate", location: { x: -15.2, y: 0, z: 27.4 },
                 attributes: { locked: true, elevation: 5 }
@@ -575,8 +583,8 @@ export const levels = [
         ],
         structures: [
             { 
-                name: "portal", location: { x: -13.5, y: 0, z: -18.5},
-                attributes: { routeTo: { level: 0, location: { x: -8.5, y: 0, z: 18.5 } } } 
+                name: "platformBlock", location: { x: -13.5, y: 0, z: -18.5},
+                attributes: { routeTo: { level: 4, location: { x: -8.5, y: 0, z: 18.5 } } } // lavaField
             }
         ],
         entities: [
@@ -624,25 +632,28 @@ export const levels = [
         ],
         structures: [
             { 
-                name: "portal", location: { x: -21.5, y: 0, z: -6.5},
-                attributes: { routeTo: { level: 0, location: { x: 6.5, y: 0, z: 19.5 } } } 
+                name: "platformBlock", location: { x: 18.4, y: 0, z: -23.1 }, 
+                attributes: { locked: false, routeTo: { level: 3, location:{ x: 3.2, y: 0, z: -19} } } //swamp
             },
             { 
-                name: "grate", location: { x: 21.5, y: 0, z: -6.5 },
-                attributes: { locked: false, elevation: 60, routeTo: { level: 3, location: { x: 5.2, y: 0, z: -21} } } 
+                name: "platformBlock", location: { x: 4.4, y: 0, z: 21.1},
+                attributes: { locked: false, elevation: 5, routeTo: { level: 5, location: { x: -90.4, y: 0, z: 100.8 } } } //kingdom
             },
-            { name: "tavernShop", location: { x: -5, y: 0, z: 0} },
+            { name: "tavernShop", location: { x: -3.5, y: 0, z: 0} },
             { 
-                name: "platformBlock", location: { x: -.85, y: 0, z: .25 },
-                attributes: { controls: "tavernShop:Walking in" }
+                name: "platformBlock", location: { x: -.5, y: 0, z: .15 },
+                attributes: { elevation: -5,controls: "tavernShop:Walking in" }
             },
             { 
-                name: "platformWood", location: { x: -2.1, y: 0, z: .25 },
+                name: "platformWood", location: { x: -1.5, y: 0, z: .15 },
                 attributes: { elevation: 5, controls: "tavernShop:Walking out" }
             }
         ],
         entities: [
-            { name: "viking", location: { x: -10.4, y: 0, z: 3.85 } },
+            { name: "daveDragon" },
+            { name: "viking", location: { x: -7.5, y: 0, z: 2.7 } },
+            { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}},
+            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}}
             // { name: "crystalMan" },
             // { name: "crystalMan" },
             // { name: "ghoul" },
@@ -683,9 +694,14 @@ export const levels = [
             { name: "ricketyPlatform", location: { x: -7.2, y: 0, z: 40 }  },
             { name: "balloon", location: { x: -7.2, y: 5.85, z: 40 }  },
             { 
-                name: "portal", location: { x: -5.5, y: 0, z: 40 }, 
-                attributes: { routeTo: { level: 0, location: { x: -1, y: 0, z: -1} } } 
+                name: "platformBlock", location: { x: -8.8, y: 0, z: 38.4 }, 
+                attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } }} //kingdom
+            },
+            { 
+                name: "platformBlock", location: { x: -19.5, y: 0, z: -6.5}, 
+                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } //lavaField
             }
+
         ],
         entities: [
             { name: "lavaGhoul" },

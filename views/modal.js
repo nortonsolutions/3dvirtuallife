@@ -6,6 +6,7 @@ import { DialogScreen } from './dialogScreen.js';
 import { CharacterScreen } from './characterScreen.js';
 import { JoinGameScreen } from './joinGameScreen.js';
 import { HeroDialogScreen } from './heroDialogScreen.js';
+import { CutSceneScreen } from './cutSceneScreen.js';
 
 class Modal {
 
@@ -20,6 +21,7 @@ class Modal {
         this.characterScreen = new CharacterScreen(eventDepot, this);
         this.joinGameScreen = new JoinGameScreen(eventDepot, this);
         this.heroDialogScreen = new HeroDialogScreen(eventDepot, this, socket);
+        this.cutSceneScreen = new CutSceneScreen(eventDepot, this);
 
         this.closeModal = this.closeModal.bind(this);
         this.heroDialog = false;
@@ -80,6 +82,9 @@ class Modal {
                         break;
                     case "joinGame":
                         this.joinGameScreen.addJoinGameEvents(context);
+                        break;
+                    case "cutScene":
+                        this.cutSceneScreen.playVideo();
                         break;
                 }
 

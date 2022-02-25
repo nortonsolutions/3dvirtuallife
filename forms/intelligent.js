@@ -231,7 +231,7 @@ export class IntelligentForm extends AnimatedForm{
 
     setElevation() {
         
-        let downRayOriginHeight = this.model.position.y + 40;
+        let downRayOriginHeight = this.model.position.y + 50;
 
         this.downRaycaster.ray.origin.copy(this.model.position);
         this.downRaycaster.ray.origin.y = downRayOriginHeight;
@@ -246,10 +246,11 @@ export class IntelligentForm extends AnimatedForm{
                 if (this.objectType == "hero") {
                     let standingUpon = getRootObject3D(downwardIntersections[0].object);
                     
-                    if (standingUpon.objectName == 'balloon') {
+                    if (standingUpon.objectName == 'balloon' && !(standingUpon.attributes.routeTo)) {
                         
                         this.balloonModel = standingUpon;
                         this.balloonFloat = true;
+                        this.balloonModel.rotateY(Math.PI);
                         this.model.add(this.balloonModel);
                         standingUpon.position.copy(new THREE.Vector3());
                         standingUpon.position.y = this.attributes.height;

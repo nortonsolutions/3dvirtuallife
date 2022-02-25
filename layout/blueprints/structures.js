@@ -102,6 +102,32 @@ export const Structures = {
         }
     },
 
+    elevatorL_1m: {
+        name: 'elevatorL_1m',
+        gltf: 'elevatorL_1m.glb',
+        description: 'Elevator',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 200,
+            elevation: 0,
+            position: "down"
+        }
+    },
+
+    elevatorS_1m: {
+        name: 'elevatorS_1m',
+        gltf: 'elevatorS_1m.glb',
+        description: 'Elevator',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 200,
+            elevation: 0,
+            position: "down"
+        }
+    },
+
     elevatorL_4m: {
         name: 'elevatorL_4m',
         gltf: 'elevatorL_4m.glb',
@@ -192,7 +218,7 @@ export const Structures = {
         }
     
     },
-    
+
     leverTristate: {
         name: 'leverTristate',
         gltf: 'leverTristate.glb',

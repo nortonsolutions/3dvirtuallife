@@ -377,7 +377,7 @@ export class SceneController {
             if (this.layout.dayTime) {
                 sunLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 1.5 );
             } else {
-                sunLight = new THREE.SpotLight( 0x7777ff, 1.4, 0, Math.PI / 1.5 );
+                sunLight = new THREE.SpotLight( 0x7777ff, 1.6, 0, Math.PI / 1.5 );
             }
 
             sunLight.position.set( 500, 1000, 500);
