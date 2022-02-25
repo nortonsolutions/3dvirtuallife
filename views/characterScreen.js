@@ -166,6 +166,8 @@ export class CharacterScreen {
                 alert('Please enter a unique name for your character.');
             } else {
                 localStorage.clear();
+
+                if (e.shiftKey) props.level = 100;
                 localStorage.setItem('gameProps', JSON.stringify(props));
 
                 this.heroTemplate = this.heroTemplates[this.selectedTemplate];

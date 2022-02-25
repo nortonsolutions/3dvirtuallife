@@ -246,17 +246,22 @@ export class StandardForm {
     }
 
 
+    // sample payload: {locked: newLockstateControlled, position: newPositionControlled, animations}
     updateAttributes(payload, local = true) {
         this.attributes = {...this.attributes, ...payload};
         this.model.attributes = {...this.attributes, ...payload};
         this.sceneController.eventDepot.fire('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, attributes: payload});
 
-        if (this.activeAction) this.animations.forEach(animation => {
-            this.runAction(animation.name, 0.2);
-        })
+        if (payload.animations && this.activeAction) {
+            payload.animations.forEach(animation => {
+                this.runAction(animation, 3, 3, 1);
+            })
+        } else if (this.activeAction) { // for objects with a singular default action
+            this.runAction(this.activeAction._clip.name, 3, 3, 1);
+        }
 
         if (local) this.sceneController.socket.emit('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level });
     }
 
-
+    
 }

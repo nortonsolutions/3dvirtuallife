@@ -334,7 +334,7 @@ export class SceneController {
                 this.formFactory.addBorderTrees(this.scene, this.floor.model);
             }
 
-            this.demarcateBlankZones(this.floor.model);
+            // this.demarcateBlankZones(this.floor.model);
 
             this.addToScene(this.floor);
             setTimeout(() => {
@@ -440,7 +440,7 @@ export class SceneController {
                 if (!this.layout.items[index].attributes) this.layout.items[index].attributes = {};
                 this.layout.items[index].attributes.layoutId = template.attributes.layoutId = nextLayoutId++;
             }
-                this.seedForm(template).then(form => {});
+            this.seedForm(template).then(form => {});
 
         });
 

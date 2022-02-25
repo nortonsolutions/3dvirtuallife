@@ -230,17 +230,14 @@ export class Hero extends IntelligentForm {
                             
                             let controlled = this.sceneController.forms.find(el => el.objectName == controlItem);
                             let newPositionControlled = controlled.attributes.position == "down" ? "up" : "down";
-                            
+                            animations = animations.split('+');
+
                             if (typeof controlled.attributes.locked == "boolean") {
                                 let newLockstateControlled = !controlled.attributes.locked; 
-                                controlled.updateAttributes({locked: newLockstateControlled, position: newPositionControlled});
+                                controlled.updateAttributes({locked: newLockstateControlled, position: newPositionControlled, animations});
                             } else if (controlled.attributes.position) { // if it has a position, alternate
-                                controlled.updateAttributes({position: newPositionControlled});
+                                controlled.updateAttributes({position: newPositionControlled, animations});
                             }
-    
-                            // animations.split('+').forEach(animation => {
-                            //     controlled.runAction(animation, 0.2);
-                            // })
                         } 
                     }
 
@@ -408,9 +405,26 @@ export class Hero extends IntelligentForm {
         });
 
 
+        /**
+         * This event is only received when shift has been pressed with the mousewheel movement;
+         * If the selectedObject controls some other object, the delta will be passed along.
+         */
+        this.sceneController.eventDepot.addListener('wheel', (e) => {
+            // if (this.selectedObject && this.selectedObject.attributes.controlsElevation) {
+
+            //     var controlItem = this.selectedObject.attributes.controls;
+            //     let controlled = this.sceneController.forms.find(el => el.objectName == controlItem);
+                
+            //     if (controlled.model.position.y >= (controlled.determineElevationFromBase()+controlled.attributes.elevation - 10) 
+            //         && controlled.model.position.y <= controlled.attributes.elevationMax + 10) {
+            //         this.selectedObject.updateAttributes({elevationChange: e.deltaY});
+            //         controlled.updateAttributes({elevationChange: e.deltaY});
+            //     }
+            // }
+        })
+
         this.sceneController.eventDepot.addListener('mouse0click', (shift) => { this.handleMouseClick('L', shift)} );
         this.sceneController.eventDepot.addListener('mouse2click', (shift) => { this.handleMouseClick('R', shift)} );
-
         this.sceneController.eventDepot.addListener('mouse1click', () => {
 
             if (this.alive) {
@@ -540,6 +554,7 @@ export class Hero extends IntelligentForm {
         this.sceneController.eventDepot.removeListeners('mouse0click');
         this.sceneController.eventDepot.removeListeners('mouse1click');
         this.sceneController.eventDepot.removeListeners('mouse2click');
+        this.sceneController.eventDepot.removeListeners('wheel');
         this.sceneController.eventDepot.removeListeners('unlockControls');
         this.sceneController.eventDepot.removeListeners('jump');
         this.sceneController.eventDepot.removeListeners('levelUp');

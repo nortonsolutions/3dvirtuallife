@@ -194,6 +194,29 @@ export const Entities = {
             grants: ["gold10"]
         }
     },
+    jelly: {
+        name: 'jelly',
+        gltf: 'jelly.glb',
+        description: 'Jelly',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 10,
+            length: 40,
+            width: 20,
+            elevation: 0,
+            scale: 30,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "0/0/0",
+                agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10"]
+        }
+    },
     dragon: {
         name: 'dragon',
         gltf: 'dragon.glb',
@@ -207,6 +230,30 @@ export const Entities = {
             width: 20,
             elevation: 0,
             scale: 60,
+            stats: {
+                health: "4/4/0",
+                mana: "60/60/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10"],
+            rangedSpell: 'fireProjectileSpell'
+        }
+    },
+    daveDragon: {
+        name: 'daveDragon',
+        gltf: 'daveDragon.glb',
+        description: 'Lobato Dragon',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 10,
+            length: 40,
+            width: 20,
+            elevation: 0,
+            scale: 50,
             stats: {
                 health: "4/4/0",
                 mana: "60/60/0",
@@ -281,11 +328,11 @@ export const Entities = {
             moves: true,
             animates: true,
             height: 30,
-            dialogHeight: 100,
+            dialogHeight: 60,
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 25,
+            scale: 17,
             goldValue: 1.1, // Slightly higher value of gold on exchanges
             conversation: {
                 conversationState: "intro",
@@ -310,7 +357,7 @@ export const Entities = {
             handScaleFactor: 60,
             grants: ["gold10","axe2"]
         },
-        equipped: {"Middle2R":["axe2",false,null]}
+        // equipped: {"Middle2R":["axe2",false,null]}
     },
     zombie: {
         name: 'zombie',
@@ -761,7 +808,7 @@ export const Entities = {
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 30,
+            scale: 35,
             goldValue: 1.1, // Slightly higher value of gold on exchanges
             conversation: {
                 conversationState: "intro",

@@ -224,7 +224,7 @@ export class AnimatedForm extends StandardForm{
         }
     }
 
-    runAction(actionName, duration) {
+    runAction(actionName, duration, fadeOutDuration = 0.2, fadeOutDelay = 0) {
 
         let action = this.actions[actionName];
         action.loop = THREE.LoopOnce;
@@ -232,7 +232,9 @@ export class AnimatedForm extends StandardForm{
         action.setEffectiveTimeScale( 1 );
             
         if (this.attributes.position == "down") {
-            action.fadeOut( duration );
+            setTimeout(() => {
+                action.fadeOut( fadeOutDuration );
+            }, fadeOutDelay*1000)
         } else {
             action.reset();
             action.setEffectiveTimeScale( 1 );

@@ -525,14 +525,22 @@ export class DialogScreen {
 
 
                 if (inv[index] && inv[index].price) { // if the item is valid and has a price
-                    let priceString = null;
+                    let priceString = '';
 
 
-                    let [paymentItem,paymentQuantity] = inv[index].price.split('/');
+                    inv[index].price.split(',').forEach((price,index) => {
+                        let [paymentItem,paymentQuantity] = price.split('/');
     
-                    if (paymentItem == "gold") {
-                        priceString = "$" + paymentQuantity;
-                    } else priceString = 'item';
+                        if (index > 0) priceString += ',';
+                        if (paymentItem == "gold") {
+                            priceString += "$" + paymentQuantity;
+                        } else priceString += 'item';
+                    })
+
+                    if (priceString.indexOf(',') >= 0) {
+                        priceString = priceString.substr(0,priceString.indexOf(',')) + "+";
+                    }
+
     
                     context.inventory[index] = {
                         index: index,

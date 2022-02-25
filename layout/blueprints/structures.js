@@ -102,15 +102,67 @@ export const Structures = {
         }
     },
 
+    elevatorL_4m: {
+        name: 'elevatorL_4m',
+        gltf: 'elevatorL_4m.glb',
+        description: 'Elevator',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 200,
+            elevation: -5,
+            position: "down"
+        }
+    },
+
+    elevatorS_4m: {
+        name: 'elevatorS_4m',
+        gltf: 'elevatorS_4m.glb',
+        description: 'Elevator',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 200,
+            elevation: -5,
+            position: "down"
+        }
+    },
+
+    elevatorL_6m: {
+        name: 'elevatorL_6m',
+        gltf: 'elevatorL_6m.glb',
+        description: 'Elevator',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 200,
+            elevation: -5,
+            position: "down"
+        }
+    },
+
+    elevatorS_6m: {
+        name: 'elevatorS_6m',
+        gltf: 'elevatorS_6m.glb',
+        description: 'Elevator',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 200,
+            elevation: -5,
+            position: "down"
+        }
+    },
+
     tavernShop: {
         name: 'tavernShop',
-        gltf: 'tavernShop.glb',
+        gltf: 'tavernShop2.glb',
         description: 'Tavern and shop',
         type: 'structure',
         attributes: {
             animates: true,
-            scale: 50,
-            elevation: 20
+            scale: 35,
+            elevation: 0 
         }
     
     },
@@ -140,6 +192,21 @@ export const Structures = {
         }
     
     },
+    
+    leverTristate: {
+        name: 'leverTristate',
+        gltf: 'leverTristate.glb',
+        description: 'Tristate Control switch',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 100,
+            elevation: 0,
+            position: "middle"
+        }
+    
+    },
+
     balloon: {
         name: 'balloon',
         gltf: 'balloon.glb',
@@ -157,6 +224,19 @@ export const Structures = {
     portal: {
         name: 'portal',
         gltf: 'portal.glb',
+        description: 'Portal',
+        type: 'structure',
+        attributes: {
+            visible: false,
+            animates: true,
+            scale: 40,
+            elevation: 0,
+        }
+    },
+    
+    portalStone: {
+        name: 'portalStone',
+        gltf: 'platformBlock.glb',
         description: 'Portal',
         type: 'structure',
         attributes: {

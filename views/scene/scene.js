@@ -1,6 +1,6 @@
 
 
-var cameraReach = 1400;
+var cameraReach = 1300;
 var cameraDistanceDefault = 200;
 var cameraElevationDefault = 40;
 
@@ -45,6 +45,7 @@ class Scene {
         this.onMouseClick = this.onMouseClick.bind(this);
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
+        this.onMouseWheel = this.onMouseWheel.bind(this);
         this.controlsLocked = this.controlsLocked.bind(this);
         this.controlsUnlocked = this.controlsUnlocked.bind(this);
         this.instructionsLock = this.instructionsLock.bind(this);
@@ -126,6 +127,7 @@ class Scene {
 
             this.backgroundMesh = new THREE.Mesh(geometry, material);
             this.backgroundMesh.rotateZ(Math.PI);
+            this.scene.background = BLACK;
             this.controls.getObject().add( this.backgroundMesh );
 
         } else if (this.background && this.background.length > 0 && this.controller.layout.dayTime) {
@@ -138,6 +140,7 @@ class Scene {
                 map: new THREE.TextureLoader().load("/textures/" + this.background)
             });
 
+            this.scene.background = WHITE;
             this.backgroundMesh = new THREE.Mesh(geometry, material);
             this.controls.getObject().add( this.backgroundMesh );
 
@@ -150,13 +153,13 @@ class Scene {
                 this.controller.layout.terrain.attributes.fog.color, 
                 700/(this.controller.layout.terrain.attributes.fog.density? 
                     this.controller.layout.terrain.attributes.fog.density : 1), 
-                cameraReach );
+                cameraReach-100 );
         } else if (this.controller.layout.dayTime == false) {
             this.scene.fog = new THREE.Fog( 
                 'black', 
                 700/(this.controller.layout.terrain.attributes.fog.density? 
                     this.controller.layout.terrain.attributes.fog.density : 1), 
-                cameraReach );
+                cameraReach-100 );
         }
     }
 
@@ -226,8 +229,9 @@ class Scene {
 
             if (this.camera.position.z <= cameraDistanceDefault) {
                 this.camera.position.z += cameraDistanceDefault / 100;
-                if (this.camera.position.y < cameraElevationDefault) this.camera.position.y += cameraElevationDefault / 100;
+                this.scene.fog.far = cameraReach-100;
             }
+            if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height) this.camera.position.y += cameraElevationDefault / 100;
         }
     }
     
@@ -509,6 +513,7 @@ class Scene {
         this.blocker.style.display = 'none';
         document.addEventListener( 'mousedown', this.onMouseDown, false );
         document.addEventListener( 'mouseup', this.onMouseUp, false );
+        document.addEventListener( 'wheel', this.onMouseWheel, false );
         document.addEventListener( 'click', this.onMouseClick, false );
     }
 
@@ -517,6 +522,7 @@ class Scene {
         this.instructions.style.display = '';
         document.removeEventListener( 'mousedown', this.onMouseDown, false );
         document.removeEventListener( 'mouseup', this.onMouseUp, false );
+        document.removeEventListener( 'wheel', this.onMouseWheel, false );
         document.removeEventListener( 'click', this.onMouseClick, false );
     }
 
@@ -626,6 +632,19 @@ class Scene {
         if (this.controls) {
             let x = this.controls.getObject().position;
             console.log(`${this.controller.level}: ${x.x}, ${x.y}, ${x.z}`);
+        }
+    }
+
+    /**
+     * 
+     */
+    onMouseWheel(e) {
+
+        if (e.shiftKey) {
+            this.controller.eventDepot.fire('wheel', e);
+        } else {
+            this.camera.position.z += e.deltaY;
+            this.camera.position.y += e.deltaY/5;
         }
     }
 

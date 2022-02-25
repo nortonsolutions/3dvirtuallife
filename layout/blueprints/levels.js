@@ -5,6 +5,76 @@
 export const levels = [
 
     {
+        level: 100,   
+        width: 10, //26
+        length: 10, //26
+        description: "Rosenetta Stone",
+        background: '', // 'clouds.png',
+        backgroundNight: '',
+        terrain: {
+            name: 'floor',
+            type: 'floor',
+            description: 'concourse',
+            gltf: 'concourse.glb',
+            attributes: {
+                scale: 100,
+                borderTrees: false,
+                light: {
+                    sunLight: false,
+                    overheadPointLight: false,
+                },
+                fog: {
+                    color: 'white',
+                    density: 0
+                }
+            }
+        },
+        items: [
+        ],
+        structures: [
+            { 
+                name: "portalStone", location: { x: 2.66, y: 0, z: -10 }, 
+                attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } 
+            },
+            { 
+                name: "portalStone", location: { x: 5.2, y: 0, z: -8.9}, 
+                attributes: { routeTo: { level: 0, location: { x: -0, y: 0, z: 0 } } } 
+            },
+            { 
+                name: "portalStone", location: { x: 7.4, y: 0, z: -7.3}, 
+                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "portalStone", location: { x: 9.1, y: 0, z: -5.3}, 
+                attributes: { routeTo: { level: 8, location: { x: -5.7, y: 0, z: 40 } } } 
+            },
+            { 
+                name: "portalStone", location: { x: 10.3, y: 0, z: -2.7}, 
+                attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "portalStone", location: { x: 10.5, y: 0, z: .05}, 
+                attributes: { routeTo: { level: 6, location: { x: -15.5, y: 0, z: -18.5 } } }
+            },
+            { 
+                name: "portalStone", location: { x: 10.2, y: 0, z: 2.7},
+                attributes: { routeTo: { level: 5, location: { x: -14.5, y: 0, z: 35.2 } } } 
+            },
+            { 
+                name: "portalStone", location: { x: 9.15, y: 0, z: 5.3}, 
+                attributes: { routeTo: { level: 7, location: { x: -18.0, y: 0, z: -6.5 } } } 
+            },
+            { 
+                name: "portalStone", location: { x: 7.4, y: 0, z: 7.5 },
+                attributes: { routeTo: { level: 2, location: { x: 0, y: 0, z: 0} } } 
+            }
+
+
+        ],
+        entities: [
+        ]
+    },
+    {
         level: 0,   
         width: 26, //26
         length: 26, //26
@@ -97,6 +167,8 @@ export const levels = [
             // { name: "gasGhoul" },
             // { name: "ghostGhoul" },
             // { name: "zombie" },
+            { name: "daveDragon" },
+            { name: "jelly", location: { x: -1, y: 0, z: -1}}
         ]
     },
     {
@@ -391,6 +463,18 @@ export const levels = [
         ],
         structures: [
             { 
+                name: "tavernShop", location: { x: 1.1, y: 0, z: -34.5 },
+                attributes: { rotateY: true }
+            },
+            { 
+                name: "platformBlock", location: { x: -2.1, y: 0, z: -34.6 },
+                attributes: { elevation: -5, controls: "tavernShop:Walking in" }
+            },
+            { 
+                name: "platformWood", location: { x: -.7, y: 0, z: -34.6 },
+                attributes: { elevation: 0, controls: "tavernShop:Walking out" }
+            },
+            { 
                 name: "portal", location: { x: -12.5, y: 0, z: 35.2 },
                 attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: -18.5 } } } 
             },
@@ -400,7 +484,7 @@ export const levels = [
             },
             { 
                 name: "balloon", location: { x: -6, y: 0, z: -.35},
-                // attributes: { routeTo: { level: 0, location: { x: -6.5, y: 0, z: -18.5 } } } 
+                attributes: { elevation: 80, routeTo: { level: 8, location: { x: -6.5, y: 0, z: 40 } } } 
             },
             { 
                 name: "kingdomGate", location: { x: -15.2, y: 0, z: 27.4 },
@@ -412,12 +496,35 @@ export const levels = [
             },
             { 
                 name: "lever", location: { x: -11.2, y: 0, z: 28.4 },
-                attributes: { rotateY: true, locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL+OpenR+OpenBars" }
+                attributes: { rotateY: true, locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL+OpenR+OpenBars", position: "up" }
+            },
+            { 
+                name: "elevatorL_6m", location: { x: -3.8, y: 0, z: 25.8 },
+            },
+            { 
+                name: "lever", location: { x: -7, y: 0, z: 24.4 },
+                attributes: { controls: "elevatorL_6m:Move" }
+            },
+            { 
+                name: "lever", location: { x: -6.2, y: 12.4, z: 24.8 },
+                attributes: { controls: "elevatorL_6m:Move", staticStartingElevation: true, position: "up" }
+            },
+            { 
+                name: "elevatorS_6m", location: { x: -26.1, y: 0, z: 25.8 },
+            },
+            { 
+                name: "lever", location: { x: -24.2, y: 0, z: 25 },
+                attributes: { controls: "elevatorS_6m:Move" }
+            },
+            { 
+                name: "lever", location: { x: -27.2, y: 12.3, z: 24.3 },
+                attributes: { controls: "elevatorS_6m:Move", staticStartingElevation: true, position: "up" }
             }
         ],
         entities: [
-            { name: "blacksmith", location: { x: -5, y: 0, z: -41.1 } },
+            { name: "blacksmith", location: { x: 5, y: 0, z: -37.1 } },
             { name: "centurion", location: { x: -10.8, y: 0, z: 28.4 } },
+            { name: "viking", location: { x: -8.8, y: 0, z: 11.15 } },
             // { name: "rockyMan" },
             // { name: "rockyMan" },
             // { name: "ghoul" },
