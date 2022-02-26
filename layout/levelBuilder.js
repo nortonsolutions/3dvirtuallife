@@ -37,7 +37,7 @@ class LevelBuilder {
     mapItemToLocation = (item) => {
         let newItem = {
             name: item.name,
-            location: item.location? item.location : this.randomUniqueLocation()
+            location: item.location? item.location : this.randomUniqueLocation(item.type && item.type=="beast")
         }
 
         if (item.attributes) newItem.attributes = item.attributes;
@@ -57,7 +57,7 @@ class LevelBuilder {
         return location;
     }
 
-    randomUniqueLocation() {
+    randomUniqueLocation(beast = false) {
         
         let location = {
             x: getRndInteger(-this.level.width/2,this.level.width/2),
@@ -65,14 +65,35 @@ class LevelBuilder {
             z: getRndInteger(-this.level.length/2,this.level.length/2)
         }
 
-        if (!this.usedLocations.includes(location)) {
+        if (!this.usedLocations.includes(location) && (!beast || this.outsideSafeZones(location))) {
             this.usedLocations.push(location);
             return location;
         } else {
-            return randomUniqueLocation(); 
+            return this.randomUniqueLocation(beast); 
         }
  
 
+    }
+
+    /**
+     *  noSpawnZones: [
+     *      // [location,radius] (both in location units, i.e. /multiplier)
+     *      [{ x: 0, y: 0, z: 0},5]
+     *  ]
+     */ 
+    outsideSafeZones(location) {
+
+        let zones = this.level.terrain.attributes.noEnemySpawnZones;
+
+        for (let zone of zones) {
+            let origin = new THREE.Vector3().copy(zone[0]);
+            let testPoint = new THREE.Vector3().copy(location);
+            if (origin.distanceTo(testPoint) < zone[1]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 

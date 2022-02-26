@@ -96,7 +96,11 @@ export const levels = [
                 fog: {
                     color: 'white',
                     density: 1
-                }
+                },
+                noEnemySpawnZones: [
+                    // [location,radius] (both in location units, i.e. /multiplier)
+                    [{ x: 0, y: 0, z: 0},6]
+                ]
             }
         },
         items: [
@@ -134,7 +138,7 @@ export const levels = [
                 attributes: { routeTo: { level: 4, location: { x: -23.5, y: 0, z: -6.5} } } //lavafield
             },
             { 
-                name: "elevatorS_1m", location: { x: -4.9, y: 0, z: 5.1 },
+                name: "elevatorL_1m", location: { x: -4.9, y: 0, z: 5.1 }, attributes: { scale: 100 }
             },
             { 
                 name: "lever", location: { x: -4, y: 0, z: 3.1 },
@@ -146,25 +150,24 @@ export const levels = [
             },
         ],
         entities: [
-            // { name: "rockyMan"},
             { name: "john" },
-            // { name: "evilOne" },
             { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
-            // { name: "ghoul" },
-            // // { name: "demonLord"},
-            // // { name: "horse" },
-            // { name: "murderBear" },
-            // // { name: "rosen" },
-            // // { name: "blacksmith" },
-            // // { name: "elfgirl" }
-            // { name: "iceGhoul" },
-            // { name: "shockGhoul" },
-            // { name: "gasGhoul" },
-            // { name: "ghostGhoul" },
-            // { name: "zombie" },
-            { name: "daveDragon"},
-
-            // { name: "jelly", location: { x: -1, y: 0, z: -1}}
+            { name: "evilOne", type: "beast" },
+            { name: "ghoul", type: "beast"  },
+            // { name: "rockyMan", type: "beast" },
+            // { name: "demonLord", type: "beast" },
+            // { name: "horse" },
+            // { name: "murderBear", type: "beast"  },
+            // { name: "rosen", type: "beast"  },
+            // { name: "blacksmith" },
+            // { name: "elfgirl" }
+            // { name: "iceGhoul", type: "beast"  },
+            // { name: "shockGhoul", type: "beast"  },
+            // { name: "gasGhoul", type: "beast"  },
+            // { name: "ghostGhoul", type: "beast"  },
+            // { name: "zombie", type: "beast" },
+            // { name: "daveDragon", type: "beast"},
+            // { name: "jelly", location: { x: -1, y: 0, z: -1}, type: "beast"}
         ]
     },
     {
@@ -187,7 +190,11 @@ export const levels = [
                 fog: {
                     color: 'black',
                     density: 1
-                }
+                },
+                noEnemySpawnZones: [
+                    // [location,radius] (both in location units, i.e. /multiplier)
+                    // [{ x: 0, y: 0, z: 0},6]
+                ]
             }
         },
         items: [
@@ -222,18 +229,18 @@ export const levels = [
         ],
         entities: [
             { name: "john" },
-            { name: "evilOne" },
-            { name: "evilOne" },
-            { name: "evilOne" },
-            { name: "rat" },
-            { name: "rat" },
-            { name: "bat" },
-            { name: "bat" },
-            { name: "bat" },
-            { name: "bat" },
-            { name: "bat" },
-            { name: "bat" },
-            { name: "ghoul" }
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "rat", type: "beast" },
+            { name: "rat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "ghoul", type: "beast" }
 
         ]
     },
@@ -257,7 +264,11 @@ export const levels = [
                 fog: {
                     color: 'black',
                     density: 1
-                }
+                },
+                noEnemySpawnZones: [
+                    // [location,radius] (both in location units, i.e. /multiplier)
+                    // [{ x: 0, y: 0, z: 0},6]
+                ]
             }
         },
         items: [
@@ -282,10 +293,10 @@ export const levels = [
 
         ],
         entities: [
-            { name: "rat", location: { x: 10, y: 0, z: 0 }},
-            { name: "demonLord", location: { x: 10, y: 0, z: 0 }},
-            { name: "ghoul", location: { x: 10, y: 0, z: 0 } },
-            { name: "ghoul", location: { x: 10, y: 0, z: 0 } }
+            { name: "rat", location: { x: 10, y: 0, z: 0 }, type: "beast"},
+            { name: "demonLord", location: { x: 10, y: 0, z: 0 }, type: "beast"},
+            { name: "ghoul", location: { x: 10, y: 0, z: 0 }, type: "beast" },
+            { name: "ghoul", location: { x: 10, y: 0, z: 0 }, type: "beast" }
             
         ]
     },
@@ -319,7 +330,11 @@ export const levels = [
                         scale: 100
                     },
                     gltf: 'water.glb'
-                }
+                },
+                noEnemySpawnZones: [
+                    // [location,radius] (both in location units, i.e. /multiplier)
+                    // [{ x: 0, y: 0, z: 0},6]
+                ]
             }
         },
         items: [
@@ -352,9 +367,9 @@ export const levels = [
             }
         ],
         entities: [
-            { name: "crystalMan" },
-            { name: "crystalMan" },
-            { name: "crystalMan" },
+            { name: "crystalMan", type: "beast" },
+            { name: "crystalMan", type: "beast" },
+            { name: "crystalMan", type: "beast" },
             
         ]
     },
@@ -390,7 +405,11 @@ export const levels = [
                         lava: true
                     },
                     gltf: 'lava.glb'
-                }
+                },
+                noEnemySpawnZones: [
+                    // [location,radius] (both in location units, i.e. /multiplier)
+                    // [{ x: 0, y: 0, z: 0},6]
+                ]
             }
         },
         items: [
@@ -417,15 +436,15 @@ export const levels = [
             }
         ],
         entities: [
-            { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5} },
-            { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5} },
-            { name: "lavaMan" },
-            { name: "lavaMan" },
-            { name: "ghoul" },
-            { name: "ghoul" },
-            { name: "ghoul" },
-            { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}},
-            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}}
+            { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5}, type: "beast" },
+            { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5}, type: "beast" },
+            { name: "lavaMan", type: "beast" },
+            { name: "lavaMan", type: "beast" },
+            { name: "ghoul", type: "beast" },
+            { name: "ghoul", type: "beast" },
+            { name: "ghoul", type: "beast" },
+            { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"},
+            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"}
             
         ]
     },
@@ -453,7 +472,10 @@ export const levels = [
                     color: 'white',
                     density: 1
                 },
-                position: "down"
+                noEnemySpawnZones: [
+                    // [location,radius] (both in location units, i.e. /multiplier)
+                    // [{ x: 0, y: 0, z: 0},6]
+                ]
             }
         },
         items: [
@@ -533,15 +555,15 @@ export const levels = [
             { name: "blacksmith", location: { x: 5, y: 0, z: -37.1 } },
             { name: "centurion", location: { x: -10.8, y: 0, z: 28.4 } },
             { name: "viking", location: { x: -8.8, y: 0, z: 11.15 } },
-            // { name: "rockyMan" },
-            // { name: "rockyMan" },
-            // { name: "ghoul" },
-            // { name: "ghoul" },
-            // { name: "ghoul" },
-            // { name: "ghoul" },
-            // { name: "ghoul" },
-            // { name: "ghoul" },
-            // { name: "elfgirl" }
+            // { name: "rockyMan", type: "beast" },
+            // { name: "rockyMan", type: "beast" },
+            // { name: "ghoul", type: "beast" },
+            // { name: "ghoul", type: "beast" },
+            // { name: "ghoul", type: "beast" },
+            // { name: "ghoul", type: "beast" },
+            // { name: "ghoul", type: "beast" },
+            // { name: "ghoul", type: "beast" },
+            // { name: "elfgirl", type: "beast" }
         ]
     },
     {
@@ -566,7 +588,11 @@ export const levels = [
                 fog: {
                     color: 'white',
                     density: 1.2
-                }
+                },
+                noEnemySpawnZones: [
+                    // [location,radius] (both in location units, i.e. /multiplier)
+                    // [{ x: 0, y: 0, z: 0},6]
+                ]
             }
         },
         items: [
@@ -588,12 +614,12 @@ export const levels = [
             }
         ],
         entities: [
-            { name: "crystalMan" },
-            { name: "crystalMan" },
-            { name: "crystalMan" },
-            { name: "crystalMan" },
-            { name: "ghoul" },
-            { name: "ghoul" }
+            { name: "crystalMan", type: "beast" },
+            { name: "crystalMan", type: "beast" },
+            { name: "crystalMan", type: "beast" },
+            { name: "crystalMan", type: "beast" },
+            { name: "ghoul", type: "beast" },
+            { name: "ghoul", type: "beast" }
         ]
     },
     {
@@ -618,7 +644,11 @@ export const levels = [
                 fog: {
                     color: 'white',
                     density: 1.2
-                }
+                },
+                noEnemySpawnZones: [
+                    // [location,radius] (both in location units, i.e. /multiplier)
+                    // [{ x: 0, y: 0, z: 0},6]
+                ]
             }
         },
         items: [
@@ -652,12 +682,12 @@ export const levels = [
         entities: [
             { name: "daveDragon" },
             { name: "viking", location: { x: -7.5, y: 0, z: 2.7 } },
-            { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}},
-            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}}
-            // { name: "crystalMan" },
-            // { name: "crystalMan" },
-            // { name: "ghoul" },
-            // { name: "ghoul" }
+            { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"},
+            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"}
+            // { name: "crystalMan", type: "beast" },
+            // { name: "crystalMan", type: "beast" },
+            // { name: "ghoul", type: "beast" },
+            // { name: "ghoul", type: "beast" }
         ]
     },
     
@@ -684,7 +714,11 @@ export const levels = [
                 fog: {
                     color: 'white',
                     density: 1.2
-                }
+                },
+                noEnemySpawnZones: [
+                    // [location,radius] (both in location units, i.e. /multiplier)
+                    // [{ x: 0, y: 0, z: 0},6]
+                ]
             }
         },
         items: [
@@ -704,10 +738,10 @@ export const levels = [
 
         ],
         entities: [
-            { name: "lavaGhoul" },
-            { name: "lavaGhoul" },
-            { name: "lavaGhoul" },
-            { name: "lavaGhoul" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
 
         ]
     }
