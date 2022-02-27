@@ -67,6 +67,10 @@ export const levels = [
             { 
                 name: "portalStone", location: { x: 7.4, y: 0, z: 7.5 },
                 attributes: { routeTo: { level: 2, location: { x: 0, y: 0, z: 0} } } 
+            },
+            { 
+                name: "portalStone", location: { x: 5.3, y: 0, z: 9 },
+                attributes: { routeTo: { level: 9, location: { x: 2, y: 0, z: 2} } } 
             }
 
 
@@ -114,12 +118,6 @@ export const levels = [
             { name: "gold" },
             { name: "iron" },
             { name: "silver" },
-            { name: "cavalier", location: { x: -1, y: 0, z: -1} },
-            { name: "direMace", location: { x: -1, y: 0, z: -1} },
-            { name: "iceSword", location: { x: -1, y: 0, z: -1} },
-            { name: "heavyAxe", location: { x: -1, y: 0, z: -1} },
-            
-
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0} },
@@ -138,7 +136,7 @@ export const levels = [
                 attributes: { routeTo: { level: 4, location: { x: -23.5, y: 0, z: -6.5} } } //lavafield
             },
             { 
-                name: "elevatorL_1m", location: { x: -4.9, y: 0, z: 5.1 }, attributes: { scale: 100 }
+                name: "elevatorS_1m", location: { x: -4.9, y: 0, z: 5.1 }, attributes: { scale: 200 }
             },
             { 
                 name: "lever", location: { x: -4, y: 0, z: 3.1 },
@@ -154,16 +152,22 @@ export const levels = [
             { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
             { name: "evilOne", type: "beast" },
             { name: "ghoul", type: "beast"  },
+            { name: "triceratops", type: "beast" },
+            // { name: "triceratops", type: "beast" },
+            { name: "iceGhoul", type: "beast"  },
+            { name: "shockGhoul", type: "beast"  },
+            { name: "gasGhoul", type: "beast"  },
+            { name: "ghostGhoul", type: "beast"  },
             // { name: "rockyMan", type: "beast" },
             // { name: "demonLord", type: "beast" },
             // { name: "horse" },
-            // { name: "murderBear", type: "beast"  },
+            { name: "murderBear", type: "beast"  },
             // { name: "rosen", type: "beast"  },
             // { name: "blacksmith" },
             // { name: "elfgirl" }
-            // { name: "iceGhoul", type: "beast"  },
-            // { name: "shockGhoul", type: "beast"  },
-            // { name: "gasGhoul", type: "beast"  },
+            { name: "iceGhoul", type: "beast"  },
+            { name: "shockGhoul", type: "beast"  },
+            { name: "gasGhoul", type: "beast"  },
             // { name: "ghostGhoul", type: "beast"  },
             // { name: "zombie", type: "beast" },
             // { name: "daveDragon", type: "beast"},
@@ -370,6 +374,11 @@ export const levels = [
             { name: "crystalMan", type: "beast" },
             { name: "crystalMan", type: "beast" },
             { name: "crystalMan", type: "beast" },
+            { name: "iceGhoul", type: "beast"  },
+            { name: "shockGhoul", type: "beast"  },
+            { name: "triceratops", type: "beast" },
+            { name: "gasGhoul", type: "beast"  },
+            { name: "ghostGhoul", type: "beast"  },
             
         ]
     },
@@ -474,7 +483,7 @@ export const levels = [
                 },
                 noEnemySpawnZones: [
                     // [location,radius] (both in location units, i.e. /multiplier)
-                    // [{ x: 0, y: 0, z: 0},6]
+                    [{ x: 0, y: 0, z: 0},35]
                 ]
             }
         },
@@ -549,21 +558,33 @@ export const levels = [
             { 
                 name: "lever", location: { x: -27.2, y: 12.3, z: 24.3 },
                 attributes: { controls: "elevatorS_6m:Move", staticStartingElevation: true, position: "up" }
-            }
+            },
+            { 
+                name: "vikingShop", location: { x: -64.5, y: 0, z:  59 },
+                attributes: { rotateY: true }
+            },
+            { 
+                name: "platformBlock", location: { x: -64.5, y: 0, z: 55 },
+                attributes: { elevation: -2, controls: "vikingShop:doorAction/3/3/1/true" } // duration/fadeOutDuration/fadeOutDelay/autorestore
+            },
+            { 
+                name: "platformWood", location: { x: -64.5, y: 0, z:  57 },
+                attributes: { elevation: 2, controls: "vikingShop:doorAction/3/3/1/true" }
+            },
         ],
         entities: [
             { name: "blacksmith", location: { x: 5, y: 0, z: -37.1 } },
             { name: "centurion", location: { x: -10.8, y: 0, z: 28.4 } },
             { name: "viking", location: { x: -8.8, y: 0, z: 11.15 } },
-            // { name: "rockyMan", type: "beast" },
-            // { name: "rockyMan", type: "beast" },
-            // { name: "ghoul", type: "beast" },
-            // { name: "ghoul", type: "beast" },
-            // { name: "ghoul", type: "beast" },
-            // { name: "ghoul", type: "beast" },
-            // { name: "ghoul", type: "beast" },
-            // { name: "ghoul", type: "beast" },
-            // { name: "elfgirl", type: "beast" }
+            { name: "rockyMan", type: "beast" },
+            { name: "rockyMan", type: "beast" },
+            { name: "ghoul", type: "beast" },
+            { name: "ghoul", type: "beast" },
+            { name: "ghoul", type: "beast" },
+            { name: "ghoul", type: "beast" },
+            { name: "ghoul", type: "beast" },
+            { name: "ghoul", type: "beast" },
+            { name: "elfgirl" }
         ]
     },
     {
@@ -619,7 +640,14 @@ export const levels = [
             { name: "crystalMan", type: "beast" },
             { name: "crystalMan", type: "beast" },
             { name: "ghoul", type: "beast" },
-            { name: "ghoul", type: "beast" }
+            { name: "ghoul", type: "beast" },
+            { name: "ghoul", type: "beast"  },
+            { name: "triceratops", type: "beast" },
+            { name: "triceratops", type: "beast" },
+            { name: "iceGhoul", type: "beast"  },
+            { name: "shockGhoul", type: "beast"  },
+            { name: "gasGhoul", type: "beast"  },
+            { name: "ghostGhoul", type: "beast"  },
         ]
     },
     {
@@ -680,14 +708,14 @@ export const levels = [
             }
         ],
         entities: [
-            { name: "daveDragon" },
+            { name: "daveDragon", type: "beast" },
             { name: "viking", location: { x: -7.5, y: 0, z: 2.7 } },
             { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"},
-            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"}
-            // { name: "crystalMan", type: "beast" },
-            // { name: "crystalMan", type: "beast" },
-            // { name: "ghoul", type: "beast" },
-            // { name: "ghoul", type: "beast" }
+            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"},
+            { name: "crystalMan", type: "beast" },
+            { name: "crystalMan", type: "beast" },
+            { name: "ghoul", type: "beast" },
+            { name: "ghoul", type: "beast" }
         ]
     },
     
@@ -742,7 +770,65 @@ export const levels = [
             { name: "lavaGhoul", type: "beast" },
             { name: "lavaGhoul", type: "beast" },
             { name: "lavaGhoul", type: "beast" },
+            { name: "ghoul", type: "beast"  },
+            { name: "triceratops", type: "beast" },
+            { name: "triceratops", type: "beast" },
+            { name: "iceGhoul", type: "beast"  },
+            { name: "shockGhoul", type: "beast"  },
+            { name: "gasGhoul", type: "beast"  },
+            { name: "ghostGhoul", type: "beast"  },
 
+        ]
+    },
+    {
+        level: 9,
+        width: 104, //26
+        length: 104, //26
+        description: "Volcano",
+        background: 'clouds.png',
+        backgroundNight: 'stars.png',
+        terrain: {
+            name: 'floor',
+            type: 'floor',
+            description: 'Volcano',
+            gltf: 'volcano.glb',
+            attributes: {
+                emissiveIntensity: 10,
+                scale: 100,
+                borderTrees: false,
+                light: {
+                    sunLight: true,
+                    overheadPointLight: false,
+                },
+                fog: {
+                    color: 'white',
+                    density: 1.2
+                },
+                noEnemySpawnZones: [
+                    // [location,radius] (both in location units, i.e. /multiplier)
+                    // [{ x: 0, y: 0, z: 0},6]
+                ]
+            }
+        },
+        items: [
+            
+        ],
+        structures: [
+            { 
+                name: "platformBlock", location: { x: -8.8, y: 0, z: 38.4 }, 
+                attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } }} //kingdom
+            },
+            { 
+                name: "platformBlock", location: { x: -19.5, y: 0, z: -6.5}, 
+                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } //lavaField
+            }
+
+        ],
+        entities: [
+            // { name: "lavaGhoul", type: "beast" },
+            // { name: "lavaGhoul", type: "beast" },
+            // { name: "lavaGhoul", type: "beast" },
+            // { name: "lavaGhoul", type: "beast" },
         ]
     }
  

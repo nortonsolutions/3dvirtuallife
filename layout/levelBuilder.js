@@ -71,7 +71,7 @@ class LevelBuilder {
         } else {
             return this.randomUniqueLocation(beast); 
         }
- 
+
 
     }
 

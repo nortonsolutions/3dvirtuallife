@@ -666,9 +666,21 @@ export class Hero extends IntelligentForm {
             } else if (this.standingUpon && this.standingUpon.attributes.controls && !(typeof this.standingUpon.attributes.locked == "boolean")) {
                 // Check to see if this switch/lever controls something:
                 // attributes: { controls: "floor:Open/Close" }  -> Open/Close correspond to up/down
-                var [controlItem,animation] = this.standingUpon.attributes.controls.split(":");
+                var [controlItem,animations] = this.standingUpon.attributes.controls.split(":");
                 let controlled = this.sceneController.forms.find(el => el.objectName == controlItem);
-                controlled.fadeToAction(animation, 0.2);
+                // controlled.fadeToAction(animation, 0.2);
+
+                let newPositionControlled = controlled.attributes.position == "down" ? "up" : "down";
+                animations = animations.split('+');
+
+                if (typeof controlled.attributes.locked == "boolean") {
+                    let newLockstateControlled = !controlled.attributes.locked; 
+                    controlled.updateAttributes({locked: newLockstateControlled, position: newPositionControlled, animations});
+                } else if (controlled.attributes.position) { // if it has a position, alternate
+                    controlled.updateAttributes({position: newPositionControlled, animations});
+                } else {
+                    controlled.updateAttributes({animations});
+                }
             }
 
             this.identifySelectedForm();

@@ -17,6 +17,7 @@ export class AnimatedForm extends StandardForm{
         this.states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
         
         this.currentlyFadingToAction = false;
+        this.currentlyRunningAction = false;
         this.animatedSubforms = [];
 
         this.handAttacksR = [];
@@ -224,23 +225,41 @@ export class AnimatedForm extends StandardForm{
         }
     }
 
-    runAction(actionName, duration, fadeOutDuration = 0.2, fadeOutDelay = 0) {
+    runAction(actionName, duration, fadeOutDuration = 0.2, fadeOutDelay = 0, autorestore = false) {
 
-        let action = this.actions[actionName];
-        action.loop = THREE.LoopOnce;
-        action.repetitions = 1;
-        action.setEffectiveTimeScale( 1 );
-            
-        if (this.attributes.position == "down") {
-            setTimeout(() => {
-                action.fadeOut( fadeOutDuration );
-            }, fadeOutDelay*1000)
-        } else {
-            action.reset();
+        if (!this.currentlyRunningAction) {
+            this.currentlyRunningAction = true;
+
+            let action = this.actions[actionName];
+            action.loop = THREE.LoopOnce;
+            action.repetitions = 1;
             action.setEffectiveTimeScale( 1 );
-            action.fadeIn( duration );
+                
+            if (this.attributes.position == "down") {
+                setTimeout(() => {
+                    action.fadeOut( fadeOutDuration );
+                }, fadeOutDelay*1000)
+            } else {
+                action.reset();
+                action.setEffectiveTimeScale( 1 );
+                action.fadeIn( duration );
+            }
+    
+            action.play();
+    
+            const restoreState = () => {
+                setTimeout(() => {
+                    action.fadeOut( fadeOutDuration );
+                    setTimeout(() => {
+                        this.currentlyRunningAction = false;
+                        this.mixer.removeEventListener('finished', restoreState );
+                    }, fadeOutDuration * 1000);
+                }, duration * 1000);
+            }
+            
+            if (autorestore) {
+                this.mixer.addEventListener( 'finished', restoreState );
+            }
         }
-
-        action.play();
     }
 }

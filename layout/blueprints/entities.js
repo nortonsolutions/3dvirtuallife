@@ -226,7 +226,31 @@ export const Entities = {
             moves: true,
             animates: true,
             height: 10,
-            length: 40,
+            length: 120,
+            width: 20,
+            elevation: 0,
+            scale: 60,
+            stats: {
+                health: "4/4/0",
+                mana: "60/60/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10"],
+            rangedSpell: 'fireProjectileSpell'
+        }
+    },
+    triceratops: {
+        name: 'triceratops',
+        gltf: 'triceratops.glb',
+        description: 'Triceratops',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 10,
+            length: 80,
             width: 20,
             elevation: 0,
             scale: 60,
@@ -250,7 +274,7 @@ export const Entities = {
             moves: true,
             animates: true,
             height: 10,
-            length: 40,
+            length: 240,
             width: 20,
             elevation: 0,
             scale: 50,

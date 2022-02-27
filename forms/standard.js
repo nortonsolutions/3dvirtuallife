@@ -254,10 +254,11 @@ export class StandardForm {
 
         if (payload.animations && this.activeAction) {
             payload.animations.forEach(animation => {
-                this.runAction(animation, 3, 4, 1);
+                let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore] = animation.split('/');
+                this.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore));
             })
         } else if (this.activeAction) { // for objects with a singular default action
-            this.runAction(this.activeAction._clip.name, 3, 4, 1);
+            this.runAction(this.activeAction._clip.name, 3, 4, 1, false);
         }
 
         if (local) this.sceneController.socket.emit('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level });

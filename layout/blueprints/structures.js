@@ -193,6 +193,19 @@ export const Structures = {
     
     },
 
+    vikingShop: {
+        name: 'vikingShop',
+        gltf: 'vikingShop.glb',
+        description: 'Humble abode of a troubled family',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 30,
+            elevation: 0 
+        }
+    
+    },
+
     ricketyPlatform: {
         name: 'ricketyPlatform',
         gltf: 'ricketyPlatform.glb',
