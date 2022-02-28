@@ -45,6 +45,10 @@ export class SceneController {
         this.scene = null;
         this.floor = null;
 
+        // Optional arrays to designate where NPC or Boss characters spawn
+        this.floorNPClocations = [];
+        this.floorBossLocations = [];
+
         if (this.firstInRoom) this.layout.dayTime = Math.random() < .5;
         
         this.sprites = [];
@@ -336,11 +340,44 @@ export class SceneController {
 
             // this.demarcateBlankZones(this.floor.model);
 
+            if (this.layout.terrain.attributes.designateNPCs) {
+                this.populateNPCnulls(this.floor.model);
+                this.populateBossNulls(this.floor.model);
+            }
+
             this.addToScene(this.floor);
             setTimeout(() => {
                 callback();
             }, 500);
         });
+    }
+
+    // Fill the following if applicable; scan for 'npc' nodes
+    // this.floorNPClocations = [];
+    populateNPCnulls(model) {
+        if (/npc/i.test(model.name)) {
+            this.floorNPClocations.push(model.position);
+        } else {
+            if (model.children) {
+                model.children.forEach(m => {
+                    this.populateNPCnulls(m);
+                })
+            }
+        }
+    }
+
+    // Fill the following if applicable; scan for 'boss nodes
+    // this.floorBossLocations = [];
+    populateBossNulls(model) {
+        if (/boss/i.test(model.name)) {
+            this.floorBossLocations.push(model.position);
+        } else {
+            if (model.children) {
+                model.children.forEach(m => {
+                    this.populateBossNulls(m);
+                })
+            }
+        }
     }
 
     /**
@@ -465,6 +502,16 @@ export class SceneController {
             if (firstInRoom) {
                 if (!this.layout.entities[index].attributes) this.layout.entities[index].attributes = {};
                 this.layout.entities[index].attributes.layoutId = template.attributes.layoutId = nextLayoutId++;
+
+                if (this.layout.terrain.attributes.designateNPCs && index < this.floorNPClocations.length) {
+                    // this.floorNPClocations = [];
+                    template.location = this.getLocationFromPosition(this.floorNPClocations[index], 1);
+                }
+
+                if (this.layout.terrain.attributes.designateNPCs && template.attributes.boss ) {
+                    // this.floorBossLocations = [];
+                    template.location = this.getLocationFromPosition(this.floorBossLocations[0], 1);
+                }
             }
             this.seedForm(template).then(form => {});
         });
@@ -722,11 +769,12 @@ export class SceneController {
     }
 
     // Calculate hero location using grid coordinates
-    getLocationFromPosition(position) {
+    // divideByMultiplier is optional for getting coordinates pre-scaling, i.e. during level loading
+    getLocationFromPosition(position, m = multiplier) {
         var location = {};
-        location.x = position.x / multiplier,
-        location.y = position.y / multiplier,
-        location.z = position.z / multiplier
+        location.x = position.x / m;
+        location.y = position.y / m;
+        location.z = position.z / m;
         return location;
     }
 

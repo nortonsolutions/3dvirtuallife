@@ -202,7 +202,8 @@ export const levels = [
                 noEnemySpawnZones: [
                     // [location,radius] (both in location units, i.e. /multiplier)
                     // [{ x: 0, y: 0, z: 0},6]
-                ]
+                ],
+                designateNPCs: true
             }
         },
         items: [
@@ -248,7 +249,7 @@ export const levels = [
             { name: "bat", type: "beast" },
             { name: "bat", type: "beast" },
             { name: "bat", type: "beast" },
-            { name: "ghoul", type: "beast" }
+            { name: "ghoul", type: "beast", attributes: { boss: false } }
 
         ]
     },

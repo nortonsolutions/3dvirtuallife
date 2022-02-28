@@ -227,7 +227,7 @@ export class AnimatedForm extends StandardForm{
 
     runAction(actionName, duration, fadeOutDuration = 0.2, fadeOutDelay = 0, autorestore = false, concurrent = false) {
 
-        if (!this.currentlyRunningAction) {
+        if (concurrent || !this.currentlyRunningAction) {
             this.currentlyRunningAction = true;
 
             let action = this.actions[actionName];

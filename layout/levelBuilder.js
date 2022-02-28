@@ -65,7 +65,7 @@ class LevelBuilder {
             z: getRndInteger(-this.level.length/2,this.level.length/2)
         }
 
-        if (!this.usedLocations.includes(location) && (!beast || this.outsideSafeZones(location))) {
+        if (!this.usedLocations.includes(location)) { //  && (!beast || this.outsideSafeZones(location))
             this.usedLocations.push(location);
             return location;
         } else {
