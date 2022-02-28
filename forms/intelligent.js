@@ -29,7 +29,7 @@ export class IntelligentForm extends AnimatedForm{
         this.equipped = this.template.equipped;
 
         this.movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.length/2 + 35 );
-        
+
     }
 
     /** load is for loading the model and animations specifically */
@@ -42,12 +42,13 @@ export class IntelligentForm extends AnimatedForm{
             // this.setToDoubleSided(this.model);
 
             this.principalGeometry = this.identifyPrincipalGeometry(this.model);
-            if (this.principalGeometry) {
+            if (!this.principalGeometry) this.findFirstGeometry(this.model);
+            
+            // if (this.principalGeometry){
                 this.principalGeometry.computeBoundingSphere();
                 this.principalBoundingSphere = this.principalGeometry.boundingSphere;
                 this.radius = this.principalBoundingSphere.radius * this.attributes.scale;
-                // this.principalGeometry = this.findFirstGeometry(this.model);
-            }
+            // }
             
             // console.log(`${this.objectName}: ${this.principalGeometry}`);
             this.computeVertexNormals(this.model);
@@ -86,7 +87,8 @@ export class IntelligentForm extends AnimatedForm{
      * TODO: Otherwise find the FIRST geometry...?
      */
     identifyPrincipalGeometry(el)  {
-        let possibleNames = ['Torso_0', 'Head_0', 'Icosphere', 'Body', "Cube.001_0", "Cube", "Body_0", "Rat_Geometry", 'Mesh_0', "Leg.R_0", "Elf_0", "Elf01_posed.002_0"];
+        // let possibleNames = ['Torso_0', 'Head_0', 'Icosphere', 'Body', "Cube.001_0", "Cube", "Body_0", "Rat_Geometry", 'Mesh_0', "Leg.R_0", "Elf_0", "Elf01_posed.002_0"];
+        let possibleNames = ['Torso_0', 'Head_0'];
         for (const name of possibleNames) {
             if (el.getObjectByName(name)) {
                 return el.getObjectByName(name).geometry;
@@ -136,15 +138,15 @@ export class IntelligentForm extends AnimatedForm{
 
     }
 
-    // findFirstGeometry(el) {
-    //     if (el.geometry) {
-    //         return el.geometry;
-    //     } else {
-    //         for (let i = 0; i < el.children.length; i++) {
-    //             return this.findFirstGeometry(el.children[i]);
-    //         }
-    //     }
-    // }
+    findFirstGeometry(el) {
+        if (!this.principalGeometry && el.geometry) {
+            this.principalGeometry = el.geometry;
+        } else if (!this.principalGeometry) {
+            for (let i = 0; i < el.children.length; i++) {
+                this.findFirstGeometry(el.children[i]);
+            }
+        }
+    }
 
     listGeometries(el) {
 

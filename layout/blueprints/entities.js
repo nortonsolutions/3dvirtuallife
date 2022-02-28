@@ -250,19 +250,19 @@ export const Entities = {
             moves: true,
             animates: true,
             height: 10,
-            length: 80,
+            length: 100,
             width: 20,
             elevation: 0,
-            scale: 60,
+            scale: 25,
             stats: {
                 health: "4/4/0",
                 mana: "60/60/0",
                 strength: "2/2/0",
-                agility: "3/3/0",
+                agility: "1/1/0",
                 defense: "1/1/0"
             },
             grants: ["gold10"],
-            rangedSpell: 'fireProjectileSpell'
+            // rangedSpell: 'fireProjectileSpell'
         }
     },
     daveDragon: {

@@ -201,7 +201,17 @@ export const Structures = {
         attributes: {
             animates: true,
             scale: 30,
-            elevation: 0 
+            elevation: 0,
+            sprites: [{ 
+                name: "fireplace",
+                regex: "fireplace",
+                frames: 8,
+                scale: 16,
+                elevation: 1,
+                flip: false,
+                animates: true,
+                showOnSeed: true
+            }] 
         }
     
     },

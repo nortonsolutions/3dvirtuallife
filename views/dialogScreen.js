@@ -276,9 +276,11 @@ export class DialogScreen {
                     
                     response = this.acceptDeal();
 
-                    setTimeout(() => {
-                        this.eventDepot.fire('modal', { type: 'cutScene', title: 'Good deal!', context: { videoName: this.entity.attributes.cutScenes.acceptDeal } });
-                    },2000);
+                    if (this.entity.attributes.cutScenes && this.entity.attributes.cutScenes.acceptDeal) {
+                        setTimeout(() => {
+                            this.eventDepot.fire('modal', { type: 'cutScene', title: 'Good deal!', context: { videoName: this.entity.attributes.cutScenes.acceptDeal } });
+                        },2000);
+                    }
                 }
 
                 this.refresh(response);

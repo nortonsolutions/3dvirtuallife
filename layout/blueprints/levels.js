@@ -71,6 +71,10 @@ export const levels = [
             { 
                 name: "portalStone", location: { x: 5.3, y: 0, z: 9 },
                 attributes: { routeTo: { level: 9, location: { x: 2, y: 0, z: 2} } } 
+            },
+            { 
+                name: "portalStone", location: { x: 2.7, y: 0, z: 10.1 },
+                attributes: { routeTo: { level: 10, location: { x: 2, y: 0, z: 2} } } 
             }
 
 
@@ -140,11 +144,11 @@ export const levels = [
             },
             { 
                 name: "lever", location: { x: -4, y: 0, z: 3.1 },
-                attributes: { controls: "elevatorS_1m:Move" }
+                attributes: { controls: "elevatorS_1m:Move/3/3/0" }
             },
             { 
                 name: "lever", location: { x: -4.2, y: 2.6, z: 3.3 },
-                attributes: { controls: "elevatorS_1m:Move", staticStartingElevation: true, position: "up" }
+                attributes: { controls: "elevatorS_1m:Move/3/3/0", staticStartingElevation: true, position: "up" }
             },
         ],
         entities: [
@@ -154,20 +158,20 @@ export const levels = [
             { name: "ghoul", type: "beast"  },
             { name: "triceratops", type: "beast" },
             // { name: "triceratops", type: "beast" },
-            { name: "iceGhoul", type: "beast"  },
-            { name: "shockGhoul", type: "beast"  },
-            { name: "gasGhoul", type: "beast"  },
-            { name: "ghostGhoul", type: "beast"  },
+            // { name: "iceGhoul", type: "beast"  },
+            // { name: "shockGhoul", type: "beast"  },
+            // { name: "gasGhoul", type: "beast"  },
+            // { name: "ghostGhoul", type: "beast"  },
             // { name: "rockyMan", type: "beast" },
             // { name: "demonLord", type: "beast" },
             // { name: "horse" },
-            { name: "murderBear", type: "beast"  },
+            // { name: "murderBear", type: "beast"  },
             // { name: "rosen", type: "beast"  },
             // { name: "blacksmith" },
             // { name: "elfgirl" }
-            { name: "iceGhoul", type: "beast"  },
-            { name: "shockGhoul", type: "beast"  },
-            { name: "gasGhoul", type: "beast"  },
+            // { name: "iceGhoul", type: "beast"  },
+            // { name: "shockGhoul", type: "beast"  },
+            // { name: "gasGhoul", type: "beast"  },
             // { name: "ghostGhoul", type: "beast"  },
             // { name: "zombie", type: "beast" },
             // { name: "daveDragon", type: "beast"},
@@ -518,11 +522,11 @@ export const levels = [
             },
             { 
                 name: "platformBlock", location: { x: -2.1, y: 0, z: -34.6 },
-                attributes: { elevation: -5, controls: "tavernShop:Walking in" }
+                attributes: { elevation: -5, controls: "tavernShop:Walking in/3/3/0" }
             },
             { 
                 name: "platformWood", location: { x: -.7, y: 0, z: -34.6 },
-                attributes: { elevation: 0, controls: "tavernShop:Walking out" }
+                attributes: { elevation: 0, controls: "tavernShop:Walking out/3/3/0" }
             },
 
             { 
@@ -531,33 +535,33 @@ export const levels = [
             },
             { 
                 name: "lever", location: { x: -11.2, y: 0, z: 26.1 },
-                attributes: { locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL+OpenR+OpenBars" }
+                attributes: { locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL/3/3/0/noAutorestore/concurrent+OpenR/3/3/0/noAutorestore/concurrent+OpenBars/3/3/0/noAutorestore/concurrent" }
             },
             { 
                 name: "lever", location: { x: -11.2, y: 0, z: 28.4 },
-                attributes: { rotateY: true, locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL+OpenR+OpenBars", position: "up" }
+                attributes: { rotateY: true, locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL/3/3/0/noAutorestore/concurrent+OpenR/3/3/0/noAutorestore/concurrent+OpenBars/3/3/0/noAutorestore/concurrent", position: "up" }
             },
             { 
                 name: "elevatorL_6m", location: { x: -3.8, y: 0, z: 25.8 },
             },
             { 
                 name: "lever", location: { x: -7, y: 0, z: 24.4 },
-                attributes: { controls: "elevatorL_6m:Move" }
+                attributes: { controls: "elevatorL_6m:Move/3/3/0" }
             },
             { 
                 name: "lever", location: { x: -6.2, y: 12.4, z: 24.8 },
-                attributes: { controls: "elevatorL_6m:Move", staticStartingElevation: true, position: "up" }
+                attributes: { controls: "elevatorL_6m:Move/3/3/0", staticStartingElevation: true, position: "up" }
             },
             { 
                 name: "elevatorS_6m", location: { x: -26.1, y: 0, z: 25.8 },
             },
             { 
                 name: "lever", location: { x: -24.2, y: 0, z: 25 },
-                attributes: { controls: "elevatorS_6m:Move" }
+                attributes: { controls: "elevatorS_6m:Move/3/3/0" }
             },
             { 
                 name: "lever", location: { x: -27.2, y: 12.3, z: 24.3 },
-                attributes: { controls: "elevatorS_6m:Move", staticStartingElevation: true, position: "up" }
+                attributes: { controls: "elevatorS_6m:Move/3/3/0", staticStartingElevation: true, position: "up" }
             },
             { 
                 name: "vikingShop", location: { x: -64.5, y: 0, z:  59 },
@@ -565,11 +569,11 @@ export const levels = [
             },
             { 
                 name: "platformBlock", location: { x: -64.5, y: 0, z: 55 },
-                attributes: { elevation: -2, controls: "vikingShop:doorAction/3/3/1/true" } // duration/fadeOutDuration/fadeOutDelay/autorestore
+                attributes: { elevation: -2, controls: "vikingShop:doorAction/3/3/1/autorestore" } // duration/fadeOutDuration/fadeOutDelay/autorestore
             },
             { 
                 name: "platformWood", location: { x: -64.5, y: 0, z:  57 },
-                attributes: { elevation: 2, controls: "vikingShop:doorAction/3/3/1/true" }
+                attributes: { elevation: 2, controls: "vikingShop:doorAction/3/3/1/autorestore" }
             },
         ],
         entities: [
@@ -700,11 +704,11 @@ export const levels = [
             { name: "tavernShop", location: { x: -3.5, y: 0, z: 0} },
             { 
                 name: "platformBlock", location: { x: -.5, y: 0, z: .15 },
-                attributes: { elevation: -5,controls: "tavernShop:Walking in" }
+                attributes: { elevation: -5, controls: "tavernShop:Walking in/3/3/0" }
             },
             { 
                 name: "platformWood", location: { x: -1.5, y: 0, z: .15 },
-                attributes: { elevation: 5, controls: "tavernShop:Walking out" }
+                attributes: { elevation: 5, controls: "tavernShop:Walking out/3/3/0" }
             }
         ],
         entities: [
@@ -794,6 +798,9 @@ export const levels = [
             gltf: 'volcano.glb',
             attributes: {
                 emissiveIntensity: 10,
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
                 scale: 100,
                 borderTrees: false,
                 light: {
@@ -823,6 +830,56 @@ export const levels = [
                 attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } //lavaField
             }
 
+        ],
+        entities: [
+            // { name: "lavaGhoul", type: "beast" },
+            // { name: "lavaGhoul", type: "beast" },
+            // { name: "lavaGhoul", type: "beast" },
+            // { name: "lavaGhoul", type: "beast" },
+        ]
+    },
+    {
+        level: 10,
+        width: 70, //26
+        length: 70, //26
+        description: "elvandor",
+        background: 'clouds.png',
+        backgroundNight: 'stars.png',
+        terrain: {
+            name: 'elvandor',
+            type: 'floor',
+            description: 'Elvandor',
+            gltf: 'elvandor.glb',
+            attributes: {
+                emissiveIntensity: 10,
+                scale: 100,
+                borderTrees: false,
+                light: {
+                    sunLight: true,
+                    overheadPointLight: false,
+                },
+                fog: {
+                    color: 'white',
+                    density: 1.2
+                },
+                noEnemySpawnZones: [
+                    // [location,radius] (both in location units, i.e. /multiplier)
+                    // [{ x: 0, y: 0, z: 0},6]
+                ]
+            }
+        },
+        items: [
+            
+        ],
+        structures: [
+            { 
+                name: "platformBlock", location: { x: -8.8, y: 0, z: 38.4 }, 
+                attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } }} //kingdom
+            },
+            { 
+                name: "platformBlock", location: { x: -19.5, y: 0, z: -6.5}, 
+                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } //lavaField
+            }
         ],
         entities: [
             // { name: "lavaGhoul", type: "beast" },

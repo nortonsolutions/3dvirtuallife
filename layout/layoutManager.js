@@ -72,10 +72,11 @@ class LayoutManager {
                     this.sceneController.animateScene();
                 })
             }
+
+            if (this.layout.terrain.attributes.cutScenes && this.layout.terrain.attributes.cutScenes.intro) { 
+                this.eventDepot.fire('modal', { type: 'cutScene', title: this.layout.terrain.description, context: { videoName: this.layout.terrain.attributes.cutScenes.intro } });
+            }
         });
-        
-
-
     }
 
     addItemToLayout(data, local = true) {

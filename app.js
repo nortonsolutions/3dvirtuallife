@@ -108,6 +108,7 @@ export const app = () => {
                         gameName = prompt("Please enter saved game name:", "default")
                     }
 
+                    game.layoutManager.sceneController.hero.cacheHero();
                     gameAPI.saveGame(gameName);
                 }
             })

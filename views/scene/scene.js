@@ -54,6 +54,8 @@ class Scene {
         this.scene = null;
         
         this.requestAnimationFrameID = null;
+
+        this.projectileMovementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(0,0,1), 0, 40 );
     }
 
     init(callback) {
@@ -248,7 +250,7 @@ class Scene {
 
     /* Distribute damage to enemies, make item disappear or fall to ground */
     /* 'local' items exert an effect while non-local are just for appearances */
-    handleAction(projectile, entitiesInRange, hostile = false) {
+    handleAction(projectile, entitiesInRange) {
 
         // Sprite effects:
         if (projectile.local && projectile.item.attributes.sprites) {
@@ -273,7 +275,7 @@ class Scene {
         if (projectile.local) {
             let [stat, change] = projectile.item.attributes.effect.split("/");
 
-            if (hostile) {
+            if (projectile.hostile) {
                 this.controller.hero.changeStat('health', -change, false);
             } else {
                 entitiesInRange.forEach(entity => {
@@ -293,6 +295,9 @@ class Scene {
             this.controller.forms = this.controller.forms.filter(el => el != projectile.item);
             this.removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
         }
+
+        // filter out of projectiles
+        this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
     }
 
     /** 
@@ -309,15 +314,16 @@ class Scene {
      */
     handleProjectiles(delta) {
         if (this.controller.projectiles.length > 0) {
-            this.controller.projectiles.filter(el => el.distanceTraveled == -1).forEach(projectile => {
-                this.handleAction(projectile, []);
-            })
+
+            // // handle projectiles that have gone full term (distanceTraveled == -1)
+            // this.controller.projectiles.filter(el => el.distanceTraveled == -1).forEach(projectile => {
+            //     this.handleAction(projectile, []);
+            // })
             
-            this.controller.projectiles = this.controller.projectiles.filter(el => el.distanceTraveled != -1);
+            for (let projectile of this.controller.projectiles) {
+            // this.controller.projectiles.forEach(projectile => {
     
-            this.controller.projectiles.forEach(projectile => {
-    
-                if (projectile.distanceTraveled == 0) { // first iteration, set velocitiess
+                if (projectile.distanceTraveled == 0) { // first iteration, set velocities
     
                     projectile.velocity.y = (projectile.item.direction.y) * 500;
                     projectile.velocity.z = projectile.item.attributes.throwableAttributes.speed * 500;
@@ -333,24 +339,37 @@ class Scene {
                 projectile.item.model.translateZ( -projectile.velocity.z * delta );
 
                 if (projectile.hostile && this.controller.heroInRange(projectile.item.attributes.range, projectile.item.model.position)) {
-                    this.handleAction(projectile, null, true);
-                } else if (!projectile.hostile) {
+                    this.handleAction(projectile, null);
+                    continue;
+                } else if (!projectile.hostile) { // projectiles launched by hero
                     var entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
                     if (entitiesInRange.length > 0) {
                         this.handleAction(projectile, entitiesInRange);
-                        this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
+                        continue;
+                        // this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
                     }
                 }
     
+                console.dir(projectile);
+                // if I hit a structure, handleAction
+                this.projectileMovementRaycaster.ray.origin.copy(projectile.item.model.position);
+                // this.projectileMovementRaycaster.ray.direction.copy(projectile.direction);
+                let pIntersects = this.projectileMovementRaycaster.intersectObjects(this.controller.structureModels, true);
+                if (pIntersects.length > 0 && pIntersects[0].object.type != "Sprite") { 
+                    this.handleAction(projectile, []);
+                    continue;
+                }
+
+                // Otherwise if I hit the max range, expire
                 projectile.distanceTraveled += (Math.abs(projectile.velocity.z * delta) + Math.abs(projectile.velocity.y * delta));
                 let maxDistance = projectile.item.attributes.throwableAttributes.distance;
-    
-                // console.log(`traveled: ${projectile.distanceTraveled}, position: ${projectile.item.model.position.x}, ${projectile.item.model.position.y},${projectile.item.model.position.z }`);
-                // console.log(`${projectile.item.model.position.y}`)
+
                 if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+5) {
-                    projectile.distanceTraveled = -1;
+                    // projectile.distanceTraveled = -1;
+                    this.handleAction(projectile, []);
+                    continue;
                 }
-            })
+            }
         }
     }
 

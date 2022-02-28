@@ -87,8 +87,8 @@ export class AnimatedForm extends StandardForm{
                 } else if (this.model.objectType=='item' && this.attributes.animatesRecurring) {
                     this.model.children[1].material.opacity = 0.5;
                 } else if (this.model.objectName=='ghostGhoul') {
-                    this.model.children[0].children[1].material.opacity = 0.5;
-                }
+                    this.model.children[0].children[1].material.opacity = 0.3;
+                } 
     
                 this.actions[ animation.name ] = action;
     
@@ -225,7 +225,7 @@ export class AnimatedForm extends StandardForm{
         }
     }
 
-    runAction(actionName, duration, fadeOutDuration = 0.2, fadeOutDelay = 0, autorestore = false) {
+    runAction(actionName, duration, fadeOutDuration = 0.2, fadeOutDelay = 0, autorestore = false, concurrent = false) {
 
         if (!this.currentlyRunningAction) {
             this.currentlyRunningAction = true;
@@ -259,6 +259,10 @@ export class AnimatedForm extends StandardForm{
             
             if (autorestore) {
                 this.mixer.addEventListener( 'finished', restoreState );
+            } else {
+                setTimeout(() => {
+                    this.currentlyRunningAction = false;
+                }, duration * 1000);
             }
         }
     }

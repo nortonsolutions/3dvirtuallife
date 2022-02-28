@@ -77,6 +77,10 @@ export class StandardForm {
                 this.setToFrontSided(this.model);
             }
 
+            if (this.objectName=='vikingShop') {
+                this.model.getObjectByName('windows').material.opacity = 0.1;
+            }
+
             // this.computeVertexNormals(this.model);
             // this.setToCastShadows();
             callback();
@@ -254,11 +258,11 @@ export class StandardForm {
 
         if (payload.animations && this.activeAction) {
             payload.animations.forEach(animation => {
-                let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore] = animation.split('/');
-                this.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore));
+                let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent] = animation.split('/');
+                this.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore=="autorestore"), Boolean(concurrent=="concurrent"));
             })
         } else if (this.activeAction) { // for objects with a singular default action
-            this.runAction(this.activeAction._clip.name, 3, 4, 1, false);
+            this.runAction(this.activeAction._clip.name, 3, 3, 1, false);
         }
 
         if (local) this.sceneController.socket.emit('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level });
