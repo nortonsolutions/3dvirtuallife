@@ -230,7 +230,12 @@ database(mongoose, (db) => {
     });
 
     socket.on('addItemToLayout', data => { // Update the local copy of the layout
-      app.layouts[socket.nsp.name][data.level][0].items.push(data.item);
+
+      if (data.item.type && data.item.type == "structure") {
+        app.layouts[socket.nsp.name][data.level][0].structures.push(data.item);
+      } else {
+        app.layouts[socket.nsp.name][data.level][0].items.push(data.item);
+      }
       notifyRoomMembers(data.level, "addItemToLayout", data);
     });
 

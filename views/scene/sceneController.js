@@ -142,7 +142,7 @@ export class SceneController {
 
             if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
             if (data.keyCode) itemTemplate.attributes.keyCode = data.keyCode;
-            
+
             this.seedForm(itemTemplate).then(form => {
     
                 if (!data.position) {
@@ -791,8 +791,12 @@ export class SceneController {
         }
     }
 
-    getObjectNameByLayoutId(layoutId) {
-        this.scene.getObjectByName()
+    getFormByLayoutId(layoutId) {
+        return this.forms.find(el => el.attributes.layoutId == layoutId);
     }
+
+    // getObjectNameByLayoutId(layoutId) {
+    //     // this.scene.getObjectByName()
+    // }
 
 }

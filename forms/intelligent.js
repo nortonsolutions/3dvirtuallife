@@ -246,6 +246,7 @@ export class IntelligentForm extends AnimatedForm{
                 this.model.position.y = topOfObject;
 
                 if (this.objectType == "hero") {
+                    let standingUponImmediate = downwardIntersections[0].object;
                     let standingUpon = getRootObject3D(downwardIntersections[0].object);
                     
                     if (standingUpon.objectName == 'balloon' && !(standingUpon.attributes.routeTo)) {
@@ -265,6 +266,16 @@ export class IntelligentForm extends AnimatedForm{
                             objectName: standingUpon.objectName,
                             objectType: standingUpon.objectType,
                             attributes: standingUpon.attributes
+                        }
+
+                        if (standingUponImmediate && standingUponImmediate.parent && standingUponImmediate.parent.attributes && standingUponImmediate.parent.attributes.keyCode) {
+                            this.standingUponImmediate = {
+                                objectName: standingUponImmediate.name,
+                                controls: standingUponImmediate.parent.attributes.layoutId,
+                                keyCode: standingUponImmediate.parent.attributes.keyCode
+                            }
+                        } else {
+                            this.standingUponImmediate = null;
                         }
                     }
                 }
