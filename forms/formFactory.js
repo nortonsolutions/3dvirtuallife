@@ -5,6 +5,7 @@ import { StandardForm } from './standard.js';
 import { SpriteForm } from './sprite.js';
 import { Fire, params } from './fire.js';
 import { WaterForm } from './water.js';
+import { GrassForm } from './grass.js';
 
 /**
  * The FormFactory will provide objects based on templates
@@ -44,6 +45,9 @@ export class FormFactory {
                 break;
             case "water":
                 form = new WaterForm(template, this.sceneController,"Water" ); // ,"Water" ); // , "Refractor");
+                break;
+            case "grass":
+                form = new GrassForm(template, this.sceneController ); // ,"Grass" ); // , "Refractor");
                 break;
             default:
                 form = new StandardForm(template, this.sceneController);
@@ -87,6 +91,22 @@ export class FormFactory {
 
     }
 
+    addLeaves = (scene, model) => {
+        
+        let spriteConfig = {
+            name: ['leaves'],
+            regex: new RegExp('null|edge', 'i'),
+            frames: 1,
+            scale: 700,
+            elevation: 20,
+            flip: false,
+            animates: false,
+            time: null
+        }
+
+        this.addSprites(model, spriteConfig, scene);
+
+    }
     /** 
      * If regex is provided, scan down the model for any part that matches regex;
      * the first param may optionally be an array for random selection.
@@ -203,6 +223,8 @@ export class FormFactory {
 
         return fireObj;
     }
+
+    
 
 
 }

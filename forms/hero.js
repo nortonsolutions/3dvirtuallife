@@ -806,7 +806,7 @@ export class Hero extends IntelligentForm {
         Object.keys(this.attributes.xpLevels).forEach(category => {
             let nextLevel = Number(this.attributes.xpLevels[category]) + 1;
             let reqPoints = Math.pow(2, nextLevel+1);
-            console.log(`${category}: ${reqPoints} required for level ${nextLevel}`);
+            // console.log(`${category}: ${reqPoints} required for level ${nextLevel}`);
             if (this.attributes.experience >= reqPoints) eligibility.push({
                 category,
                 nextLevel

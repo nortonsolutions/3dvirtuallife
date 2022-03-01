@@ -33,6 +33,8 @@ export class StandardForm {
 
         this.setRoofToSingleSided = this.setRoofToSingleSided.bind(this);
         this.load = this.load.bind(this);
+
+        this.firstMaterial = null;
     }
 
     /** load is for loading the model and animations specifically */
@@ -50,7 +52,7 @@ export class StandardForm {
             model.scale.y = this.template.attributes.scale;
             model.scale.z = this.template.attributes.scale;
 
-            if (this.template.attributes.rotateY) model.rotateY(Math.PI);
+            if (this.template.attributes.rotateY) model.rotateY(degreesToRadians(this.template.attributes.rotateY));
             this.model = model;
             this.animations = gltf.animations;
            
@@ -78,6 +80,7 @@ export class StandardForm {
             }
 
             if (this.objectName=='vikingShop') {
+                this.model.getObjectByName('windows').material.transparent = true;
                 this.model.getObjectByName('windows').material.opacity = 0.1;
             }
 
@@ -88,6 +91,16 @@ export class StandardForm {
         }, undefined, function ( error ) {
             console.error( error );
         });
+    }
+
+    findFirstMaterial(el) {
+        if (!this.firstMaterial && el.material) {
+            this.firstMaterial = el.material;
+        } else if (!this.firstMaterial) {
+            for (let i = 0; i < el.children.length; i++) {
+                this.findFirstMaterial(el.children[i]);
+            }
+        }
     }
 
     /** 
@@ -156,7 +169,7 @@ export class StandardForm {
         let yOffset = 40;
 
         this.upRaycaster.ray.origin.copy(this.model.position);
-        this.upRaycaster.ray.origin.y = -yOffset;
+        this.upRaycaster.ray.origin.y = -200;
         
         if (this.upRaycaster.intersectObject(this.sceneController.floor.model, true)[0]) {
             

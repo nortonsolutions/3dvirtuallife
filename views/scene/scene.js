@@ -142,6 +142,7 @@ class Scene {
                 map: new THREE.TextureLoader().load("/textures/" + this.background)
             });
 
+            // Match the background color to the fog for best fadeout
             this.scene.background = WHITE;
             this.backgroundMesh = new THREE.Mesh(geometry, material);
             this.controls.getObject().add( this.backgroundMesh );
@@ -150,18 +151,20 @@ class Scene {
             this.scene.background = BLACK;
         }
 
-        if (this.controller.layout.terrain.attributes.fog && this.controller.layout.dayTime) {
-            this.scene.fog = new THREE.Fog( 
-                this.controller.layout.terrain.attributes.fog.color, 
-                700/(this.controller.layout.terrain.attributes.fog.density? 
-                    this.controller.layout.terrain.attributes.fog.density : 1), 
-                cameraReach-100 );
-        } else if (this.controller.layout.dayTime == false) {
-            this.scene.fog = new THREE.Fog( 
-                'black', 
-                700/(this.controller.layout.terrain.attributes.fog.density? 
-                    this.controller.layout.terrain.attributes.fog.density : 1), 
-                cameraReach-100 );
+        if (this.controller.layout.terrain.attributes.fog) {
+            if (this.controller.layout.terrain.attributes.fog && this.controller.layout.dayTime) {
+                this.scene.fog = new THREE.Fog( 
+                    this.controller.layout.terrain.attributes.fog.color, 
+                    700/(this.controller.layout.terrain.attributes.fog.density? 
+                        this.controller.layout.terrain.attributes.fog.density : 1), 
+                    cameraReach-100 );
+            } else if (this.controller.layout.dayTime == false) {
+                this.scene.fog = new THREE.Fog( 
+                    'black', 
+                    700/(this.controller.layout.terrain.attributes.fog.density? 
+                        this.controller.layout.terrain.attributes.fog.density : 1), 
+                    cameraReach-100 );
+            }
         }
     }
 

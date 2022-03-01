@@ -383,6 +383,46 @@ export const Entities = {
         },
         // equipped: {"Middle2R":["axe2",false,null]}
     },
+    elfgirl: {
+        name: 'elfgirl',
+        gltf: 'elfgirl.glb',
+        description: 'Elvish woman',
+        type: 'friendly',
+        inventory: [
+            {itemName:"houseLarge",quantity:1,price:"gold/3"},
+        ],
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 30,
+            dialogHeight: 60,
+            length: 20,
+            width: 20,
+            elevation: 0,
+            scale: 30,
+            goldValue: 1.1, // Slightly higher value of gold on exchanges
+            conversation: {
+                conversationState: "intro",
+                engagementState: 0,
+                special: {
+                    condition: ["bagOfGems","gold"],
+                    speech: 'Welcome to my shop, my friend.',
+                    action: 'showWares'
+                },
+                intro: {
+                    speech: "Hello there, stranger.  Come back when you have something to trade.", 
+                    responses: [convo.wellwish]
+                }
+            },
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "1/1/0",
+                defense: "1/1/0"
+            }
+        },
+    },
     zombie: {
         name: 'zombie',
         gltf: 'zombie.glb',
@@ -661,69 +701,7 @@ export const Entities = {
             }
         }
     },
-    elfgirl: {
-        name: 'elfgirl',
-        gltf: 'elfgirl.glb',
-        description: 'Elvish girl',
-        type: 'friendly',
-        inventory: [
-            {itemName:"armor",quantity:1,price:"crystalBall/1"},
-            {itemName:"bluepotion",quantity:1,price:"crystalBall/1"}
-        ],
-        attributes: {
-            moves: true,
-            animates: true,
-            height: 30,
-            dialogHeight: 70,
-            length: 20,
-            width: 20,
-            elevation: 0,
-            scale: 30,
-            conversation: {
-                conversationState: "intro",
-                engagementState: 0,
-                special: {
-                    condition: ["crystalBall"],
-                    speech: 'Ah, you have my crystal ball!  Please take what you will in exchange!',
-                    action: "showWares",
-                    jumpToState: "complete"
-                },
-                intro: {
-                    speech: "Hello there, stranger.", 
-                    responses: [convo.engage, convo.disengage]
-                },
-                engaged: [ // ordered to allow progression
-                    {
-                        speech: "These are terrible times here, so beware.  The place is overrun with horrors from the depths.", 
-                        responses: [convo.engage, convo.disengage]
-                    },
-                    {
-                        speech: "Yes, yes....  I'll tell you, the thieves running rampant have no regard for anyone or anything but themselves.  Recently they stole my crystal ball.", 
-                        responses: [convo.empathize, convo.disengage]
-                    },
-                    {
-                        speech: "Thank you for your concern, fellow man.  If you could find and return my crystal ball, I will reward your efforts.", 
-                        responses: [convo.disengage, convo.wellwish],
-                    }
-                ],
-                disengaged: {
-                    speech: "Have a fine day, stranger.",
-                    responses: [convo.engage, convo.disengage]
-                },
-                complete: {
-                    speech: "Most esteemed greetings to you, my friend!",
-                    responses: [convo.wellwish]
-                }
-            },
-            stats: {
-                health: "2/2/0",
-                mana: "0/0/0",
-                strength: "1/1/0",
-                agility: "1/2/0",
-                defense: "0/0/0"
-            }
-        }
-    },
+
     shopkeep: {
         name: 'shopkeep',
         gltf: 'shopkeep.glb',
@@ -780,7 +758,7 @@ export const Entities = {
             width: 20,
             elevation: 0,
             scale: 45,
-            rotateY: true,
+            rotateY: 180,
             conversation: {
                 conversationState: "intro",
                 engagementState: 0,

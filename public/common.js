@@ -2,6 +2,10 @@
 
 var multiplier = 100;
 
+function degreesToRadians(degrees) {
+    return Number(degrees) * Math.PI / 180;
+}
+
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min) ) + min;
 }
@@ -49,7 +53,7 @@ function shiftTowardCenter(value, factor) {
         if (value > 0) {
             return value - (5 * factor);
         } else return value + (5 * factor);
-    }
+    } else return value;
 }
 
 postOptions = (data) => {

@@ -49,7 +49,7 @@ export class SceneController {
         this.floorNPClocations = [];
         this.floorBossLocations = [];
 
-        if (this.firstInRoom) this.layout.dayTime = Math.random() < .5;
+        if (this.firstInRoom) this.layout.dayTime = Math.random() < .9;
         
         this.sprites = [];
         this.projectiles = [];
@@ -98,15 +98,18 @@ export class SceneController {
         this.scene = new Scene(this);
         this.scene.init(() => {
             this.addFloor(() => {
+                this.scene.animate();
                 this.addWater(() => {
-                    this.scene.animate();
-                    this.addLights();
-                    this.addHero(() => {
-                        this.seedForms(this.firstInRoom, () => {
-                            this.introduce();
-                            this.scene.readyForLock = true;
+                    this.addGrass(() => {
+                        this.addLights();
+                        this.addHero(() => {
+                            this.seedForms(this.firstInRoom, () => {
+                                this.introduce();
+                                this.scene.readyForLock = true;
+                            });
                         });
-                    });
+    
+                    })
                 });
             });
         });
@@ -300,6 +303,18 @@ export class SceneController {
         }
     }
 
+    addGrass(callback) {
+        if (this.layout.terrain.attributes.grass) {
+            this.grass = this.formFactory.newForm("grass", this.layout.terrain.attributes.grass);
+            this.grass.load(() => {
+                this.addToScene(this.grass, false);
+                callback();
+            });
+        } else {
+            callback();
+        }
+    }
+
     addToScene(form, addToForms = true, addToScene = true, reseed = false) {
         
         if (reseed) {
@@ -331,14 +346,19 @@ export class SceneController {
         this.floor = this.formFactory.newForm("floor", this.layout.terrain);
         this.floor.load(() => {
 
-            if (this.floor.attributes.emissiveIntensity) this.floor.model.children[0].material.emissiveIntensity = this.floor.attributes.emissiveIntensity;
+            if (this.floor.attributes.emissiveIntensity) {
+                this.floor.findFirstMaterial(this.floor.model);
+                this.floor.firstMaterial.emissiveIntensity = this.floor.attributes.emissiveIntensity;
+            }
             
             this.formFactory.addSconces(this.floor.model, (100/this.layout.terrain.attributes.scale));
             if (this.layout.terrain.attributes.borderTrees) {
                 this.formFactory.addBorderTrees(this.scene, this.floor.model);
             }
 
-            // this.demarcateBlankZones(this.floor.model);
+            if (this.layout.terrain.attributes.leaves) {
+                this.formFactory.addLeaves(this.scene, this.floor.model);
+            }
 
             if (this.layout.terrain.attributes.designateNPCs) {
                 this.populateNPCnulls(this.floor.model);
@@ -375,23 +395,6 @@ export class SceneController {
             if (model.children) {
                 model.children.forEach(m => {
                     this.populateBossNulls(m);
-                })
-            }
-        }
-    }
-
-    /**
-     * Iterate through the objects which match 'blank' regex, add their
-     * bounding boxes to noEnemySpawnZones where enemies cannot appear.
-     */
-    demarcateBlankZones(model) {
-        if (/blank/i.test(model.name)) {
-            if (model.geometry) model.geometry.computeBoundingBox();
-            this.noEnemySpawnZones.push(model.geometry.boundingBox);
-        } else {
-            if (model.children) {
-                model.children.forEach(m => {
-                    this.demarcateBlankZones(m);
                 })
             }
         }
@@ -503,14 +506,14 @@ export class SceneController {
                 if (!this.layout.entities[index].attributes) this.layout.entities[index].attributes = {};
                 this.layout.entities[index].attributes.layoutId = template.attributes.layoutId = nextLayoutId++;
 
-                if (this.layout.terrain.attributes.designateNPCs && index < this.floorNPClocations.length) {
+                if (this.layout.terrain.attributes.designateNPCs && template.type == "beast" && index < this.floorNPClocations.length) {
                     // this.floorNPClocations = [];
-                    template.location = this.getLocationFromPosition(this.floorNPClocations[index], 1);
+                    template.location = this.getLocationFromPosition(this.floorNPClocations[index], 100/this.layout.terrain.attributes.scale);
                 }
 
                 if (this.layout.terrain.attributes.designateNPCs && template.attributes.boss ) {
                     // this.floorBossLocations = [];
-                    template.location = this.getLocationFromPosition(this.floorBossLocations[0], 1);
+                    template.location = this.getLocationFromPosition(this.floorBossLocations[0], 100/this.layout.terrain.attributes.scale);
                 }
             }
             this.seedForm(template).then(form => {});

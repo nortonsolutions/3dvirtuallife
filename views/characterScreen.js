@@ -319,7 +319,7 @@ function newHeroTemplate(name,height) {
         },
         gltf: 'robot.glb',
         model: null,
-        inventory: [],
+        inventory: [{"itemName":"gold", "quantity": 3}],
         spells: [
             {"itemName":"healSpell"},
             {"itemName":"healAllSpell"},

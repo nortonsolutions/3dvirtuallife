@@ -74,7 +74,7 @@ export class DialogScreen {
             this.currentModel.scale.z = this.entity.template.attributes.scale;
 
             if (this.entity.template.attributes.rotateY) {
-                this.currentModel.rotateY(Math.PI);
+                this.currentModel.rotateY(degreesToRadians(this.entity.template.attributes.rotateY));
             }
 
             this.scene.add( this.currentModel );

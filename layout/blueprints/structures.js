@@ -263,7 +263,7 @@ export const Structures = {
         type: 'structure',
         attributes: {
             staticStartingElevation: true,
-            rotateY: true,
+            rotateY: 180,
             animates: false,
             scale: 30,
             elevation: 30,
@@ -356,6 +356,29 @@ export const Structures = {
             locked: true,
             position: "down"
         }
-    }
+    },
+
+    houseLarge: {
+        name: 'houseLarge',
+        gltf: 'houseLarge.glb',
+        description: 'Large house',
+        type: 'structure',
+        attributes: {
+            animates: true,
+            scale: 30,
+            elevation: 0,
+            sprites: [{ 
+                name: "fireplace",
+                regex: "fireplace",
+                frames: 8,
+                scale: 16,
+                elevation: 1,
+                flip: false,
+                animates: true,
+                showOnSeed: true
+            }] 
+        }
+    
+    },
 }
 
