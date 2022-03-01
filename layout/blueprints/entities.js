@@ -395,7 +395,7 @@ export const Entities = {
             moves: true,
             animates: true,
             height: 30,
-            dialogHeight: 60,
+            dialogHeight: 45,
             length: 20,
             width: 20,
             elevation: 0,
@@ -832,7 +832,7 @@ export const Entities = {
                 health: "2/2/0",
                 mana: "0/0/0",
                 strength: "1/1/0",
-                agility: "1/2/0",
+                agility: "0/0/0",
                 defense: "0/0/0"
             }
         }

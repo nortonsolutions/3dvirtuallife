@@ -24,7 +24,7 @@ export class ArtificialForm extends IntelligentForm{
                     break;
                 case "rockyman":
                 case "lavaman":
-                case "crystalman":
+                case "crystalman":  
                     this.actions['Idle'].setEffectiveTimeScale(.5);
                     this.actions['Walking'].setEffectiveTimeScale(.5);
                     this.actions['Punch'].setEffectiveTimeScale(.5);
@@ -32,6 +32,8 @@ export class ArtificialForm extends IntelligentForm{
                     this.actions['Kick'].setEffectiveTimeScale(.5);
                     this.actions['Death'].setEffectiveTimeScale(.5);
                     break;
+                case "blacksmith":
+                    this.actions['Smiting'].setEffectiveTimeScale(.5);
             }
             if (callback) callback();
         });

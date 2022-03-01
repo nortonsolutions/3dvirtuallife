@@ -137,7 +137,7 @@ export class SceneController {
         
         let itemTemplate = this.getTemplateByName(data.itemName);
 
-        if (itemTemplate.type == 'item') {
+        if (itemTemplate.type == 'item' || itemTemplate.type == 'structure') {
             if (data.attributes) itemTemplate.attributes = {...itemTemplate.attributes, ...data.attributes};
 
             if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;

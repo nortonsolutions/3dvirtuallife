@@ -35,7 +35,7 @@ export class AnimatedForm extends StandardForm{
         this.possibleBowAttacks = ["ThumbsUp", "Givining the bird"];
 
         this.emotes = [ 
-            'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp', 'Walking in', 'Walking out', 'Open', 'Close',
+            'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp', 'Open', 'Close',
             ...this.possibleBlocks,
             ...this.possibleBowAttacks, 
             ...this.possibleHandAttacksR, 
@@ -84,11 +84,7 @@ export class AnimatedForm extends StandardForm{
                     action.clampWhenFinished = true;
                     action.loop = THREE.LoopPingPong;
                     action.repetitions = 1;
-                } else if (this.model.objectType=='item' && this.attributes.animatesRecurring) {
-                    this.model.children[1].material.opacity = 0.5;
-                } else if (this.model.objectName=='ghostGhoul') {
-                    this.model.children[0].children[1].material.opacity = 0.3;
-                } 
+                }
     
                 this.actions[ animation.name ] = action;
     
@@ -96,9 +92,14 @@ export class AnimatedForm extends StandardForm{
     
             this.handAttacks = [...this.handAttacksR, ...this.handAttacksL];
             this.kickAttacks = [...this.kickAttacksR, ...this.kickAttacksL];
-
-            this.activeActionName = 'Idle'; // Default for intelligent/walking beings
-            this.activeAction = this.actions[ 'Idle' ]? this.actions[ 'Idle' ] : this.actions[ firstAnimationName ];
+            
+            if (this.objectName == "blacksmith") {
+                this.activeActionName = 'Smiting';
+            } else {
+                this.activeActionName = 'Idle';
+            }
+             // Default for intelligent/walking beings
+            this.activeAction = this.actions[ this.activeActionName ]? this.actions[ this.activeActionName ] : this.actions[ firstAnimationName ];
             this.previousActionName = '';
             this.previousAction = null;
     
@@ -108,7 +109,7 @@ export class AnimatedForm extends StandardForm{
                         this.runAction(animation.name, 0.2);
                     })
                 
-            } else if (this.actions[ 'Idle' ]) this.activeAction.play();
+            } else if (this.actions[ this.activeActionName ]) this.activeAction.play();
 
             callback();
 

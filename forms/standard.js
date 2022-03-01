@@ -82,7 +82,11 @@ export class StandardForm {
             if (this.objectName=='vikingShop') {
                 this.model.getObjectByName('windows').material.transparent = true;
                 this.model.getObjectByName('windows').material.opacity = 0.1;
-            }
+            } else if (this.objectName == 'orb') {
+                this.model.children[1].material.opacity = 0.5;
+            } else if (this.model.objectName == 'ghostGhoul') {
+                this.model.children[0].children[1].material.opacity = 0.3;
+            } 
 
             // this.computeVertexNormals(this.model);
             // this.setToCastShadows();

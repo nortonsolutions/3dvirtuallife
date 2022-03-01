@@ -330,7 +330,7 @@ export const levels = [
                     overheadPointLight: false,
                 },
                 fog: {
-                    color: 'green',
+                    color: 'white',
                     density: 1.2
                 },
                 water: {
@@ -530,13 +530,13 @@ export const levels = [
                 name: "tavernShop", location: { x: 1.1, y: 0, z: -34.5 },
                 attributes: { rotateY: 180 }
             },
-            { 
+            { // animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent
                 name: "platformBlock", location: { x: -2.1, y: 0, z: -34.6 },
-                attributes: { elevation: -5, controls: "tavernShop:Walking in/3/3/0" }
+                attributes: { elevation: -5, controls: "tavernShop:Walking in/1/0/0/0/0" }
             },
             { 
                 name: "platformWood", location: { x: -.7, y: 0, z: -34.6 },
-                attributes: { elevation: 0, controls: "tavernShop:Walking out/3/3/0" }
+                attributes: { elevation: 0, controls: "tavernShop:Walking out/1/0/0/0/0" }
             },
 
             { 

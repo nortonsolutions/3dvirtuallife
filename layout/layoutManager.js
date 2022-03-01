@@ -82,13 +82,16 @@ class LayoutManager {
     addItemToLayout(data, local = true) {
         let item = {}; item.attributes = {};
 
-        if (!this.allItems[data.itemName]) {
+        if (!this.allObjects[data.itemName]) {
             console.error(`${data.itemName} not found in this.allItems`);
         } else {
-            item.name = this.allItems[data.itemName].name;
+            item.name = this.allObjects[data.itemName].name;
+            item.type = this.allObjects[data.itemName].type;
             item.location = data.location;
             item.attributes.layoutId = data.layoutId;
-            this.layout.items.push(item);
+
+            if (item.type == "item") this.layout.items.push(item);
+            if (item.type == "structure") this.layout.structures.push(item);
             if (local) this.socket.emit('addItemToLayout', {level: this.props.level, data, item});
             this.cacheLayout();
         }

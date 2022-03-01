@@ -361,11 +361,12 @@ export const Structures = {
     houseLarge: {
         name: 'houseLarge',
         gltf: 'houseLarge.glb',
+        image: 'houseLarge.png',
         description: 'Large house',
         type: 'structure',
         attributes: {
             animates: true,
-            scale: 30,
+            scale: 140,
             elevation: 0,
             sprites: [{ 
                 name: "fireplace",
