@@ -216,7 +216,12 @@ class InventoryScreen {
                     location: this.location,
                     source: data[3]
                 }
-    
+
+                var heroInventory = JSON.parse(localStorage.getItem('gameHeroTemplate')).inventory;
+
+                var itemIndex = heroInventory.map(el => el != undefined? el.itemName: null ).indexOf(data[0]);
+                if (itemIndex != -1 && heroInventory[itemIndex].keyCode) dropData.keyCode = heroInventory[itemIndex].keyCode;
+
                 this.eventDepot.fire('dropItemToScene', dropData);
     
                 this.refresh();

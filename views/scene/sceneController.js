@@ -131,7 +131,7 @@ export class SceneController {
         }
     }
 
-    /** data: {location ..., itemName..., } */
+    /** data: {location ..., itemName..., keyCode...} */
     /** local means it happened in this system and will be broadcast */ 
     dropItemToScene(data, local = true) {
         
@@ -141,6 +141,8 @@ export class SceneController {
             if (data.attributes) itemTemplate.attributes = {...itemTemplate.attributes, ...data.attributes};
 
             if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
+            if (data.keyCode) itemTemplate.attributes.keyCode = data.keyCode;
+            
             this.seedForm(itemTemplate).then(form => {
     
                 if (!data.position) {

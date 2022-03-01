@@ -88,6 +88,18 @@ export const Items = {
             elevation: 20
         }
     },
+    keyToHouse: {
+        name: 'keyToHouse',
+        gltf: 'key.gltf',
+        image: 'keyCopper.png',
+        description: 'A shiny housekey',
+        type: 'item',
+        attributes: {
+            animates: false,
+            scale: 30,
+            elevation: 20
+        }
+    },
     keyToChest: {
         name: 'keyToChest',
         gltf: 'key.gltf',

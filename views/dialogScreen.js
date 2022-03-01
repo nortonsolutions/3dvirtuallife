@@ -488,7 +488,15 @@ export class DialogScreen {
     acceptDeal() { // item exchange
 
         Object.keys(this.tab.items).forEach(item => {
-            this.hero.addToInventory(item, 0, this.tab.items[item]);
+
+            let keyCode = null;
+
+            if (/house/.test(item)) {
+                keyCode = getRndInteger(1,100000);
+                this.hero.addToInventory("keyToHouse", 0, this.tab.items[item], keyCode);
+            }
+
+            this.hero.addToInventory(item, 0, this.tab.items[item], keyCode);
         });
 
         Object.keys(this.payment).forEach(item => {

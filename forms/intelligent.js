@@ -434,10 +434,16 @@ export class IntelligentForm extends AnimatedForm{
 
     getInventoryQuantity(itemName) {
         var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
-        if (itemIndex != -1)
-         {
+        if (itemIndex != -1) {
             return this.inventory[itemIndex].quantity;
         } else return 0;
+    }
+
+    getInventoryKeyCode(itemName) {
+        var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
+        if (itemIndex != -1 && this.inventory[itemIndex].keyCode) {
+            return this.inventory[itemIndex].keyCode;
+        } else return null;
     }
 
     getGoldValue(itemName) {
@@ -462,7 +468,7 @@ export class IntelligentForm extends AnimatedForm{
         return worth;
     }
 
-    addToInventory(itemName, desiredIndex, quantity) {
+    addToInventory(itemName, desiredIndex, quantity, keyCode = null) {
 
         var newQuantity;
         var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
@@ -482,6 +488,8 @@ export class IntelligentForm extends AnimatedForm{
             itemName: itemName,
             quantity: newQuantity
         }
+
+        if (keyCode) this.inventory[itemIndex].keyCode = keyCode;
 
         if (this.objectSubtype == "local") this.cacheHero();
         return {itemIndex, quantity: newQuantity};

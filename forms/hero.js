@@ -191,11 +191,15 @@ export class Hero extends IntelligentForm {
                 let objectSubtype = this.selectedObject.objectSubtype;
                 
                 if (objectType == "item") {
-                    this.sceneController.eventDepot.fire('takeItemFromScene', {
+
+                    let data = {
                         itemName: this.selectedObject.attributes.baseItemName? this.selectedObject.attributes.baseItemName : this.selectedObject.objectName, 
                         quantity: this.selectedObject.attributes.quantity? this.selectedObject.attributes.quantity : 1,
-                        layoutId: this.selectedObject.model.attributes.layoutId
-                    });
+                        layoutId: this.selectedObject.model.attributes.layoutId,
+                    }
+
+                    if (this.selectedObject.attributes.keyCode) data.keyCode =this.selectedObject.attributes.keyCode;
+                    this.sceneController.eventDepot.fire('takeItemFromScene', data);
 
                 } else if (objectType == "friendly") {
                     
@@ -384,7 +388,7 @@ export class Hero extends IntelligentForm {
         });
 
         this.sceneController.eventDepot.addListener('takeItemFromScene', (data) => {
-            this.addToInventory(data.itemName, undefined, data.quantity);
+            this.addToInventory(data.itemName, undefined, data.quantity, data.keyCode);
         });
 
         this.sceneController.eventDepot.addListener('removeFromInventory', (itemName) => {
@@ -392,7 +396,7 @@ export class Hero extends IntelligentForm {
         });
 
         this.sceneController.eventDepot.addListener('addToInventory', (data) => {
-            this.addToInventory(data.itemName, undefined, data.quantity);
+            this.addToInventory(data.itemName, undefined, data.quantity, data.keyCode);
         });
 
         this.sceneController.eventDepot.addListener('dropItemToScene', (data) => {
@@ -761,7 +765,9 @@ export class Hero extends IntelligentForm {
                 } else {
                     for (let x = 0; x < item.quantity; x++) {   
                         /** data: {location ..., itemName..., } */
-                        this.sceneController.dropItemToScene({itemName: item.itemName, position: this.model.position});
+                        let dropData = {itemName: item.itemName, position: this.model.position};
+                        if (item.keyCode) dropData.attributes = { keyCode: item.keyCode };
+                        this.sceneController.dropItemToScene(dropData);
                     }
                 }
             }
