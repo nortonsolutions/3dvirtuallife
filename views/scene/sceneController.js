@@ -55,9 +55,6 @@ export class SceneController {
         this.projectiles = [];
 
         this.clock = new THREE.Clock();
-        this.refractor = null;
-
-        this.noEnemySpawnZones = [];
 
         // Bindings:
         this.addEventListeners = this.addEventListeners.bind(this);
@@ -293,7 +290,6 @@ export class SceneController {
 
     addWater(callback) {
         if (this.layout.terrain.attributes.water) {
-            this.refractor = null;
             this.waterElevation = this.layout.terrain.attributes.water.attributes.elevation;
             this.water = this.formFactory.newForm("water", this.layout.terrain.attributes.water);
             this.water.load(() => {
@@ -356,6 +352,10 @@ export class SceneController {
             this.formFactory.addSconces(this.floor.model, (100/this.layout.terrain.attributes.scale));
             if (this.layout.terrain.attributes.borderTrees) {
                 this.formFactory.addBorderTrees(this.scene, this.floor.model);
+            }
+
+            if (this.layout.terrain.attributes.grassSprites) {
+                this.formFactory.addGrassSprites(this.scene, this.floor.model);
             }
 
             if (this.layout.terrain.attributes.leaves) {
@@ -625,10 +625,6 @@ export class SceneController {
                 }
             });
             
-            if (this.refractor) {
-                this.refractor.material.uniforms[ "time" ].value += this.clock.getDelta();
-            }
-    
             if (this.overheadPointLight && this.scene.controls) {
                 let controlsObject = this.scene.controls.getObject();
                 this.overheadPointLight.position.copy(controlsObject.position);

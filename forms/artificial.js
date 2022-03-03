@@ -11,29 +11,21 @@ export class ArtificialForm extends IntelligentForm{
         super.load(() => {
             switch (this.objectName) {
                 case "evilOne":
-                    this.actions['Idle'].setEffectiveTimeScale(20);
-                    this.actions['Walking'].setEffectiveTimeScale(20);
-                    this.actions['Punch'].setEffectiveTimeScale(8);
-                    this.actions['Death'].setEffectiveTimeScale(8);
+                    Object.values(this.actions).forEach(action => { action.setEffectiveTimeScale(8); });
                     break;
                 case "blueShirt":
-                    this.actions['Idle'].setEffectiveTimeScale(2);
-                    this.actions['Walking'].setEffectiveTimeScale(2);
-                    this.actions['Punch'].setEffectiveTimeScale(2);
-                    this.actions['Death'].setEffectiveTimeScale(1);
+                    Object.values(this.actions).forEach(action => { action.setEffectiveTimeScale(2); });
                     break;
                 case "rockyman":
                 case "lavaman":
                 case "crystalman":  
-                    this.actions['Idle'].setEffectiveTimeScale(.5);
-                    this.actions['Walking'].setEffectiveTimeScale(.5);
-                    this.actions['Punch'].setEffectiveTimeScale(.5);
-                    this.actions['Punch2'].setEffectiveTimeScale(.5);
-                    this.actions['Kick'].setEffectiveTimeScale(.5);
-                    this.actions['Death'].setEffectiveTimeScale(.5);
+                    Object.values(this.actions).forEach(action => { action.setEffectiveTimeScale(0.3); });
                     break;
                 case "blacksmith":
-                    this.actions['Smiting'].setEffectiveTimeScale(.5);
+                    Object.values(this.actions).forEach(action => { 
+                        action.setEffectiveTimeScale(0.3); 
+                    });
+                    break;
             }
             if (callback) callback();
         });
@@ -41,81 +33,87 @@ export class ArtificialForm extends IntelligentForm{
 
     move(delta) {
         if (this.alive) {
+            let closestHeroPosition = this.closestHeroPosition();
+
+            if (closestHeroPosition && closestHeroPosition.distance < 1000) {
             
-            // TODO: If the velocity is already close to zero, maintain idle
-            this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
+                // TODO: If the velocity is already close to zero, maintain idle
+                this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
-            if (this.absVelocity < .1 && Math.random() < .95) {
-                // DO NOTHING, maintain idle state
+                if (this.absVelocity < .1 && Math.random() < .95) {
+                    // DO NOTHING, maintain idle state
 
-            } else {
+                } else {
 
-                // INERTIA
-                this.velocity.x -= this.velocity.x * 10.0 * delta;
-                this.velocity.z -= this.velocity.z * 10.0 * delta;
-                this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+                    // INERTIA
+                    this.velocity.x -= this.velocity.x * 10.0 * delta;
+                    this.velocity.z -= this.velocity.z * 10.0 * delta;
+                    this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
-                if (Math.random() < .4) { // percentage of changing direction
-                    this.direction.z = getRandomArbitrary(0,10);
-                    this.direction.x = getRandomArbitrary(-1,1);
-                    this.direction.normalize();
+                    if (Math.random() < .4) { // percentage of changing direction
+                        this.direction.z = getRandomArbitrary(0,10);
+                        this.direction.x = getRandomArbitrary(-1,1);
+                        this.direction.normalize();
+                    }
+
+                    let agility = this.getEffectiveStat('agility');
+
+                    if (Math.random() < .2) { // percentage of moving
+                        this.velocity.z += this.direction.z * 1000.0 * agility * delta;
+                        this.velocity.x += this.direction.x * 1000.0 * agility * delta;
+                    } 
+
+                    this.movementRaycaster.ray.origin.copy( this.model.position );
+
+                    // Make a random rotation (yaw)
+
+                    if (this.getEffectiveStat('agility') > 0) {
+                        this.model.rotateY(getRndInteger(-5,5)/100);
+                        this.rotation.copy(this.model.rotation);
+                    }
+
                 }
 
-                let agility = this.getEffectiveStat('agility');
+                super.move(delta);
 
-                if (Math.random() < .2) { // percentage of moving
-                    this.velocity.z += this.direction.z * 1000.0 * agility * delta;
-                    this.velocity.x += this.direction.x * 1000.0 * agility * delta;
+                if (this.objectType == "beast") {
+                    
+                        let d = closestHeroPosition.distance;
+
+                        if (d < 60) {
+                            this.facePosition(closestHeroPosition.position);
+                            this.attackHero(closestHeroPosition.heroLayoutId);
+                            this.stopAndBackup(delta);
+                        } else if (d < 400 && this.attributes.rangedSpell) {
+                            this.facePosition(closestHeroPosition.position);
+                            
+                            if (Math.random()<.05) {
+                                let action = this.possibleThrowAttacks[getRndInteger(0,this.possibleThrowAttacks.length-1)]
+                                this.fadeToAction(action, 0.2);
+                                setTimeout(() => {
+                                    this.castSpell(this.sceneController.getTemplateByName(this.attributes.rangedSpell), true, true);
+                                }, 1000);
+                            } else {
+                                this.moveToward(delta);
+                            }
+
+                        } else if (d < 700) {
+                            this.facePosition(closestHeroPosition.position);
+                            this.moveToward(delta);
+                        } 
+                    
                 } 
 
-                this.movementRaycaster.ray.origin.copy( this.model.position );
+                if (this.setElevation() == -1) {
+                    // console.log(`${this.objectName} is out of bounds`)
+                    this.model.position.x = shiftTowardCenter(this.model.position.x, 1);
+                    this.model.position.z = shiftTowardCenter(this.model.position.z, 1);
 
-                // Make a random rotation (yaw)
-
-                if (this.getEffectiveStat('agility') > 0) {
-                    this.model.rotateY(getRndInteger(-5,5)/100);
-                    this.rotation.copy(this.model.rotation);
-                }
-
+                    // this.stopAndBackup(delta);
+                };
+            } else { // idle
+                this.fadeToAction('Idle', 0.2);
             }
-
-            super.move(delta);
-
-            if (this.objectType == "beast") {
-                let closestHeroPosition = this.closestHeroPosition();
-                
-                if (closestHeroPosition) {
-                    let d = closestHeroPosition.distance;
-                    if (d < 60) {
-                        this.facePosition(closestHeroPosition.position);
-                        this.attackHero(closestHeroPosition.heroLayoutId);
-                        this.stopAndBackup(delta);
-                    } else if (d < 400 && this.attributes.rangedSpell) {
-                        this.facePosition(closestHeroPosition.position);
-                        
-                        if (Math.random()<.05) {
-                            this.fadeToAction('Striking L', 0.2);
-                            setTimeout(() => {
-                                 this.castSpell(this.sceneController.getTemplateByName(this.attributes.rangedSpell), true, true);
-                            }, 1000);
-                        } else {
-                            this.moveToward(delta);
-                        }
-
-                    } else if (d < 700) {
-                        this.facePosition(closestHeroPosition.position);
-                        this.moveToward(delta);
-                    } 
-                }
-            } 
-
-            if (this.setElevation() == -1) {
-                console.log(`${this.objectName} is out of bounds`)
-                this.model.position.x = shiftTowardCenter(this.model.position.x, 1);
-                this.model.position.z = shiftTowardCenter(this.model.position.z, 1);
-
-                // this.stopAndBackup(delta);
-            };
         }
     }
     

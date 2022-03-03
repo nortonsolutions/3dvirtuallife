@@ -667,10 +667,10 @@ export class Hero extends IntelligentForm {
                     this.sceneController.scene.removeFromScenebyLayoutId(this.attributes.layoutId);
                     this.sceneController.eventDepot.fire('loadLevel', loadData);
                 }
-            } else if (this.standingUpon && this.standingUpon.attributes.controls && !(typeof this.standingUpon.attributes.locked == "boolean")) {
+            } else if (this.standingUpon && this.standingUpon.attributes.footControls && !(typeof this.standingUpon.attributes.locked == "boolean")) {
                 // Check to see if this switch/lever controls something:
                 // attributes: { controls: "floor:Open/Close" }  -> Open/Close correspond to up/down
-                var [controlItem,animations] = this.standingUpon.attributes.controls.split(":");
+                var [controlItem,animations] = this.standingUpon.attributes.footControls.split(":");
                 let controlled = this.sceneController.forms.find(el => el.objectName == controlItem);
                 // controlled.fadeToAction(animation, 0.2);
 

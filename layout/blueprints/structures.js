@@ -6,7 +6,8 @@ export const Structures = {
         description: 'Mighty regal castle',
         type: 'structure',
         attributes: {
-            animates: false,
+            animates: true,
+            position: "down",
             scale: 100,
             elevation: -6,
             sprites: [{ 
@@ -30,8 +31,8 @@ export const Structures = {
         type: 'structure',
         attributes: {
             animates: false,
-            scale: 30,
-            elevation: -40,
+            scale: 40,
+            elevation: -90,
         }
     },
 
@@ -186,6 +187,7 @@ export const Structures = {
         description: 'Tavern and shop',
         type: 'structure',
         attributes: {
+            transparentWindows: true,
             animates: true,
             scale: 35,
             elevation: 0 
@@ -200,6 +202,7 @@ export const Structures = {
         type: 'structure',
         attributes: {
             animates: true,
+            transparentWindows: true,
             scale: 30,
             elevation: 0,
             sprites: [{ 
@@ -360,11 +363,12 @@ export const Structures = {
 
     houseLarge: {
         name: 'houseLarge',
-        gltf: 'houseLarge.glb',
+        gltf: 'houseLarge2.glb',
         image: 'houseLarge.png',
         description: 'Large house',
         type: 'structure',
         attributes: {
+            transparentWindows: true,
             animates: true,
             scale: 140,
             elevation: 0,
@@ -381,5 +385,55 @@ export const Structures = {
         }
     
     },
+
+    houseMedium: {
+        name: 'houseMedium',
+        gltf: 'houseMedium.glb',
+        image: 'houseMedium.png',
+        description: 'Medium house',
+        type: 'structure',
+        attributes: {
+            transparentWindows: true,
+            animates: true,
+            scale: 140,
+            elevation: 0,
+            sprites: [{ 
+                name: "fireplace",
+                regex: "fireplace",
+                frames: 8,
+                scale: 16,
+                elevation: 1,
+                flip: false,
+                animates: true,
+                showOnSeed: true
+            }] 
+        }
+    
+    },
+
+    houseSmall: {
+        name: 'houseSmall',
+        gltf: 'houseSmall.glb',
+        image: 'houseSmall.png',
+        description: 'Large house',
+        type: 'structure',
+        attributes: {
+            transparentWindows: true,
+            animates: true,
+            scale: 140,
+            elevation: 0,
+            sprites: [{ 
+                name: "fireplace",
+                regex: "fireplace",
+                frames: 8,
+                scale: 16,
+                elevation: 1,
+                flip: false,
+                animates: true,
+                showOnSeed: true
+            }] 
+        }
+    
+    }
 }
 

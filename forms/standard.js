@@ -65,7 +65,7 @@ export class StandardForm {
                 } else {
                     this.model.position.y = this.template.location.y * multiplier;
                 }
-                this.tweakPosition();
+                // this.tweakPosition();
 
                 // console.log(`Placing ${this.objectName} @ ${this.model.position.x},${this.model.position.y},${this.model.position.z}` );
             
@@ -79,9 +79,10 @@ export class StandardForm {
                 this.setToFrontSided(this.model);
             }
 
-            if (this.objectName=='vikingShop') {
-                this.model.getObjectByName('windows').material.transparent = true;
-                this.model.getObjectByName('windows').material.opacity = 0.1;
+            if (this.attributes.transparentWindows) {
+                let windows = this.model.getObjectByName('windows');
+                this.setMaterialRecursive(windows, "transparent", true);
+                this.setMaterialRecursive(windows, "opacity", 0.1);
             } else if (this.objectName == 'orb') {
                 this.model.children[1].material.opacity = 0.5;
             } else if (this.model.objectName == 'ghostGhoul') {
@@ -95,6 +96,16 @@ export class StandardForm {
         }, undefined, function ( error ) {
             console.error( error );
         });
+    }
+
+    setMaterialRecursive(el, property, value) {
+        if (el.material) {
+            el.material[property] = value;
+        } else if (el.children && el.children.length > 0) {
+            for (let i = 0; i < el.children.length; i++) {
+                this.setMaterialRecursive(el.children[i], property, value);
+            }
+        }
     }
 
     findFirstMaterial(el) {
@@ -170,6 +181,7 @@ export class StandardForm {
 
     determineElevationFromBase() {
 
+        // console.log(`Determining elevation from base for ${this.objectName}`)
         let yOffset = 40;
 
         this.upRaycaster.ray.origin.copy(this.model.position);

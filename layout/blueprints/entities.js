@@ -194,6 +194,30 @@ export const Entities = {
             grants: ["gold10"]
         }
     },
+    crocodile: {
+        name: 'crocodile',
+        gltf: 'crocodile.glb',
+        description: 'Slithering crocodile',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            swims: true,
+            height: 10,
+            length: 80,
+            width: 20,
+            elevation: 0,
+            scale: 10,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "1/1/0"
+            },
+            grants: ["gold10"]
+        }
+    },
     jelly: {
         name: 'jelly',
         gltf: 'jelly.glb',
@@ -389,6 +413,8 @@ export const Entities = {
         description: 'Elvish woman',
         type: 'friendly',
         inventory: [
+            {itemName:"houseSmall",quantity:1,price:"gold/2"},
+            {itemName:"houseMedium",quantity:1,price:"gold/2"},
             {itemName:"houseLarge",quantity:1,price:"gold/3"},
         ],
         attributes: {

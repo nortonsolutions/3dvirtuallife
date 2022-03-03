@@ -1,6 +1,6 @@
 
 
-var cameraReach = 2500;
+var cameraReach = 2300;
 var cameraDistanceDefault = 200;
 var cameraElevationDefault = 40;
 
@@ -135,7 +135,7 @@ class Scene {
         } else if (this.background && this.background.length > 0 && this.controller.layout.dayTime) {
 
             // simplistic equirectangular mapping to the inverse of a sphere geometry:
-            var geometry = new THREE.SphereBufferGeometry(cameraReach - 100);
+            var geometry = new THREE.SphereBufferGeometry(cameraReach - 200);
             geometry.scale (-1,1,1);
 
             var material = new THREE.MeshBasicMaterial( {
@@ -234,7 +234,7 @@ class Scene {
 
             if (this.camera.position.z <= cameraDistanceDefault) {
                 this.camera.position.z += cameraDistanceDefault / 100;
-                this.scene.fog.far = cameraReach-100;
+                if (this.scene.fog) this.scene.fog.far = cameraReach-100;
             }
             if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height) this.camera.position.y += cameraElevationDefault / 100;
         }

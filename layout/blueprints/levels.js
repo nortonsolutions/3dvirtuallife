@@ -50,7 +50,7 @@ export const levels = [
             },
             { 
                 name: "portalStone", location: { x: 10.3, y: 0, z: -2.7}, 
-                attributes: { routeTo: { level: 3, location: { x: 1, y: 0, z: 1 } } } 
+                attributes: { routeTo: { level: 3, location: { x: 9.2, y: 0, z: 39.6} } } 
             },
             { 
                 name: "portalStone", location: { x: 10.5, y: 0, z: .05}, 
@@ -95,6 +95,9 @@ export const levels = [
             description: 'valley',
             gltf: 'valley.glb',
             attributes: {
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
                 scale: 100,
                 borderTrees: true,
                 light: {
@@ -105,10 +108,7 @@ export const levels = [
                     color: 'white',
                     density: 1
                 },
-                noEnemySpawnZones: [
-                    // [location,radius] (both in location units, i.e. /multiplier)
-                    [{ x: 0, y: 0, z: 0},6]
-                ]
+                designateNPCs: true
             }
         },
         items: [
@@ -124,7 +124,9 @@ export const levels = [
             { name: "silver" },
         ],
         structures: [
-            { name: "shed", location: { x: 0, y: 0, z: 0} },
+            { name: "shed", location: { x: 0, y: 0, z: 0},
+                attributes: { transparentWindows: true} 
+            }, 
             { name: "rock1" },
             { name: "cart" },
             { 
@@ -133,22 +135,30 @@ export const levels = [
             },
             { 
                 name: "platformBlock", location: { x: 19.5, y: 0, z: -6.5}, 
-                attributes: { routeTo: { level: 3, location: { x: -18.0, y: 0, z: -6.5 } } } //swamp
+                attributes: { routeTo: { level: 3, location: { x: 9.2, y: 0, z: 39.6} } } //swamp
             },
             { 
                 name: "platformBlock", location: { x: -17.0, y: 0, z: -6.0 },
                 attributes: { routeTo: { level: 4, location: { x: -23.5, y: 0, z: -6.5} } } //lavafield
             },
             { 
-                name: "elevatorS_1m", location: { x: -4.9, y: 0, z: 5.1 }, attributes: { scale: 200 }
+                name: "elevatorS_1m", location: { x: -4.75, y: 0, z: 4.75 }, attributes: { scale: 200 }
             },
             { 
                 name: "lever", location: { x: -4, y: 0, z: 3.1 },
-                attributes: { controls: "elevatorS_1m:Move/3/3/0" }
+                attributes: { controls: "elevatorS_1m:Move/3/3/0", rotateY: 270 }
             },
             { 
-                name: "lever", location: { x: -4.2, y: 2.6, z: 3.3 },
-                attributes: { controls: "elevatorS_1m:Move/3/3/0", staticStartingElevation: true, position: "up" }
+                name: "lever", location: { x: -4.5, y: 2.6, z: 3.45 },
+                attributes: { controls: "elevatorS_1m:Move/3/3/1", staticStartingElevation: true, position: "up", rotateY: 315 }
+            },
+            { 
+                name: "lever", location: { x: -.8, y: 0, z: 4.1 },
+                attributes: { controls: "shed:gateaction/2/2/1/false/concurrent+invgateaction/2/2/1/false/concurrent" }
+            },
+            { 
+                name: "lever", location: { x: -.9, y: 2.6, z: 5 },
+                attributes: { rotateY: 180, controls: "shed:gateaction/2/2/1/false/concurrent+invgateaction/2/2/1/false/concurrent", position: "up" }
             },
         ],
         entities: [
@@ -157,6 +167,7 @@ export const levels = [
             { name: "evilOne", type: "beast" },
             { name: "ghoul", type: "beast"  },
             { name: "triceratops", type: "beast" },
+            { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
             // { name: "triceratops", type: "beast" },
             // { name: "iceGhoul", type: "beast"  },
             // { name: "shockGhoul", type: "beast"  },
@@ -190,6 +201,9 @@ export const levels = [
             description: 'dungeon',
             gltf: 'dungeon.glb',
             attributes: {
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
                 scale: 100,
                 light: {
                     sunLight: false,
@@ -199,10 +213,6 @@ export const levels = [
                     color: 'black',
                     density: 1
                 },
-                noEnemySpawnZones: [
-                    // [location,radius] (both in location units, i.e. /multiplier)
-                    // [{ x: 0, y: 0, z: 0},6]
-                ],
                 designateNPCs: true
             }
         },
@@ -265,6 +275,9 @@ export const levels = [
             description: 'catacomb',
             gltf: 'catacomb.glb',
             attributes: {
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
                 scale: 100,
                 light: {
                     sunLight: false,
@@ -274,10 +287,7 @@ export const levels = [
                     color: 'black',
                     density: 1
                 },
-                noEnemySpawnZones: [
-                    // [location,radius] (both in location units, i.e. /multiplier)
-                    // [{ x: 0, y: 0, z: 0},6]
-                ]
+                designateNPCs: true
             }
         },
         items: [
@@ -315,36 +325,37 @@ export const levels = [
         length: 52, //26
         description: "Swamp",
         background: 'swampBackground.png',
-        backgroundNight: 'swampBackground.png',
+        backgroundNight: '',
         terrain: {
             name: 'floor',
             type: 'floor',
             description: 'swamp',
             gltf: 'swamp.glb',
             attributes: {
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
                 scale: 100,
                 borderTrees: false,
+                grassSprites: true,
                 leaves: true,
                 light: {
                     sunLight: true,
                     overheadPointLight: false,
                 },
                 fog: {
-                    color: 'white',
-                    density: 1.2
+                    color: '#88e732',
+                    density: .5
                 },
                 water: {
                     attributes: {
-                        elevation: -140,
+                        elevation: -120,
                         color: "green",
                         scale: 200
                     },
                     gltf: 'water.glb'
                 },
-                noEnemySpawnZones: [
-                    // [location,radius] (both in location units, i.e. /multiplier)
-                    // [{ x: 0, y: 0, z: 0},6]
-                ]
+                designateNPCs: true
             }
         },
         items: [
@@ -352,39 +363,50 @@ export const levels = [
             // { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
             // { name: "rosenRelic" },
             // { name: "gold25", location: { x: 10, y: 0, z: -1 }},
-            // { name: "redpotion" },
-            // { name: "greenpotion" },
-            // { name: "smallSword" },
-            // { name: "blackpotion" },
-            // { name: "bagOfGems" },
-            // { name: "chromium" },
-            // { name: "copper" }
+            { name: "redpotion" },
+            { name: "greenpotion" },
+            { name: "smallSword" },
+            { name: "blackpotion" },
+            { name: "bagOfGems" },
+            { name: "chromium" },
+            { name: "copper" }
         ],
         structures: [
-            // { name: "bridge", location: { x: 5.3, y: 0, z: -18} },
-            // { name: "bridge", location: { x: 10.8, y: 0, z: 17.5} },
-            // { 
-            //     name: "platformBlock", location: { x: -21.5, y: 0, z: -6.5},
-            //     attributes: { elevation: 5, routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } //valley
-            // },
-            // { 
-            //     name: "platformBlock", location: { x: 8.4, y: 0, z: 21.1},
-            //     attributes: { locked: false, elevation: 10, routeTo: { level: 5, location: { x: -14.5, y: 0, z: 35.5 } } } //kingdom
-            // },
-            // { 
-            //     name: "platformBlock", location: { x: 3.2, y: 0, z: -21}, 
-            //     attributes: { locked: false, elevation: 60, routeTo: { level: 7, location: { x: 16.9, y: 0, z: -25.5 } } } //snowyland
-            // }
+            { name: "bridge", location: { x: -11.1, y: 0, z: 33.7} },
+            { name: "bridge", location: { x: 36.5, y: 0, z: 18.5}, attributes: { rotateY: 90 } },
+            { 
+                name: "platformBlock", location: { x: 11.2, y: 0, z: 39.6},
+                attributes: { elevation: 5, routeTo: { level: 0, location: { x: 19.5, y: 0, z: -6.5 } } } //valley
+            },
+            { 
+                name: "platformBlock", location: { x: -14.2, y: 0, z: 36.8},
+                attributes: { locked: false, elevation: -5, routeTo: { level: 5, location: { x: -7.4, y: 0, z: 38.5 } } } //kingdom
+            },
+            { 
+                name: "platformBlock", location: { x: 39.4, y: 0, z: 21.4}, 
+                attributes: { locked: false, elevation: 0, routeTo: { level: 7, location: { x: 16.9, y: 0, z: -25.5 } } } //snowyland
+            }
         ],
         entities: [
             // { name: "crystalMan", type: "beast" },
             // { name: "crystalMan", type: "beast" },
+            { name: "crocodile", type: "beast" },
+            { name: "crocodile", type: "beast" },
+            { name: "crocodile", type: "beast" },
+            // { name: "crocodile", type: "beast" },
+            // { name: "crocodile", type: "beast" },
+            // { name: "crocodile", type: "beast" },
+            // { name: "crocodile", type: "beast" },
             // { name: "iceGhoul", type: "beast"  },
             // { name: "shockGhoul", type: "beast"  },
-            // { name: "triceratops", type: "beast" },
             // { name: "gasGhoul", type: "beast"  },
             // { name: "ghostGhoul", type: "beast"  },
-            
+            // { name: "john" },
+            // { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
+            // { name: "evilOne", type: "beast" },
+            // { name: "ghoul", type: "beast"  },
+            // { name: "triceratops", type: "beast" },
+            // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
         ]
     },
     {
@@ -400,6 +422,9 @@ export const levels = [
             description: 'lavafield',
             gltf: 'lavafield.glb',
             attributes: {
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
                 scale: 100,
                 borderTrees: true,
                 light: {
@@ -420,10 +445,8 @@ export const levels = [
                     },
                     gltf: 'lava.glb'
                 },
-                noEnemySpawnZones: [
-                    // [location,radius] (both in location units, i.e. /multiplier)
-                    // [{ x: 0, y: 0, z: 0},6]
-                ]
+                designateNPCs: true
+
             }
         },
         items: [
@@ -475,6 +498,9 @@ export const levels = [
             description: 'kingdom',
             gltf: 'kingdom.glb',
             attributes: {
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
                 animates: true,
                 scale: 200,
                 borderTrees: true,
@@ -486,10 +512,6 @@ export const levels = [
                     color: 'white',
                     density: 1
                 },
-                noEnemySpawnZones: [
-                    // [location,radius] (both in location units, i.e. /multiplier)
-                    [{ x: 0, y: 0, z: 0},35]
-                ],
                 designateNPCs: true,
                 // grass: {
                 //     attributes: {
@@ -516,7 +538,7 @@ export const levels = [
 
             { 
                 name: "platformBlock", location: { x: -13.5, y: 0, z: 35.5 },
-                attributes: { locked: false, elevation: 10, routeTo: { level: 3, location: { x: 6.4, y: 0, z: 21.1} } } //swamp
+                attributes: { locked: false, elevation: 10, routeTo: { level: 3, location: { x: -14, y: 0, z: 35.1} } } //swamp
             },
             { 
                 name: "platformBlock", location: { x: -92.4, y: 0, z: 100.8 },
@@ -532,11 +554,11 @@ export const levels = [
             },
             { // animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent
                 name: "platformBlock", location: { x: -2.1, y: 0, z: -34.6 },
-                attributes: { elevation: -5, controls: "tavernShop:Walking in/1/0/0/0/0" }
+                attributes: { elevation: -5, footControls: "tavernShop:Walking in/1/0/0/0/0" }
             },
             { 
                 name: "platformWood", location: { x: -.7, y: 0, z: -34.6 },
-                attributes: { elevation: 0, controls: "tavernShop:Walking out/1/0/0/0/0" }
+                attributes: { elevation: 0, footControls: "tavernShop:Walking out/1/0/0/0/0" }
             },
 
             { 
@@ -545,33 +567,33 @@ export const levels = [
             },
             { 
                 name: "lever", location: { x: -11.2, y: 0, z: 26.1 },
-                attributes: { locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL/3/3/0/noAutorestore/concurrent+OpenR/3/3/0/noAutorestore/concurrent+OpenBars/3/3/0/noAutorestore/concurrent" }
+                attributes: { locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL/3/5/1/noAutorestore/concurrent+OpenR/3/5/1/noAutorestore/concurrent+OpenBars/3/5/1/noAutorestore/concurrent" }
             },
             { 
                 name: "lever", location: { x: -11.2, y: 0, z: 28.4 },
-                attributes: { rotateY: 180, locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL/3/3/0/noAutorestore/concurrent+OpenR/3/3/0/noAutorestore/concurrent+OpenBars/3/3/0/noAutorestore/concurrent", position: "up" }
+                attributes: { rotateY: 180, locked: true, key: "keyToKingdom", controls: "kingdomGate:OpenL/3/5/1/noAutorestore/concurrent+OpenR/3/5/1/noAutorestore/concurrent+OpenBars/3/5/1/noAutorestore/concurrent", position: "up" }
             },
             { 
                 name: "elevatorL_6m", location: { x: -3.8, y: 0, z: 25.8 },
             },
             { 
                 name: "lever", location: { x: -7, y: 0, z: 24.4 },
-                attributes: { controls: "elevatorL_6m:Move/3/3/0" }
+                attributes: { controls: "elevatorL_6m:Move/5/9/1", rotateY: 45 }
             },
             { 
                 name: "lever", location: { x: -6.2, y: 12.4, z: 24.8 },
-                attributes: { controls: "elevatorL_6m:Move/3/3/0", staticStartingElevation: true, position: "up" }
+                attributes: { controls: "elevatorL_6m:Move/5/9/1", staticStartingElevation: true, position: "up", rotateY: 45 }
             },
             { 
                 name: "elevatorS_6m", location: { x: -26.1, y: 0, z: 25.8 },
             },
             { 
                 name: "lever", location: { x: -24.2, y: 0, z: 25 },
-                attributes: { controls: "elevatorS_6m:Move/3/3/0" }
+                attributes: { controls: "elevatorS_6m:Move/5/9/1", rotateY: 315 }
             },
             { 
                 name: "lever", location: { x: -27.2, y: 12.3, z: 24.3 },
-                attributes: { controls: "elevatorS_6m:Move/3/3/0", staticStartingElevation: true, position: "up" }
+                attributes: { controls: "elevatorS_6m:Move/5/9/1", staticStartingElevation: true, position: "up", rotateY: 45 }
             },
             { 
                 name: "vikingShop", location: { x: -64.5, y: 0, z:  59 },
@@ -579,11 +601,11 @@ export const levels = [
             },
             { 
                 name: "platformBlock", location: { x: -64.5, y: 0, z: 55 },
-                attributes: { elevation: -2, controls: "vikingShop:doorAction/3/3/1/autorestore" } // duration/fadeOutDuration/fadeOutDelay/autorestore
+                attributes: { elevation: -2, footControls: "vikingShop:doorAction/3/3/1/autorestore" } // duration/fadeOutDuration/fadeOutDelay/autorestore
             },
             { 
                 name: "platformWood", location: { x: -64.5, y: 0, z:  57 },
-                attributes: { elevation: 2, controls: "vikingShop:doorAction/3/3/1/autorestore" }
+                attributes: { elevation: 2, footControls: "vikingShop:doorAction/3/3/1/autorestore" }
             },
         ],
         entities: [
@@ -615,6 +637,9 @@ export const levels = [
             description: 'ruins',
             gltf: 'ruins.glb',
             attributes: {
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
                 scale: 100,
                 borderTrees: true,
                 light: {
@@ -625,10 +650,8 @@ export const levels = [
                     color: 'white',
                     density: 1.2
                 },
-                noEnemySpawnZones: [
-                    // [location,radius] (both in location units, i.e. /multiplier)
-                    // [{ x: 0, y: 0, z: 0},6]
-                ]
+                designateNPCs: true
+
             }
         },
         items: [
@@ -678,6 +701,9 @@ export const levels = [
             description: 'swamp',
             gltf: 'snowyland.glb',
             attributes: {
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
                 scale: 100,
                 borderTrees: true,
                 light: {
@@ -688,10 +714,8 @@ export const levels = [
                     color: 'white',
                     density: 1.2
                 },
-                noEnemySpawnZones: [
-                    // [location,radius] (both in location units, i.e. /multiplier)
-                    // [{ x: 0, y: 0, z: 0},6]
-                ]
+                designateNPCs: true
+
             }
         },
         items: [
@@ -706,7 +730,7 @@ export const levels = [
         structures: [
             { 
                 name: "platformBlock", location: { x: 18.4, y: 0, z: -23.1 }, 
-                attributes: { locked: false, routeTo: { level: 3, location:{ x: 3.2, y: 0, z: -19} } } //swamp
+                attributes: { locked: false, routeTo: { level: 3, location: { x: 37.1, y: 0, z: 21.4}  } } //swamp
             },
             { 
                 name: "platformBlock", location: { x: 4.4, y: 0, z: 21.1},
@@ -715,11 +739,11 @@ export const levels = [
             { name: "tavernShop", location: { x: -3.5, y: 0, z: 0} },
             { 
                 name: "platformBlock", location: { x: -.5, y: 0, z: .15 },
-                attributes: { elevation: -5, controls: "tavernShop:Walking in/3/3/0" }
+                attributes: { elevation: -5, footControls: "tavernShop:Walking in/3/3/0" }
             },
             { 
                 name: "platformWood", location: { x: -1.5, y: 0, z: .15 },
-                attributes: { elevation: 5, controls: "tavernShop:Walking out/3/3/0" }
+                attributes: { elevation: 5, footControls: "tavernShop:Walking out/3/3/0" }
             }
         ],
         entities: [
@@ -747,6 +771,9 @@ export const levels = [
             description: 'Lava Labyrinth',
             gltf: 'lavalabyrinth.glb',
             attributes: {
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
                 emissiveIntensity: 10,
                 scale: 100,
                 borderTrees: false,
@@ -758,10 +785,8 @@ export const levels = [
                     color: 'white',
                     density: 1.2
                 },
-                noEnemySpawnZones: [
-                    // [location,radius] (both in location units, i.e. /multiplier)
-                    // [{ x: 0, y: 0, z: 0},6]
-                ]
+                designateNPCs: true
+
             }
         },
         items: [
@@ -822,10 +847,8 @@ export const levels = [
                     color: 'white',
                     density: 1.2
                 },
-                noEnemySpawnZones: [
-                    // [location,radius] (both in location units, i.e. /multiplier)
-                    // [{ x: 0, y: 0, z: 0},6]
-                ]
+                designateNPCs: true
+
             }
         },
         items: [
@@ -862,6 +885,9 @@ export const levels = [
             description: 'Elvandor',
             gltf: 'elvandor.glb',
             attributes: {
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
                 emissiveIntensity: 10,
                 scale: 100,
                 borderTrees: false,
@@ -873,10 +899,8 @@ export const levels = [
                     color: 'white',
                     density: 1.2
                 },
-                noEnemySpawnZones: [
-                    // [location,radius] (both in location units, i.e. /multiplier)
-                    // [{ x: 0, y: 0, z: 0},6]
-                ]
+                designateNPCs: true
+
             }
         },
         items: [

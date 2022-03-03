@@ -26,6 +26,7 @@ export class AnimatedForm extends StandardForm{
         this.kickAttacksL = [];
         this.blocks = [];
         this.bowAttacks = [];
+        this.throwAttacks = [];
 
         this.possibleHandAttacksR = ["Punch", "Attack", "Punch2", "Punching R", "Striking R", "Swing R"];
         this.possibleHandAttacksL = ["Punching L", "Striking L", "Swing L"];
@@ -33,6 +34,7 @@ export class AnimatedForm extends StandardForm{
         this.possibleKickAttacksL = ["Kick L"]
         this.possibleBlocks = ["Blocking R", "Blocking L"];
         this.possibleBowAttacks = ["ThumbsUp", "Givining the bird"];
+        this.possibleThrowAttacks = ["Striking L", "Punch2", "Punch"];
 
         this.emotes = [ 
             'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp', 'Open', 'Close',
@@ -41,7 +43,8 @@ export class AnimatedForm extends StandardForm{
             ...this.possibleHandAttacksR, 
             ...this.possibleKickAttacksR,
             ...this.possibleHandAttacksL, 
-            ...this.possibleKickAttacksL
+            ...this.possibleKickAttacksL,
+            ...this.possibleThrowAttacks
         ];
     }
     
@@ -66,6 +69,8 @@ export class AnimatedForm extends StandardForm{
                     this.blocks.push(animation.name);
                 } else if (this.possibleBowAttacks.includes(animation.name)) {
                     this.bowAttacks.push(animation.name);
+                } else if (this.possibleThrowAttacks.includes(animation.name)) {
+                    this.throwAttacks.push(animation.name);
                 }
 
                 var action = this.mixer.clipAction( animation );
@@ -132,10 +137,19 @@ export class AnimatedForm extends StandardForm{
                         if (this.objectName == 'horse') {
                             this.fadeToAction( 'horse_A_', 0.2);
                         } else {
-                            this.fadeToAction( 'Walking', 0.2);
+                            if (this.swimming) {
+                                this.fadeToAction( 'Swimming', 0.2);
+                            } else {
+                                this.fadeToAction( 'Walking', 0.2);
+                            }
                         }
                     } else if (this.absVelocity >= 250 && this.activeActionName == 'Walking') {
-                        this.fadeToAction( 'Running', 0.2);
+                        
+                        if (this.swimming) {
+                            this.fadeToAction( 'Swimming', 0.2);
+                        } else {
+                            this.fadeToAction( 'Running', 0.2);
+                        }
                     }
                 }
             }

@@ -13,7 +13,7 @@ export class SpriteForm {
     getSprite() {
 
         let spriteMaterial = new THREE.SpriteMaterial({
-            opacity: .9,
+            opacity: .8,
             transparent: true,
             map: this.spriteMap,
             rotation: this.flip? Math.PI : 0

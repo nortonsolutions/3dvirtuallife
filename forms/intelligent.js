@@ -192,21 +192,28 @@ export class IntelligentForm extends AnimatedForm{
             if (typeof this.sceneController.waterElevation == "number") {
                 
                 if (this.model.position.y < this.sceneController.waterElevation) {
-                    let distanceBelowWater = Math.abs(this.sceneController.waterElevation - this.model.position.y);
-                    this.velocity.x *= Math.max((100-(distanceBelowWater*3))/100,.5);
-                    this.velocity.y *= Math.max((100-(distanceBelowWater*3))/100,.5);
-                    this.velocity.z *= Math.max((100-(distanceBelowWater*3))/100,.5);
-
-                    if (this.sceneController.water.attributes.lava && this.objectName != "lavaMan") {
-                        this.changeStat('health',-distanceBelowWater/1000);
+                    
+                    if (this.attributes.swims) {
+                        this.swimming = true;
+                    } else {
+                        let distanceBelowWater = Math.abs(this.sceneController.waterElevation - this.model.position.y);
+                        this.velocity.x *= Math.max((100-(distanceBelowWater*3))/100,.5);
+                        this.velocity.y *= Math.max((100-(distanceBelowWater*3))/100,.5);
+                        this.velocity.z *= Math.max((100-(distanceBelowWater*3))/100,.5);
+    
+                        if (this.sceneController.water.attributes.lava && this.objectName != "lavaMan") {
+                            this.changeStat('health',-distanceBelowWater/1000);
+                        }
                     }
+                } else {
+                    if (this.attributes.swims) this.swimming = false;
                 }
     
             }
 
             let fIntersects = this.movementRaycaster.intersectObjects(this.sceneController.structureModels, true);
             
-            if (fIntersects.length == 0 || (fIntersects[0] && fIntersects[0].object.type == "Sprite")) { // Nothing is in the front, so move forward at given velocity
+            if (fIntersects.length == 0) { // || (fIntersects[0] && fIntersects[0].object.type == "Sprite")) { // Nothing is in the front, so move forward at given velocity
                 
                 this.model.translateX( this.velocity.x * delta );
                 this.model.translateY( this.velocity.y * delta );

@@ -44,10 +44,10 @@ export class FormFactory {
                 form = new AnimatedForm(template, this.sceneController);
                 break;
             case "water":
-                form = new WaterForm(template, this.sceneController,"Water" ); // ,"Water" ); // , "Refractor");
+                form = new WaterForm(template, this.sceneController,"Water" ); // ,"Water" );
                 break;
             case "grass":
-                form = new GrassForm(template, this.sceneController ); // ,"Grass" ); // , "Refractor");
+                form = new GrassForm(template, this.sceneController ); // ,"Grass" );
                 break;
             default:
                 form = new StandardForm(template, this.sceneController);
@@ -89,6 +89,21 @@ export class FormFactory {
 
         this.addSprites(model, spriteConfig, scene);
 
+    }
+
+    addGrassSprites = (scene, model) => {
+        
+        let spriteConfig = {
+            name: ['grass01','grass02','grass03','grass04','grass05'],
+            regex: new RegExp('grass', 'i'),
+            frames: 1,
+            scale: 70,
+            elevation: 10,
+            flip: false,
+            animates: false,
+            time: null
+        }
+        this.addSprites(model, spriteConfig, scene);
     }
 
     addLeaves = (scene, model) => {
