@@ -63,6 +63,9 @@ class LayoutManager {
                 this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects, this.socket, this.firstInRoom, this.props.level);
                 this.sceneController.animateScene();
 
+                if (this.layout.terrain.attributes.cutScenes && this.layout.terrain.attributes.cutScenes.intro) { 
+                    this.eventDepot.fire('modal', { type: 'cutScene', title: this.layout.terrain.description, context: { videoName: this.layout.terrain.attributes.cutScenes.intro } });
+                }
             } else {
 
                 this.socket.emit('pullLayout', this.props.level, (data) => {
@@ -70,12 +73,14 @@ class LayoutManager {
                     this.cacheLayout();
                     this.sceneController = new SceneController(heroTemplate, this.layout, this.eventDepot, this.allObjects, this.socket, this.firstInRoom, this.props.level);
                     this.sceneController.animateScene();
+
+                    if (this.layout.terrain.attributes.cutScenes && this.layout.terrain.attributes.cutScenes.intro) { 
+                        this.eventDepot.fire('modal', { type: 'cutScene', title: this.layout.terrain.description, context: { videoName: this.layout.terrain.attributes.cutScenes.intro } });
+                    }
                 })
             }
 
-            if (this.layout.terrain.attributes.cutScenes && this.layout.terrain.attributes.cutScenes.intro) { 
-                this.eventDepot.fire('modal', { type: 'cutScene', title: this.layout.terrain.description, context: { videoName: this.layout.terrain.attributes.cutScenes.intro } });
-            }
+
         });
     }
 

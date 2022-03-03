@@ -123,7 +123,7 @@ export class AnimatedForm extends StandardForm{
 
     animate(delta) {
 
-        if (this.attributes.moves) {
+        if (this.attributes.moves && this.heroNearby) {
             if (this.alive) {
                 
                 if (this.objectType == "hero" && this.balloonRide) {
@@ -131,9 +131,9 @@ export class AnimatedForm extends StandardForm{
                 } else {
                     this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
-                    if (this.absVelocity < .1 && (this.activeActionName == 'Walking' || this.activeActionName == 'Running')) {
+                    if (this.absVelocity < .1 && ((this.activeActionName == 'Walking' || this.activeActionName == 'Running' || this.activeActionName == 'Swimming') || this.paused)) {
                         this.fadeToAction( 'Idle', 0.2);
-                    } else if (this.absVelocity >= .1 && this.activeActionName == 'Idle') {
+                    } else if (this.absVelocity >= .1 && (this.activeActionName == 'Idle' || this.paused)) {
                         if (this.objectName == 'horse') {
                             this.fadeToAction( 'horse_A_', 0.2);
                         } else {
@@ -160,11 +160,11 @@ export class AnimatedForm extends StandardForm{
 
     fadeToAction( actionName, duration ) {
 
-        if ( this.activeActionName != "Death" && (actionName == "Death" || ! this.currentlyFadingToAction) && this.activeActionName !== actionName ) { // 
-            // console.log(`${this.objectName}: fadingToAction ${actionName}`);
-
-            this.currentlyFadingToAction = true;
+        if ( this.activeActionName != "Death" && 
+             (actionName == "Death" || ! this.currentlyFadingToAction) && 
+             this.activeActionName !== actionName ) {
             
+            this.currentlyFadingToAction = true;
             let newAction = this.actions[ actionName ];
 
             this.previousActionName = this.activeActionName;
@@ -190,8 +190,6 @@ export class AnimatedForm extends StandardForm{
 
                 this.activeAction
                     .reset()
-                    // .setEffectiveTimeScale( 1 )
-                    // .setEffectiveWeight( 1 )
                     .fadeIn( duration )
                     .play();
 

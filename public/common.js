@@ -203,3 +203,28 @@ querySC = async function(queryName, eventDepot, args) {
     
 }
 
+createMaterial = (vertexShader, fragmentShader) => {
+    var vertexShader = document.getElementById(vertexShader).innerHTML;
+    var fragmentShader = document.getElementById(fragmentShader).innerHTML;
+
+    var attributes = {};
+    var uniforms = {
+        time: {type: 'f', value: 0.2 },
+        scale: {type: 'f', value: 0.2 },
+        alpha: {type: 'f', value: 0.6 },
+        resolution: {type: 'v2', value: new THREE.Vector2() }
+    };
+    
+    uniforms.resolution.value.x = window.innerWidth;
+    uniforms.resolution.value.y = window.innerHeight;
+
+    var meshMaterial = new THREE.ShaderMaterial({
+        uniforms,
+        attributes,
+        vertexShader,
+        fragmentShader,
+        transparent: true
+    });
+
+    return meshMaterial;
+}

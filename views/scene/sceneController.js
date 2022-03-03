@@ -266,7 +266,7 @@ export class SceneController {
             }
         })
 
-        this.eventDepot.addListener('takeItemFromScene', this.takeItemFromScene);
+        this.eventDepot.addListener('takeItemFromSceneAndAddToInventory', this.takeItemFromScene);
         this.eventDepot.addListener('dropItemToScene', this.dropItemToScene);
         
         this.eventDepot.addListener('querySC', (data) => {
@@ -646,7 +646,7 @@ export class SceneController {
             });
         }
 
-        this.eventDepot.removeListener('takeItemFromScene', 'bound takeItemFromScene');
+        this.eventDepot.removeListener('takeItemFromSceneAndAddToInventory', 'bound takeItemFromScene');
         this.eventDepot.removeListener('dropItemToScene', 'bound dropItemToScene');
 
         if (this.hero) this.hero.stop(() => {

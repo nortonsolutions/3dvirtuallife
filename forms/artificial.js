@@ -16,10 +16,11 @@ export class ArtificialForm extends IntelligentForm{
                 case "blueShirt":
                     Object.values(this.actions).forEach(action => { action.setEffectiveTimeScale(2); });
                     break;
-                case "rockyman":
-                case "lavaman":
-                case "crystalman":  
-                    Object.values(this.actions).forEach(action => { action.setEffectiveTimeScale(0.3); });
+                case "rockyMan":
+                case "lavaMan":
+                case "crystalMan":  
+                    Object.values(this.actions).forEach(action => { action.setEffectiveTimeScale(0.5); });
+                    this.actions['Idle'].setEffectiveTimeScale(.005);
                     break;
                 case "blacksmith":
                     Object.values(this.actions).forEach(action => { 
@@ -36,7 +37,8 @@ export class ArtificialForm extends IntelligentForm{
             let closestHeroPosition = this.closestHeroPosition();
 
             if (closestHeroPosition && closestHeroPosition.distance < 1000) {
-            
+                this.heroNearby = true;
+
                 // TODO: If the velocity is already close to zero, maintain idle
                 this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
@@ -112,7 +114,8 @@ export class ArtificialForm extends IntelligentForm{
                     // this.stopAndBackup(delta);
                 };
             } else { // idle
-                this.fadeToAction('Idle', 0.2);
+                this.fadeToAction('Idle', 0.2); // force Idle animation
+                this.heroNearby = false; // stops movement
             }
         }
     }

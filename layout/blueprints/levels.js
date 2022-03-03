@@ -501,7 +501,7 @@ export const levels = [
                 cutScenes: {
                     intro: "volcanoIntro.mkv"    
                 },
-                animates: true,
+                animates: false,
                 scale: 200,
                 borderTrees: true,
                 light: {
@@ -794,7 +794,7 @@ export const levels = [
         ],
         structures: [
             { name: "ricketyPlatform", location: { x: -7.2, y: 0, z: 40 }  },
-            { name: "balloon", location: { x: -7.2, y: 5.85, z: 40 }  },
+            { name: "balloon", location: { x: -7.2, y: 6.0, z: 40 }  },
             { 
                 name: "platformBlock", location: { x: -8.8, y: 0, z: 38.4 }, 
                 attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } }} //kingdom

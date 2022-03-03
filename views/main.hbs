@@ -69,4 +69,46 @@
         
     </script>
 
+    {{!-- position --}}
+    <script id="vertexShader1" type="x-shader/x-vertex">
+        uniform float time;
+        void main() {
+            vec3 posChanged = position;
+            posChanged.x = posChanged.x*(abs(sin(time*1.0)));
+            posChanged.y = posChanged.y*(abs(cos(time*1.0)));
+            posChanged.z = posChanged.x*(abs(sin(time*1.0)));
+
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(posChanged,1.0);
+        }
+    </script>
+
+    {{!-- color --}} 
+    <script id="fragmentShader1" type="x-shader/x-fragment">  
+        #ifdef GL_ES
+        precision mediump float;
+        #endif
+
+        uniform float time;
+        uniform vec2 resolution;
+
+        void main (void) {
+            vec2 uPos = (gl_FragCoord.xy / resolution.xy);
+            uPos.x -= 1.0;
+            uPos.y -= 0.5;
+
+            vec3 color = vec3(0.0);
+            float vertColor = 2.0;
+            for (float i = 0.0; i < 15.0; ++i) {
+                float t = time * (0.9);
+                uPos.y += sin(uPos.x*i + t+i/2.0) * 0.1;
+                float fTemp = abs(1.0 / uPos.y / 100.0);
+                vertColor += fTemp;
+                color += vec3(fTemp*10.0-i)/10.0, fTemp*i/10.0, pow(fTemp,1.5)*1.5;
+            }
+
+            vec4 color_final = vec4(color, 1.0);
+            gl_FragColor = color_final;
+        }
+    </script>
+
 </html>

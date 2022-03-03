@@ -265,6 +265,7 @@ export const Structures = {
         description: 'Festive hot-air balloon',
         type: 'structure',
         attributes: {
+            equippedScale: 30,
             staticStartingElevation: true,
             rotateY: 180,
             animates: false,

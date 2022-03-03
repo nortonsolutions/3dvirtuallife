@@ -862,5 +862,29 @@ export const Entities = {
                 defense: "0/0/0"
             }
         }
-    }
+    },
+    sunTree: {
+        name: 'sunTree',
+        gltf: 'sunSeed.glb',
+        description: 'Sun Tree',
+        type: 'friendly',
+        subtype: 'tree',
+        attributes: {
+            moves: false,
+            animates: false,
+            height: 30,
+            dialogHeight: 60,
+            length: 20,
+            width: 20,
+            elevation: 0,
+            scale: 45,
+            stats: {
+                health: "2/2/0",
+                mana: "0/0/0",
+                strength: "1/1/0",
+                agility: "0/0/0", // stands in place
+                defense: "0/0/0"
+            }
+        }
+    },
 }
