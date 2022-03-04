@@ -126,32 +126,36 @@ export class AnimatedForm extends StandardForm{
         if (this.attributes.moves && this.heroNearby) {
             if (this.alive) {
                 
-                if (this.objectType == "hero" && this.balloonRide) {
+                let controlled = this.mountedUpon? this.mountedUpon : this;
+
+                if (this.objectType == "hero" && this.mounted) {
                     this.fadeToAction( 'Idle', 0.2);
-                } else {
+                }
+
+                // } else {
                     this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
-                    if (this.absVelocity < .1 && ((this.activeActionName == 'Walking' || this.activeActionName == 'Running' || this.activeActionName == 'Swimming') || this.paused)) {
-                        this.fadeToAction( 'Idle', 0.2);
-                    } else if (this.absVelocity >= .1 && (this.activeActionName == 'Idle' || this.paused)) {
-                        if (this.objectName == 'horse') {
-                            this.fadeToAction( 'horse_A_', 0.2);
+                    if (this.absVelocity < .1 && ((controlled.activeActionName == 'Walking' || controlled.activeActionName == 'Running' || controlled.activeActionName == 'Swimming' || controlled.activeActionName == 'horse_A_') || this.paused)) {
+                        controlled.fadeToAction( 'Idle', 0.2);
+                    } else if (this.absVelocity >= .1 && (controlled.activeActionName == 'Idle' || controlled.objectName == 'horse' || this.paused)) {
+                        if (controlled.objectName == 'horse') {
+                            controlled.fadeToAction( 'horse_A_', 0.2);
                         } else {
                             if (this.swimming) {
-                                this.fadeToAction( 'Swimming', 0.2);
+                                controlled.fadeToAction( 'Swimming', 0.2);
                             } else {
-                                this.fadeToAction( 'Walking', 0.2);
+                                controlled.fadeToAction( 'Walking', 0.2);
                             }
                         }
-                    } else if (this.absVelocity >= 250 && this.activeActionName == 'Walking') {
+                    } else if (this.absVelocity >= 250 && controlled.activeActionName == 'Walking') {
                         
                         if (this.swimming) {
-                            this.fadeToAction( 'Swimming', 0.2);
+                            controlled.fadeToAction( 'Swimming', 0.2);
                         } else {
-                            this.fadeToAction( 'Running', 0.2);
+                            controlled.fadeToAction( 'Running', 0.2);
                         }
                     }
-                }
+                // }
             }
         }
 
@@ -160,61 +164,67 @@ export class AnimatedForm extends StandardForm{
 
     fadeToAction( actionName, duration ) {
 
-        if ( this.activeActionName != "Death" && 
-             (actionName == "Death" || ! this.currentlyFadingToAction) && 
-             this.activeActionName !== actionName ) {
-            
-            this.currentlyFadingToAction = true;
-            let newAction = this.actions[ actionName ];
-
+        if (!this.actions[actionName]) { // if animation doesn't exist, fadeOut and set activeActionName
             this.previousActionName = this.activeActionName;
             this.previousAction = this.activeAction;
             this.activeActionName = actionName;
-            this.activeAction = newAction;
+            if (this.previousAction) this.previousAction.fadeOut(0.2);
 
-            if (this.previousActionName && this.actions[this.previousActionName]) {
-                this.previousAction.fadeOut( duration );
-            }
+        } else {
+            if (this.activeActionName != "Death" && (actionName == "Death" || !this.currentlyFadingToAction) && this.activeActionName !== actionName) {
+              this.currentlyFadingToAction = true;
+              let newAction = this.actions[actionName];
 
-            if (this.activeAction) {
+              this.previousActionName = this.activeActionName;
+              this.previousAction = this.activeAction;
+              this.activeActionName = actionName;
+              this.activeAction = newAction;
 
+              if (this.previousActionName && this.actions[this.previousActionName]) {
+                this.previousAction.fadeOut(duration);
+              }
+
+              if (this.activeAction) {
                 if (this.handAttacksR.includes(this.activeActionName)) {
-                    this.handAttackR = true;
+                  this.handAttackR = true;
                 } else if (this.handAttacksL.includes(this.activeActionName)) {
-                    this.handAttackL = true;
+                  this.handAttackL = true;
                 } else if (this.kickAttacksR.includes(this.activeActionName)) {
-                    this.kickAttackR = true;
+                  this.kickAttackR = true;
                 } else if (this.kickAttacksR.includes(this.activeActionName)) {
-                    this.kickAttackL = true;
-                } 
+                  this.kickAttackL = true;
+                }
 
                 this.activeAction
-                    .reset()
-                    .fadeIn( duration )
-                    .play();
+                  .reset()
+                  .fadeIn(duration)
+                  .play();
 
                 const restoreState = () => {
-                    this.handAttackR = false;
-                    this.handAttackL = false;
-                    this.kickAttackR = false;
-                    this.kickAttackL = false;
+                  this.handAttackR = false;
+                  this.handAttackL = false;
+                  this.kickAttackR = false;
+                  this.kickAttackL = false;
 
-                    this.currentlyFadingToAction = false;
-                    this.mixer.removeEventListener('finished', restoreState );
-                    if (this.actions[this.previousActionName]) {
-                        this.fadeToAction( this.previousActionName, 0.1 );
-                    } else {
-                        this.activeActionName = "Idle";
-                    }
-                }
+                  this.currentlyFadingToAction = false;
+                  this.mixer.removeEventListener("finished", restoreState);
+                  if (this.actions[this.previousActionName]) {
+                    this.fadeToAction(this.previousActionName, 0.1);
+                  } else {
+                    this.activeActionName = "Idle";
+                  }
+                };
 
                 if (this.emotes.includes(actionName)) {
-                    this.mixer.addEventListener( 'finished', restoreState );
+                  this.mixer.addEventListener("finished", restoreState);
                 } else {
-                    this.currentlyFadingToAction = false;
+                  this.currentlyFadingToAction = false;
                 }
+              }
             }
+
         }
+
     }
 
     runActiveAction(duration) {

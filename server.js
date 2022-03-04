@@ -233,8 +233,10 @@ database(mongoose, (db) => {
 
       if (data.item.type && data.item.type == "structure") {
         app.layouts[socket.nsp.name][data.level][0].structures.push(data.item);
-      } else {
+      } else if (data.item.type && data.item.type == "item") {
         app.layouts[socket.nsp.name][data.level][0].items.push(data.item);
+      } else if (data.item.type && data.item.type == "entity") {
+        app.layouts[socket.nsp.name][data.level][0].entities.push(data.item);
       }
       notifyRoomMembers(data.level, "addItemToLayout", data);
     });

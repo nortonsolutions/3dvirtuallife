@@ -33,7 +33,7 @@ export class ArtificialForm extends IntelligentForm{
     }
 
     move(delta) {
-        if (this.alive) {
+        if (this.alive && !this.controlled) {
             let closestHeroPosition = this.closestHeroPosition();
 
             if (closestHeroPosition && closestHeroPosition.distance < 1000) {

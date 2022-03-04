@@ -623,13 +623,15 @@ export const Entities = {
         description: 'Strong horse',
         type: 'friendly',
         attributes: {
+            mountable: true,
             moves: true,
             animates: true,
-            height: 30,
+            height: 35,
             length: 50,
             width: 20,
             elevation: -10,
-            scale: .5,
+            equippedScale: .35,
+            scale: .35,
             stats: {
                 health: "4/4/0",
                 mana: "0/0/0",
@@ -640,6 +642,7 @@ export const Entities = {
             grants: ["gold10"]
         }
     },
+
     demonLord: {
         name: 'demonLord',
         gltf: 'demonLord.glb',

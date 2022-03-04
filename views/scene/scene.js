@@ -104,22 +104,14 @@ class Scene {
     }
 
     add ( model ) {
-        console.log(`adding model`);
-        console.dir(model);
         this.scene.add( model );
     }
 
     removeFromScenebyLayoutId(layoutId) {
-        console.log(`scene children before removeFromScenebyLayoutId:`);
-        console.dir(this.scene.children);
-
         let formToRemove = this.scene.children.find(el => {
             return el.attributes? el.attributes.layoutId == layoutId : false;
         })
         this.scene.remove(formToRemove);
-        console.log(`scene children after:`);
-        console.dir(this.scene.children);
-        
     }
     
     addBackground() {
@@ -362,7 +354,6 @@ class Scene {
                     }
                 }
     
-                console.dir(projectile);
                 // if I hit a structure, handleAction
                 this.projectileMovementRaycaster.ray.origin.copy(projectile.item.model.position);
                 // this.projectileMovementRaycaster.ray.direction.copy(projectile.direction);
@@ -592,8 +583,8 @@ class Scene {
 
             case 32: // space
                 
-                if (this.controller.hero.balloonRide) {
-                    this.controller.eventDepot.fire('descend', { vehicle: "balloon" });
+                if (this.controller.hero.mountedUpon) {
+                    this.controller.eventDepot.fire('descend', { vehicle: this.controller.hero.mountedUpon.objectName });
                 } else {
                     this.controller.eventDepot.fire('jump', {});
                 }

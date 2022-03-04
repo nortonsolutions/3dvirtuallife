@@ -98,6 +98,7 @@ class LayoutManager {
 
             if (item.type == "item") this.layout.items.push(item);
             if (item.type == "structure") this.layout.structures.push(item);
+            if (item.type == "entity") this.layout.entities.push(item);
             if (local) this.socket.emit('addItemToLayout', {level: this.props.level, data, item});
             this.cacheLayout();
         }

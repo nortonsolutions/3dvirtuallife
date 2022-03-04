@@ -22,7 +22,7 @@ class InventoryScreen {
         // startingIndex will advance by inventoryPageSize for each page
         let startingIndex = this.pageNumber? this.pageNumber * inventoryPageSize: 0;
 
-        var bodyParts = [['Head_end','one'],['Torso','two'],['Middle2R','three'],['Middle2L','four'],['special','five'],['feet','six']];
+        var bodyParts = [['Head_end','one'],['Torso','two'],['Middle2R','three'],['Middle2L','four'],['mount','five'],['feet','six']];
         var hotKeys = ['f1key','f2key','f3key','f4key','f5key','f6key','f7key','f8key']
     
         var context = { showInventory: this.showInventory, equippedBodyParts: {}, equippedHotKeys: {}, inventory: [], pageNumber };

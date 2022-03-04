@@ -122,6 +122,10 @@ export const levels = [
             { name: "gold" },
             { name: "iron" },
             { name: "silver" },
+            { 
+                name: "balloon", location: { x: -3, y: 0, z: -1},
+                attributes: { staticStartingElevation: false }
+            },
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0},
@@ -134,7 +138,11 @@ export const levels = [
                 attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } //dungeon
             },
             { 
-                name: "platformBlock", location: { x: 19.5, y: 0, z: -6.5}, 
+                name: "platformBlock", location: { x: 35.15, y: 9.25, z: -.70 },
+                attributes: { staticStartingElevation: true, routeTo: { level: 2, location: { x: 0, y: 0, z: 0} } } //catacomb
+            },
+            { 
+                name: "platformBlock", location: { x: 25.5, y: 0, z: -6.5}, 
                 attributes: { routeTo: { level: 3, location: { x: 9.2, y: 0, z: 39.6} } } //swamp
             },
             { 
@@ -162,12 +170,12 @@ export const levels = [
             },
         ],
         entities: [
-            { name: "john" },
-            { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
-            { name: "evilOne", type: "beast" },
-            { name: "ghoul", type: "beast"  },
-            { name: "triceratops", type: "beast" },
-            { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
+            // { name: "john" },
+            // { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
+            // { name: "evilOne", type: "beast" },
+            // { name: "ghoul", type: "beast"  },
+            // { name: "triceratops", type: "beast" },
+            // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
             // { name: "triceratops", type: "beast" },
             // { name: "iceGhoul", type: "beast"  },
             // { name: "shockGhoul", type: "beast"  },
@@ -175,7 +183,7 @@ export const levels = [
             // { name: "ghostGhoul", type: "beast"  },
             // { name: "rockyMan", type: "beast" },
             // { name: "demonLord", type: "beast" },
-            // { name: "horse" },
+            { name: "horse", location: { x: 1, y: 0, z: 1} },
             // { name: "murderBear", type: "beast"  },
             // { name: "rosen", type: "beast"  },
             // { name: "blacksmith" },

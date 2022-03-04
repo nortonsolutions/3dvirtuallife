@@ -45,8 +45,7 @@ export class Hero extends IntelligentForm {
         // Proximity Light is used for object selection/identification
         this.proximityLight = new THREE.PointLight( 0x00ff00, 5, 250, 30 );
         
-        this.balloonModel = null;
-        this.balloonFloat = true;
+        this.balloonFloat = true; // does the balloon float upwards or has it arrived at the hovering altitude?
         this.balloonFloatStart = 0;
         this.cacheHero();
 
@@ -191,11 +190,25 @@ export class Hero extends IntelligentForm {
 
                 let objectType = this.selectedObject.objectType;
                 let objectSubtype = this.selectedObject.objectSubtype;
-                
-                if (objectType == "item") {
+                let itemName = this.selectedObject.attributes.baseItemName? this.selectedObject.attributes.baseItemName : this.selectedObject.objectName;
+
+                if (this.selectedObject.attributes.mountable) {
+
+                    let data = {    
+                        itemName, 
+                        quantity: this.selectedObject.attributes.quantity? this.selectedObject.attributes.quantity : 1,
+                        layoutId: this.selectedObject.model.attributes.layoutId,
+                    }
+
+                    // Place immediately in 'mount' equipped position
+                    this.sceneController.eventDepot.fire('takeItemFromSceneAndAddToInventory', data);
+                    this.sceneController.eventDepot.fire('removeFromInventory', itemName)
+                    this.sceneController.eventDepot.fire('equipItem', {bodyPart: "mount", itemName });
+
+                } else if (objectType == "item") {
 
                     let data = {
-                        itemName: this.selectedObject.attributes.baseItemName? this.selectedObject.attributes.baseItemName : this.selectedObject.objectName, 
+                        itemName, 
                         quantity: this.selectedObject.attributes.quantity? this.selectedObject.attributes.quantity : 1,
                         layoutId: this.selectedObject.model.attributes.layoutId,
                     }
@@ -273,53 +286,39 @@ export class Hero extends IntelligentForm {
 
         this.sceneController.eventDepot.addListener('descend', (data) => {
             
-            if (this.model.position.y <= this.determineElevationFromBase() + this.attributes.height) {
+            if (this.balloonRide) {
+                if (this.model.position.y <= this.determineElevationFromBase() + this.attributes.height) {
+                    if (this.mounted) {
+                        this.mounted = false;
+                        this.sceneController.eventDepot.fire('dismount', data);
+                    }
+    
+                } else {
+                    this.model.position.y -= 3;
+                }
+    
+            } else if (this.mountedUpon) {
+                data.type = this.mountedUpon.objectType;
                 this.sceneController.eventDepot.fire('dismount', data);
-                // if (this.mounted) {
-                //     this.mounted = false;
-                //     this.sceneController.eventDepot.fire('dismount', data);
-                // }
-
-            } else {
-                this.model.position.y -= 3;
             }
         })
 
-        // data: { vehicle: 'balloon' }
+        // data: { vehicle: 'balloon', type: 'entity|item' }
         this.sceneController.eventDepot.addListener('dismount', (data) => {
-            // console.log(`dismounting`);
-            // // this.unequip('mount', data.vehicle);
-            // let position = new THREE.Vector3().copy(this.model.position);
-            // position.y += 10;
-            // // position.z += 70;
 
-            // let dropData = {
-            //     itemName: data.vehicle,
-            //     source: 'mount',
-            //     position
-            // }
+            let dropData = {
+                itemName: data.vehicle,
+                location: this.location,
+                source: "mount",
+                type: data.type
+            };
 
-            // this.sceneController.eventDepot.fire('dropItemToScene', dropData);
-            // // this.sceneController.dropItemToScene({itemName: data.vehicle, position});
-            
-            // // let vehicle = this.sceneController.scene.scene.getObjectByProperty('objectName',data.vehicle);
-            // // this.sceneController.structureModels.push(vehicle.model);
-
-            // this.model.translateZ(70);
-            // if (this.balloonRide) this.balloonRide = false;
-            
-            // Place the riding vehicle back on the ground and back up
-            let vehicle = this.model.getObjectByProperty('objectName',data.vehicle);
-            this.sceneController.scene.add(vehicle);
-            this.sceneController.structureModels.push(vehicle);
-
-            vehicle.position.copy(this.model.position);
-            vehicle.position.y += this.attributes.height;
-
-
+            this.sceneController.eventDepot.fire('dropItemToScene', dropData);
             this.model.translateZ(70);
-            this.balloonRide = false;
-        })
+            if (this.balloonRide) this.balloonRide = false;
+            if (this.mountedUpon) this.mountedUpon = null;
+            this.mounted = false;
+        });
 
         // data: { otherLayoutId: data.layoutId, otherInventory: data.heroInventory, initiator: ...}
         this.sceneController.socket.on('heroDialogNew', data => { // request for heroDialog; open modal
@@ -644,7 +643,7 @@ export class Hero extends IntelligentForm {
             this.velocity.x -= this.velocity.x * 10.0 * delta;
             this.velocity.z -= this.velocity.z * 10.0 * delta;
 
-            if (!this.balloonRide) {
+            if (!this.balloonRide && !this.mountedUpon) {
                 this.velocity.y -= 39.8 * 100.0 * delta; // 100.0 = mass
             }
 
@@ -769,7 +768,6 @@ export class Hero extends IntelligentForm {
 
             diff.subVectors(this.positionWeapon, entity.model.position);
 
-            // console.log(`diff length: ${diff.length()}; radius: ${entity.radius}`);
             if ( diff.length() < entity.radius ) {
                 let hitPointReduction = (getRandomArbitrary(0,this.getEffectiveStat('strength'))/10);
                 this.inflictDamage(entity, hitPointReduction);
@@ -854,7 +852,6 @@ export class Hero extends IntelligentForm {
         Object.keys(this.attributes.xpLevels).forEach(category => {
             let nextLevel = Number(this.attributes.xpLevels[category]) + 1;
             let reqPoints = Math.pow(2, nextLevel+1);
-            // console.log(`${category}: ${reqPoints} required for level ${nextLevel}`);
             if (this.attributes.experience >= reqPoints) eligibility.push({
                 category,
                 nextLevel
@@ -921,6 +918,19 @@ export class Hero extends IntelligentForm {
                 this.model.position.y += (Math.sin((performance.now() - this.balloonFloatStart)/1000));
                 if (this.model.position.y <= baseline - 200) this.balloonFloat = true;
             }
+
+        } else if (this.mountedUpon) {
+
+            let baseline = this.determineElevationFromBase() + this.mountedUpon.attributes.height;
+            
+            if (Math.abs(this.velocity.z) > 0.01) {
+                if (this.movementStart == null) this.movementStart = performance.now();
+                this.model.position.y += (2 * Math.sin((performance.now() - this.movementStart)/200));
+            } else {
+                this.model.position.y = baseline;
+                this.movementStart = null;
+            }
+        
         } else {
             super.setElevation();
         }

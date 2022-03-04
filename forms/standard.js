@@ -67,8 +67,7 @@ export class StandardForm {
                 }
                 // this.tweakPosition();
 
-                // console.log(`Placing ${this.objectName} @ ${this.model.position.x},${this.model.position.y},${this.model.position.z}` );
-            
+                
             } else if (this.objectName == "floor") { // floor is the only form without location
                 this.setRoofToSingleSided();
                 this.setFloorToReceiveShadow();
@@ -181,7 +180,6 @@ export class StandardForm {
 
     determineElevationFromBase() {
 
-        // console.log(`Determining elevation from base for ${this.objectName}`)
         let yOffset = 40;
 
         this.upRaycaster.ray.origin.copy(this.model.position);

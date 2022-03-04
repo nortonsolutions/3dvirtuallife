@@ -115,7 +115,6 @@ export class SceneController {
     /** data: {itemName: ..., layoutId: ...} */
     takeItemFromScene(data, local = true) {
 
-        console.log(`Removing ${data.itemName} with layoutId ${data.layoutId} from scene`);
         this.scene.removeFromScenebyLayoutId(data.layoutId);
         this.forms = this.forms.filter(el => {
             return el.model.attributes.layoutId != data.layoutId;
@@ -129,13 +128,13 @@ export class SceneController {
         }
     }
 
-    /** data: {location ..., itemName..., keyCode...} */
+    /** data: {location ..., itemName..., keyCode..., type...} */
     /** local means it happened in this system and will be broadcast */ 
     dropItemToScene(data, local = true) {
 
         let itemTemplate = this.getTemplateByName(data.itemName);
 
-        if (itemTemplate.type == 'item' || itemTemplate.type == 'structure') {
+        // if (itemTemplate.type == 'item' || itemTemplate.type == 'structure') {
             if (data.attributes) itemTemplate.attributes = {...itemTemplate.attributes, ...data.attributes};
 
             if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
@@ -146,7 +145,7 @@ export class SceneController {
                 if (!data.position) {
                     data.position = new THREE.Vector3();
                     data.position.copy(this.hero.model.position);
-                    data.position.y = this.hero.determineElevationFromBase();
+                    data.position.y = this.hero.determineElevationFromBase() + itemTemplate.attributes.elevation;
                 }
 
                 form.model.position.copy(data.position);
@@ -168,7 +167,7 @@ export class SceneController {
                     this.eventDepot.fire('addItemToLayout', data);
                 }
             })
-        }
+        // }
     }
     
     addEventListeners() {
@@ -418,9 +417,9 @@ export class SceneController {
 
             var sunLight;
             if (this.layout.dayTime) {
-                sunLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 1.5 );
+                sunLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 1.2 );
             } else {
-                sunLight = new THREE.SpotLight( 0x7777ff, 1.6, 0, Math.PI / 1.5 );
+                sunLight = new THREE.SpotLight( 0x7777ff, 1.6, 0, Math.PI / 1.2 );
             }
 
             sunLight.position.set( 500, 1000, 500);
@@ -438,7 +437,6 @@ export class SceneController {
 
                 this.scene.add( shadowCameraHelper );
             }
-            console.log(`dayTime: ${this.layout.dayTime}`)
         }
 
         if (this.layout.terrain.attributes.light.overheadPointLight || this.layout.dayTime == false) {
@@ -617,8 +615,7 @@ export class SceneController {
                     this.socket.emit('updateEntityPositions', { level: this.level, positions });
                 }
             }
-            
-            // console.dir(this.forms);
+
             this.forms.forEach(form => {
                 
                 if (form.attributes.animates) {
@@ -716,15 +713,12 @@ export class SceneController {
     allEnemiesInRange(range, position) {
         var response = [];
         this.entities.filter(el => el.objectType == "beast").forEach(entity => {
-            // console.log(`distanceTo ${entity.objectName} is ${position.distanceTo(entity.model.position)}`);
-            
             // apply height
             let enemyPosition = new THREE.Vector3();
             enemyPosition.copy(entity.model.position);
             enemyPosition.y += entity.attributes.height;
             
             if (position.distanceTo(enemyPosition) < range) {
-                // console.log(`in range`)
                 response.push(entity);
             }
         })

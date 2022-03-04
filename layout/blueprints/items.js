@@ -312,84 +312,7 @@ export const Items = {
                     showOnSeed: false,
                     showOnEquip: true,
                     elevation: 0
-                },
-                { 
-                    name: "flame",
-                    frames: 40,
-                    scale: .05,
-                    scaleY: 1.5,
-                    translateZ: -.20,
-                    flip: true,
-                    showOnSeed: false,
-                    showOnEquip: true,
-                    elevation: 0
-                },
-                { 
-                    name: "flame",
-                    frames: 40,
-                    scale: .05,
-                    scaleY: 1.5,
-                    translateZ: -.30,
-                    flip: true,
-                    showOnSeed: false,
-                    showOnEquip: true,
-                    elevation: 0
-                },
-                { 
-                    name: "flame",
-                    frames: 40,
-                    scale: .05,
-                    scaleY: 1.5,
-                    translateZ: -.40,
-                    flip: true,
-                    showOnSeed: false,
-                    showOnEquip: true,
-                    elevation: 0
-                },                { 
-                    name: "flame",
-                    frames: 40,
-                    scale: .05,
-                    scaleY: 1.5,
-                    translateZ: -.15,
-                    flip: true,
-                    showOnSeed: false,
-                    showOnEquip: true,
-                    elevation: 0
-                },
-                { 
-                    name: "flame",
-                    frames: 40,
-                    scale: .05,
-                    scaleY: 1.5,
-                    translateZ: -.25,
-                    flip: true,
-                    showOnSeed: false,
-                    showOnEquip: true,
-                    elevation: 0
-                },
-                { 
-                    name: "flame",
-                    frames: 40,
-                    scale: .05,
-                    scaleY: 1.5,
-                    translateZ: -.35,
-                    flip: true,
-                    showOnSeed: false,
-                    showOnEquip: true,
-                    elevation: 0
-                },
-                { 
-                    name: "flame",
-                    frames: 40,
-                    scale: .05,
-                    scaleY: 1.5,
-                    translateZ: -.45,
-                    flip: true,
-                    showOnSeed: false,
-                    showOnEquip: true,
-                    elevation: 0
                 }
-
             ],
         } 
     },
@@ -813,7 +736,7 @@ export const Items = {
         description: 'A gleaming ball of crystal',
         type: 'item',
         attributes: {
-            equippable: ['special'],
+            equippable: ['mount'],
             animates: false,
             scale: 50,
             elevation: 30,
@@ -827,7 +750,7 @@ export const Items = {
         description: 'Gyrating elements in a sphere',
         type: 'item',
         attributes: {
-            equippable: ['special'],
+            equippable: ['mount'],
             animates: true,
             scale: 50,
             elevation: 30,
@@ -1115,16 +1038,18 @@ export const Items = {
     balloon: {
         name: 'balloon',
         gltf: 'balloon.glb',
+        image: 'balloon.png',
         description: 'Festive hot-air balloon',
         type: 'item',
         attributes: {
+            mountable: true,
             equippedScale: 30,
-            staticStartingElevation: true,
+            // staticStartingElevation: true,
             rotateY: 180,
             animates: false,
             scale: 30,
             elevation: 30,
-            addToStructureModels: true
+            // addToStructureModels: true
         }
     },
 }

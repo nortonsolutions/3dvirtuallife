@@ -50,7 +50,6 @@ export class IntelligentForm extends AnimatedForm{
                 this.radius = this.principalBoundingSphere.radius * this.attributes.scale;
             // }
             
-            // console.log(`${this.objectName}: ${this.principalGeometry}`);
             this.computeVertexNormals(this.model);
             this.setToCastShadows();
 
@@ -249,51 +248,26 @@ export class IntelligentForm extends AnimatedForm{
         if (downwardIntersections[0]) { 
             var topOfObject = downRayOriginHeight - downwardIntersections[0].distance + 2;
             if (this.model.position.y <= topOfObject) {
-                // console.log(`position: ${this.model.position.y}, topOfObject: ${topOfObject}`);
                 this.model.position.y = topOfObject;
 
                 if (this.objectType == "hero") {
                     let standingUponImmediate = downwardIntersections[0].object;
                     let standingUpon = getRootObject3D(downwardIntersections[0].object);
-                    
-                    if (standingUpon.objectName == 'balloon' && !(standingUpon.attributes.routeTo)) {
-                        
-                        // if (!this.balloonRide) { // if just getting on
-                        //     let layoutId = standingUpon.attributes.layoutId;
-                        //     this.sceneController.takeItemFromScene({ itemName: 'balloon', layoutId });
-                        //     this.equip('mount', 'balloon');
-                        //     this.sceneController.structureModels = this.sceneController.structureModels.filter(el => el != this.balloonModel);
-                        //     this.balloonRide = true;
-                        // } 
 
-                        // this.balloonFloat = true;
-                        
-                        this.balloonModel = standingUpon;
-                        this.balloonFloat = true;
-                        this.balloonModel.rotateY(Math.PI);
-                        this.model.add(this.balloonModel);
-                        standingUpon.position.copy(new THREE.Vector3());
-                        standingUpon.position.y = this.attributes.height;
+                    this.standingUpon = {
+                        objectName: standingUpon.objectName,
+                        objectType: standingUpon.objectType,
+                        attributes: standingUpon.attributes
+                    }
 
-                        this.sceneController.structureModels = this.sceneController.structureModels.filter(el => el != this.balloonModel);
-
-                        this.balloonRide = true;
+                    if (standingUponImmediate && standingUponImmediate.parent && standingUponImmediate.parent.attributes && standingUponImmediate.parent.attributes.keyCode) {
+                        this.standingUponImmediate = {
+                            objectName: standingUponImmediate.name,
+                            controls: standingUponImmediate.parent.attributes.layoutId,
+                            keyCode: standingUponImmediate.parent.attributes.keyCode
+                        }
                     } else {
-                        this.standingUpon = {
-                            objectName: standingUpon.objectName,
-                            objectType: standingUpon.objectType,
-                            attributes: standingUpon.attributes
-                        }
-
-                        if (standingUponImmediate && standingUponImmediate.parent && standingUponImmediate.parent.attributes && standingUponImmediate.parent.attributes.keyCode) {
-                            this.standingUponImmediate = {
-                                objectName: standingUponImmediate.name,
-                                controls: standingUponImmediate.parent.attributes.layoutId,
-                                keyCode: standingUponImmediate.parent.attributes.keyCode
-                            }
-                        } else {
-                            this.standingUponImmediate = null;
-                        }
+                        this.standingUponImmediate = null;
                     }
                 }
 
@@ -316,9 +290,6 @@ export class IntelligentForm extends AnimatedForm{
                 this.model.position.y = newYposition;
             }
         }
-
-        // console.log(`${this.model.position.y}`);
-        // if (this.standingUpon) console.log(`${this.standingUpon.objectName}`);
     }
 
     /** Intermittently recharge mana and health for the player based on strength and agility */
@@ -427,8 +398,6 @@ export class IntelligentForm extends AnimatedForm{
                     position.copy(this.model.position);
                     // position.y = this.determineElevationFromBase(); // causes disappearing floor!
                     
-                    console.log(`Granting ${itemName} @ ${position.x},${position.y},${position.z}`);
-
                     let data = {
                         itemName,
                         position
@@ -636,9 +605,39 @@ export class IntelligentForm extends AnimatedForm{
                         }  else if (this.model.getObjectByName("footL")) this.model.getObjectByName("footL").add(itemCopy);
                         break;
                     case "mount":
-                        item.model.position.y += this.attributes.height;
+
+                        switch (itemName) { 
+                            case "balloon":
+                                // special case for remote balloon ?!?
+                                if (this.objectSubtype == "remote") {
+                                    scale = scale/10;
+                                    item.model.scale.copy(new THREE.Vector3( scale, scale, scale ));
+                                    item.model.position.y = this.attributes.height / 10;
+                                } else {
+                                    item.model.position.y += this.attributes.height;
+                                }
+                                break;
+                            case "horse":
+                                item.model.position.y -= item.attributes.height;
+                                break;
+                        }
+
+
                         this.model.add(item.model);
-                        this.mounted = true;
+                        
+                        if (this.objectSubtype == "local") {
+                            this.mounted = true;
+                            this.mountedUpon = item;
+                            switch (itemName) { 
+                                case "balloon":
+                                    this.balloonFloat = true;
+                                    this.balloonRide = true;
+                                    break;
+                                case "horse":
+                                    this.mountedUpon.controlled = true;
+                                    break;
+                            }
+                        }
                         break;
                     default:
                         this.model.getObjectByName(area).add(item.model);
@@ -660,7 +659,7 @@ export class IntelligentForm extends AnimatedForm{
                         }
                     })
                 } 
-            }, false);  // false means do not addToForms, true means reseed
+            });  // optional: addToForms, reseed
         }
 
 
@@ -821,7 +820,6 @@ export class IntelligentForm extends AnimatedForm{
                     item.model.position.y += this.attributes.height;
                     
                     // Starting direction
-                    console.log(`Launching with direction: ${this.direction.x},${this.direction.y},${this.direction.z}`)
                     let direction = new THREE.Vector3().copy(this.direction); // this.sceneController.scene.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
                     
                     if (hostile) {
