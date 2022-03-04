@@ -88,7 +88,7 @@ class Modal {
                         break;
                 }
 
-                if (data.type == 'levelUp') {
+                if (data.type == 'levelUp' || data.type == 'cutScene') {
                     this.eventDepot.fire('disableCloser', {});
                 } else {
                     this.eventDepot.fire('enableCloser', {});

@@ -170,24 +170,23 @@ export const levels = [
             },
         ],
         entities: [
-            // { name: "john" },
-            // { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
-            // { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+
+            { name: "triceratops", type: "beast" },
             // { name: "ghoul", type: "beast"  },
-            // { name: "triceratops", type: "beast" },
             // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
-            // { name: "triceratops", type: "beast" },
-            // { name: "iceGhoul", type: "beast"  },
-            // { name: "shockGhoul", type: "beast"  },
-            // { name: "gasGhoul", type: "beast"  },
-            // { name: "ghostGhoul", type: "beast"  },
             // { name: "rockyMan", type: "beast" },
             // { name: "demonLord", type: "beast" },
-            { name: "horse", location: { x: 1, y: 0, z: 1} },
+            { name: "horse" },
             // { name: "murderBear", type: "beast"  },
             // { name: "rosen", type: "beast"  },
-            // { name: "blacksmith" },
-            // { name: "elfgirl" }
             // { name: "iceGhoul", type: "beast"  },
             // { name: "shockGhoul", type: "beast"  },
             // { name: "gasGhoul", type: "beast"  },
@@ -195,6 +194,11 @@ export const levels = [
             // { name: "zombie", type: "beast" },
             // { name: "daveDragon", type: "beast"},
             // { name: "jelly", location: { x: -1, y: 0, z: -1}, type: "beast"}
+            { name: "john" },
+            { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
+            // { name: "blacksmith" },
+            // { name: "elfgirl" }
+            
         ]
     },
     {
@@ -255,20 +259,20 @@ export const levels = [
             
         ],
         entities: [
+            
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "rat", type: "beast" },
+            { name: "rat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "ghoul", type: "beast", attributes: { boss: false } },
             { name: "john" },
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
-            { name: "rat", type: "beast" },
-            { name: "rat", type: "beast" },
-            { name: "bat", type: "beast" },
-            { name: "bat", type: "beast" },
-            { name: "bat", type: "beast" },
-            { name: "bat", type: "beast" },
-            { name: "bat", type: "beast" },
-            { name: "bat", type: "beast" },
-            { name: "ghoul", type: "beast", attributes: { boss: false } }
-
         ]
     },
     {
@@ -540,14 +544,14 @@ export const levels = [
             { name: "titanium" },
             { name: "wolfram" },
             { name: "silver" },
-            { 
-                name: "balloon", location: { x: -5.3, y: 0, z: -67.5 }, 
-                attributes: { staticStartingElevation: false, routeTo: { level: 8, location: { x: -3.5, y: 0, z: 40 } } } //lavaLabyrinth
-            },
+
 
         ],
         structures: [
-
+            { 
+                name: "platformBlock", location: { x: -5.3, y: 0, z: -67.5 }, 
+                attributes: { routeTo: { level: 8, location: { x: -3.5, y: 0, z: 40 } } } //lavaLabyrinth
+            },
             { 
                 name: "platformBlock", location: { x: -13.5, y: 0, z: 35.5 },
                 attributes: { locked: false, elevation: 10, routeTo: { level: 3, location: { x: -14, y: 0, z: 35.1} } } //swamp
