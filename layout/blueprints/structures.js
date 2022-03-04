@@ -259,20 +259,7 @@ export const Structures = {
     
     },
 
-    balloon: {
-        name: 'balloon',
-        gltf: 'balloon.glb',
-        description: 'Festive hot-air balloon',
-        type: 'structure',
-        attributes: {
-            equippedScale: 30,
-            staticStartingElevation: true,
-            rotateY: 180,
-            animates: false,
-            scale: 30,
-            elevation: 30,
-        }
-    },
+
 
     portal: {
         name: 'portal',

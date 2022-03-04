@@ -115,6 +115,7 @@ export class SceneController {
     /** data: {itemName: ..., layoutId: ...} */
     takeItemFromScene(data, local = true) {
 
+        console.log(`Removing ${data.itemName} with layoutId ${data.layoutId} from scene`);
         this.scene.removeFromScenebyLayoutId(data.layoutId);
         this.forms = this.forms.filter(el => {
             return el.model.attributes.layoutId != data.layoutId;
@@ -131,7 +132,7 @@ export class SceneController {
     /** data: {location ..., itemName..., keyCode...} */
     /** local means it happened in this system and will be broadcast */ 
     dropItemToScene(data, local = true) {
-        
+
         let itemTemplate = this.getTemplateByName(data.itemName);
 
         if (itemTemplate.type == 'item' || itemTemplate.type == 'structure') {
@@ -334,7 +335,7 @@ export class SceneController {
             this.others.push( form );
         } else if (form.objectType == "friendly" || form.objectType == "beast") {
             this.entities.push( form );
-        } else if (form.objectType == "floor" || form.objectType == "structure") {
+        } else if (form.objectType == "floor" || form.objectType == "structure" || form.attributes.addToStructureModels ) {
             this.structureModels.push ( form.model );
         }
     }
@@ -669,14 +670,14 @@ export class SceneController {
      * as with launching or equipping.  Use dropItemToScene to broadcast
      * with a shared layoutId.
      */
-    loadFormByName(formName, callback, addToForms) {
+    loadFormByName(formName, callback, addToForms, reseed = false) {
 
         let formTemplate = this.getTemplateByName(formName);
         this.socket.emit('nextLayoutId', this.level, layoutId => {
             formTemplate.attributes.layoutId = layoutId;
 
             // if (formTemplate.type == "spell") addToForms = false;
-            this.seedForm(formTemplate, null, addToForms).then(form => {
+            this.seedForm(formTemplate, reseed, addToForms).then(form => {
                callback(form);
             });
         })

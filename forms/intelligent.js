@@ -61,11 +61,11 @@ export class IntelligentForm extends AnimatedForm{
                 })
 
                 Object.keys(this.equipped).forEach(bodyPart => {
-                    this.equip(bodyPart, this.equipped[bodyPart][0], this.equipped[bodyPart][1], this.equipped[bodyPart][2]); // bodyPart, itemName, throwable
+                    this.equip(bodyPart, this.equipped[bodyPart][0], this.equipped[bodyPart][1], this.equipped[bodyPart][2], true); // bodyPart, itemName, throwable
                 })
             }
             
-            
+            // this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
             this.addHealthBarToModel();
 
             if (callback) callback();
@@ -258,6 +258,16 @@ export class IntelligentForm extends AnimatedForm{
                     
                     if (standingUpon.objectName == 'balloon' && !(standingUpon.attributes.routeTo)) {
                         
+                        // if (!this.balloonRide) { // if just getting on
+                        //     let layoutId = standingUpon.attributes.layoutId;
+                        //     this.sceneController.takeItemFromScene({ itemName: 'balloon', layoutId });
+                        //     this.equip('mount', 'balloon');
+                        //     this.sceneController.structureModels = this.sceneController.structureModels.filter(el => el != this.balloonModel);
+                        //     this.balloonRide = true;
+                        // } 
+
+                        // this.balloonFloat = true;
+                        
                         this.balloonModel = standingUpon;
                         this.balloonFloat = true;
                         this.balloonModel.rotateY(Math.PI);
@@ -376,9 +386,9 @@ export class IntelligentForm extends AnimatedForm{
 
         if (this.objectSubtype == "local") this.updateHeroStats(stat);
         
-        this.sceneController.eventDepot.fire('statusUpdate', { 
-            message: `${this.objectName} ${stat} stat boosted: ${this.attributes.stats[stat]}` 
-        }); 
+        // this.sceneController.eventDepot.fire('statusUpdate', { 
+        //     message: `${this.objectName} ${stat} stat boosted: ${this.attributes.stats[stat]}` 
+        // }); 
     }
 
     getStatAll(stat) {
@@ -569,12 +579,12 @@ export class IntelligentForm extends AnimatedForm{
         return true;
     }
 
-    equip(area, itemName, throwable = false, throws = null) {
+    equip(area, itemName, throwable = false, throws = null, initial = false) {
         this.equipped[area] = [itemName,throwable,throws];
         
         if (this.objectType == "hero" && this.objectSubtype == "local") {
             this.cacheHero();
-            this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
+            if (!initial) this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
         }
 
         if (area.match('key')) {
@@ -625,6 +635,11 @@ export class IntelligentForm extends AnimatedForm{
                             this.model.getObjectByName("FootL").add(itemCopy);
                         }  else if (this.model.getObjectByName("footL")) this.model.getObjectByName("footL").add(itemCopy);
                         break;
+                    case "mount":
+                        item.model.position.y += this.attributes.height;
+                        this.model.add(item.model);
+                        this.mounted = true;
+                        break;
                     default:
                         this.model.getObjectByName(area).add(item.model);
                         break;
@@ -634,10 +649,6 @@ export class IntelligentForm extends AnimatedForm{
                     
                     this.animatedSubforms.push([area,item]);
                     if (item.attributes.animationOnEquip) {
-                        // let action = item.activeAction;
-                        // action.clampWhenFinished = true;
-                        // action.loop = THREE.LoopPingPong;
-                        // action.repetitions = 1;
                         item.runActiveAction(2);
                     }
                 }
@@ -649,14 +660,14 @@ export class IntelligentForm extends AnimatedForm{
                         }
                     })
                 } 
-            });  // false means do not add to forms
+            }, false);  // false means do not addToForms, true means reseed
         }
 
 
 
     }
     
-    unequip(area) {
+    unequip(area, death = false) {
         
         if (this.equipped[area]) {
             let itemName = this.equipped[area][0];
@@ -665,7 +676,7 @@ export class IntelligentForm extends AnimatedForm{
             
             if (this.objectType == "hero" && this.objectSubtype == "local") {
                 this.cacheHero();
-                this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
+                if (!death) this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
             }
 
             if (area.match('key')) {

@@ -104,13 +104,22 @@ class Scene {
     }
 
     add ( model ) {
+        console.log(`adding model`);
+        console.dir(model);
         this.scene.add( model );
     }
 
     removeFromScenebyLayoutId(layoutId) {
-        this.scene.remove(this.scene.children.find(el => {
+        console.log(`scene children before removeFromScenebyLayoutId:`);
+        console.dir(this.scene.children);
+
+        let formToRemove = this.scene.children.find(el => {
             return el.attributes? el.attributes.layoutId == layoutId : false;
-        }));
+        })
+        this.scene.remove(formToRemove);
+        console.log(`scene children after:`);
+        console.dir(this.scene.children);
+        
     }
     
     addBackground() {

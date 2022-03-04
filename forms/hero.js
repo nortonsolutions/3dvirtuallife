@@ -50,6 +50,8 @@ export class Hero extends IntelligentForm {
         this.balloonFloatStart = 0;
         this.cacheHero();
 
+        this.heroNearby = true;
+
     }
 
     load(callback) {
@@ -199,7 +201,7 @@ export class Hero extends IntelligentForm {
                     }
 
                     if (this.selectedObject.attributes.keyCode) data.keyCode =this.selectedObject.attributes.keyCode;
-                    this.sceneController.eventDepot.fire('takeItemFromScene', data);
+                    this.sceneController.eventDepot.fire('takeItemFromSceneAndAddToInventory', data);
 
                 } else if (objectType == "friendly") {
                     
@@ -273,6 +275,11 @@ export class Hero extends IntelligentForm {
             
             if (this.model.position.y <= this.determineElevationFromBase() + this.attributes.height) {
                 this.sceneController.eventDepot.fire('dismount', data);
+                // if (this.mounted) {
+                //     this.mounted = false;
+                //     this.sceneController.eventDepot.fire('dismount', data);
+                // }
+
             } else {
                 this.model.position.y -= 3;
             }
@@ -280,6 +287,26 @@ export class Hero extends IntelligentForm {
 
         // data: { vehicle: 'balloon' }
         this.sceneController.eventDepot.addListener('dismount', (data) => {
+            // console.log(`dismounting`);
+            // // this.unequip('mount', data.vehicle);
+            // let position = new THREE.Vector3().copy(this.model.position);
+            // position.y += 10;
+            // // position.z += 70;
+
+            // let dropData = {
+            //     itemName: data.vehicle,
+            //     source: 'mount',
+            //     position
+            // }
+
+            // this.sceneController.eventDepot.fire('dropItemToScene', dropData);
+            // // this.sceneController.dropItemToScene({itemName: data.vehicle, position});
+            
+            // // let vehicle = this.sceneController.scene.scene.getObjectByProperty('objectName',data.vehicle);
+            // // this.sceneController.structureModels.push(vehicle.model);
+
+            // this.model.translateZ(70);
+            // if (this.balloonRide) this.balloonRide = false;
             
             // Place the riding vehicle back on the ground and back up
             let vehicle = this.model.getObjectByProperty('objectName',data.vehicle);
@@ -387,7 +414,7 @@ export class Hero extends IntelligentForm {
             this.addToInventory(data.itemName, data.desiredIndex);
         });
 
-        this.sceneController.eventDepot.addListener('takeItemFromScene', (data) => {
+        this.sceneController.eventDepot.addListener('takeItemFromSceneAndAddToInventory', (data) => {
             this.addToInventory(data.itemName, undefined, data.quantity, data.keyCode);
         });
 
@@ -551,7 +578,7 @@ export class Hero extends IntelligentForm {
         this.sceneController.eventDepot.removeListeners('unequipItem');
         this.sceneController.eventDepot.removeListeners('equipItem');
         this.sceneController.eventDepot.removeListeners('placeItem');
-        this.sceneController.eventDepot.removeListeners('takeItemFromScene');
+        this.sceneController.eventDepot.removeListeners('takeItemFromSceneAndAddToInventory');
         this.sceneController.eventDepot.removeListeners('removeFromInventory');
         this.sceneController.eventDepot.removeListeners('addToInventory');
         this.sceneController.eventDepot.removeListeners('dropItemToScene');
@@ -793,7 +820,7 @@ export class Hero extends IntelligentForm {
         Object.values(this.equipped).forEach(item => {
             /** data: {location ..., itemName..., } */
             if (item) {
-                this.unequip(item[1]);
+                this.unequip(item[1], true);
                 this.sceneController.dropItemToScene({itemName: item[0], position: this.model.position});
             }
         });

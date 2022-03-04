@@ -532,6 +532,10 @@ export const levels = [
             { name: "titanium" },
             { name: "wolfram" },
             { name: "silver" },
+            { 
+                name: "balloon", location: { x: -5.3, y: 0, z: -67.5 }, 
+                attributes: { staticStartingElevation: false, routeTo: { level: 8, location: { x: -3.5, y: 0, z: 40 } } } //lavaLabyrinth
+            },
 
         ],
         structures: [
@@ -543,10 +547,6 @@ export const levels = [
             { 
                 name: "platformBlock", location: { x: -92.4, y: 0, z: 100.8 },
                 attributes: { locked: false, elevation: 5, routeTo: { level: 7, location: { x: 6.4, y: 0, z: 21.1} } } //snowyLand
-            },
-            { 
-                name: "balloon", location: { x: -5.3, y: 0, z: -67.5 }, 
-                attributes: { staticStartingElevation: false, routeTo: { level: 8, location: { x: -3.5, y: 0, z: 40 } } } //lavaLabyrinth
             },
             { 
                 name: "tavernShop", location: { x: 1.1, y: 0, z: -34.5 },
@@ -790,11 +790,10 @@ export const levels = [
             }
         },
         items: [
-            
+            { name: "balloon", location: { x: -7.2, y: 6.0, z: 40 }  },
         ],
         structures: [
             { name: "ricketyPlatform", location: { x: -7.2, y: 0, z: 40 }  },
-            { name: "balloon", location: { x: -7.2, y: 6.0, z: 40 }  },
             { 
                 name: "platformBlock", location: { x: -8.8, y: 0, z: 38.4 }, 
                 attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } }} //kingdom

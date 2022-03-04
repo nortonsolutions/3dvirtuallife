@@ -1110,5 +1110,21 @@ export const Items = {
             elevation: 0,
             effect: "strength/3"
         } 
-    }
+    },
+
+    balloon: {
+        name: 'balloon',
+        gltf: 'balloon.glb',
+        description: 'Festive hot-air balloon',
+        type: 'item',
+        attributes: {
+            equippedScale: 30,
+            staticStartingElevation: true,
+            rotateY: 180,
+            animates: false,
+            scale: 30,
+            elevation: 30,
+            addToStructureModels: true
+        }
+    },
 }
