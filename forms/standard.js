@@ -40,6 +40,9 @@ export class StandardForm {
     /** load is for loading the model and animations specifically */
     load(callback) {
         
+        if (typeof this.template.attributes.stage == "number") {
+            this.template.gltf = this.template.attributes.gltfs[this.template.attributes.stage];
+        }
         this.sceneController.loader.load( '/models/3d/gltf/' + this.template.gltf, (gltf) => {
         
             let model = gltf.scene;

@@ -30,8 +30,9 @@ export const Structures = {
         description: 'Sturdy bridge',
         type: 'structure',
         attributes: {
+            transparentWindows: true,
             animates: false,
-            scale: 40,
+            scale: 120,
             elevation: -90,
         }
     },

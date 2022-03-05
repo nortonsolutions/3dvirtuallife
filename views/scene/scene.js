@@ -273,18 +273,30 @@ class Scene {
                 //     })
                 // }
             });
-
         }
 
         if (projectile.local) {
-            let [stat, change] = projectile.item.attributes.effect.split("/");
 
-            if (projectile.hostile) {
-                this.controller.hero.changeStat('health', -change, false);
-            } else {
-                entitiesInRange.forEach(entity => {
-                    this.controller.hero.inflictDamage(entity, change);
-                })
+            if (projectile.item.attributes.effect) {
+                let [type, change] = projectile.item.attributes.effect.split("/");
+
+                if (projectile.hostile) {
+                    this.controller.hero.changeStat('health', -change, false);
+                } else {
+                    entitiesInRange.forEach(entity => {
+                        this.controller.hero.inflictDamage(entity, change, type);
+                    })
+                }
+    
+            } else if (projectile.item.attributes.plantable) {
+                let dropData = {
+                    itemName: projectile.item.objectName,
+                    location: this.controller.getLocationFromPosition(projectile.item.model.position),
+                    source: "",
+                    type: "entity"
+                };
+    
+                this.controller.dropItemToScene(dropData);
             }
 
         }
@@ -327,6 +339,8 @@ class Scene {
             for (let projectile of this.controller.projectiles) {
             // this.controller.projectiles.forEach(projectile => {
     
+                console.log(`Before gravity`);
+                console.dir(projectile);
                 if (projectile.distanceTraveled == 0) { // first iteration, set velocities
     
                     projectile.velocity.y = (projectile.item.direction.y) * 500;
@@ -339,28 +353,40 @@ class Scene {
                     projectile.velocity.y -= 9.8 * projectile.item.attributes.throwableAttributes.weight * 100 * delta;
                 }
     
+                console.log(`After gravity`);
+                console.dir(projectile);
                 projectile.item.model.translateY( projectile.velocity.y * delta );
                 projectile.item.model.translateZ( -projectile.velocity.z * delta );
 
-                if (projectile.hostile && this.controller.heroInRange(projectile.item.attributes.range, projectile.item.model.position)) {
-                    this.handleAction(projectile, null);
-                    continue;
-                } else if (!projectile.hostile) { // projectiles launched by hero
-                    var entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
-                    if (entitiesInRange.length > 0) {
-                        this.handleAction(projectile, entitiesInRange);
+                if (!projectile.item.attributes.plantable) {
+                    if (projectile.hostile && this.controller.heroInRange(projectile.item.attributes.range, projectile.item.model.position)) {
+                        this.handleAction(projectile, null);
                         continue;
-                        // this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
+                    } else if (!projectile.hostile) { // projectiles launched by hero
+                        var entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
+                        if (entitiesInRange.length > 0) {
+                            this.handleAction(projectile, entitiesInRange);
+                            continue;
+                            // this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
+                        }
                     }
-                }
+        
+                    // if I hit a structure, handleAction
+                    this.projectileMovementRaycaster.ray.origin.copy(projectile.item.model.position);
+                    // this.projectileMovementRaycaster.ray.direction.copy(projectile.direction);
+                    let pIntersects = this.projectileMovementRaycaster.intersectObjects(this.controller.structureModels, true);
+                    if (pIntersects.length > 0 && pIntersects[0].object.type != "Sprite") { 
+                        this.handleAction(projectile, []);
+                        continue;
+                    }
     
-                // if I hit a structure, handleAction
-                this.projectileMovementRaycaster.ray.origin.copy(projectile.item.model.position);
-                // this.projectileMovementRaycaster.ray.direction.copy(projectile.direction);
-                let pIntersects = this.projectileMovementRaycaster.intersectObjects(this.controller.structureModels, true);
-                if (pIntersects.length > 0 && pIntersects[0].object.type != "Sprite") { 
-                    this.handleAction(projectile, []);
-                    continue;
+
+                } else {
+                    if (projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+5) {
+                        // projectile.distanceTraveled = -1;
+                        this.handleAction(projectile, []);
+                        continue;
+                    }
                 }
 
                 // Otherwise if I hit the max range, expire

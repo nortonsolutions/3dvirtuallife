@@ -189,7 +189,7 @@ export const Items = {
             scale: 5,
             equippedScale: 0.005,
             elevation: 10,
-            effect: "damage/3",
+            effect: "poisonDamage/3",
             range: 40,
             sprites: [{ 
                 name: "greenExplosion",
@@ -242,7 +242,7 @@ export const Items = {
             scale: 5,
             equippedScale: 0.005,
             elevation: 10,
-            effect: "damage/3",
+            effect: "thunderDamage/3",
             range: 40,
             sprites: [{ 
                 name: "hitEffect",
@@ -581,7 +581,7 @@ export const Items = {
                 chanceToLeaveOnGround: 0.5
             },
             elevation: 10,
-            effect: "damage/5",
+            effect: "generalDamage/5",
             range: 20
         }         
     },

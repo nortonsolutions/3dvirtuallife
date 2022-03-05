@@ -49,7 +49,7 @@ export const Spells = {
         type: 'spell',
         attributes: {
             manaCost: 1,
-            effect: "damage/3",
+            effect: "poisonDamage/3",
             range: 80,
             sprites: [{ 
                 name: "greenExplosion",
@@ -70,7 +70,7 @@ export const Spells = {
         type: 'spell',
         attributes: {
             manaCost: 1,
-            effect: "damage/3",
+            effect: "poisonDamage/3",
             range: 80,
             animates: false,
             scale: .5,
@@ -119,8 +119,8 @@ export const Spells = {
         type: 'spell',
         attributes: {
             manaCost: 1,
-            effect: "damage/3",
-            range: 80,
+            effect: "generalDamage/3",
+            range: 40,
             animates: false,
             scale: .5,
             throwable: true,
@@ -130,7 +130,7 @@ export const Spells = {
                 distance: 1200, // px
                 speed: 3 // 1 = full walking speed
             },
-            continuousSprites: true,
+            continuousSprites: false,
             sprites: [{ 
                 name: "rock1",
                 regex: "",
@@ -150,7 +150,7 @@ export const Spells = {
         type: 'spell',
         attributes: {
             manaCost: 1,
-            effect: "damage/3",
+            effect: "fireDamage/3",
             range: 80,
             animates: false,
             scale: .5,
@@ -199,7 +199,7 @@ export const Spells = {
         type: 'spell',
         attributes: {
             manaCost: 1,
-            effect: "damage/3",
+            effect: "fireDamage/3",
             range: 80,
             animates: false,
             scale: .5,
@@ -248,7 +248,7 @@ export const Spells = {
         type: 'spell',
         attributes: {
             manaCost: 1,
-            effect: "damage/3",
+            effect: "iceDamage/3",
             range: 80,
             animates: false,
             scale: .5,
@@ -284,11 +284,11 @@ export const Spells = {
         name: 'lightningBoltSpell',
         gltf: 'lightningBolt.glb',
         image: 'lightningBolt.png',
-        description: 'A projectile bolt to inflict lightning damage',
+        description: 'A projectile bolt to inflict thunder damage',
         type: 'spell',
         attributes: {
             manaCost: 1,
-            effect: "damage/3",
+            effect: "thunderDamage/3",
             range: 80,
             animates: true,
             scale: 10,
@@ -299,7 +299,16 @@ export const Spells = {
                 distance: 1200, // px
                 speed: 3 // 1 = full walking speed
             },
-            continuousSprites: false
+            continuousSprites: true,
+            sprites: [{ 
+                name: "heal",
+                regex: "",
+                frames: 10,
+                scale: 50,
+                elevation: 10,
+                flip: false,
+                time: 1
+            }]
         }
     }
 }

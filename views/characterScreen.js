@@ -307,7 +307,11 @@ function newHeroTemplate(name,height) {
                 mana: "3/3/0",
                 strength: "1/1/0",
                 agility: "3/3/0",
-                defense: "0/0/0"
+                defense: "0/0/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             xpLevels: {
                 health: 0,
@@ -321,14 +325,14 @@ function newHeroTemplate(name,height) {
         model: null,
         inventory: [{"itemName":"gold", "quantity": 3}],
         spells: [
-            {"itemName":"healSpell"},
-            {"itemName":"healAllSpell"},
-            {"itemName":"poisonSpell"},
-            {"itemName":"poisonProjectileSpell"},
-            {"itemName":"fireProjectileSpell"},
-            {"itemName":"iceProjectileSpell"},
-            {"itemName":"lightningBoltSpell"},
-            {"itemName":"fireSpell"}
+            // {"itemName":"healSpell"},
+            // {"itemName":"healAllSpell"},
+            // {"itemName":"poisonSpell"},
+            // {"itemName":"poisonProjectileSpell"},
+            // {"itemName":"fireProjectileSpell"},
+            // {"itemName":"iceProjectileSpell"},
+            // {"itemName":"lightningBoltSpell"},
+            // {"itemName":"fireSpell"}
         ],
         equipped: {},
         conversation: {

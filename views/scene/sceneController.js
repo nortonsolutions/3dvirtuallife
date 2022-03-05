@@ -599,7 +599,7 @@ export class SceneController {
             if (this.firstInRoom) { 
                 
                 this.entities.forEach(entity => {  
-                    if (entity.objectSubType != "remote") entity.move(delta);
+                    if (entity.objectSubtype != "remote" && entity.objectSubtype != "tree") entity.move(delta);
                 });
                 
                 if (Math.random() < 0.5) { // Update others 50% of the time

@@ -123,25 +123,28 @@ export const xpLevels = {
             effect: "defense/1"
         },
         2: {
-            effect: "defense/1"
+            effect: "defense/1+fire/1"
         },
         3: {
-            effect: "defense/1"
+            effect: "defense/1+ice/1"
         },
         4: {
-            effect: "defense/1"
+            effect: "defense/1+poison/1"
         },
         5: {
-            effect: "defense/1"
+            effect: "defense/1+thunder/1"
         },
         6: {
-            effect: "defense/1"
+            effect: "defense/1+fire/1"
         },
         7: {
-            effect: "defense/1"
+            effect: "defense/1+ice/1"
         },
         8: {
-            effect: "defense/1"
+            effect: "defense/1+poison/1"
+        },
+        9: {
+            effect: "defense/1+thunder/1"
         }
     },
     

@@ -27,7 +27,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "2/2/0",
-                defense: "1/1/0"
+                defense: "1/1/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "1/1/0",
+                thunder: "0/0/0"
             },
             grants: ["gold3"]
         }
@@ -50,7 +54,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "4/4/0",
                 agility: "2/2/0",
-                defense: "2/2/0"
+                defense: "0/0/0", // rock, weapon, arrow damage defense
+                fire: "2/2/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold25"]
         }
@@ -73,7 +81,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "4/4/0",
                 agility: "2/2/0",
-                defense: "2/2/0"
+                defense: "1/1/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold25"],
             rangedSpell: 'rockProjectileSpell'
@@ -97,7 +109,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "4/4/0",
                 agility: "2/2/0",
-                defense: "2/2/0"
+                defense: "0/0/0", // rock, weapon, arrow damage defense
+                fire: "1/1/0",
+                ice: "1/1/0",
+                poison: "1/1/0",
+                thunder: "1/1/0"
             },
             grants: ["gold25"]
         }
@@ -120,7 +136,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "2/2/0",
-                defense: "1/1/0"
+                defense: "0/0/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold3"]
         }
@@ -143,7 +163,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "2/2/0",
-                defense: "1/1/0"
+                defense: "0/0/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold3"]
         }
@@ -166,7 +190,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "2/2/0",
-                defense: "1/1/0"
+                defense: "0/0/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold3"]
         }
@@ -189,7 +217,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "1/1/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold10"]
         }
@@ -213,7 +245,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "2/2/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold10"]
         }
@@ -236,7 +272,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "0/0/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "0/0/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold10"]
         }
@@ -259,7 +299,11 @@ export const Entities = {
                 mana: "60/60/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "1/1/0", // rock, weapon, arrow damage defense
+                fire: "5/5/0",
+                ice: "1/1/0",
+                poison: "1/1/0",
+                thunder: "0/0/0"
             },
             grants: ["gold10"],
             rangedSpell: 'fireProjectileSpell'
@@ -283,7 +327,40 @@ export const Entities = {
                 mana: "60/60/0",
                 strength: "2/2/0",
                 agility: "1/1/0",
-                defense: "1/1/0"
+                defense: "4/4/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
+            },
+            grants: ["gold10"],
+            // rangedSpell: 'fireProjectileSpell'
+      
+        }
+    },
+    trex: {
+        name: 'trex',
+        gltf: 'trex.glb',
+        description: 'Tyranosaurus Rex',
+        type: 'beast',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 50,
+            length: 40,
+            width: 20,
+            elevation: 0,
+            scale: 200,
+            stats: {
+                health: "4/4/0",
+                mana: "60/60/0",
+                strength: "2/2/0",
+                agility: "1/1/0",
+                defense: "5/5/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "2/2/0"
             },
             grants: ["gold10"],
             // rangedSpell: 'fireProjectileSpell'
@@ -307,7 +384,11 @@ export const Entities = {
                 mana: "60/60/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "7/7/0", // rock, weapon, arrow damage defense
+                fire: "7/7/0",
+                ice: "0/0/0",
+                poison: "7/7/0",
+                thunder: "3/3/0"
             },
             grants: ["gold10"],
             rangedSpell: 'fireProjectileSpell'
@@ -331,7 +412,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "1/1/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold10"]
         }
@@ -354,7 +439,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "2/2/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "2/2/0"
             },
             grants: ["gold10","katana"]
         }
@@ -400,7 +489,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "1/1/0", // rock, weapon, arrow damage defense
+                fire: "1/1/0",
+                ice: "1/1/0",
+                poison: "1/1/0",
+                thunder: "1/1/0"
             },
             handScaleFactor: 60,
             grants: ["gold10","axe2"]
@@ -445,7 +538,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "1/1/0",
-                defense: "1/1/0"
+                defense: "0/0/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             }
         },
     },
@@ -468,7 +565,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "0/0/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold10"]
         },
@@ -476,7 +577,7 @@ export const Entities = {
     ghoul: {
         name: 'ghoul',
         gltf: 'ghoul.glb',
-        description: 'Menacing red lava ghoul',
+        description: 'Menacing ghoul',
         type: 'beast',
         attributes: {
             moves: true,
@@ -491,10 +592,14 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "2/2/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold10"],
-            rangedSpell: 'poisonProjectileSpell'
+            // rangedSpell: 'poisonProjectileSpell'
         }
     },
     lavaGhoul: {
@@ -515,7 +620,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "1/1/0", // rock, weapon, arrow damage defense
+                fire: "5/5/0",
+                ice: "0/0/0",
+                poison: "1/1/0",
+                thunder: "0/0/0"
             },
             grants: ["gold10"],
             rangedSpell: 'fireProjectileSpell'
@@ -539,7 +648,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "1/1/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "1/1/0",
+                thunder: "5/5/0"
             },
             grants: ["gold10"],
             rangedSpell: 'lightningBoltSpell'
@@ -563,7 +676,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "1/1/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "5/5/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold10"],
             rangedSpell: 'iceProjectileSpell'
@@ -587,7 +704,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "1/1/0", // rock, weapon, arrow damage defense
+                fire: "1/1/0",
+                ice: "1/1/0",
+                poison: "1/1/0",
+                thunder: "5/5/0"
             },
             grants: ["gold10"],
             rangedSpell: 'lightningBoltSpell'
@@ -611,7 +732,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "2/2/0",
                 agility: "3/3/0",
-                defense: "1/1/0"
+                defense: "1/1/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "5/5/0",
+                thunder: "0/0/0"
             },
             grants: ["gold10"],
             rangedSpell: 'poisonProjectileSpell'
@@ -637,7 +762,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "0/0/0",
                 agility: "7/7/0",
-                defense: "1/1/0"
+                defense: "5/5/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             },
             grants: ["gold10"]
         }
@@ -661,7 +790,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "10/10/0",
                 agility: "3/3/0",
-                defense: "2/2/0"
+                defense: "6/6/6", // rock, weapon, arrow damage defense
+                fire: "6/6/6",
+                ice: "0/0/0",
+                poison: "6/6/6",
+                thunder: "0/0/0"
             },
             grants: ["keyToChest2"],
             rangedSpell: 'fireProjectileSpell'
@@ -726,7 +859,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "1/1/0",
                 agility: "1/2/0",
-                defense: "0/0/0"
+                defense: "3/3/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             }
         }
     },
@@ -769,7 +906,11 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "1/1/0",
                 agility: "1/2/0",
-                defense: "0/0/0"
+                defense: "3/3/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
             }
         }
     },
@@ -805,11 +946,15 @@ export const Entities = {
                 }
             },
             stats: {
-                health: "2/2/0",
+                health: "7/7/7",
                 mana: "0/0/0",
-                strength: "1/1/0",
+                strength: "7/7/7",
                 agility: "0/0/0", // stands in place
-                defense: "0/0/0"
+                defense: "10/10/0", // rock, weapon, arrow damage defense
+                fire: "2/2/0",
+                ice: "2/2/0",
+                poison: "2/2/0",
+                thunder: "2/2/0"
             }
         }
     },
@@ -862,32 +1007,62 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "1/1/0",
                 agility: "0/0/0",
-                defense: "0/0/0"
+                defense: "5/5/0", // rock, weapon, arrow damage defense
+                fire: "5/5/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "5/5/0"
             }
         }
     },
-    sunTree: {
-        name: 'sunTree',
-        gltf: 'sunSeed.glb',
-        description: 'Sun Tree',
+    sunSeed: {
+        name: 'sunSeed',
+        gltf: '',
+        image: 'sunSeed.png',
+        description: 'Sun Tree Seed',
         type: 'friendly',
         subtype: 'tree',
         attributes: {
             moves: false,
             animates: false,
+            plantable: true,
+            throwable: true,
+            throwableAttributes: {
+                pitch: .7, // angle up (percentage of 90 degrees)
+                weight: 4, // lbs
+                distance: 700, // px
+                speed: 1 // 1 = full walking speed
+            },
             height: 30,
             dialogHeight: 60,
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 45,
+            scale: 1,
+            equippedScale: 0.001,
             stats: {
                 health: "2/2/0",
                 mana: "0/0/0",
                 strength: "1/1/0",
                 agility: "0/0/0", // stands in place
-                defense: "0/0/0"
-            }
+                defense: "0/0/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
+            },
+            stage: 0,
+            gltfs: ['sunSeed.glb','sunTree1.glb','sunTree2.glb','sunTree3.glb','sunTree4.glb'],
+            continuousSprites: true,
+            sprites: [{ 
+                name: "heal",
+                regex: "",
+                frames: 10,
+                scale: 50,
+                elevation: 10,
+                flip: false,
+                time: 2
+            }]
         }
     },
 }

@@ -117,9 +117,9 @@ export class Hero extends IntelligentForm {
     takeEffect(item) {
 
         // What is the item effect?
-        let [stat, change] = item.attributes.effect.split("/");
+        let [type, change] = item.attributes.effect.split("/");
 
-        switch (stat) {
+        switch (type) {
 
             case "scale":
 
@@ -138,17 +138,21 @@ export class Hero extends IntelligentForm {
                 this.changeStat(stat, change, false);
                 break;
 
-            case "damage":
+            case "poisonDamage":
+            case "fireDamage":
+            case "iceDamage":
+            case "thunderDamage":    
+            case "generalDamage":                            
                 this.fadeToAction("Yes", 0.2);
                 
                 if (item.attributes.range) { // general attack against all in range
                     let entitiesInRange = this.sceneController.allEnemiesInRange(item.attributes.range, this.model.position);
                     entitiesInRange.forEach(entity => {
-                        this.inflictDamage(entity, change);
+                        this.inflictDamage(entity, change, type);
                     })
 
                 } else { // standard attack upon 'selectedObject'
-                    if (this.selectedObject.alive) this.inflictDamage(this.selectedObject, change);
+                    if (this.selectedObject.alive) this.inflictDamage(this.selectedObject, change, type);
                 }
 
                 break;
@@ -205,7 +209,7 @@ export class Hero extends IntelligentForm {
                     this.sceneController.eventDepot.fire('removeFromInventory', itemName)
                     this.sceneController.eventDepot.fire('equipItem', {bodyPart: "mount", itemName });
 
-                } else if (objectType == "item") {
+                } else if (objectType == "item" || objectSubtype == "tree") {
 
                     let data = {
                         itemName, 
@@ -507,13 +511,16 @@ export class Hero extends IntelligentForm {
             this.attributes.xpLevels[data.category] = data.nextLevel;
             this.sceneController.eventDepot.fire('statusUpdate', { message: `Advanced in ${data.category} to level ${data.nextLevel}`});
             
-            // Lookup up xpLevels in gameObjects, then apply the effect:
-            let effect = this.sceneController.getTemplateByName('xpLevels')[data.category][data.nextLevel]? this.sceneController.getTemplateByName('xpLevels')[data.category][data.nextLevel].effect : `${data.category}/1`;
+            // Lookup up xpLevels in gameObjects, then apply the effects:
+            let effectString = this.sceneController.getTemplateByName('xpLevels')[data.category][data.nextLevel]? this.sceneController.getTemplateByName('xpLevels')[data.category][data.nextLevel].effect : `${data.category}/1`;
             let spell = this.sceneController.getTemplateByName('xpLevels')[data.category][data.nextLevel]? this.sceneController.getTemplateByName('xpLevels')[data.category][data.nextLevel].spell : null;
 
-            if (effect) {
-                let [stat, change] = effect.split("/");
-                this.changeStat(stat, change, true);
+            var effects = effectString.split('+');
+            for (var effect of effects) {
+                if (effect) {
+                    let [stat, change] = effect.split("/");
+                    this.changeStat(stat, change, true);
+                }
             }
 
             if (spell) {
@@ -770,7 +777,7 @@ export class Hero extends IntelligentForm {
 
             if ( diff.length() < entity.radius ) {
                 let hitPointReduction = (getRandomArbitrary(0,this.getEffectiveStat('strength'))/10);
-                this.inflictDamage(entity, hitPointReduction);
+                this.inflictDamage(entity, hitPointReduction, "generalDamage");
 
                 // Add hit sprites at the location of the hand:
                 this.sceneController.formFactory.addSprites(null, hitSpriteConfig, this.sceneController.scene, true, this.positionWeapon);
@@ -869,8 +876,37 @@ export class Hero extends IntelligentForm {
         }
     }
 
-    inflictDamage(entity, hitPointReduction) {
+    /**
+     * 
+     * @param entity 
+     * @param hitPointReduction - base hitPoint reduction
+     * @param type - type of damage
+     */
+    inflictDamage(entity, hitPointReduction, type) {
+        
+        console.log(`Inflicting ${hitPointReduction} damage, type ${type}, on ${entity.objectName}`);
+        var defenseRating = entity.getEffectiveStat('defense');
+        // check the defense level for this type of damage
+        switch (type) {
+            case "iceDamage":
+                defenseRating += entity.getEffectiveStat('ice');
+                break;
+            case "fireDamage":
+                defenseRating += entity.getEffectiveStat('fire');
+                break;
+            case "poisonDamage":
+                defenseRating += entity.getEffectiveStat('poison');
+                break;
+            case "thunderDamage":
+                defenseRating += entity.getEffectiveStat('thunder');
+                break;
+            default:
+                break;
+        }
 
+        hitPointReduction = Math.max(hitPointReduction - defenseRating,0.01);
+
+        console.log(`Defense rating is: ${defenseRating} ... total reduction: ${hitPointReduction}`);
         if (entity.changeStat('health', -hitPointReduction, false) <= 0) {
     
             this.attributes.experience += entity.getStatMax('health');
