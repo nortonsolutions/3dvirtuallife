@@ -98,15 +98,21 @@ class LayoutManager {
 
             if (item.type == "item") this.layout.items.push(item);
             if (item.type == "structure") this.layout.structures.push(item);
-            if (item.type == "entity") this.layout.entities.push(item);
+            if (item.type == "entity" || item.type == "friendly" || item.type == "beast") this.layout.entities.push(item);
             if (local) this.socket.emit('addItemToLayout', {level: this.props.level, data, item});
             this.cacheLayout();
         }
     }
     
-    removeItemFromLayout(layoutId, local = true) {
-        this.layout.items = this.layout.items.filter(el => el.attributes.layoutId != layoutId);
-        if (local) this.socket.emit('removeItemFromLayout', {level: this.props.level, layoutId});
+    removeFromLayoutByLayoutId(layoutId, local = true) {
+        if (this.layout.items.map(el => el.attributes.layoutId).includes(layoutId)) {
+            this.layout.items = this.layout.items.filter(el => el.attributes.layoutId != layoutId);
+        } else if (this.layout.entities.map(el => el.attributes.layoutId).includes(layoutId)) {
+            this.layout.entities = this.layout.entities.filter(el => el.attributes.layoutId != layoutId);
+        } else if (this.layout.structures.map(el => el.attributes.layoutId).includes(layoutId)) {
+            this.layout.structures = this.layout.structures.filter(el => el.attributes.layoutId != layoutId);
+        }
+        if (local) this.socket.emit('removeFromLayoutByLayoutId', {level: this.props.level, layoutId});
         this.cacheLayout();
     }
 
@@ -121,12 +127,12 @@ class LayoutManager {
             this.addItemToLayout(data.data, false);
         });
 
-        this.socket.on('removeItemFromLayout', data => {
-            this.removeItemFromLayout(data.layoutId, false);
+        this.socket.on('removeFromLayoutByLayoutId', data => {
+            this.removeFromLayoutByLayoutId(data.layoutId, false);
         });
 
-        this.eventDepot.addListener('removeItemFromLayout', (layoutId) => {
-            this.removeItemFromLayout(layoutId);
+        this.eventDepot.addListener('removeFromLayoutByLayoutId', (layoutId) => {
+            this.removeFromLayoutByLayoutId(layoutId);
         });
 
         this.eventDepot.addListener('addItemToLayout', (data) => {
@@ -155,7 +161,7 @@ class LayoutManager {
 
     shutdown(callback) {
         this.eventDepot.removeListeners('updateStructureAttributes');
-        this.eventDepot.removeListeners('removeItemFromLayout');
+        this.eventDepot.removeListeners('removeFromLayoutByLayoutId');
         this.eventDepot.removeListeners('addItemToLayout');
         this.eventDepot.removeListeners('cacheLayout');
         

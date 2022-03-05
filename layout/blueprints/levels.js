@@ -818,7 +818,7 @@ export const levels = [
         structures: [
             { name: "ricketyPlatform", location: { x: -7.2, y: 0, z: 40 }  },
             { 
-                name: "platformBlock", location: { x: -8.8, y: 0, z: 38.4 }, 
+                name: "platformBlock", location: { x: -2.5, y: 0, z: 38.4 }, 
                 attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } }} //kingdom
             },
             { 

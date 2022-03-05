@@ -202,6 +202,7 @@ export class Hero extends IntelligentForm {
                         itemName, 
                         quantity: this.selectedObject.attributes.quantity? this.selectedObject.attributes.quantity : 1,
                         layoutId: this.selectedObject.model.attributes.layoutId,
+                        type: objectType
                     }
 
                     // Place immediately in 'mount' equipped position
@@ -215,6 +216,7 @@ export class Hero extends IntelligentForm {
                         itemName, 
                         quantity: this.selectedObject.attributes.quantity? this.selectedObject.attributes.quantity : 1,
                         layoutId: this.selectedObject.model.attributes.layoutId,
+                        type: objectType
                     }
 
                     if (this.selectedObject.attributes.keyCode) data.keyCode =this.selectedObject.attributes.keyCode;

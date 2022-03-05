@@ -291,6 +291,7 @@ class Scene {
             } else if (projectile.item.attributes.plantable) {
                 let dropData = {
                     itemName: projectile.item.objectName,
+                    position: projectile.item.model.position,
                     location: this.controller.getLocationFromPosition(projectile.item.model.position),
                     source: "",
                     type: "entity"

@@ -241,9 +241,9 @@ database(mongoose, (db) => {
       notifyRoomMembers(data.level, "addItemToLayout", data);
     });
 
-    socket.on('removeItemFromLayout', data => {
+    socket.on('removeFromLayoutByLayoutId', data => {
       app.layouts[socket.nsp.name][data.level][0].items = app.layouts[socket.nsp.name][data.level][0].items.filter(el => el.attributes.layoutId != data.layoutId);
-      notifyRoomMembers(data.level, "removeItemFromLayout", data);
+      notifyRoomMembers(data.level, "removeFromLayoutByLayoutId", data);
     });
 
     /** 

@@ -112,7 +112,11 @@ export class SceneController {
         });
     }
 
-    /** data: {itemName: ..., layoutId: ...} */
+    /** 
+     * Technically not just for 'items'; provide 'type' to take entities/structures
+     * data: {itemName: ..., layoutId: ..., quantity: ..., type: ....} 
+     * 
+     */
     takeItemFromScene(data, local = true) {
 
         this.scene.removeFromScenebyLayoutId(data.layoutId);
@@ -120,7 +124,7 @@ export class SceneController {
             return el.model.attributes.layoutId != data.layoutId;
         });
 
-        this.eventDepot.fire('removeItemFromLayout', data.layoutId);
+        this.eventDepot.fire('removeFromLayoutByLayoutId', data.layoutId);
 
         if (local) {
             data.level = this.level;
@@ -128,7 +132,7 @@ export class SceneController {
         }
     }
 
-    /** data: {location ..., itemName..., keyCode..., type...} */
+    /** data: {location ..., itemName..., keyCode..., type..., position...} */
     /** local means it happened in this system and will be broadcast */ 
     dropItemToScene(data, local = true) {
 
