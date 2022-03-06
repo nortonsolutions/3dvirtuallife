@@ -54,8 +54,6 @@ export class SceneController {
         this.sprites = [];
         this.projectiles = [];
 
-        this.clock = new THREE.Clock();
-
         // Bindings:
         this.addEventListeners = this.addEventListeners.bind(this);
         this.deanimateScene = this.deanimateScene.bind(this);
@@ -65,6 +63,10 @@ export class SceneController {
 
         this.multiplayer = false;
         this.addEventListeners();
+
+        // this.refractors = [];
+        // this.dudvMap = new THREE.TextureLoader().load( '/textures/waterdudv.jpg' );
+        // this.dudvMap.wrapS = this.dudvMap.wrapT = THREE.RepeatWrapping;
     }
 
     introduce() {
@@ -132,8 +134,11 @@ export class SceneController {
         }
     }
 
-    /** data: {location ..., itemName..., keyCode..., type..., position...} */
-    /** local means it happened in this system and will be broadcast */ 
+    /** 
+     * data: {location ..., itemName..., keyCode..., type..., position...} 
+     * @local means it happened in this system and will be broadcast
+     * @data.type allows dropping non-items like entities or structures
+     */
     dropItemToScene(data, local = true) {
 
         let itemTemplate = this.getTemplateByName(data.itemName);
@@ -143,6 +148,7 @@ export class SceneController {
 
             if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
             if (data.keyCode) itemTemplate.attributes.keyCode = data.keyCode;
+            if (typeof data.stage == "number") itemTemplate.attributes.stage = data.stage;
 
             this.seedForm(itemTemplate).then(form => {
     
@@ -158,6 +164,7 @@ export class SceneController {
                     this.socket.emit('nextLayoutId', this.level, layoutId => {
                         data.layoutId = form.model.attributes.layoutId = layoutId;
                         data.location = this.getLocationFromPosition(data.position);
+                        if (typeof form.model.attributes.stage == "number") data.stage = form.model.attributes.stage;
                         this.eventDepot.fire('addItemToLayout', data);
         
                         // if (this.multiplayer) {
@@ -358,6 +365,8 @@ export class SceneController {
                 this.formFactory.addBorderTrees(this.scene, this.floor.model);
             }
 
+
+
             if (this.layout.terrain.attributes.grassSprites) {
                 this.formFactory.addGrassSprites(this.scene, this.floor.model);
             }
@@ -369,6 +378,10 @@ export class SceneController {
             if (this.layout.terrain.attributes.designateNPCs) {
                 this.populateNPCnulls(this.floor.model);
                 this.populateBossNulls(this.floor.model);
+            }
+
+            if (this.layout.terrain.attributes.addPonds) {
+                this.formFactory.addPonds(this.floor.model);
             }
 
             this.addToScene(this.floor);
@@ -441,6 +454,13 @@ export class SceneController {
 
                 this.scene.add( shadowCameraHelper );
             }
+
+            var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+            this.scene.add( ambientLight );
+    
+            var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+            this.scene.camera.add( pointLight );
+            
         }
 
         if (this.layout.terrain.attributes.light.overheadPointLight || this.layout.dayTime == false) {

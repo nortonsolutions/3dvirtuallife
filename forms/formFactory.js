@@ -122,6 +122,65 @@ export class FormFactory {
         this.addSprites(model, spriteConfig, scene);
 
     }
+
+    addPonds = (model) => {
+        if (/water/.test(model.name) && model.geometry) {
+            
+            var params = {
+                color: '#ccccff',
+                scale: 4,
+                flowX: .5,
+                flowY: .1
+            };
+
+            var textureLoader = new THREE.TextureLoader();
+            var waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+            let water = new THREE.Water( waterGeometry, {
+                color: params.color,
+                scale: params.scale,
+                textureWidth: 1024,
+                textureHeight: 1024,
+                // flowDirection: new THREE.Vector2( params.flowX, params.flowY ),
+                flowMap: textureLoader.load( 'textures/Water_1_M_Flow.jpg' )
+            } );
+
+            // let refractor = new THREE.Refractor( waterGeometry, {
+            //     color: 0x999999,
+            //     textureWidth: 128,
+            //     textureHeight: 128,
+            //     shader: THREE.WaterRefractionShader
+            // } );
+            
+            // this.sceneController.refractors.push(water);
+
+            let scale = this.sceneController.layout.terrain.attributes.scale;
+            water.position.copy(model.position);
+            water.position.x *= scale;
+            water.position.y *= scale;
+            water.position.z *= scale;
+
+            water.scale.x = scale;
+            water.scale.y = scale;
+            water.scale.z = scale;
+            // refractor.position.set( 0, 10, 0 );
+
+            this.setToDoubleSided(water);
+            this.sceneController.scene.add(water);
+            
+            // refractor.material.uniforms[ "tDudv" ].value = this.sceneController.dudvMap;
+            water.rotation.x = - Math.PI / 2;
+            model.parent.remove(model);
+            
+
+        } else {
+            if (model.children) {
+                model.children.forEach(m => {
+                    this.addPonds(m);
+                })
+            }
+        }
+    }
+
     /** 
      * If regex is provided, scan down the model for any part that matches regex;
      * the first param may optionally be an array for random selection.
@@ -239,7 +298,16 @@ export class FormFactory {
         return fireObj;
     }
 
-    
+    setToDoubleSided(root) {
+        
+        if (!root) root = this.model;
+        if (root.material) { 
+                root.material.side = THREE.DoubleSide;
+        }
 
+        if (root.children) {
+            root.children.forEach(e => this.setToDoubleSided(e)); 
+        }
+    }
 
 }

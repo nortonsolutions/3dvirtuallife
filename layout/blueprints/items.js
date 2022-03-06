@@ -1052,4 +1052,20 @@ export const Items = {
             // addToStructureModels: true
         }
     },
+
+    watercan: {
+        name: 'watercan',
+        gltf: 'watercan.glb',
+        image: 'watercan.png',
+        description: 'Sturdy watering can',
+        type: 'item',
+        attributes: {
+            equippedScale: 30,
+            // rotateY: 180,
+            animates: false,
+            scale: 30,
+            elevation: 30
+            // addToStructureModels: true
+        }
+    },
 }

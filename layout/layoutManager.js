@@ -94,7 +94,8 @@ class LayoutManager {
             item.type = this.allObjects[data.itemName].type;
             item.location = data.location;
             item.attributes.layoutId = data.layoutId;
-            item.attributes.keyCode = data.keyCode
+            if (data.keyCode) item.attributes.keyCode = data.keyCode;
+            if (typeof data.stage == "number") item.attributes.stage = data.stage;
 
             if (item.type == "item") this.layout.items.push(item);
             if (item.type == "structure") this.layout.structures.push(item);

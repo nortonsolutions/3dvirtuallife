@@ -56,6 +56,7 @@ class Scene {
         this.requestAnimationFrameID = null;
 
         this.projectileMovementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(0,0,1), 0, 40 );
+        // this.clock = new THREE.Clock(); // for use by refractor uniform updates
     }
 
     init(callback) {
@@ -418,6 +419,10 @@ class Scene {
                 this.handleSprites();
                 this.handleProjectiles(this.delta);
 
+                // if (this.controller.layout.terrain.attributes.addPonds) {
+                //     this.handleRefractors();
+                // }
+
                 if (this.backgroundMesh && this.controls) this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
     
                 this.prevTime = this.time;
@@ -425,7 +430,7 @@ class Scene {
             } else {
                 this.prevTime = performance.now();
             }
-
+            // this.renderer.setClearColor( 0x20252f );
             this.renderer.render( this.scene, this.camera );
             
             if (minimap) {
@@ -441,6 +446,13 @@ class Scene {
             this.dispose(this.scene);
         }
 
+    }
+
+    handleRefractors() {
+        this.controller.refractors.forEach(refractor => {
+            refractor.material.uniforms[ "time" ].value += this.clock.getDelta();
+            
+        })
     }
 
     dispose(item) {

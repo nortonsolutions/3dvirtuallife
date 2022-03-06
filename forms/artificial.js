@@ -12,6 +12,7 @@ export class ArtificialForm extends IntelligentForm{
             switch (this.objectName) {
                 case "evilOne":
                     Object.values(this.actions).forEach(action => { action.setEffectiveTimeScale(8); });
+                    this.actions['Idle'].setEffectiveTimeScale(1);
                     break;
                 case "blueShirt":
                     Object.values(this.actions).forEach(action => { action.setEffectiveTimeScale(2); });

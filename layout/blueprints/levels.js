@@ -98,6 +98,7 @@ export const levels = [
                 cutScenes: {
                     intro: "volcanoIntro.mkv"    
                 },
+                addPonds: true,
                 scale: 100,
                 borderTrees: true,
                 light: {

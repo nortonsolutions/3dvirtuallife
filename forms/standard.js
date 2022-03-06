@@ -74,7 +74,6 @@ export class StandardForm {
             } else if (this.objectName == "floor") { // floor is the only form without location
                 this.setRoofToSingleSided();
                 this.setFloorToReceiveShadow();
-                
             }
 
             if (this.objectName == "balloon") {
@@ -127,7 +126,6 @@ export class StandardForm {
      * 
      */
     tweakPosition() {
-
         
         let directions = [
             new THREE.Vector3( 1, 0, 0 ),
