@@ -278,7 +278,7 @@ class Scene {
 
         if (projectile.local) {
 
-            if (projectile.item.attributes.effect) {
+            if (projectile.item.attributes.effect && !projectile.item.objectSubtype == 'lifegiving') {
                 let [type, change] = projectile.item.attributes.effect.split("/");
 
                 if (projectile.hostile) {
@@ -298,12 +298,48 @@ class Scene {
                     type: "entity"
                 };
     
+                console.log(`scene: dropping plantable item to scene:`)
+                console.dir(dropData);
                 this.controller.dropItemToScene(dropData);
-            }
+            
+            } else if (projectile.item.objectSubtype == 'lifegiving') {
+                
+                let [type, change] = projectile.item.attributes.effect.split("/");
+                console.log(`Inside Entities in range:`);
+                console.dir(entitiesInRange);
+                entitiesInRange.forEach(entity => {
 
+                    entity.changeStat(type, change, true);
+                    // this.controller.hero.inflictDamage(entity, change, type);
+                    if (entity.attributes.stage < 4 && entity.getEffectiveStat('health') >= 10 * (entity.attributes.stage + 1)) {
+                        entity.attributes.stage++;
+            
+                        // remove and re-add to layout:
+                        let data = {    
+                            itemName: entity.objectName, 
+                            quantity: entity.attributes.quantity? entity.attributes.quantity : 1,
+                            layoutId: entity.attributes.layoutId,
+                            type: entity.objectType
+                        }
+
+                        this.controller.takeItemFromScene(data);
+                        
+                        let dropData = {
+                            itemName: entity.objectName,
+                            position: entity.model.position,
+                            location: this.controller.getLocationFromPosition(entity.model.position),
+                            source: "",
+                            type: "entity",
+                            attributes: {stage: entity.attributes.stage }
+                        };
+            
+                        this.controller.dropItemToScene(dropData);
+                    }
+                })
+            }
         }
 
-        if (projectile.item.objectType == 'item' && 
+        if (projectile.item.objectType == 'item' && projectile.item.objectSubtype != "tree" && projectile.item.objectSubtype != 'lifegiving' &&
             projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround && 
             Math.random() < projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround) {
             projectile.item.model.position.y = projectile.item.determineElevationFromBase() + projectile.item.attributes.elevation;
@@ -337,12 +373,20 @@ class Scene {
             // this.controller.projectiles.filter(el => el.distanceTraveled == -1).forEach(projectile => {
             //     this.handleAction(projectile, []);
             // })
+
+            // else if (side == "R" && objectSubtype == "tree") {
+            //     let watercan = this.watercanEquipped();
+            //     if (watercan) this.water(this.selectedObject);
+
+            // } 
             
+            console.log(`projectiles:`);
+            console.dir(this.controller.projectiles)
             for (let projectile of this.controller.projectiles) {
             // this.controller.projectiles.forEach(projectile => {
     
-                console.log(`Before gravity`);
-                console.dir(projectile);
+                // console.log(`Before gravity`);
+                // console.dir(projectile);
                 if (projectile.distanceTraveled == 0) { // first iteration, set velocities
     
                     projectile.velocity.y = (projectile.item.direction.y) * 500;
@@ -355,12 +399,31 @@ class Scene {
                     projectile.velocity.y -= 9.8 * projectile.item.attributes.throwableAttributes.weight * 100 * delta;
                 }
     
-                console.log(`After gravity`);
-                console.dir(projectile);
+                // console.log(`After gravity`);
+                // console.dir(projectile);
                 projectile.item.model.translateY( projectile.velocity.y * delta );
                 projectile.item.model.translateZ( -projectile.velocity.z * delta );
 
-                if (!projectile.item.attributes.plantable) {
+                if (projectile.item.attributes.plantable) { // seeds (plantable)
+
+                    if (projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+5) {
+                        // projectile.distanceTraveled = -1;
+                        this.handleAction(projectile, []);
+                        continue;
+                    }
+
+                } else if (projectile.item.objectSubtype == "lifegiving") { // e.g. water
+                    var entitiesInRange = this.controller.allFriendliesInRange(projectile.item.attributes.range, projectile.item.model.position);
+                    console.log(`Entities in range:`);
+                    console.dir(entitiesInRange);
+                    if (entitiesInRange.length > 0) {
+                        this.handleAction(projectile, entitiesInRange);
+                        continue;
+                        // this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
+                    }
+
+
+                } else { // weapons/spells
                     if (projectile.hostile && this.controller.heroInRange(projectile.item.attributes.range, projectile.item.model.position)) {
                         this.handleAction(projectile, null);
                         continue;
@@ -383,12 +446,6 @@ class Scene {
                     }
     
 
-                } else {
-                    if (projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+5) {
-                        // projectile.distanceTraveled = -1;
-                        this.handleAction(projectile, []);
-                        continue;
-                    }
                 }
 
                 // Otherwise if I hit the max range, expire

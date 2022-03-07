@@ -172,7 +172,7 @@ class InventoryScreen {
                         this.eventDepot.fire('unequipItem', index);
 
                         if (!itemName.match(/spell/i)) {
-                            this.eventDepot.fire('placeItem', {itemName, desiredIndex: targetElement.id});
+                            this.eventDepot.fire('addToInventory', {itemName, desiredIndex: targetElement.id});
                         } 
         
                     } else { // to another body part or hotkey
@@ -266,7 +266,7 @@ class InventoryScreen {
     }
 
     validTarget = (itemName, targetElement) => {
-        if (itemName.match(/key|gold/i) && Array.from(targetElement.classList).includes('body')) {
+        if (itemName.match(/key|gold|^water$/i) && Array.from(targetElement.classList).includes('body')) {
             alert(`${itemName} cannot be equipped.`);
             return false;
         } else if (/redpotion|bluepotion|mushroom|spell/i.test(itemName) && Array.from(targetElement.classList).includes('bodyPart')) {

@@ -292,96 +292,6 @@ export class IntelligentForm extends AnimatedForm{
         }
     }
 
-    /** Intermittently recharge mana and health for the player based on strength and agility */
-    intermittentRecharge() {
-        
-        let chance = this.getEffectiveStat("strength") + this.getEffectiveStat("agility");
-
-        if (Math.random()*100 < chance) {
-            this.changeStat("health", 0.01);
-            this.changeStat("mana", 0.01);
-        }
-    }
-
-    /** returns the new value */
-    changeStat(stat, change, changeMax = false) {
-        
-        change = Number(change);
-        let currentStat = this.attributes.stats[stat].split('/');
-        let cur = Number(currentStat[0]);
-        let max = Number(currentStat[1]);
-        let newvalue = 0;
-
-        if (changeMax) max = max + change;
-
-        if (change > 0) {
-            newvalue = Math.min(max, cur + change);
-        } else {
-            newvalue = cur + change;
-
-            if (stat == "health") { 
-
-                if (this.alive && newvalue <= 0) {
-                    this.death();
-                }
-            }
-        }
-
-        this.attributes.stats[stat] = Number(newvalue).toFixed(2) + "/" + Number(max).toFixed(2) + "/" + this.getStatBoost(stat); //.toLocaleString('en-US',{minimumIntegerDigits:2})
-        
-        if (this.objectSubtype == "local") this.updateHeroStats(stat);
-
-        // this.sceneController.eventDepot.fire('statusUpdate', { 
-        //     // message: `${this.objectName} ${stat} stat updated: ${this.attributes.stats[stat]}` 
-        // }); 
-
-        switch (stat) {
-            case "health":
-                this.healthSprite.scale.x = this.spriteScaleX("health");
-                break;
-            case "mana":
-                this.manaSprite.scale.x = this.spriteScaleX("mana");
-                break;
-        }
-
-
-        return newvalue;
-    }
-
-
-    changeStatBoost(stat, change) {
-        change = Number(change);
-        let currentBoost = this.getStatBoost(stat);
-
-        this.attributes.stats[stat] = this.getStat(stat) + "/" + this.getStatMax(stat) + "/" + (Number(currentBoost) + Number(change));
-
-        if (this.objectSubtype == "local") this.updateHeroStats(stat);
-        
-        // this.sceneController.eventDepot.fire('statusUpdate', { 
-        //     message: `${this.objectName} ${stat} stat boosted: ${this.attributes.stats[stat]}` 
-        // }); 
-    }
-
-    getStatAll(stat) {
-        return Number(this.attributes.stats[stat]);
-    }
-
-    getStat(stat) {
-        return Number(this.attributes.stats[stat].split('/')[0]);
-    }
-
-    getStatMax(stat) {
-        return Number(this.attributes.stats[stat].split('/')[1]);
-    }
-
-    getStatBoost(stat) { // statBoost effectively raises the stat for runtime
-        return Number(this.attributes.stats[stat].split('/')[2]);
-    }
-
-    getEffectiveStat(stat) {
-        return Math.max(this.getStat(stat) + this.getStatBoost(stat),0);
-    }
-
     death(local = true) {
         this.alive = false;
         
@@ -465,7 +375,7 @@ export class IntelligentForm extends AnimatedForm{
         return worth;
     }
 
-    addToInventory(itemName, desiredIndex, quantity, keyCode = null) {
+    addToInventory(itemName, desiredIndex, quantity = 1, keyCode = null) {
 
         var newQuantity;
         var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
@@ -562,6 +472,11 @@ export class IntelligentForm extends AnimatedForm{
             this.sceneController.loadFormByName(itemName, (item) => {
 
                 item.model.position.set(0,0,0);
+
+                if (item.attributes.rotateY) item.model.rotateY(degreesToRadians(item.attributes.rotateY));
+                if (item.attributes.rotateX) item.model.rotateX(degreesToRadians(item.attributes.rotateX));
+                if (item.attributes.rotateZ) item.model.rotateZ(degreesToRadians(item.attributes.rotateZ));
+
                 if (!this.attributes.flipWeapon) item.model.rotation.y = Math.PI;
 
                 let scale = item.attributes.equippedScale? item.attributes.equippedScale: 0.1;
@@ -583,7 +498,11 @@ export class IntelligentForm extends AnimatedForm{
                         case "mana":
                         case "strength":
                         case "agility":
-                        case "defense": 
+                        case "defense":
+                        case "fire":
+                        case "ice":
+                        case "thunder":
+                        case "poison": 
                             this.changeStatBoost(stat, change);
                             break;
                         case "light":
@@ -659,7 +578,7 @@ export class IntelligentForm extends AnimatedForm{
                         }
                     })
                 } 
-            });  // optional: addToForms, reseed
+            },true,false,false);  // optional: addToForms, reseed, trackEntity
         }
 
 
@@ -841,7 +760,7 @@ export class IntelligentForm extends AnimatedForm{
                             if (parentBodyPart) this.addToInventory(parentItemName, 0, 1);
                         }
                     }
-                }); // false means do not addToForms
+                },true,false,false); // addToForms, reseed, trackEntity
 
             }
 
@@ -853,7 +772,7 @@ export class IntelligentForm extends AnimatedForm{
                 item.direction = data.direction;
                 
                 this.sceneController.addToProjectiles(item, local, hostile);
-            }, false);
+            }, false, false, false);
         }
 
     }

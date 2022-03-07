@@ -45,7 +45,6 @@ export const baselineHeroTemplates = [
             flipWeapon: true,
             stats: {
                 strength: "2/2/0",
-                
             }
         },
         description: "Above-average strength."

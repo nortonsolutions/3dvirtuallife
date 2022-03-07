@@ -1038,8 +1038,8 @@ export const Entities = {
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 1,
-            equippedScale: 0.001,
+            scale: 10,
+            equippedScale: 0.01,
             stats: {
                 health: "2/2/0",
                 mana: "0/0/0",
@@ -1052,13 +1052,13 @@ export const Entities = {
                 thunder: "0/0/0"
             },
             stage: 0,
-            gltfs: ['sunSeed.glb','sunTree1.glb','sunTree2.glb','sunTree3.glb','sunTree4.glb'],
+            gltfs: ['sunSeed2.glb','sunTree1.glb','sunTree2.glb','sunTree3.glb','sunTree4.glb'],
             continuousSprites: true,
             sprites: [{ 
                 name: "heal",
                 regex: "",
                 frames: 10,
-                scale: 50,
+                scale: 5,
                 elevation: 10,
                 flip: false,
                 time: 2

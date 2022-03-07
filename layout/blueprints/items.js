@@ -358,6 +358,7 @@ export const Items = {
         type: 'item',
         subtype: 'sword',
         attributes: {
+            flipWeapon: true,
             equippable: ['Middle2R', 'Middle2L'],
             animates: false,
             scale: 60,
@@ -561,6 +562,7 @@ export const Items = {
             effect: "strength/1",
         } 
     },
+
     arrow: {
         name: 'arrow',
         gltf: 'arrow.glb',
@@ -1059,12 +1061,74 @@ export const Items = {
         image: 'watercan.png',
         description: 'Sturdy watering can',
         type: 'item',
+        subtype: 'launcher',
         attributes: {
-            equippedScale: 30,
+            // rotateY: 180,
+            waters: true,
+            animates: false,
+            scale: 100,
+            equippedScale: .1,
+            elevation: 0,
+            throwable: false,
+            throws: "water",
+            full: 0
+            // rotateY: 315, 
+            // rotateZ: 180
+            // rotateX: 315
+            
+            // addToStructureModels: true
+        }
+    },
+    water: {
+        name: 'water',
+        gltf: 'watercan.glb',
+        image: 'waterDroplet.png',
+        description: 'water',
+        type: 'item',
+        subtype: 'lifegiving',
+        attributes: {
+            equippable: ['Middle2R', 'Middle2L'],
+            animates: false,
+            scale: .001,
+            equippedScale: 0.001,
+            throwable: true,
+            throwableAttributes: {
+                pitch: .7, // angle up (percentage of 90 degrees)
+                weight: 4, // lbs
+                distance: 700, // px
+                speed: 1 // 1 = full walking speed
+            },
+            elevation: 10,
+            effect: "health/1",
+            range: 100,
+            continuousSprites: true,
+            sprites: [{ 
+                name: "blueExplosion",
+                regex: "",
+                frames: 10,
+                scale: 200,
+                flip: false,
+                elevation: 40,
+                time: 2
+            }],
+        }    
+    },
+    miningHammer: {
+        name: 'miningHammer',
+        gltf: 'miningHammer.glb',
+        image: 'miningHammer.png',
+        description: 'Sturdy mining hammer',
+        type: 'item',
+        attributes: {
             // rotateY: 180,
             animates: false,
-            scale: 30,
-            elevation: 30
+            scale: 100,
+            equippedScale: .1,
+            elevation: 0,
+            // rotateY: 315, 
+            // rotateZ: 180
+            // rotateX: 315
+            
             // addToStructureModels: true
         }
     },

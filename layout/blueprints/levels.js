@@ -109,7 +109,10 @@ export const levels = [
                     color: 'white',
                     density: 1
                 },
-                designateNPCs: true
+                designateNPCs: true,
+                waterSources: [
+                    [{x: -16, y: 0, z: -175}, 80]
+                ]
             }
         },
         items: [
@@ -125,10 +128,12 @@ export const levels = [
             { name: "gold" },
             { name: "iron" },
             { name: "silver" },
-            { 
-                name: "balloon", location: { x: -3, y: 0, z: -1},
-                attributes: { staticStartingElevation: false }
-            },
+            { name: "watercan", location: { x: 1.1, y: 0.3, z: 4.4}, attributes: { staticStartingElevation: true }},
+            { name: "miningHammer", location: { x: -3, y: 0, z: 0}},
+            // { 
+            //     name: "balloon", location: { x: -3, y: 0, z: -1},
+            //     attributes: { staticStartingElevation: false }
+            // },
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0},
@@ -180,19 +185,19 @@ export const levels = [
             { name: "evilOne", type: "beast" },
             { name: "evilOne", type: "beast" },
             { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
+            // { name: "evilOne", type: "beast" },
+            // { name: "evilOne", type: "beast" },
             { name: "evilOne", type: "beast" },
             { name: "evilOne", type: "beast" },
             { name: "evilOne", type: "beast" },
 
             { name: "triceratops", type: "beast" },
-            { name: "trex", type: "beast" },
+            // { name: "trex", type: "beast" },
             // { name: "ghoul", type: "beast"  },
             // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
             // { name: "rockyMan", type: "beast" },
             // { name: "demonLord", type: "beast" },
-            { name: "horse", location: { x: 1, y: 0, z: 1} },
+            // { name: "horse", location: { x: 1, y: 0, z: 1} },
             // { name: "murderBear", type: "beast"  },
             // { name: "rosen", type: "beast"  },
             // { name: "iceGhoul", type: "beast"  },

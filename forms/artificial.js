@@ -91,7 +91,7 @@ export class ArtificialForm extends IntelligentForm{
                             this.facePosition(closestHeroPosition.position);
                             
                             if (Math.random()<.05) {
-                                let action = this.possibleThrowAttacks[getRndInteger(0,this.possibleThrowAttacks.length-1)]
+                                let action = this.throwActions[getRndInteger(0,this.throwActions.length-1)]
                                 this.fadeToAction(action, 0.2);
                                 setTimeout(() => {
                                     this.castSpell(this.sceneController.getTemplateByName(this.attributes.rangedSpell), true, true);

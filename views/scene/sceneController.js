@@ -64,6 +64,9 @@ export class SceneController {
         this.multiplayer = false;
         this.addEventListeners();
 
+        // An array of waterSources -- [[{position},radius],[{position},radius]]
+        this.waterSources = [];
+
         // this.refractors = [];
         // this.dudvMap = new THREE.TextureLoader().load( '/textures/waterdudv.jpg' );
         // this.dudvMap.wrapS = this.dudvMap.wrapT = THREE.RepeatWrapping;
@@ -126,6 +129,12 @@ export class SceneController {
             return el.model.attributes.layoutId != data.layoutId;
         });
 
+        if (data.type == "entity" || data.type == "beast" || data.type == "friendly") {
+            this.entities = this.entities.filter(el => {
+                return el.model.attributes.layoutId != data.layoutId;
+            });
+        }
+
         this.eventDepot.fire('removeFromLayoutByLayoutId', data.layoutId);
 
         if (local) {
@@ -141,6 +150,8 @@ export class SceneController {
      */
     dropItemToScene(data, local = true) {
 
+        console.log(`dropping to scene:`)
+        console.dir(data);
         let itemTemplate = this.getTemplateByName(data.itemName);
 
         // if (itemTemplate.type == 'item' || itemTemplate.type == 'structure') {
@@ -324,7 +335,7 @@ export class SceneController {
         }
     }
 
-    addToScene(form, addToForms = true, addToScene = true, reseed = false) {
+    addToScene(form, addToForms = true, addToScene = true, reseed = false, trackEntity = true) {
         
         if (reseed) {
             this.forms = this.forms.filter(el => el.attributes.layoutId != form.attributes.layoutId);
@@ -343,8 +354,8 @@ export class SceneController {
 
         if (form.objectSubtype == "remote") {
             this.others.push( form );
-        } else if (form.objectType == "friendly" || form.objectType == "beast") {
-            this.entities.push( form );
+        } else if (form.objectType == "friendly" || form.objectType == "beast" || form.objectType == "entity") {
+            if (trackEntity) this.entities.push( form );
         } else if (form.objectType == "floor" || form.objectType == "structure" || form.attributes.addToStructureModels ) {
             this.structureModels.push ( form.model );
         }
@@ -365,8 +376,6 @@ export class SceneController {
                 this.formFactory.addBorderTrees(this.scene, this.floor.model);
             }
 
-
-
             if (this.layout.terrain.attributes.grassSprites) {
                 this.formFactory.addGrassSprites(this.scene, this.floor.model);
             }
@@ -384,11 +393,21 @@ export class SceneController {
                 this.formFactory.addPonds(this.floor.model);
             }
 
+            this.addWaterSources();
+
             this.addToScene(this.floor);
             setTimeout(() => {
                 callback();
             }, 500);
         });
+    }
+
+    addWaterSources() {
+        if (this.floor.attributes.waterSources) {
+            for (let waterSource of this.floor.attributes.waterSources) {
+                this.waterSources.push(waterSource);
+            }
+        }
     }
 
     // Fill the following if applicable; scan for 'npc' nodes
@@ -455,11 +474,11 @@ export class SceneController {
                 this.scene.add( shadowCameraHelper );
             }
 
-            var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
-            this.scene.add( ambientLight );
+            // var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+            // this.scene.add( ambientLight );
     
-            var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-            this.scene.camera.add( pointLight );
+            // var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+            // this.scene.camera.add( pointLight );
             
         }
 
@@ -559,9 +578,11 @@ export class SceneController {
      * Load model of each form and add to scene.
      * 
      * reseed is set for updates as when character equips/unequips
+     * addToForms indicates that the form will be added to this.forms
+     * trackEntity is for entities only; specify false if the entity is only equipped
      * 
      */ 
-    seedForm(formTemplate, reseed = false, addToForms = true) {
+    seedForm(formTemplate, reseed = false, addToForms = true, trackEntity = true) {
 
         var form;
         if (formTemplate.attributes.moves) {
@@ -581,7 +602,7 @@ export class SceneController {
                 })
             }
 
-            this.addToScene(form, addToForms, true, reseed);
+            this.addToScene(form, addToForms, true, reseed, trackEntity);
         
             if (this.firstInRoom && form.attributes.contentItems) {
                 form.attributes.contentItems.forEach(contentItemName => {
@@ -691,14 +712,14 @@ export class SceneController {
      * as with launching or equipping.  Use dropItemToScene to broadcast
      * with a shared layoutId.
      */
-    loadFormByName(formName, callback, addToForms, reseed = false) {
+    loadFormByName(formName, callback, addToForms, reseed = false, trackEntity = true) {
 
         let formTemplate = this.getTemplateByName(formName);
         this.socket.emit('nextLayoutId', this.level, layoutId => {
             formTemplate.attributes.layoutId = layoutId;
 
             // if (formTemplate.type == "spell") addToForms = false;
-            this.seedForm(formTemplate, reseed, addToForms).then(form => {
+            this.seedForm(formTemplate, reseed, addToForms, trackEntity).then(form => {
                callback(form);
             });
         })

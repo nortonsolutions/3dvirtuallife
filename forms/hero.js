@@ -283,10 +283,73 @@ export class Hero extends IntelligentForm {
 
                     this.sceneController.eventDepot.fire('modal', dialogData);
                 } 
-            } 
+            } else if (this.atWaterSource()) { // no selected object:
+
+                let watercan = this.watercanEquipped();
+                if (watercan) {
+                    this.drawWater(watercan);
+                }
+            }
         }
     }
 
+    // water(entity) {
+    //     // show some sprite stuff upon the item
+    //     let spriteConfig = {
+    //         name: 'blueExplosion',
+    //         regex: '',
+    //         frames: 10,
+    //         scale: 1,
+    //         elevation: .1,
+    //         flip: false,
+    //         animates: true,
+    //         time: 3
+    //     }
+        
+    //     this.sceneController.formFactory.addSprites(entity.model, spriteConfig, this.sceneController.scene, true, entity.model.position);
+    // }
+
+    atWaterSource() {
+        // this.sceneController.waterSources -- array of waterSources, i.e.,
+        //  [[{position},radius],[{position},radius]]
+        for (let waterSource of this.sceneController.waterSources) {
+            let position = new THREE.Vector3(waterSource[0].x, waterSource[0].y, waterSource[0].z);
+            let distance = waterSource[1];
+
+            // test my distance
+            if (this.model.position.distanceTo(position) <= distance) return true;
+        }
+        
+        return false;
+    }
+
+    watercanEquipped() {
+
+        if ((this.equipped.Middle2R && this.equipped.Middle2R[0] == "watercan") || (this.equipped.Middle2L && this.equipped.MiddleL[0] == "watercan")) {
+            return this.model.getObjectByProperty('objectName', 'watercan');
+        } else return null;
+    }
+
+    drawWater(watercan) {
+
+        let spriteConfig = {
+            name: 'blueExplosion',
+            regex: '',
+            frames: 10,
+            scale: 100,
+            elevation: 60,
+            flip: false,
+            animates: true,
+            time: 3
+        }
+        
+        this.sceneController.formFactory.addSprites(watercan.model, spriteConfig, this.sceneController.scene, true, watercan.getWorldPosition());
+
+        this.fadeToAction('ThumbsUp', 0.2);
+        // add 'water' to inventory;
+        this.sceneController.eventDepot.fire('addToInventory', {itemName: 'water', quantity: 4});
+        console.log('test');
+    }
 
     addEventListeners() {
 
@@ -468,15 +531,19 @@ export class Hero extends IntelligentForm {
                 let throws = this.equippedThrows();
                 if (throws.length > 0) {
                     throws.forEach(([bodyPart,item]) => {
-
+                        var tool;
                         // animate weapon (if applicable) and launch item
-                        let tool = this.animatedSubforms.find(el => el[0] == bodyPart)[1];
-                        if (tool) tool.runActiveAction(2);
-                        
-                        this.fadeToAction(this.bowAttacks[0], 0.2);
+                        if (this.animatedSubforms.length > 0) {
+                            let tool = this.animatedSubforms.find(el => el[0] == bodyPart)[1];
+                            if (tool) tool.runActiveAction(2);
+                            
+                            this.fadeToAction(this.launcherActions[getRndInteger(0,this.launcherActions.length-1)], 0.2);
+                        } else {
+                            tool = this.model.getObjectByName(bodyPart).getObjectByProperty('objectSubtype','launcher');
+                        }
                         
                         setTimeout(() => {
-                            this.launch(item, null, [bodyPart, tool.objectName]);
+                            this.launch(item, null, [bodyPart, tool? tool.objectName: null]);
                         }, 500)
                     })
                 } else {

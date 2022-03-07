@@ -25,26 +25,26 @@ export class AnimatedForm extends StandardForm{
         this.handAttacksL = [];
         this.kickAttacksL = [];
         this.blocks = [];
-        this.bowAttacks = [];
-        this.throwAttacks = [];
+        this.launcherActions = [];
+        this.throwActions = [];
 
         this.possibleHandAttacksR = ["Punch", "Attack", "Punch2", "Punching R", "Striking R", "Swing R"];
         this.possibleHandAttacksL = ["Punching L", "Striking L", "Swing L"];
         this.possibleKickAttacksR = ["Kick", "Kick R"];
         this.possibleKickAttacksL = ["Kick L"]
         this.possibleBlocks = ["Blocking R", "Blocking L"];
-        this.possibleBowAttacks = ["ThumbsUp", "Givining the bird"];
-        this.possibleThrowAttacks = ["Striking L", "Punch2", "Punch"];
+        this.possibleLauncherActions = ["ThumbsUp", "Givining the bird"];
+        this.possibleThrowActions = ["Striking L", "Punch2", "Punch"];
 
         this.emotes = [ 
             'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp', 'Open', 'Close',
             ...this.possibleBlocks,
-            ...this.possibleBowAttacks, 
+            ...this.possibleLauncherActions, 
             ...this.possibleHandAttacksR, 
             ...this.possibleKickAttacksR,
             ...this.possibleHandAttacksL, 
             ...this.possibleKickAttacksL,
-            ...this.possibleThrowAttacks
+            ...this.possibleThrowActions
         ];
     }
     
@@ -67,10 +67,10 @@ export class AnimatedForm extends StandardForm{
                     this.kickAttacksL.push(animation.name);
                 } else if (this.possibleBlocks.includes(animation.name)) {
                     this.blocks.push(animation.name);
-                } else if (this.possibleBowAttacks.includes(animation.name)) {
-                    this.bowAttacks.push(animation.name);
-                } else if (this.possibleThrowAttacks.includes(animation.name)) {
-                    this.throwAttacks.push(animation.name);
+                } else if (this.possibleLauncherActions.includes(animation.name)) {
+                    this.launcherActions.push(animation.name);
+                } else if (this.possibleThrowActions.includes(animation.name)) {
+                    this.throwActions.push(animation.name);
                 }
 
                 var action = this.mixer.clipAction( animation );

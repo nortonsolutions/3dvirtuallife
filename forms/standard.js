@@ -43,12 +43,14 @@ export class StandardForm {
         if (typeof this.template.attributes.stage == "number") {
             this.template.gltf = this.template.attributes.gltfs[this.template.attributes.stage];
         }
+
         this.sceneController.loader.load( '/models/3d/gltf/' + this.template.gltf, (gltf) => {
         
             let model = gltf.scene;
             
             model.objectName = this.template.name;
             model.objectType = this.template.type;
+            model.objectSubtype = this.template.subtype;
             model.attributes = this.template.attributes;
 
             model.scale.x = this.template.attributes.scale;
@@ -56,6 +58,8 @@ export class StandardForm {
             model.scale.z = this.template.attributes.scale;
 
             if (this.template.attributes.rotateY) model.rotateY(degreesToRadians(this.template.attributes.rotateY));
+            if (this.template.attributes.rotateX) model.rotateX(degreesToRadians(this.template.attributes.rotateX));
+            if (this.template.attributes.rotateZ) model.rotateZ(degreesToRadians(this.template.attributes.rotateZ));
             this.model = model;
             this.animations = gltf.animations;
            
@@ -296,5 +300,93 @@ export class StandardForm {
         if (local) this.sceneController.socket.emit('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level });
     }
 
+    /** Intermittently recharge mana and health for the player based on strength and agility */
+    intermittentRecharge() {
+            
+        let chance = this.getEffectiveStat("strength") + this.getEffectiveStat("agility");
 
+        if (Math.random()*100 < chance) {
+            this.changeStat("health", 0.01);
+            this.changeStat("mana", 0.01);
+        }
+    }
+
+    /** returns the new value */
+    changeStat(stat, change, changeMax = false) {
+        
+        change = Number(change);
+        let currentStat = this.attributes.stats[stat].split('/');
+        let cur = Number(currentStat[0]);
+        let max = Number(currentStat[1]);
+        let newvalue = 0;
+
+        if (changeMax) max = max + change;
+
+        if (change > 0) {
+            newvalue = Math.min(max, cur + change);
+        } else {
+            newvalue = cur + change;
+
+            if (stat == "health") { 
+
+                if (this.alive && newvalue <= 0) {
+                    this.death();
+                }
+            }
+        }
+
+        this.attributes.stats[stat] = Number(newvalue).toFixed(2) + "/" + Number(max).toFixed(2) + "/" + this.getStatBoost(stat); //.toLocaleString('en-US',{minimumIntegerDigits:2})
+        
+        if (this.objectSubtype == "local") this.updateHeroStats(stat);
+
+        // this.sceneController.eventDepot.fire('statusUpdate', { 
+        //     // message: `${this.objectName} ${stat} stat updated: ${this.attributes.stats[stat]}` 
+        // }); 
+
+        switch (stat) {
+            case "health":
+                if (this.healthSprite) this.healthSprite.scale.x = this.spriteScaleX("health");
+                break;
+            case "mana":
+                if (this.manaSprite) this.manaSprite.scale.x = this.spriteScaleX("mana");
+                break;
+        }
+
+
+        return newvalue;
+    }
+
+
+    changeStatBoost(stat, change) {
+        change = Number(change);
+        let currentBoost = this.getStatBoost(stat);
+
+        this.attributes.stats[stat] = this.getStat(stat) + "/" + this.getStatMax(stat) + "/" + (Number(currentBoost) + Number(change));
+
+        if (this.objectSubtype == "local") this.updateHeroStats(stat);
+        
+        // this.sceneController.eventDepot.fire('statusUpdate', { 
+        //     message: `${this.objectName} ${stat} stat boosted: ${this.attributes.stats[stat]}` 
+        // }); 
+    }
+
+    getStatAll(stat) {
+        return Number(this.attributes.stats[stat]);
+    }
+
+    getStat(stat) {
+        return Number(this.attributes.stats[stat].split('/')[0]);
+    }
+
+    getStatMax(stat) {
+        return Number(this.attributes.stats[stat].split('/')[1]);
+    }
+
+    getStatBoost(stat) { // statBoost effectively raises the stat for runtime
+        return Number(this.attributes.stats[stat].split('/')[2]);
+    }
+
+    getEffectiveStat(stat) {
+        return Math.max(this.getStat(stat) + this.getStatBoost(stat),0);
+    }
 }
