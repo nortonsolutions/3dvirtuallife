@@ -5,6 +5,8 @@ export class ArtificialForm extends IntelligentForm{
 
     constructor(template, sceneController) {
         super(template, sceneController);
+
+        this.follower = this.template.attributes.follower;
     }
 
     load(callback) {
@@ -83,7 +85,7 @@ export class ArtificialForm extends IntelligentForm{
                     
                         let d = closestHeroPosition.distance;
 
-                        if (d < 60) {
+                        if (d < 100) {
                             this.facePosition(closestHeroPosition.position);
                             this.attackHero(closestHeroPosition.heroLayoutId);
                             this.stopAndBackup(delta);
@@ -105,7 +107,46 @@ export class ArtificialForm extends IntelligentForm{
                             this.moveToward(delta);
                         } 
                     
-                } 
+                } else if (this.follower) {
+
+                    let closestBeast = this.closestBeast(1000);
+                    if (closestBeast) {
+                        let b = closestBeast.beast;
+                        let d = closestBeast.distance;
+                        if (d < 100) {
+                            this.facePosition(b.model.position);
+    
+                            let side = ['L','R'][getRndInteger(0,1)];
+                            let shift = [true,false][getRndInteger(0,1)];
+                            this.attack(side, shift);
+                            this.stopAndBackup(delta);
+    
+                        } else if (d < 400 && this.attributes.rangedSpell) {
+                            this.facePosition(b.model.position);
+                            if (Math.random()<.05) {
+                                let action = this.throwActions[getRndInteger(0,this.throwActions.length-1)]
+                                this.fadeToAction(action, 0.2);
+                                setTimeout(() => {
+                                    this.castSpell(this.sceneController.getTemplateByName(this.attributes.rangedSpell), true, false);
+                                }, 1000);
+                            } else {
+                                this.moveToward(delta);
+                            }
+    
+                        } else if (d < 700) {
+                            this.facePosition(b.model.position);
+                            this.moveToward(delta);
+                        }                      
+                    } else {
+                        let d = closestHeroPosition.distance;
+
+                        if (d < 1000 && d > 50) {
+                            this.facePosition(closestHeroPosition.position);
+                            this.moveToward(delta);
+                        } 
+                    }
+                    
+                }
 
                 if (this.setElevation() == -1) {
                     // console.log(`${this.objectName} is out of bounds`)
@@ -114,6 +155,7 @@ export class ArtificialForm extends IntelligentForm{
 
                     // this.stopAndBackup(delta);
                 };
+
             } else { // idle
                 this.fadeToAction('Idle', 0.2); // force Idle animation
                 this.heroNearby = false; // stops movement
@@ -137,6 +179,29 @@ export class ArtificialForm extends IntelligentForm{
 
     facePosition(position) {
         this.model.lookAt(position);
+    }
+
+    closestBeast(range) { // used by followers to attack
+        let beastIndex = 0;
+        let distance = Infinity;
+
+        var entitiesInRange = this.sceneController.allEnemiesInRange(range, this.model.position);
+        if (entitiesInRange.length > 0) {
+            entitiesInRange.forEach((entity,index) => {
+                let p = entity.model.position
+                let d = this.model.position.distanceTo(p);
+                if (d < distance) {
+                    distance = d;
+                    beastIndex = index;
+                }
+            })
+        }
+
+        if (distance == Infinity) {
+            return null;
+        } else {
+            return { beast: entitiesInRange[beastIndex], distance };
+        }
     }
 
     closestHeroPosition() {

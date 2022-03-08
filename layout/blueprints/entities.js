@@ -375,7 +375,7 @@ export const Entities = {
             moves: true,
             animates: true,
             height: 10,
-            length: 240,
+            length: 300,
             width: 20,
             elevation: 0,
             scale: 50,
@@ -498,7 +498,7 @@ export const Entities = {
             handScaleFactor: 60,
             grants: ["gold10","axe2"]
         },
-        // equipped: {"Middle2R":["axe2",false,null]}
+        equipped: {"Middle2R":["axe2",false,null]}
     },
     elfgirl: {
         name: 'elfgirl',

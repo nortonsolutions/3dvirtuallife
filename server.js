@@ -235,7 +235,7 @@ database(mongoose, (db) => {
         app.layouts[socket.nsp.name][data.level][0].structures.push(data.item);
       } else if (data.item.type && data.item.type == "item") {
         app.layouts[socket.nsp.name][data.level][0].items.push(data.item);
-      } else if (data.item.type && (data.item.type == "entity" || data.item.type == "beast" || data.item.type == "friendly") {
+      } else if (data.item.type && (data.item.type == "entity" || data.item.type == "beast" || data.item.type == "friendly")) {
         app.layouts[socket.nsp.name][data.level][0].entities.push(data.item);
       }
       notifyRoomMembers(data.level, "addItemToLayout", data);

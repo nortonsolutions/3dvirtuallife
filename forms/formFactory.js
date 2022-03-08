@@ -140,8 +140,8 @@ export class FormFactory {
                 scale: params.scale,
                 textureWidth: 1024,
                 textureHeight: 1024,
-                // flowDirection: new THREE.Vector2( params.flowX, params.flowY ),
-                flowMap: textureLoader.load( 'textures/Water_1_M_Flow.jpg' )
+                flowDirection: new THREE.Vector2( params.flowX, params.flowY ),
+                // flowMap: textureLoader.load( 'textures/Water_1_M_Flow.jpg' )
             } );
 
             // let refractor = new THREE.Refractor( waterGeometry, {

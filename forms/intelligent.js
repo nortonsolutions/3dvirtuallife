@@ -1,5 +1,15 @@
 import { AnimatedForm } from './animated.js'
 
+let hitSpriteConfig = { 
+    name: "hit1",
+    regex: "",
+    frames: 8,
+    scale: 40, 
+    elevation: 30,
+    flip: false,
+    time: .1
+}
+
 /** IntelligentForms are AnimatedForms which also
  * move and make decisions every turn.  Subclasses
  * include the Hero and ArtificialForms (AIs).
@@ -234,8 +244,88 @@ export class IntelligentForm extends AnimatedForm{
                 
             }
             this.intermittentRecharge();
+
+            if ((this.objectType == 'hero' && this.objectSubtype == 'local') || this.objectType == 'friendly') {
+                if (this.handAttackR){
+                    this.handleAttack('Middle2R');
+                } else if (this.handAttackL){
+                    this.handleAttack('Middle2L');
+                } else if (this.kickAttackR){
+                    this.handleAttack('FootR');
+                } else if (this.kickAttackL){
+                    this.handleAttack('FootL');
+                }
+            }
         }
     }
+
+    handleAttack(bodyPart) {
+
+        let diff = new THREE.Vector3();
+        // What is the world position of my hands or their associated weapons?  Start with right hand.
+        let weapon = this.equipped[bodyPart]? this.equipped[bodyPart][0] : bodyPart;
+        this.positionWeapon = weapon==bodyPart? this.model.getObjectByName(bodyPart).getWorldPosition(this.positionWeapon) : this.model.getObjectByProperty("objectName", weapon).getWorldPosition(this.positionWeapon);
+        
+        for (const entity of this.sceneController.allEnemiesInRange(100, this.model.position)) {
+
+            diff.subVectors(this.positionWeapon, entity.model.position);
+
+            if ( diff.length() < entity.radius ) {
+                let hitPointReduction = (getRandomArbitrary(0,this.getEffectiveStat('strength'))/10);
+                this.inflictDamage(entity, hitPointReduction, "generalDamage");
+
+                // Add hit sprites at the location of the hand:
+                this.sceneController.formFactory.addSprites(null, hitSpriteConfig, this.sceneController.scene, true, this.positionWeapon);
+            }
+        }
+
+    }
+
+    /**
+     * 
+     * @param entity 
+     * @param hitPointReduction - base hitPoint reduction
+     * @param type - type of damage
+     */
+    inflictDamage(entity, hitPointReduction, type) {
+        
+        console.log(`Inflicting ${hitPointReduction} damage, type ${type}, on ${entity.objectName}`);
+        var defenseRating = entity.getEffectiveStat('defense');
+        // check the defense level for this type of damage
+        switch (type) {
+            case "iceDamage":
+                defenseRating += entity.getEffectiveStat('ice');
+                break;
+            case "fireDamage":
+                defenseRating += entity.getEffectiveStat('fire');
+                break;
+            case "poisonDamage":
+                defenseRating += entity.getEffectiveStat('poison');
+                break;
+            case "thunderDamage":
+                defenseRating += entity.getEffectiveStat('thunder');
+                break;
+            default:
+                break;
+        }
+
+        hitPointReduction = Math.max(hitPointReduction - defenseRating,0.01);
+
+        console.log(`Defense rating is: ${defenseRating} ... total reduction: ${hitPointReduction}`);
+        if (entity.changeStat('health', -hitPointReduction, false) <= 0) {
+    
+            this.attributes.experience += entity.getStatMax('health');
+
+            if (this.objectName == "hero" && this.levelUpEligibility().length > 0) {
+                setTimeout(() => {
+                    this.sceneController.eventDepot.fire('modal', { type: 'levelUp', title: 'Level Up', context: this.levelUpEligibility() });
+                }, 1500);
+            }
+
+            this.sceneController.eventDepot.fire('updateXP', this.attributes.experience); 
+        };
+    }
+
 
     setElevation() {
         
@@ -774,6 +864,37 @@ export class IntelligentForm extends AnimatedForm{
                 this.sceneController.addToProjectiles(item, local, hostile);
             }, false, false, false);
         }
+
+    }
+
+    /**
+     * side is L or R; shift is true (kick) or false (hand)
+     */
+    attack(side, shift) {
+        
+        if (side=='R' && !shift && this.handAttacksR.length == 0) {
+            side = 'L';
+        } else if (side=='L' && !shift && this.handAttacksL.length == 0) {
+            side = 'R';
+        } else if (side=='R' && shift && this.kickAttacksR.length == 0) {
+            side = 'L';
+        } else if (side=='L' && shift && this.kickAttacksL.length == 0) {
+            side = 'R';
+        }
+        
+        // this.handAttacksR = [];
+        // this.kickAttacksR = [];
+        // this.handAttacksL = [];
+        // this.kickAttacksL = [];
+
+        if (this.kickAttacks.length == 0) shift = false;
+        let possibleAttacks = shift ? "kickAttacks" + side: "handAttacks" + side;
+        
+        // Choose an attack
+        let attack = this[possibleAttacks][getRndInteger(0,this[possibleAttacks].length-1)];
+    
+        /** During action runtime, this.handAttack==true */
+        this.fadeToAction(attack, 0.2);
 
     }
 

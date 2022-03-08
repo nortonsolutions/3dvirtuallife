@@ -42,7 +42,7 @@ export const levels = [
             },
             { 
                 name: "portalStone", location: { x: 7.4, y: 0, z: -7.3}, 
-                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } 
+                attributes: { routeTo: { level: 4, location: { x: -44.5, y: 0, z: -50} } } 
             },
             { 
                 name: "portalStone", location: { x: 9.1, y: 0, z: -5.3}, 
@@ -159,7 +159,7 @@ export const levels = [
             },
             { 
                 name: "platformBlock", location: { x: -17.0, y: 0, z: -6.0 },
-                attributes: { routeTo: { level: 4, location: { x: -23.5, y: 0, z: -6.5} } } //lavafield
+                attributes: { routeTo: { level: 4, location: { x: -44.5, y: 0, z: -50} } } //lavafield
             },
             { 
                 name: "elevatorS_1m", location: { x: -4.75, y: 0, z: 4.75 }, attributes: { scale: 200 }
@@ -469,7 +469,7 @@ export const levels = [
                     attributes: {
                         elevation: 0,
                         color: "green",
-                        scale: 100,
+                        scale: 500,
                         lava: true
                     },
                     gltf: 'lava.glb'
@@ -489,16 +489,19 @@ export const levels = [
         ],
         structures: [
             { 
-                name: "platformBlock", location: { x: -21.5, y: 0, z: -6.5},
+                name: "platformBlock", location: { x: -42.5, y: 0, z: -50},
                 attributes: { routeTo: { level: 0, location: { x: -17.0, y: 0, z: -6.0 } } } //valley
             },
             { 
-                name: "platformBlock", location: { x: -17.0, y: 0, z: -6.5 },
-                attributes: { routeTo: { level: 8, location: { x: -17.5, y: 0, z: -6.5} } } //lavaLabyrinth
+                name: "platformBlock", location: { x: -80.0, y: 0, z: -86.9 },
+                attributes: { routeTo: { level: 8, location: { x: -11, y: 0, z: -6.5} } } //lavaLabyrinth
             },
             { 
-                name: "platformBlock", location: { x: -7.5, y: 0, z: 18.5 },
-                attributes: { routeTo: { level: 6, location: { x: -11.5, y: 0, z: -18.5} } } // ruins
+                name: "platformBlock", location: { x: -34.9, y: 0, z: 73.5 },
+                attributes: { routeTo: { level: 9, location: { x: 2, y: 0, z: 2} } } //volcano
+            },
+            { // fireSteedAltar
+                name: "platformBlock", location: { x: -17.5, y: 0, z: -12.4 }
             }
         ],
         entities: [
@@ -743,6 +746,16 @@ export const levels = [
                     color: 'white',
                     density: 1.2
                 },
+                // water: {
+
+                //     attributes: {
+                //         elevation: 0,
+                //         color: "blue",
+                //         scale: 500,
+                //         lava: false
+                //     },
+                //     gltf: 'water.glb'
+                // },
                 designateNPCs: true
 
             }
@@ -768,22 +781,27 @@ export const levels = [
             { name: "tavernShop", location: { x: -3.5, y: 0, z: 0} },
             { 
                 name: "platformBlock", location: { x: -.5, y: 0, z: .15 },
-                attributes: { elevation: -5, footControls: "tavernShop:Walking in/3/3/0" }
+                attributes: { elevation: -5, footControls: "tavernShop:Walking in/1/0/0/0/0" }
             },
             { 
                 name: "platformWood", location: { x: -1.5, y: 0, z: .15 },
-                attributes: { elevation: 5, footControls: "tavernShop:Walking out/3/3/0" }
+                attributes: { elevation: 5, footControls: "tavernShop:Walking out/1/0/0/0/0" }
             }
         ],
         entities: [
             { name: "daveDragon", type: "beast" },
-            { name: "viking", location: { x: -7.5, y: 0, z: 2.7 } },
-            { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"},
-            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"},
+            { name: "dragon", type: "beast"},
+            { name: "daveDragon", type: "beast"},
+            { name: "dragon", type: "beast"},
+            { name: "daveDragon", type: "beast"},
             { name: "crystalMan", type: "beast" },
             { name: "crystalMan", type: "beast" },
             { name: "ghoul", type: "beast" },
-            { name: "ghoul", type: "beast" }
+            { name: "ghoul", type: "beast" },
+            { name: "viking", location: { x: -7.5, y: 0, z: 2.7 } },
+            { name: "viking", location: { x: -0, y: 0, z: 1.9 },
+                attributes: { follower: true },
+            } 
         ]
     },
     
@@ -828,8 +846,8 @@ export const levels = [
                 attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } }} //kingdom
             },
             { 
-                name: "platformBlock", location: { x: -19.5, y: 0, z: -6.5}, 
-                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } //lavaField
+                name: "platformBlock", location: { x: -10.7, y: 0, z: -4.2 }, 
+                attributes: { routeTo: { level: 4, location: { x: -78.0, y: 0, z: -86.9 } } } //lavaField
             }
 
         ],
@@ -884,12 +902,8 @@ export const levels = [
         ],
         structures: [
             { 
-                name: "platformBlock", location: { x: -8.8, y: 0, z: 38.4 }, 
-                attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } }} //kingdom
-            },
-            { 
-                name: "platformBlock", location: { x: -19.5, y: 0, z: -6.5}, 
-                attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } //lavaField
+                name: "platformBlock", location: { x: 0, y: 0, z: 2}, 
+                attributes: { routeTo: { level: 4, location: { x: -36.9, y: 0, z: 73.5 } } } //lavaField
             }
 
         ],

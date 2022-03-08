@@ -8,7 +8,7 @@
  * Knows how to create its own model based on template.
  */
 
-var upRaycasterTestLength = 700; 
+var upRaycasterTestLength = 1600; 
 var downRaycasterTestLength = 80;
 
 

@@ -1,6 +1,6 @@
 
 
-var cameraReach = 2300;
+var cameraReach = 2000;
 var cameraDistanceDefault = 200;
 var cameraElevationDefault = 40;
 
@@ -298,15 +298,15 @@ class Scene {
                     type: "entity"
                 };
     
-                console.log(`scene: dropping plantable item to scene:`)
-                console.dir(dropData);
+                // console.log(`scene: dropping plantable item to scene:`)
+                // console.dir(dropData);
                 this.controller.dropItemToScene(dropData);
             
             } else if (projectile.item.objectSubtype == 'lifegiving') {
                 
                 let [type, change] = projectile.item.attributes.effect.split("/");
-                console.log(`Inside Entities in range:`);
-                console.dir(entitiesInRange);
+                // console.log(`Inside Entities in range:`);
+                // console.dir(entitiesInRange);
                 entitiesInRange.forEach(entity => {
 
                     entity.changeStat(type, change, true);
@@ -380,8 +380,8 @@ class Scene {
 
             // } 
             
-            console.log(`projectiles:`);
-            console.dir(this.controller.projectiles)
+            // console.log(`projectiles:`);
+            // console.dir(this.controller.projectiles)
             for (let projectile of this.controller.projectiles) {
             // this.controller.projectiles.forEach(projectile => {
     
@@ -414,8 +414,8 @@ class Scene {
 
                 } else if (projectile.item.objectSubtype == "lifegiving") { // e.g. water
                     var entitiesInRange = this.controller.allFriendliesInRange(projectile.item.attributes.range, projectile.item.model.position);
-                    console.log(`Entities in range:`);
-                    console.dir(entitiesInRange);
+                    // console.log(`Entities in range:`);
+                    // console.dir(entitiesInRange);
                     if (entitiesInRange.length > 0) {
                         this.handleAction(projectile, entitiesInRange);
                         continue;

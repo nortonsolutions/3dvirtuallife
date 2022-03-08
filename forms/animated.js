@@ -59,6 +59,8 @@ export class AnimatedForm extends StandardForm{
                 
                 if (this.possibleHandAttacksR.includes(animation.name)) {
                     this.handAttacksR.push(animation.name);
+                } else if (this.possibleThrowActions.includes(animation.name)) {
+                    this.throwActions.push(animation.name);
                 } else if (this.possibleHandAttacksL.includes(animation.name)) {
                     this.handAttacksL.push(animation.name);
                 } else if (this.possibleKickAttacksR.includes(animation.name)) {
@@ -69,9 +71,7 @@ export class AnimatedForm extends StandardForm{
                     this.blocks.push(animation.name);
                 } else if (this.possibleLauncherActions.includes(animation.name)) {
                     this.launcherActions.push(animation.name);
-                } else if (this.possibleThrowActions.includes(animation.name)) {
-                    this.throwActions.push(animation.name);
-                }
+                } 
 
                 var action = this.mixer.clipAction( animation );
                 if (index == 0) { firstAnimationName = animation.name };
