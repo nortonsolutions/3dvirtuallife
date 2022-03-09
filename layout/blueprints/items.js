@@ -600,6 +600,54 @@ export const Items = {
             elevation: 10
         }
     },
+
+    bait: {
+        name: 'bait',
+        gltf: 'arrow.glb',
+        image: 'arrow.png',
+        description: 'nightcrawler bait',
+        type: 'item',
+        subtype: 'bait',
+        attributes: {
+            animates: false,
+            scale: 250,
+            equippedScale: 0.3,
+            throwable: true,
+            throwableAttributes: {
+                pitch: .7, // angle up (percentage of 90 degrees)
+                weight: 1, // lbs
+                distance: 2000, // px
+                speed: 4 // 1 = full walking speed
+            },
+            elevation: 10,
+            range: 100,
+            continuousSprites: true,
+            sprites: [{ 
+                name: "blueExplosion",
+                regex: "",
+                frames: 10,
+                scale: 2,
+                flip: false,
+                elevation: 0,
+                time: 2
+            }],
+        }         
+    },
+
+    bait25: {
+        name: 'bait25',
+        gltf: 'arrow25.glb',
+        description: 'Twenty-five nightcrawlers',
+        type: 'item',
+        attributes: {
+            baseItemName: 'bait',
+            quantity: 25,
+            animates: false,
+            scale: 200,
+            elevation: 10
+        }
+    },
+
     busterblade: {
         name: 'busterblade',
         gltf: 'busterblade.glb',
@@ -1055,6 +1103,24 @@ export const Items = {
         }
     },
 
+    fishingBoat: {
+        name: 'fishingBoat',
+        gltf: 'fishingBoat.glb',
+        image: 'fishingBoat.png',
+        description: 'Fishing boat',
+        type: 'item',
+        attributes: {
+            mountable: true,
+            equippedScale: 30,
+            // staticStartingElevation: true,
+            rotateY: 180,
+            animates: false,
+            scale: 30,
+            elevation: 30,
+            // addToStructureModels: true
+        }
+    },
+
     watercan: {
         name: 'watercan',
         gltf: 'watercan.glb',
@@ -1075,7 +1141,6 @@ export const Items = {
             // rotateY: 315, 
             // rotateZ: 180
             // rotateX: 315
-            
             // addToStructureModels: true
         }
     },
@@ -1132,4 +1197,23 @@ export const Items = {
             // addToStructureModels: true
         }
     },
+
+    fishingPole: {
+        name: 'fishingPole',
+        gltf: 'bow.glb',
+        image: 'bow.png',
+        description: 'Fishing pole',
+        type: 'item',
+        subtype: 'launcher',
+        attributes: {
+            animates: true,
+            defaultAction: "ArmatureAction",
+            scale: 200,
+            equippedScale: .1,
+            elevation: 0,
+            throwable: false,
+            throws: "bait",
+        }
+    }
+
 }

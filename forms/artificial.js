@@ -87,7 +87,7 @@ export class ArtificialForm extends IntelligentForm{
 
                         if (d < 100) {
                             this.facePosition(closestHeroPosition.position);
-                            this.attackHero(closestHeroPosition.heroLayoutId);
+                            if (!this.attributes.docile) this.attackHero(closestHeroPosition.heroLayoutId);
                             this.stopAndBackup(delta);
                         } else if (d < 400 && this.attributes.rangedSpell) {
                             this.facePosition(closestHeroPosition.position);
@@ -163,16 +163,6 @@ export class ArtificialForm extends IntelligentForm{
         }
     }
     
-    stopAndBackup(delta) {
-
-        this.model.translateX( -this.velocity.x * delta );
-        this.model.translateZ( -this.velocity.z * delta );
-
-        this.velocity.x = 0;
-        this.velocity.z = 0;
-        
-    }
-
     moveToward(delta) {
         this.model.translateZ( this.velocity.z * delta );
     }

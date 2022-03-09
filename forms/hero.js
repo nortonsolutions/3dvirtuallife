@@ -202,7 +202,7 @@ export class Hero extends IntelligentForm {
                     this.sceneController.eventDepot.fire('removeFromInventory', itemName)
                     this.sceneController.eventDepot.fire('equipItem', {bodyPart: "mount", itemName });
 
-                } else if (objectType == "item" || objectSubtype == "tree") {
+                } else if (objectType == "item" || objectSubtype == "tree" || objectSubtype == "fish") {
 
                     let data = {
                         itemName, 
@@ -789,7 +789,7 @@ export class Hero extends IntelligentForm {
         this.inventory.forEach(item => {
 
             if (item) {
-                if (item.itemName == "gold" || item.itemName == "arrow") {
+                if (item.itemName == "gold" || item.itemName == "arrow" || item.itemName == "bait") {
                     if (item.quantity >= 25) {
                         for (let x = 0; x < item.quantity / 25; x++) {
                             this.sceneController.dropItemToScene({itemName: item.itemName + "25", position: this.model.position});

@@ -254,6 +254,39 @@ export const Entities = {
             grants: ["gold10"]
         }
     },
+    catFish: {
+        name: 'catFish',
+        gltf: 'catFish.glb',
+        image: 'catFish.png',
+        description: 'Gangly catfish',
+        type: 'beast',
+        subtype: 'fish',
+        attributes: {
+            moves: true,
+            animates: true,
+            swims: true,
+            docile: true,
+            catchable: true,
+            movementRadius: 100,
+            height: 10,
+            length: 30,
+            width: 20,
+            elevation: -10,
+            scale: 10,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "2/2/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
+            },
+            grants: ["gold10"]
+        }
+    },
     jelly: {
         name: 'jelly',
         gltf: 'jelly.glb',
@@ -762,6 +795,36 @@ export const Entities = {
                 mana: "0/0/0",
                 strength: "0/0/0",
                 agility: "7/7/0",
+                defense: "5/5/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
+            },
+            grants: ["gold10"]
+        }
+    },
+
+    fireSteed: {
+        name: 'fireSteed',
+        gltf: 'fireSteed.glb',
+        description: 'Mystical fire steed',
+        type: 'friendly',
+        attributes: {
+            mountable: true,
+            moves: true,
+            animates: true,
+            height: 35,
+            length: 50,
+            width: 20,
+            elevation: 0,
+            equippedScale: 30,
+            scale: 30,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "0/0/0",
+                agility: "1/1/0",
                 defense: "5/5/0", // rock, weapon, arrow damage defense
                 fire: "0/0/0",
                 ice: "0/0/0",

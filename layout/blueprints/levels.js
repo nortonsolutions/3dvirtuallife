@@ -109,20 +109,23 @@ export const levels = [
                     color: 'white',
                     density: 1
                 },
-                designateNPCs: true,
+                designateNPCs: false,
                 waterSources: [
-                    [{x: -16, y: 0, z: -175}, 80]
+                    [{x: -16, y: 0, z: -175}, 80],
+                    [{x: -9.5, y: 0, z: -56}, 300],
                 ]
             }
         },
         items: [
-            { name: "keyToShed", location: { x: -1, y: 0, z: -1} },
+            { name: "keyToShed", location: { x: 2, y: 0, z: -1} },
             { name: "redpotion" },
-            { name: "greenpotion", location: { x: -1, y: 0, z: -1} },
-            { name: "greenpotion", location: { x: -1, y: 0, z: -1} },
+            { name: "greenpotion", location: { x: -2, y: 0, z: 0} },
+            { name: "greenpotion", location: { x: -1, y: 0, z: 2} },
             { name: "gold3" },
             { name: "bow" },
             { name: "arrow25" },
+            { name: "fishingPole", location: { x: 0, y: 0, z: -1} },
+            { name: "bait25", location: { x: 0, y: 0, z: 2} },
             { name: "smallSword" },
             { name: "aluminium", location: { x: -1, y: 0, z: -1}},
             { name: "gold" },
@@ -134,6 +137,10 @@ export const levels = [
             //     name: "balloon", location: { x: -3, y: 0, z: -1},
             //     attributes: { staticStartingElevation: false }
             // },
+            { 
+                name: "fishingBoat", location: { x: -7.4, y: 0, z: 51.2},
+                attributes: { staticStartingElevation: false }
+            },
         ],
         structures: [
             { name: "shed", location: { x: 0, y: 0, z: 0},
@@ -182,16 +189,22 @@ export const levels = [
             },
         ],
         entities: [
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
             // { name: "evilOne", type: "beast" },
             // { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
+            // { name: "evilOne", type: "beast" },
+            // { name: "evilOne", type: "beast" },
+            // { name: "evilOne", type: "beast" },
+            // { name: "evilOne", type: "beast" },
+            // { name: "evilOne", type: "beast" },
+            // { name: "evilOne", type: "beast" },
+            // { name: "triceratops", type: "beast" },
+            // { name: "john" },
+            // { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
+            // { name: "sunSeed", location: { x: 1, y: 0, z: -1}},
+            // { name: "sunSeed", location: { x: 1, y: 0, z: -2}},
+            // { name: "sunSeed", location: { x: 1, y: 0, z: -3}},
+            // { name: "sunSeed", location: { x: -1, y: 0, z: 1}},
 
-            { name: "triceratops", type: "beast" },
             // { name: "trex", type: "beast" },
             // { name: "ghoul", type: "beast"  },
             // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
@@ -207,14 +220,12 @@ export const levels = [
             // { name: "zombie", type: "beast" },
             // { name: "daveDragon", type: "beast"},
             // { name: "jelly", location: { x: -1, y: 0, z: -1}, type: "beast"}
-            { name: "john" },
-            { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
+
             // { name: "blacksmith" },
             // { name: "elfgirl" },
-            { name: "sunSeed", location: { x: 1, y: 0, z: 1}},
-            { name: "sunSeed", location: { x: 1, y: 0, z: 1}},
-            { name: "sunSeed", location: { x: 1, y: 0, z: 1}},
-            { name: "sunSeed", location: { x: 1, y: 0, z: 1}}
+
+            // { name: "fireSteed", location: { x: 1, y: 0, z: 0}},
+            { name: "catFish", location: { x: -12, y: 0, z: 58}, type: "beast" }
             
         ]
     },

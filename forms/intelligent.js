@@ -77,6 +77,11 @@ export class IntelligentForm extends AnimatedForm{
             // this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
             this.addHealthBarToModel();
 
+            if (this.attributes.movementRadius) {
+                this.startingPoint = new THREE.Vector3();
+                this.startingPoint.copy(this.model.position);
+            }
+
             if (callback) callback();
         })
 
@@ -218,31 +223,25 @@ export class IntelligentForm extends AnimatedForm{
                     if (this.attributes.swims) this.swimming = false;
                 }
     
-            }
+            } else if (this.attributes.swims && this.attributes.movementRadius) this.swimming = true;
 
             let fIntersects = this.movementRaycaster.intersectObjects(this.sceneController.structureModels, true);
             
             if (fIntersects.length == 0) { // || (fIntersects[0] && fIntersects[0].object.type == "Sprite")) { // Nothing is in the front, so move forward at given velocity
                 
-                this.model.translateX( this.velocity.x * delta );
-                this.model.translateY( this.velocity.y * delta );
-                this.model.translateZ( this.velocity.z * delta );
+                if (this.attributes.movementRadius && this.outOfMovementRadius()) {
+                    this.stopAndBackup(delta);
+                } else {
+                    this.model.translateX( this.velocity.x * delta );
+                    this.model.translateY( this.velocity.y * delta );
+                    this.model.translateZ( this.velocity.z * delta );
+                }
     
             } else { // Something is blocking, so stop without moving
-                
-                if (this.objectSubtype == "local") {
-                    this.model.translateX( -this.velocity.x * delta );
-                    this.model.translateZ( -this.velocity.z * delta );
-                } else {
-                    // console.dir(fIntersects[0]);
-                }
-                this.velocity.x = 0;
-                this.velocity.y = 0;
-                this.velocity.z = 0;
-    
-                // this.sceneController.eventDepot.fire('updateHelper', { position: fIntersects[0].point, color: { r: 0, g: 1, b: 0 }});
-                
+                // if (this.objectSubtype == "local") //local only?
+                this.stopAndBackup(delta);
             }
+
             this.intermittentRecharge();
 
             if ((this.objectType == 'hero' && this.objectSubtype == 'local') || this.objectType == 'friendly') {
@@ -256,7 +255,25 @@ export class IntelligentForm extends AnimatedForm{
                     this.handleAttack('FootL');
                 }
             }
+
+
         }
+    }
+
+    stopAndBackup(delta) {
+
+        this.model.translateX( -this.velocity.x * delta );
+        this.model.translateY( -this.velocity.y * delta );
+        this.model.translateZ( -this.velocity.z * delta );
+
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+        this.velocity.z = 0;
+        
+    }
+
+    outOfMovementRadius() { // assumes static position
+        return (this.startingPoint.distanceTo(this.model.position) >= this.movementRadius)                
     }
 
     handleAttack(bodyPart) {

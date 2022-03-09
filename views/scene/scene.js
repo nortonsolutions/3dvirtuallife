@@ -278,7 +278,7 @@ class Scene {
 
         if (projectile.local) {
 
-            if (projectile.item.attributes.effect && !projectile.item.objectSubtype == 'lifegiving') {
+            if (projectile.item.attributes.effect && !(projectile.item.objectSubtype == 'lifegiving')) {
                 let [type, change] = projectile.item.attributes.effect.split("/");
 
                 if (projectile.hostile) {
@@ -336,10 +336,13 @@ class Scene {
                         this.controller.dropItemToScene(dropData);
                     }
                 })
-            }
+
+            } 
         }
 
-        if (projectile.item.objectType == 'item' && projectile.item.objectSubtype != "tree" && projectile.item.objectSubtype != 'lifegiving' &&
+
+        if (projectile.item.objectType == 'item' && 
+            projectile.item.objectSubtype != "tree" && projectile.item.objectSubtype != 'lifegiving' &&
             projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround && 
             Math.random() < projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround) {
             projectile.item.model.position.y = projectile.item.determineElevationFromBase() + projectile.item.attributes.elevation;
@@ -349,10 +352,47 @@ class Scene {
             this.controller.forms = this.controller.forms.filter(el => el != projectile.item);
             this.removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
         }
-
+        
         // filter out of projectiles
         this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
     }
+    
+    catch(projectile, entitiesInRange) {
+        
+        entitiesInRange.forEach(e => {
+
+            if (e.attributes.catchable) { // just apply locally; do not broadcast
+                e.fadeToAction("Thrashing", 0.2);
+                e.model.position.x = 0;
+                e.model.position.y = 0;
+                e.model.position.z = 0;
+                e.model.scale.set(.01,.01,.01);
+                
+                projectile.item.model.add(e.model);
+            }
+        })    
+    }
+
+    release(projectile) {
+        projectile.item.model.children.forEach(child => {
+            if (child.attributes && child.attributes.catchable) {
+                child.position.copy(projectile.item.model.position);
+                child.scale.set(10,10,10);
+                this.add(child);
+                let caught = this.controller.getFormByLayoutId(child.attributes.layoutId);
+                caught.attributes.stats.agility = "0/0/0";
+                caught.fadeToAction('Flopping', 0.2);
+
+                
+            }
+        })
+
+        if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
+        this.controller.forms = this.controller.forms.filter(el => el != projectile.item);
+        this.removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
+        this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
+    }
+
 
     /** 
      * Each projectile looks like this:
@@ -369,26 +409,13 @@ class Scene {
     handleProjectiles(delta) {
         if (this.controller.projectiles.length > 0) {
 
-            // // handle projectiles that have gone full term (distanceTraveled == -1)
-            // this.controller.projectiles.filter(el => el.distanceTraveled == -1).forEach(projectile => {
-            //     this.handleAction(projectile, []);
-            // })
-
-            // else if (side == "R" && objectSubtype == "tree") {
-            //     let watercan = this.watercanEquipped();
-            //     if (watercan) this.water(this.selectedObject);
-
-            // } 
-            
-            // console.log(`projectiles:`);
-            // console.dir(this.controller.projectiles)
             for (let projectile of this.controller.projectiles) {
-            // this.controller.projectiles.forEach(projectile => {
-    
-                // console.log(`Before gravity`);
-                // console.dir(projectile);
+                
+                console.log(`${projectile.item.objectName}: ${projectile.velocity.z} @ ${projectile.item.model.position.x}, ${projectile.item.model.position.y}, ${projectile.item.model.position.z}`);
+                
                 if (projectile.distanceTraveled == 0) { // first iteration, set velocities
-    
+                    projectile.startingPosition = new THREE.Vector3();
+                    projectile.startingPosition.copy(projectile.item.model.position);
                     projectile.velocity.y = (projectile.item.direction.y) * 500;
                     projectile.velocity.z = projectile.item.attributes.throwableAttributes.speed * 500;
                     
@@ -396,34 +423,28 @@ class Scene {
     
                     // INERTIA/GRAVITY
                     projectile.velocity.z -= projectile.velocity.z * delta;
-                    projectile.velocity.y -= 9.8 * projectile.item.attributes.throwableAttributes.weight * 100 * delta;
+                    if (!projectile.returning) projectile.velocity.y -= 9.8 * projectile.item.attributes.throwableAttributes.weight * 100 * delta;
                 }
     
-                // console.log(`After gravity`);
-                // console.dir(projectile);
-                projectile.item.model.translateY( projectile.velocity.y * delta );
+                if (!projectile.returning) projectile.item.model.translateY( projectile.velocity.y * delta );
                 projectile.item.model.translateZ( -projectile.velocity.z * delta );
 
                 if (projectile.item.attributes.plantable) { // seeds (plantable)
 
                     if (projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+5) {
-                        // projectile.distanceTraveled = -1;
                         this.handleAction(projectile, []);
                         continue;
                     }
 
                 } else if (projectile.item.objectSubtype == "lifegiving") { // e.g. water
                     var entitiesInRange = this.controller.allFriendliesInRange(projectile.item.attributes.range, projectile.item.model.position);
-                    // console.log(`Entities in range:`);
-                    // console.dir(entitiesInRange);
                     if (entitiesInRange.length > 0) {
                         this.handleAction(projectile, entitiesInRange);
                         continue;
-                        // this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
                     }
 
 
-                } else { // weapons/spells
+                } else if (projectile.item.objectSubtype != "bait") { // weapons/spells
                     if (projectile.hostile && this.controller.heroInRange(projectile.item.attributes.range, projectile.item.model.position)) {
                         this.handleAction(projectile, null);
                         continue;
@@ -432,30 +453,52 @@ class Scene {
                         if (entitiesInRange.length > 0) {
                             this.handleAction(projectile, entitiesInRange);
                             continue;
-                            // this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
                         }
                     }
         
                     // if I hit a structure, handleAction
                     this.projectileMovementRaycaster.ray.origin.copy(projectile.item.model.position);
-                    // this.projectileMovementRaycaster.ray.direction.copy(projectile.direction);
                     let pIntersects = this.projectileMovementRaycaster.intersectObjects(this.controller.structureModels, true);
                     if (pIntersects.length > 0 && pIntersects[0].object.type != "Sprite") { 
                         this.handleAction(projectile, []);
                         continue;
                     }
-    
-
                 }
 
                 // Otherwise if I hit the max range, expire
                 projectile.distanceTraveled += (Math.abs(projectile.velocity.z * delta) + Math.abs(projectile.velocity.y * delta));
                 let maxDistance = projectile.item.attributes.throwableAttributes.distance;
 
-                if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+5) {
-                    // projectile.distanceTraveled = -1;
-                    this.handleAction(projectile, []);
+                console.log(`traveled: ${projectile.distanceTraveled}, y: ${projectile.item.model.position.y}, elev: ${projectile.item.determineElevationFromBase()}`)
+                if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+15 || this.returning) {
+                    if (projectile.item.objectSubtype == 'bait') {
+                        // turn around and reset velocity, then head back until I reach the caster
+                        if (!projectile.returning) {
+                            console.log(`Turning AROUND.`)
+                            projectile.item.model.lookAt(projectile.startingPosition);
+                            projectile.velocity.z = -projectile.item.attributes.throwableAttributes.speed * 350;
+                            projectile.returning = true;
+                        } else {
+                            projectile.item.model.lookAt(projectile.startingPosition);
+                        }
+                        
+                        let distanceToOrigin = projectile.item.model.position.distanceTo(projectile.startingPosition);
+                        console.log(`distanceToOrigin: ${distanceToOrigin}`);
+                        if (distanceToOrigin < 100) {
+                            this.release(projectile);
+                        } else {
+                            var entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
+                            if (entitiesInRange.length > 0) {
+                                this.catch(projectile, entitiesInRange);
+                                continue;
+                            }
+                        }
+                    } else {
+                        this.handleAction(projectile, []);
+                    }
                     continue;
+                } else {
+
                 }
             }
         }

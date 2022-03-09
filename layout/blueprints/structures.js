@@ -269,7 +269,7 @@ export const Structures = {
         type: 'structure',
         attributes: {
             visible: false,
-            animates: true,
+            animates: false,
             scale: 40,
             elevation: 0,
         }
@@ -282,7 +282,7 @@ export const Structures = {
         type: 'structure',
         attributes: {
             visible: false,
-            animates: true,
+            animates: false,
             scale: 40,
             elevation: 0,
         }
