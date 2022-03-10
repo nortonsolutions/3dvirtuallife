@@ -144,16 +144,26 @@ class LayoutManager {
             this.cacheLayout();
         });
 
-        // data: {layoutId: ..., attributes: ...}
-        this.eventDepot.addListener('updateStructureAttributes', (data) => {
+        // data: {layoutId: ..., attributes: ..., type: ...}
+        this.eventDepot.addListener('updateAttributes', (data) => {
             
-            var index = this.layout.structures.findIndex(el => el.attributes.layoutId == data.layoutId);
-            if (index == -1) {
-                console.log('NOT FOUND');
-            } else {
-                this.layout.structures[index].attributes = {...this.layout.structures[index].attributes, ...data.attributes};
-                this.cacheLayout();
+            switch (data.type) {
+                case 'structure':
+                    var index = this.layout.structures.findIndex(el => el.attributes.layoutId == data.layoutId);
+                    if (index != -1) this.layout.structures[index].attributes = {...this.layout.structures[index].attributes, ...data.attributes};
+                    break;
+                case 'item':
+                    var index = this.layout.items.findIndex(el => el.attributes.layoutId == data.layoutId);
+                    if (index != -1) this.layout.items[index].attributes = {...this.layout.items[index].attributes, ...data.attributes};
+                    break;
+                case 'entity':
+                case 'friendly':
+                case 'beast':
+                    var index = this.layout.entities.findIndex(el => el.attributes.layoutId == data.layoutId);
+                    if (index != -1) this.layout.entities[index].attributes = {...this.layout.entities[index].attributes, ...data.attributes};
+                    break;
             }
+            this.cacheLayout();
         });
 
     }
@@ -161,7 +171,7 @@ class LayoutManager {
 
 
     shutdown(callback) {
-        this.eventDepot.removeListeners('updateStructureAttributes');
+        this.eventDepot.removeListeners('updateAttributes');
         this.eventDepot.removeListeners('removeFromLayoutByLayoutId');
         this.eventDepot.removeListeners('addItemToLayout');
         this.eventDepot.removeListeners('cacheLayout');

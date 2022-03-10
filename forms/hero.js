@@ -41,7 +41,7 @@ export class Hero extends IntelligentForm {
         this.balloonFloatStart = 0;
         this.cacheHero();
 
-        this.heroNearby = true;
+        this.attributes.heroNearby = true;
 
     }
 

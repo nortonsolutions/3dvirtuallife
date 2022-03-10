@@ -304,14 +304,38 @@ database(mongoose, (db) => {
       // }
     });
 
-    socket.on('updateStructureAttributes', data => {
-      // update the stored layout for late-joiners
-      let index = app.layouts[socket.nsp.name][data.level][0].structures.findIndex(el => el.attributes.layoutId == data.layoutId);
-      let structure = app.layouts[socket.nsp.name][data.level][0].structures[index];
-      structure.attributes = {...structure.attributes, ...data.payload};
+    socket.on('updateAttributes', data => { // include type 
+      var index;
+      
+      switch (data.type) {
+        case 'structure':
+            index = app.layouts[socket.nsp.name][data.level][0].structures.findIndex(el => el.attributes.layoutId == data.layoutId);
+            if (index != -1) {
+              let structure = app.layouts[socket.nsp.name][data.level][0].structures[index];
+              structure.attributes = {...structure.attributes, ...data.payload};
+            }
+            break;
+        case 'item':
+            index = app.layouts[socket.nsp.name][data.level][0].items.findIndex(el => el.attributes.layoutId == data.layoutId);
+            if (index != -1) {
+              let item = app.layouts[socket.nsp.name][data.level][0].items[index];
+              item.attributes = {...item.attributes, ...data.payload};
+            }
+            break;
+        case 'entity':
+        case 'friendly':
+        case 'beast':
+            index = app.layouts[socket.nsp.name][data.level][0].entities.findIndex(el => el.attributes.layoutId == data.layoutId);
+            if (index != -1) {
+              let entity = app.layouts[socket.nsp.name][data.level][0].entities[index];
+              entity.attributes = {...entity.attributes, ...data.payload};
+            }
+            break;
+      }
+
       
       // notify existing room members
-      notifyRoomMembers(data.level, 'updateStructureAttributes', data);
+      notifyRoomMembers(data.level, 'updateAttributes', data);
     });
 
     // data: { level: this.sceneController.level, itemName, position: item.model.position, rotation: item.model.rotation })

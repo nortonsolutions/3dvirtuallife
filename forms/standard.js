@@ -313,7 +313,7 @@ export class StandardForm {
     updateAttributes(payload, local = true) {
         this.attributes = {...this.attributes, ...payload};
         this.model.attributes = {...this.attributes, ...payload};
-        this.sceneController.eventDepot.fire('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, attributes: payload});
+        this.sceneController.eventDepot.fire('updateAttributes', {layoutId: this.model.attributes.layoutId, attributes: payload, type: this.objectType});
 
         if (payload.animations && this.activeAction) {
             payload.animations.forEach(animation => {
@@ -324,7 +324,7 @@ export class StandardForm {
             this.runAction(this.activeAction._clip.name, 3, 3, 1, false);
         }
 
-        if (local) this.sceneController.socket.emit('updateStructureAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level });
+        if (local) this.sceneController.socket.emit('updateAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level, type: this.objectType });
     }
 
     /** Intermittently recharge mana and health for the player based on strength and agility */

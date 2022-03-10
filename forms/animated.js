@@ -123,7 +123,7 @@ export class AnimatedForm extends StandardForm{
 
     animate(delta) {
 
-        if (this.attributes.moves && this.heroNearby) {
+        if (this.attributes.moves && this.attributes.heroNearby) {
             if (this.alive) {
                 
                 let controlled = this.mountedUpon? this.mountedUpon : this;

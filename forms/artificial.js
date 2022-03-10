@@ -39,8 +39,14 @@ export class ArtificialForm extends IntelligentForm{
         if (this.alive && !this.controlled) {
             let closestHeroPosition = this.closestHeroPosition();
 
-            if (closestHeroPosition && closestHeroPosition.distance < 1000) {
-                this.heroNearby = true;
+            if (!this.attributes.heroNearby && closestHeroPosition && closestHeroPosition.distance < 1000) {
+                this.updateAttributes({heroNearby: true});
+            } else if (this.attributes.heroNearby && (!closestHeroPosition || closestHeroPosition.distance >= 1000)) {
+                // this.fadeToAction('Idle', 0.2); // force Idle animation
+                this.updateAttributes({heroNearby: false}); // stops movement
+            }
+            
+            if (this.attributes.heroNearby) {
 
                 // TODO: If the velocity is already close to zero, maintain idle
                 this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
@@ -156,10 +162,7 @@ export class ArtificialForm extends IntelligentForm{
                     // this.stopAndBackup(delta);
                 };
 
-            } else { // idle
-                this.fadeToAction('Idle', 0.2); // force Idle animation
-                this.heroNearby = false; // stops movement
-            }
+            } 
         }
     }
     

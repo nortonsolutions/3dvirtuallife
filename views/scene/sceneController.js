@@ -222,9 +222,24 @@ export class SceneController {
             this.hero.launch(data.itemName, null, [], false, data, data.hostile);
         });
 
-        this.socket.on('updateStructureAttributes', (data) => {
-            let structure = this.forms.find(el => el.attributes.layoutId == data.layoutId);
-            structure.updateAttributes(data.payload, false);
+        this.socket.on('updateAttributes', (data) => {
+            switch (data.type) {
+                case 'structure':
+                    let structure = this.forms.find(el => el.attributes.layoutId == data.layoutId);
+                    structure.updateAttributes(data.payload, false);
+                    break;
+                case 'item':
+                    let item = this.forms.find(el => el.attributes.layoutId == data.layoutId);
+                    item.updateAttributes(data.payload, false);
+                    break;
+                case 'entity':
+                case 'friendly':
+                case 'beast':
+                    let entity = this.forms.find(el => el.attributes.layoutId == data.layoutId);
+                    entity.updateAttributes(data.payload, false);
+                    break;
+            }
+            
         });
 
         // data: {layoutId: this.attributes.layoutId, hero: this.objectType=="hero"};
@@ -276,7 +291,7 @@ export class SceneController {
                 if (localEntity) {
                     let rotation = new THREE.Euler( entity.rotation._x, entity.rotation._y, entity.rotation._z, 'YXZ' );
                     localEntity.model.rotation.copy(rotation);
-                    localEntity.velocity.copy(entity.velocity);
+                    if (localEntity.velocity) localEntity.velocity.copy(entity.velocity);
                     localEntity.model.position.copy(entity.position);
                 }
             });
@@ -557,13 +572,13 @@ export class SceneController {
                 this.layout.entities[index].attributes.layoutId = template.attributes.layoutId = nextLayoutId++;
 
                 if (this.layout.terrain.attributes.designateNPCs && template.type == "beast" && template.subtype != "fish" && index < this.floorNPClocations.length) {
-                    // this.floorNPClocations = [];
                     template.location = this.getLocationFromPosition(this.floorNPClocations[index], 100/this.layout.terrain.attributes.scale);
+                    this.layout.entities[index].location = template.location;
                 }
 
                 if (this.layout.terrain.attributes.designateNPCs && template.attributes.boss ) {
-                    // this.floorBossLocations = [];
                     template.location = this.getLocationFromPosition(this.floorBossLocations[0], 100/this.layout.terrain.attributes.scale);
+                    this.layout.entities[index].location = template.location;
                 }
             }
             this.seedForm(template).then(form => {});
