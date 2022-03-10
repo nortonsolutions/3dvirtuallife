@@ -68,7 +68,12 @@ export class StandardForm {
                 this.model.position.z = this.template.location.z * multiplier;
 
                 if (!this.template.attributes.staticStartingElevation) {
-                    this.model.position.y = this.determineElevationFromBase() + this.attributes.elevation;
+                    if (this.template.attributes.floats) {
+                        this.model.position.y = this.determinePondElevation();     
+                    } else {
+                        this.model.position.y = this.determineElevationFromBase() + this.attributes.elevation;     
+                    }
+                   
                 } else {
                     this.model.position.y = this.template.location.y * multiplier;
                 }
@@ -92,7 +97,9 @@ export class StandardForm {
                 this.model.children[1].material.opacity = 0.5;
             } else if (this.model.objectName == 'ghostGhoul') {
                 this.model.children[0].children[1].material.opacity = 0.3;
-            } 
+            } else if (this.attributes.emissiveIntensity) {
+                this.setMaterialRecursive(this.model, "emissiveIntensity", this.attributes.emissiveIntensity);
+            }
 
             // this.computeVertexNormals(this.model);
             // this.setToCastShadows();
@@ -180,6 +187,26 @@ export class StandardForm {
             el.children.forEach(child => {
                 this.computeVertexNormals(child);
             })
+        }
+    }
+
+    determinePondElevation() {
+        let yOffset = 40;
+
+        this.upRaycaster.ray.origin.copy(this.model.position);
+        this.upRaycaster.ray.origin.y = -200;
+        
+        if (this.upRaycaster.intersectObjects(this.sceneController.ponds, true)[0]) {
+            
+            let distanceFromBase = this.upRaycaster.intersectObjects(this.sceneController.ponds, true)[0].distance;
+            this.downRaycaster.ray.origin.copy (this.upRaycaster.ray.origin);
+            this.downRaycaster.ray.origin.y += (distanceFromBase + yOffset);
+            
+            let distanceFromAbove = this.downRaycaster.intersectObjects(this.sceneController.ponds, true)[0].distance;
+            let elevation = this.downRaycaster.ray.origin.y - distanceFromAbove + 5; 
+            return (elevation);
+        } else {
+            return this.determineElevationFromBase();
         }
     }
 

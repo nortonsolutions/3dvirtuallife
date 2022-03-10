@@ -301,19 +301,7 @@ export class Hero extends IntelligentForm {
     //     this.sceneController.formFactory.addSprites(entity.model, spriteConfig, this.sceneController.scene, true, entity.model.position);
     // }
 
-    atWaterSource() {
-        // this.sceneController.waterSources -- array of waterSources, i.e.,
-        //  [[{position},radius],[{position},radius]]
-        for (let waterSource of this.sceneController.waterSources) {
-            let position = new THREE.Vector3(waterSource[0].x, waterSource[0].y, waterSource[0].z);
-            let distance = waterSource[1];
 
-            // test my distance
-            if (this.model.position.distanceTo(position) <= distance) return true;
-        }
-        
-        return false;
-    }
 
     watercanEquipped() {
 
@@ -908,11 +896,26 @@ export class Hero extends IntelligentForm {
 
         } else if (this.mountedUpon) {
 
-            let baseline = this.determineElevationFromBase() + this.mountedUpon.attributes.height;
+            var baseline;
+            if (this.mountedUpon.attributes.floats) {
+
+                // If floor line is above water line, dismount:
+                let pondLine = this.determinePondElevation();
+                let floorLine = this.determineElevationFromBase();
+                baseline = pondLine + this.mountedUpon.attributes.height;
+                if (floorLine > pondLine + 10) {
+                    let data = {}
+                    data.vehicle = this.mountedUpon.objectName;
+                    data.type = this.mountedUpon.objectType;
+                    this.sceneController.eventDepot.fire('dismount', data);
+                } 
+            } else {
+                baseline = this.determineElevationFromBase() + this.mountedUpon.attributes.height;
+            }
             
             if (Math.abs(this.velocity.z) > 0.01) {
                 if (this.movementStart == null) this.movementStart = performance.now();
-                this.model.position.y += (2 * Math.sin((performance.now() - this.movementStart)/200));
+                this.model.position.y = baseline + (2 * Math.sin((performance.now() - this.movementStart)/200));
             } else {
                 this.model.position.y = baseline;
                 this.movementStart = null;

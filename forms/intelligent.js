@@ -211,19 +211,30 @@ export class IntelligentForm extends AnimatedForm{
                         this.swimming = true;
                     } else {
                         let distanceBelowWater = Math.abs(this.sceneController.waterElevation - this.model.position.y);
-                        this.velocity.x *= Math.max((100-(distanceBelowWater*3))/100,.5);
-                        this.velocity.y *= Math.max((100-(distanceBelowWater*3))/100,.5);
-                        this.velocity.z *= Math.max((100-(distanceBelowWater*3))/100,.5);
-    
-                        if (this.sceneController.water.attributes.lava && this.objectName != "lavaMan") {
-                            this.changeStat('health',-distanceBelowWater/1000);
-                        }
+                        this.underWater(distanceBelowWater);
                     }
                 } else {
                     if (this.attributes.swims) this.swimming = false;
                 }
     
-            } else if (this.attributes.swims && this.attributes.movementRadius) this.swimming = true;
+            } else if (this.attributes.swims && this.attributes.movementRadius) {
+                this.swimming = true;
+            } else if (this.sceneController.layout.terrain.attributes.addPonds && this.atWaterSource()) {
+                // If floor line is below water line....
+                let pondLine = this.determinePondElevation();
+                let floorLine = this.determineElevationFromBase();
+                if (floorLine < pondLine) {
+                    // console.log(`${this.objectName} - floorLine ${floorLine} is below pondLine ${pondLine}`)
+                    if (this.attributes.swims) {
+                        this.swimming = true;
+                    } else {
+                        let distanceBelowWater = Math.abs(pondLine - floorLine);
+                        this.underWater(distanceBelowWater);
+                    }
+                } 
+
+            } 
+
 
             let fIntersects = this.movementRaycaster.intersectObjects(this.sceneController.structureModels, true);
             
@@ -257,6 +268,35 @@ export class IntelligentForm extends AnimatedForm{
             }
 
 
+        }
+    }
+
+    atWaterSource() {
+        
+        // this.sceneController.waterSources -- array of waterSources, i.e.,
+        //  [[{position},radius],[{position},radius]]
+        for (let waterSource of this.sceneController.waterSources) {
+            let position = new THREE.Vector3(waterSource[0].x, waterSource[0].y, waterSource[0].z);
+            let distance = waterSource[1];
+
+            // test my distance
+            if (this.model.position.distanceTo(position) <= distance) {
+                // console.log(`${this.objectName} near water source`);
+                return true;
+            } 
+        }
+        
+        return false;
+    }
+
+
+    underWater(distanceBelowWater) {
+        this.velocity.x *= Math.max((100-(distanceBelowWater*3))/100,.5);
+        this.velocity.y *= Math.max((100-(distanceBelowWater*3))/100,.5);
+        this.velocity.z *= Math.max((100-(distanceBelowWater*3))/100,.5);
+
+        if (this.sceneController.water && this.sceneController.water.attributes.lava && this.getEffectiveStat('fire')<5) {
+            this.changeStat('health',-distanceBelowWater/1000);
         }
     }
 
@@ -644,6 +684,10 @@ export class IntelligentForm extends AnimatedForm{
                                 }
                                 break;
                             case "horse":
+                            case "fireSteed":
+                            case "fishingBoat":
+
+                                if (item.model.attributes.rotateY) item.model.rotateY(degreesToRadians(item.model.attributes.rotateY));
                                 item.model.position.y -= item.attributes.height;
                                 break;
                         }
@@ -660,6 +704,8 @@ export class IntelligentForm extends AnimatedForm{
                                     this.balloonRide = true;
                                     break;
                                 case "horse":
+                                case "fireSteed":
+                                case "fishingBoat":
                                     this.mountedUpon.controlled = true;
                                     break;
                             }

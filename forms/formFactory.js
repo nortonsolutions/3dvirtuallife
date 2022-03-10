@@ -166,6 +166,7 @@ export class FormFactory {
 
             this.setToDoubleSided(water);
             this.sceneController.scene.add(water);
+            this.sceneController.ponds.push(water);
             
             // refractor.material.uniforms[ "tDudv" ].value = this.sceneController.dudvMap;
             water.rotation.x = - Math.PI / 2;

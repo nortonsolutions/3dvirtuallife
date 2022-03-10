@@ -132,30 +132,43 @@ export class AnimatedForm extends StandardForm{
                     this.fadeToAction( 'Idle', 0.2);
                 }
 
-                // } else {
+                if (controlled.attributes.animates) {
                     this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
-                    if (this.absVelocity < .1 && ((controlled.activeActionName == 'Walking' || controlled.activeActionName == 'Running' || controlled.activeActionName == 'Swimming' || controlled.activeActionName == 'horse_A_') || this.paused)) {
+                    if (this.absVelocity < .1 && controlled.activeActionName != 'Idle' && controlled.activeActionName != 'Flopping') { // ((controlled.activeActionName == 'Walking' || controlled.activeActionName == 'Running' || controlled.activeActionName == 'Swimming' || controlled.activeActionName == 'horse_A_') || this.paused)) {
                         controlled.fadeToAction( 'Idle', 0.2);
-                    } else if (this.absVelocity >= .1 && (controlled.activeActionName == 'Idle' || controlled.objectName == 'horse' || this.paused)) {
-                        if (controlled.objectName == 'horse') {
-                            controlled.fadeToAction( 'horse_A_', 0.2);
-                        } else {
-                            if (this.swimming) {
-                                controlled.fadeToAction( 'Swimming', 0.2);
-                            } else {
-                                controlled.fadeToAction( 'Walking', 0.2);
-                            }
+                    } else if (this.absVelocity >= .1 && (controlled.activeActionName == 'Idle' || controlled.objectName == 'horse' || controlled.objectName == 'fireSteed' )) {
+                        // console.log(`${controlled.objectName} walking`)
+                        switch (controlled.objectName) {
+                            case "horse":
+                                // controlled.fadeToAction( 'horse_A_', 0.2);
+                                // break;
+
+                            case "fishingBoat":
+                                controlled.attributes.movingAnimations.split('+').forEach(animation => {
+                                    let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent] = animation.split('/');
+                                    controlled.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore=="autorestore"), Boolean(concurrent=="concurrent"));
+                                })
+                                break;
+                            default:
+                                if (this.swimming) {
+                                    controlled.fadeToAction( 'Swimming', 0.2);
+                                } else {
+                                    controlled.fadeToAction( 'Walking', 0.2);
+                                }
+                                break;
                         }
+
                     } else if (this.absVelocity >= 250 && controlled.activeActionName == 'Walking') {
-                        
+                        // console.log(`${controlled.objectName} running`)
                         if (this.swimming) {
                             controlled.fadeToAction( 'Swimming', 0.2);
                         } else {
                             controlled.fadeToAction( 'Running', 0.2);
                         }
                     }
-                // }
+                }
+
             }
         }
 

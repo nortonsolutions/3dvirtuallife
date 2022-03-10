@@ -109,10 +109,10 @@ export const levels = [
                     color: 'white',
                     density: 1
                 },
-                designateNPCs: false,
+                designateNPCs: true,
                 waterSources: [
                     [{x: -16, y: 0, z: -175}, 80],
-                    [{x: -9.5, y: 0, z: -56}, 300],
+                    [{x: -1195, y: 0, z: 5750}, 800],
                 ]
             }
         },
@@ -133,12 +133,12 @@ export const levels = [
             { name: "silver" },
             { name: "watercan", location: { x: 1.1, y: 0.3, z: 4.4}, attributes: { staticStartingElevation: true }},
             { name: "miningHammer", location: { x: -3, y: 0, z: 0}},
-            // { 
-            //     name: "balloon", location: { x: -3, y: 0, z: -1},
-            //     attributes: { staticStartingElevation: false }
-            // },
             { 
-                name: "fishingBoat", location: { x: -7.4, y: 0, z: 51.2},
+                name: "balloon", location: { x: -3, y: 0, z: -1},
+                attributes: { staticStartingElevation: false }
+            },
+            { 
+                name: "fishingBoat", location: { x: -8, y: 0, z: 52},
                 attributes: { staticStartingElevation: false }
             },
         ],
@@ -189,28 +189,27 @@ export const levels = [
             },
         ],
         entities: [
-            // { name: "evilOne", type: "beast" },
-            // { name: "evilOne", type: "beast" },
-            // { name: "evilOne", type: "beast" },
-            // { name: "evilOne", type: "beast" },
-            // { name: "evilOne", type: "beast" },
-            // { name: "evilOne", type: "beast" },
-            // { name: "evilOne", type: "beast" },
-            // { name: "evilOne", type: "beast" },
-            // { name: "triceratops", type: "beast" },
-            // { name: "john" },
-            // { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
-            // { name: "sunSeed", location: { x: 1, y: 0, z: -1}},
-            // { name: "sunSeed", location: { x: 1, y: 0, z: -2}},
-            // { name: "sunSeed", location: { x: 1, y: 0, z: -3}},
-            // { name: "sunSeed", location: { x: -1, y: 0, z: 1}},
-
-            // { name: "trex", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "triceratops", type: "beast" },
+            { name: "trex", type: "beast" },
+            { name: "john" },
+            { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
+            { name: "sunSeed", location: { x: 1, y: 0, z: -1}},
+            { name: "sunSeed", location: { x: 1, y: 0, z: -2}},
+            { name: "sunSeed", location: { x: 1, y: 0, z: -3}},
+            { name: "sunSeed", location: { x: -1, y: 0, z: 1}},
             // { name: "ghoul", type: "beast"  },
             // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
             // { name: "rockyMan", type: "beast" },
             // { name: "demonLord", type: "beast" },
-            // { name: "horse", location: { x: 1, y: 0, z: 1} },
+            { name: "horse" },
             // { name: "murderBear", type: "beast"  },
             // { name: "rosen", type: "beast"  },
             // { name: "iceGhoul", type: "beast"  },
@@ -223,9 +222,10 @@ export const levels = [
 
             // { name: "blacksmith" },
             // { name: "elfgirl" },
-
-            // { name: "fireSteed", location: { x: 1, y: 0, z: 0}},
-            { name: "catFish", location: { x: -12, y: 0, z: 58}, type: "beast" }
+            // { name: "pug", location: { x: 1, y: 0, z: 1} },
+            { name: "catFish", location: { x: -9, y: 0, z: 56}},
+            { name: "catFish", location: { x: -8, y: 0, z: 56}},
+            { name: "catFish", location: { x: -8.5, y: 0, z: 55}}
             
         ]
     },

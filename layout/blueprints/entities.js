@@ -55,7 +55,7 @@ export const Entities = {
                 strength: "4/4/0",
                 agility: "2/2/0",
                 defense: "0/0/0", // rock, weapon, arrow damage defense
-                fire: "2/2/0",
+                fire: "5/5/0",
                 ice: "0/0/0",
                 poison: "0/0/0",
                 thunder: "0/0/0"
@@ -271,8 +271,8 @@ export const Entities = {
             height: 10,
             length: 30,
             width: 20,
-            elevation: -10,
-            scale: 10,
+            elevation: 0,
+            scale: 5,
             stats: {
                 health: "4/4/0",
                 mana: "0/0/0",
@@ -775,12 +775,46 @@ export const Entities = {
             rangedSpell: 'poisonProjectileSpell'
         }
     },
+
+    pug: {
+        name: 'pug',
+        gltf: 'pug.glb',
+        image: 'pug.png',
+        description: 'Regal pug',
+        type: 'friendly',
+        attributes: {
+            moves: true,
+            animates: true,
+            height: 35,
+            length: 30,
+            width: 20,
+            elevation: 0,
+            equippedScale: .35,
+            scale: 100,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "0/0/0",
+                agility: "1/1/0",
+                defense: "5/5/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
+            },
+            grants: ["gold10"]
+        }
+    },
+
     horse: {
         name: 'horse',
         gltf: 'horse.glb',
+        image: 'horse.png',
         description: 'Strong horse',
         type: 'friendly',
         attributes: {
+            movingAnimations: "horse_A_/2/1/1/false/false",
+            runningAnimations: "horse_A_/2/1/1/false/false",
             mountable: true,
             moves: true,
             animates: true,
@@ -808,13 +842,15 @@ export const Entities = {
     fireSteed: {
         name: 'fireSteed',
         gltf: 'fireSteed.glb',
+        image: 'fireSteed.png',
         description: 'Mystical fire steed',
         type: 'friendly',
         attributes: {
+            emissiveIntensity: 3,
             mountable: true,
             moves: true,
             animates: true,
-            height: 35,
+            height: 40,
             length: 50,
             width: 20,
             elevation: 0,

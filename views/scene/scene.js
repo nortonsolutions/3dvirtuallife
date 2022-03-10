@@ -238,7 +238,11 @@ class Scene {
                 this.camera.position.z += cameraDistanceDefault / 100;
                 if (this.scene.fog) this.scene.fog.far = cameraReach-100;
             }
-            if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height) this.camera.position.y += cameraElevationDefault / 100;
+            if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height) {
+                this.camera.position.y += cameraElevationDefault / 100;
+            } else if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height) {
+                this.camera.position.y -= cameraElevationDefault / 100;
+            } 
         }
     }
     
@@ -360,7 +364,7 @@ class Scene {
     catch(projectile, entitiesInRange) {
         
         entitiesInRange.forEach(e => {
-
+            console.error(`${e.objectName} caught @ ${e.model.position.x},${e.model.position.y},${e.model.position.z}`)
             if (e.attributes.catchable) { // just apply locally; do not broadcast
                 e.fadeToAction("Thrashing", 0.2);
                 e.model.position.x = 0;
@@ -377,9 +381,10 @@ class Scene {
         projectile.item.model.children.forEach(child => {
             if (child.attributes && child.attributes.catchable) {
                 child.position.copy(projectile.item.model.position);
-                child.scale.set(10,10,10);
+                child.scale.set(5,5,5);
                 this.add(child);
                 let caught = this.controller.getFormByLayoutId(child.attributes.layoutId);
+                caught.model.position.y = caught.determineElevationFromBase() + caught.attributes.elevation;
                 caught.attributes.stats.agility = "0/0/0";
                 caught.fadeToAction('Flopping', 0.2);
 
@@ -411,7 +416,7 @@ class Scene {
 
             for (let projectile of this.controller.projectiles) {
                 
-                console.log(`${projectile.item.objectName}: ${projectile.velocity.z} @ ${projectile.item.model.position.x}, ${projectile.item.model.position.y}, ${projectile.item.model.position.z}`);
+                // console.log(`${projectile.item.objectName}: ${projectile.velocity.z} @ ${projectile.item.model.position.x}, ${projectile.item.model.position.y}, ${projectile.item.model.position.z}`);
                 
                 if (projectile.distanceTraveled == 0) { // first iteration, set velocities
                     projectile.startingPosition = new THREE.Vector3();
@@ -469,12 +474,12 @@ class Scene {
                 projectile.distanceTraveled += (Math.abs(projectile.velocity.z * delta) + Math.abs(projectile.velocity.y * delta));
                 let maxDistance = projectile.item.attributes.throwableAttributes.distance;
 
-                console.log(`traveled: ${projectile.distanceTraveled}, y: ${projectile.item.model.position.y}, elev: ${projectile.item.determineElevationFromBase()}`)
+                // console.log(`traveled: ${projectile.distanceTraveled}, y: ${projectile.item.model.position.y}, elev: ${projectile.item.determineElevationFromBase()}`)
                 if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+15 || this.returning) {
                     if (projectile.item.objectSubtype == 'bait') {
                         // turn around and reset velocity, then head back until I reach the caster
                         if (!projectile.returning) {
-                            console.log(`Turning AROUND.`)
+                            // console.log(`Turning AROUND.`)
                             projectile.item.model.lookAt(projectile.startingPosition);
                             projectile.velocity.z = -projectile.item.attributes.throwableAttributes.speed * 350;
                             projectile.returning = true;
@@ -483,7 +488,7 @@ class Scene {
                         }
                         
                         let distanceToOrigin = projectile.item.model.position.distanceTo(projectile.startingPosition);
-                        console.log(`distanceToOrigin: ${distanceToOrigin}`);
+                        // console.log(`distanceToOrigin: ${distanceToOrigin}`);
                         if (distanceToOrigin < 100) {
                             this.release(projectile);
                         } else {

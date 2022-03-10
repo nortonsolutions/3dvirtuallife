@@ -615,22 +615,22 @@ export const Items = {
             throwable: true,
             throwableAttributes: {
                 pitch: .7, // angle up (percentage of 90 degrees)
-                weight: 1, // lbs
+                weight: 2, // lbs
                 distance: 2000, // px
                 speed: 4 // 1 = full walking speed
             },
             elevation: 10,
-            range: 100,
-            continuousSprites: true,
-            sprites: [{ 
-                name: "blueExplosion",
-                regex: "",
-                frames: 10,
-                scale: 2,
-                flip: false,
-                elevation: 0,
-                time: 2
-            }],
+            range: 140,
+            // continuousSprites: true,
+            // sprites: [{ 
+            //     name: "blueExplosion",
+            //     regex: "",
+            //     frames: 10,
+            //     scale: 2,
+            //     flip: false,
+            //     elevation: 0,
+            //     time: 2
+            // }],
         }         
     },
 
@@ -638,6 +638,48 @@ export const Items = {
         name: 'bait25',
         gltf: 'arrow25.glb',
         description: 'Twenty-five nightcrawlers',
+        type: 'item',
+        attributes: {
+            baseItemName: 'bait',
+            quantity: 25,
+            animates: false,
+            scale: 200,
+            elevation: 10
+        }
+    },
+
+    bait10: {
+        name: 'bait10',
+        gltf: 'bait25.glb',
+        description: 'Ten nightcrawlers',
+        type: 'item',
+        attributes: {
+            baseItemName: 'bait',
+            quantity: 25,
+            animates: false,
+            scale: 200,
+            elevation: 10
+        }
+    },
+
+    bait3: {
+        name: 'bait3',
+        gltf: 'arrow25.glb',
+        description: 'Three nightcrawlers',
+        type: 'item',
+        attributes: {
+            baseItemName: 'bait',
+            quantity: 25,
+            animates: false,
+            scale: 200,
+            elevation: 10
+        }
+    },
+
+    bait1: {
+        name: 'bait1',
+        gltf: 'arrow.glb',
+        description: 'One nightcrawler',
         type: 'item',
         attributes: {
             baseItemName: 'bait',
@@ -1105,18 +1147,21 @@ export const Items = {
 
     fishingBoat: {
         name: 'fishingBoat',
-        gltf: 'fishingBoat.glb',
+        gltf: 'fishingBoat2.glb',
         image: 'fishingBoat.png',
         description: 'Fishing boat',
         type: 'item',
         attributes: {
+            height: 10,
+            movingAnimations: "RowAction/2/1/1/false/false",
             mountable: true,
-            equippedScale: 30,
-            // staticStartingElevation: true,
-            rotateY: 180,
-            animates: false,
-            scale: 30,
-            elevation: 30,
+            floats: true,
+            equippedScale: 15,
+            rotateY: 90,
+            animates: true,
+            scale: 15,
+            elevation: 0,
+            translateZ: 20
             // addToStructureModels: true
         }
     },
@@ -1200,16 +1245,16 @@ export const Items = {
 
     fishingPole: {
         name: 'fishingPole',
-        gltf: 'bow.glb',
-        image: 'bow.png',
+        gltf: 'fishingPole.glb',
+        image: 'fishingPole.png',
         description: 'Fishing pole',
         type: 'item',
         subtype: 'launcher',
         attributes: {
             animates: true,
-            defaultAction: "ArmatureAction",
-            scale: 200,
-            equippedScale: .1,
+            defaultAction: "SnapAction",
+            scale: 2,
+            equippedScale: .002,
             elevation: 0,
             throwable: false,
             throws: "bait",

@@ -66,6 +66,7 @@ export class SceneController {
 
         // An array of waterSources -- [[{position},radius],[{position},radius]]
         this.waterSources = [];
+        this.ponds = [];
 
         // this.refractors = [];
         // this.dudvMap = new THREE.TextureLoader().load( '/textures/waterdudv.jpg' );
@@ -166,7 +167,12 @@ export class SceneController {
                 if (!data.position) {
                     data.position = new THREE.Vector3();
                     data.position.copy(this.hero.model.position);
-                    data.position.y = this.hero.determineElevationFromBase() + itemTemplate.attributes.elevation;
+
+                    if (data.itemName == "fishingBoat") {
+                        data.position.y = this.hero.determinePondElevation() + itemTemplate.attributes.elevation;
+                    } else {
+                        data.position.y = this.hero.determineElevationFromBase() + itemTemplate.attributes.elevation;
+                    }
                 }
 
                 form.model.position.copy(data.position);
@@ -550,7 +556,7 @@ export class SceneController {
                 if (!this.layout.entities[index].attributes) this.layout.entities[index].attributes = {};
                 this.layout.entities[index].attributes.layoutId = template.attributes.layoutId = nextLayoutId++;
 
-                if (this.layout.terrain.attributes.designateNPCs && template.type == "beast" && index < this.floorNPClocations.length) {
+                if (this.layout.terrain.attributes.designateNPCs && template.type == "beast" && template.subtype != "fish" && index < this.floorNPClocations.length) {
                     // this.floorNPClocations = [];
                     template.location = this.getLocationFromPosition(this.floorNPClocations[index], 100/this.layout.terrain.attributes.scale);
                 }
@@ -562,7 +568,6 @@ export class SceneController {
             }
             this.seedForm(template).then(form => {});
         });
-
 
         if (firstInRoom) { // Update layouts with layoutIds assigned....
             this.socket.emit('pushLayout', {level: this.level, layout: this.layout, nextLayoutId });
@@ -757,12 +762,13 @@ export class SceneController {
 
     allEnemiesInRange(range, position) {
         var response = [];
+        
         this.entities.filter(el => el.objectType == "beast").forEach(entity => {
             // apply height
             let enemyPosition = new THREE.Vector3();
             enemyPosition.copy(entity.model.position);
             enemyPosition.y += entity.attributes.height;
-            
+            // console.log(`${entity.objectName} found at ${enemyPosition.x},${enemyPosition.y},${enemyPosition.z} @ distance of ${position.distanceTo(enemyPosition)}; range = ${range}`);
             if (position.distanceTo(enemyPosition) < range) {
                 response.push(entity);
             }
