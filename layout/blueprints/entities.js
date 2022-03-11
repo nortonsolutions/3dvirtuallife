@@ -287,6 +287,40 @@ export const Entities = {
             grants: ["gold10"]
         }
     },
+
+    carp: {
+        name: 'carp',
+        gltf: 'carp.glb',
+        image: 'carp.png',
+        description: 'Slimy carp',
+        type: 'beast',
+        subtype: 'fish',
+        attributes: {
+            moves: true,
+            animates: true,
+            swims: true,
+            docile: true,
+            catchable: true,
+            movementRadius: 100,
+            height: 10,
+            length: 30,
+            width: 20,
+            elevation: 0,
+            scale: 5,
+            stats: {
+                health: "4/4/0",
+                mana: "0/0/0",
+                strength: "2/2/0",
+                agility: "3/3/0",
+                defense: "2/2/0", // rock, weapon, arrow damage defense
+                fire: "0/0/0",
+                ice: "0/0/0",
+                poison: "0/0/0",
+                thunder: "0/0/0"
+            },
+            grants: ["gold10"]
+        }
+    },
     jelly: {
         name: 'jelly',
         gltf: 'jelly.glb',

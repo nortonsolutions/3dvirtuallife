@@ -56,6 +56,7 @@ class Scene {
         this.requestAnimationFrameID = null;
 
         this.projectileMovementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(0,0,1), 0, 40 );
+        this.cameraReach = cameraReach;
         // this.clock = new THREE.Clock(); // for use by refractor uniform updates
     }
 
@@ -364,7 +365,7 @@ class Scene {
     catch(projectile, entitiesInRange) {
         
         entitiesInRange.forEach(e => {
-            console.error(`${e.objectName} caught @ ${e.model.position.x},${e.model.position.y},${e.model.position.z}`)
+            // console.error(`${e.objectName} caught @ ${e.model.position.x},${e.model.position.y},${e.model.position.z}`)
             if (e.attributes.catchable) { // just apply locally; do not broadcast
                 e.fadeToAction("Thrashing", 0.2);
                 e.model.position.x = 0;
@@ -640,6 +641,7 @@ class Scene {
         })
 
         this.controller.eventDepot.addListener('lockControls', () => {
+            this.time = this.prevTime = performance.now(); // reset the deltas
             this.controls.lock();
         })
 

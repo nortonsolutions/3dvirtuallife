@@ -123,11 +123,23 @@ export class AnimatedForm extends StandardForm{
 
     animate(delta) {
 
-        if (this.attributes.moves && this.attributes.heroNearby) {
-            if (this.alive) {
-                
-                let controlled = this.mountedUpon? this.mountedUpon : this;
+        if (this.alive) {
 
+            if (this.attributes.shouldAnimate) {
+                    
+                // if (this.mixer.timeScale == 0) this.mixer.timeScale = 1; //unpause all animations
+                
+                var controlled;
+                if (this.mountedUpon) {
+                    controlled = this.mountedUpon
+                } else if (this.attributes.mountedUpon) {
+                    // find the mountedUpon form in forms, for remote stuff
+                    controlled = this.sceneController.forms.find(el => el.objectName == this.attributes.mountedUpon);
+                } else {
+                    controlled = this;
+                }
+                
+                // let controlled = this.mountedUpon? this.mountedUpon : this;
                 if (this.objectType == "hero" && this.mounted) {
                     this.fadeToAction( 'Idle', 0.2);
                 }
@@ -137,9 +149,10 @@ export class AnimatedForm extends StandardForm{
 
                     if (this.absVelocity < .1 && controlled.activeActionName != 'Idle' && controlled.activeActionName != 'Flopping') { // ((controlled.activeActionName == 'Walking' || controlled.activeActionName == 'Running' || controlled.activeActionName == 'Swimming' || controlled.activeActionName == 'horse_A_') || this.paused)) {
                         controlled.fadeToAction( 'Idle', 0.2);
-                    } else if (this.absVelocity >= .1 && (controlled.activeActionName == 'Idle' || controlled.objectName == 'horse' || controlled.objectName == 'fireSteed' )) {
+                    } else if (this.absVelocity >= .1 && this.absVelocity < 250 && (controlled.activeActionName == 'Idle' || controlled.activeActionName == 'Running')) {// || controlled.objectName == 'horse' || controlled.objectName == 'fireSteed' )) {
                         // console.log(`${controlled.objectName} walking`)
                         switch (controlled.objectName) {
+                            
                             case "horse":
                                 // controlled.fadeToAction( 'horse_A_', 0.2);
                                 // break;
@@ -163,27 +176,36 @@ export class AnimatedForm extends StandardForm{
                         // console.log(`${controlled.objectName} running`)
                         if (this.swimming) {
                             controlled.fadeToAction( 'Swimming', 0.2);
+                        } else if (controlled.objectName == 'fireSteed') { // one-off
+                            controlled.fadeToAction( 'Walking', 0.2);
                         } else {
                             controlled.fadeToAction( 'Running', 0.2);
                         }
                     }
+                    if (controlled.mixer) controlled.mixer.update( delta );
+                    if (this.mountedUpon) this.mixer.update( delta );
                 }
-
+                
+            } else {
+                // if (this.mixer.timeScale == 1) this.mixer.timeScale = 0; // pause all animations
             }
+        } else {
+            this.mixer.update( delta );
         }
-
-        this.mixer.update( delta );
     }
 
     fadeToAction( actionName, duration ) {
 
+        if (this.objectName == "horse" || this.objectName == "fireSteed") {
+            console.log(`${this.objectName} fading to ${actionName}; currentAction is ${this.activeActionName}`);
+        }
         if (!this.actions[actionName]) { // if animation doesn't exist, fadeOut and set activeActionName
             this.previousActionName = this.activeActionName;
             this.previousAction = this.activeAction;
             this.activeActionName = actionName;
             if (this.previousAction) this.previousAction.fadeOut(0.2);
 
-        } else {
+        } else { // animation exists
             if (this.activeActionName != "Death" && (actionName == "Death" || !this.currentlyFadingToAction) && this.activeActionName !== actionName) {
               this.currentlyFadingToAction = true;
               let newAction = this.actions[actionName];

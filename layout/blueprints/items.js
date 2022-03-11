@@ -603,14 +603,14 @@ export const Items = {
 
     bait: {
         name: 'bait',
-        gltf: 'arrow.glb',
-        image: 'arrow.png',
+        gltf: 'worm.glb',
+        image: 'worm.png',
         description: 'nightcrawler bait',
         type: 'item',
         subtype: 'bait',
         attributes: {
             animates: false,
-            scale: 250,
+            scale: 2,
             equippedScale: 0.3,
             throwable: true,
             throwableAttributes: {
@@ -636,56 +636,56 @@ export const Items = {
 
     bait25: {
         name: 'bait25',
-        gltf: 'arrow25.glb',
+        gltf: 'worm.glb',
         description: 'Twenty-five nightcrawlers',
         type: 'item',
         attributes: {
             baseItemName: 'bait',
             quantity: 25,
             animates: false,
-            scale: 200,
+            scale: 2,
             elevation: 10
         }
     },
 
     bait10: {
         name: 'bait10',
-        gltf: 'bait25.glb',
+        gltf: 'worm.glb',
         description: 'Ten nightcrawlers',
         type: 'item',
         attributes: {
             baseItemName: 'bait',
             quantity: 25,
             animates: false,
-            scale: 200,
+            scale: 2,
             elevation: 10
         }
     },
 
     bait3: {
         name: 'bait3',
-        gltf: 'arrow25.glb',
+        gltf: 'worm.glb',
         description: 'Three nightcrawlers',
         type: 'item',
         attributes: {
             baseItemName: 'bait',
             quantity: 25,
             animates: false,
-            scale: 200,
+            scale: 2,
             elevation: 10
         }
     },
 
     bait1: {
         name: 'bait1',
-        gltf: 'arrow.glb',
+        gltf: 'worm.glb',
         description: 'One nightcrawler',
         type: 'item',
         attributes: {
             baseItemName: 'bait',
             quantity: 25,
             animates: false,
-            scale: 200,
+            scale: 2,
             elevation: 10
         }
     },
@@ -1234,6 +1234,26 @@ export const Items = {
             animates: false,
             scale: 100,
             equippedScale: .1,
+            elevation: 0,
+            // rotateY: 315, 
+            // rotateZ: 180
+            // rotateX: 315
+            
+            // addToStructureModels: true
+        }
+    },
+
+    pickAxe: {
+        name: 'pickAxe',
+        gltf: 'pickAxe.glb',
+        image: 'pickAxe.png',
+        description: 'Strong pickaxe',
+        type: 'item',
+        attributes: {
+            // rotateY: 180,
+            animates: false,
+            scale: 3,
+            equippedScale: .003,
             elevation: 0,
             // rotateY: 315, 
             // rotateZ: 180

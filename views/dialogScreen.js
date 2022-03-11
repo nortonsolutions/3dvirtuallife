@@ -118,9 +118,10 @@ export class DialogScreen {
         
         if (this.running) {
             this.time = performance.now();
+            
             this.delta = ( this.time - this.prevTime ) / 1000;
-
             if (this.mixer) this.mixer.update( this.delta );
+            
             this.animationId = requestAnimationFrame( this.render );
             
             this.renderer.render( this.scene, this.camera );

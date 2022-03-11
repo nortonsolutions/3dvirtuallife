@@ -151,8 +151,6 @@ export class SceneController {
      */
     dropItemToScene(data, local = true) {
 
-        console.log(`dropping to scene:`)
-        console.dir(data);
         let itemTemplate = this.getTemplateByName(data.itemName);
 
         // if (itemTemplate.type == 'item' || itemTemplate.type == 'structure') {
@@ -226,17 +224,17 @@ export class SceneController {
             switch (data.type) {
                 case 'structure':
                     let structure = this.forms.find(el => el.attributes.layoutId == data.layoutId);
-                    structure.updateAttributes(data.payload, false);
+                    if (structure) structure.updateAttributes(data.payload, false);
                     break;
                 case 'item':
                     let item = this.forms.find(el => el.attributes.layoutId == data.layoutId);
-                    item.updateAttributes(data.payload, false);
+                    if (item) item.updateAttributes(data.payload, false);
                     break;
                 case 'entity':
                 case 'friendly':
                 case 'beast':
                     let entity = this.forms.find(el => el.attributes.layoutId == data.layoutId);
-                    entity.updateAttributes(data.payload, false);
+                    if (entity) entity.updateAttributes(data.payload, false);
                     break;
             }
             
@@ -247,11 +245,11 @@ export class SceneController {
             if (data.hero) {
                 let other = this.others.find(el => el.attributes.layoutId == data.layoutId);
                 this.others = this.others.filter(el => el.attributes.layoutId != data.layoutId);
-                other.death(false);
+                if (other) other.death(false);
             } else {
                 let entity = this.entities.find(el => el.attributes.layoutId == data.layoutId);
                 this.entities = this.entities.filter(el => el.attributes.layoutId != data.layoutId);
-                entity.death(false);
+                if (entity) entity.death(false);
             }
         });
 
@@ -291,7 +289,7 @@ export class SceneController {
                 if (localEntity) {
                     let rotation = new THREE.Euler( entity.rotation._x, entity.rotation._y, entity.rotation._z, 'YXZ' );
                     localEntity.model.rotation.copy(rotation);
-                    if (localEntity.velocity) localEntity.velocity.copy(entity.velocity);
+                    if (localEntity.velocity && entity.velocity) localEntity.velocity.copy(entity.velocity);
                     localEntity.model.position.copy(entity.position);
                 }
             });
@@ -651,10 +649,10 @@ export class SceneController {
                 resolve(form);
             }
 
-        });
+            });
 
-    })    
-}
+        })    
+    }
 
     handleMovement(delta) {
         if (this.hero && this.scene.controls) {

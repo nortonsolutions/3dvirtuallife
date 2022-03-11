@@ -75,6 +75,10 @@ export const levels = [
             { 
                 name: "portalStone", location: { x: 2.7, y: 0, z: 10.1 },
                 attributes: { routeTo: { level: 10, location: { x: 2, y: 0, z: 2} } } 
+            },
+            { 
+                name: "portalStone", location: { x: -.02, y: 0, z: 10.3 },
+                attributes: { routeTo: { level: 11, location: { x: 2, y: 0, z: 2} } } 
             }
 
 
@@ -126,13 +130,14 @@ export const levels = [
             { name: "arrow25" },
             { name: "fishingPole", location: { x: 0, y: 0, z: -1} },
             { name: "bait25", location: { x: 0, y: 0, z: 2} },
-            { name: "smallSword" },
-            { name: "aluminium", location: { x: -1, y: 0, z: -1}},
-            { name: "gold" },
-            { name: "iron" },
-            { name: "silver" },
+            // { name: "smallSword" },
+            // { name: "aluminium", location: { x: -1, y: 0, z: -1}},
+            // { name: "gold" },
+            // { name: "iron" },
+            // { name: "silver" },
             { name: "watercan", location: { x: 1.1, y: 0.3, z: 4.4}, attributes: { staticStartingElevation: true }},
             { name: "miningHammer", location: { x: -3, y: 0, z: 0}},
+            { name: "pickAxe", location: { x: -2, y: 0, z: 0}},
             { 
                 name: "balloon", location: { x: -3, y: 0, z: -1},
                 attributes: { staticStartingElevation: false }
@@ -196,20 +201,20 @@ export const levels = [
             { name: "evilOne", type: "beast" },
             { name: "evilOne", type: "beast" },
             { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
             { name: "triceratops", type: "beast" },
-            { name: "trex", type: "beast" },
+            // // { name: "trex", type: "beast" },
             { name: "john" },
             { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
             { name: "sunSeed", location: { x: 1, y: 0, z: -1}},
             { name: "sunSeed", location: { x: 1, y: 0, z: -2}},
             { name: "sunSeed", location: { x: 1, y: 0, z: -3}},
             { name: "sunSeed", location: { x: -1, y: 0, z: 1}},
+            { name: "fireSteed", location: { x: -1, y: 0, z: 1}},
             // { name: "ghoul", type: "beast"  },
             // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
             // { name: "rockyMan", type: "beast" },
             // { name: "demonLord", type: "beast" },
-            { name: "horse" },
+            { name: "horse", location: { x: -2, y: 0, z: 2} },
             // { name: "murderBear", type: "beast"  },
             // { name: "rosen", type: "beast"  },
             // { name: "iceGhoul", type: "beast"  },
@@ -225,7 +230,10 @@ export const levels = [
             // { name: "pug", location: { x: 1, y: 0, z: 1} },
             { name: "catFish", location: { x: -9, y: 0, z: 56}},
             { name: "catFish", location: { x: -8, y: 0, z: 56}},
-            { name: "catFish", location: { x: -8.5, y: 0, z: 55}}
+            { name: "catFish", location: { x: -8.5, y: 0, z: 55}},
+            { name: "carp", location: { x: -7, y: 0, z: 54}},
+            { name: "carp", location: { x: -7.5, y: 0, z: 54}}
+
             
         ]
     },
@@ -933,7 +941,7 @@ export const levels = [
         background: 'clouds.png',
         backgroundNight: 'stars.png',
         terrain: {
-            name: 'elvandor',
+            name: 'floor',
             type: 'floor',
             description: 'Elvandor',
             gltf: 'elvandor.glb',
@@ -975,6 +983,80 @@ export const levels = [
             // { name: "lavaGhoul", type: "beast" },
             // { name: "lavaGhoul", type: "beast" },
         ]
-    }
+    },
+    {
+        level: 11,
+        width: 32, //32
+        length: 32,  //32
+        description: "Dungeon Caves",
+        background: '',
+        terrain: {
+            name: 'floor',
+            type: 'floor',
+            description: 'caves',
+            gltf: 'caves.glb',
+            attributes: {
+                cutScenes: {
+                    intro: "volcanoIntro.mkv"    
+                },
+                scale: 100,
+                light: {
+                    sunLight: false,
+                    overheadPointLight: true,
+                },
+                fog: {
+                    color: 'black',
+                    density: 1
+                },
+                designateNPCs: true
+            }
+        },
+        items: [
+            // { name: "bagOfGems" },
+            // { name: "mace" },
+            // { name: "bluepotion" },
+            // { name: "busterbuckler" },
+            // { name: "torch", location: { x: 0, y: 0, z: 0}},
+            // { name: "keyToChest", location: { x: 1, y: 0, z: 0 }},
+            // { name: "gold3" },
+            // { name: "gold25" },
+            // { name: "gold1" },
+            // { name: "gold10" },
+            // { name: "arrow25" },
+            // { name: "aluminium" },
+            // { name: "iron" }
+        ],
+        structures: [
+            { 
+                name: "ancientChest", location: { x: 0, y: 0, z: -1 },
+                attributes: { key: 'keyToChest', contentItems: [ "bagOfGems" ] }
+            },
+            // { 
+            //     name: "archway", location: { x: 16, y: 0, z: 4 },
+            //     attributes: { routeTo: { level: 0, location: { x: 3, y: 0, z: 4} } } //valley
+            // },
+            // { 
+            //     name: "archway", location: { x: 16, y: 0, z: -4 },
+            //     attributes: { routeTo: { level: 2, location: { x: 0, y: 0, z: 0} } } //catacomb
+            // },
+            
+        ],
+        entities: [
+            
+            // { name: "evilOne", type: "beast" },
+            // { name: "evilOne", type: "beast" },
+            // { name: "evilOne", type: "beast" },
+            // { name: "rat", type: "beast" },
+            // { name: "rat", type: "beast" },
+            // { name: "bat", type: "beast" },
+            // { name: "bat", type: "beast" },
+            // { name: "bat", type: "beast" },
+            // { name: "bat", type: "beast" },
+            // { name: "bat", type: "beast" },
+            // { name: "bat", type: "beast" },
+            // { name: "ghoul", type: "beast", attributes: { boss: false } },
+            // { name: "john" },
+        ]
+    },
  
 ]

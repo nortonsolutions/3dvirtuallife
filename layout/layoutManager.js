@@ -105,7 +105,7 @@ class LayoutManager {
         }
     }
     
-    removeFromLayoutByLayoutId(layoutId, local = true) {
+    removeFromLayoutByLayoutId(layoutId, local = true) {  // remove From scene 
         if (this.layout.items.map(el => el.attributes.layoutId).includes(layoutId)) {
             this.layout.items = this.layout.items.filter(el => el.attributes.layoutId != layoutId);
         } else if (this.layout.entities.map(el => el.attributes.layoutId).includes(layoutId)) {

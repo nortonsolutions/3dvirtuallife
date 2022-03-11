@@ -320,7 +320,9 @@ export class StandardForm {
                 let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent] = animation.split('/');
                 this.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore=="autorestore"), Boolean(concurrent=="concurrent"));
             })
-        } else if (this.activeAction) { // for objects with a singular default action
+        } 
+        
+        if (this.attributes.defaultSingleAction && this.activeAction) {
             this.runAction(this.activeAction._clip.name, 3, 3, 1, false);
         }
 

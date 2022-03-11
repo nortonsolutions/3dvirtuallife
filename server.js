@@ -166,6 +166,12 @@ database(mongoose, (db) => {
       if (x) x[1] = heroTemplate;
     }
 
+    const updateHeroAttributes = function (room,payload) {
+      let x = app.rooms[socket.nsp.name][room].find(el => el[0] == socket.id);
+      x[1].attributes = {...x[1].attributes, ...payload};
+      notifyRoomMembers(room, "updateHeroTemplate", x[1]);
+    }
+
     // Default namespace = "/" (equivalent to io.sockets)
     // if (!app.games[socket.nsp.name]) app.games[socket.nsp.name] = {};
     if (!app.rooms[socket.nsp.name]) app.rooms[socket.nsp.name] = [];
@@ -242,7 +248,18 @@ database(mongoose, (db) => {
     });
 
     socket.on('removeFromLayoutByLayoutId', data => {
-      app.layouts[socket.nsp.name][data.level][0].items = app.layouts[socket.nsp.name][data.level][0].items.filter(el => el.attributes.layoutId != data.layoutId);
+
+      let layout = app.layouts[socket.nsp.name][data.level][0];
+      
+      if (layout.items.map(el => el.attributes.layoutId).includes(data.layoutId)) {
+        layout.items = layout.items.filter(el => el.attributes.layoutId != data.layoutId);
+      } else if (layout.entities.map(el => el.attributes.layoutId).includes(data.layoutId)) {
+        layout.entities = layout.entities.filter(el => el.attributes.layoutId != data.layoutId);
+      } else if (layout.structures.map(el => el.attributes.layoutId).includes(data.layoutId)) {
+        layout.structures = layout.structures.filter(el => el.attributes.layoutId != data.layoutId);
+      }
+
+      // layout.items = layout.items.filter(el => el.attributes.layoutId != data.layoutId);
       notifyRoomMembers(data.level, "removeFromLayoutByLayoutId", data);
     });
 
@@ -306,31 +323,38 @@ database(mongoose, (db) => {
 
     socket.on('updateAttributes', data => { // include type 
       var index;
-      
-      switch (data.type) {
-        case 'structure':
-            index = app.layouts[socket.nsp.name][data.level][0].structures.findIndex(el => el.attributes.layoutId == data.layoutId);
-            if (index != -1) {
-              let structure = app.layouts[socket.nsp.name][data.level][0].structures[index];
-              structure.attributes = {...structure.attributes, ...data.payload};
-            }
-            break;
-        case 'item':
-            index = app.layouts[socket.nsp.name][data.level][0].items.findIndex(el => el.attributes.layoutId == data.layoutId);
-            if (index != -1) {
-              let item = app.layouts[socket.nsp.name][data.level][0].items[index];
-              item.attributes = {...item.attributes, ...data.payload};
-            }
-            break;
-        case 'entity':
-        case 'friendly':
-        case 'beast':
-            index = app.layouts[socket.nsp.name][data.level][0].entities.findIndex(el => el.attributes.layoutId == data.layoutId);
-            if (index != -1) {
-              let entity = app.layouts[socket.nsp.name][data.level][0].entities[index];
-              entity.attributes = {...entity.attributes, ...data.payload};
-            }
-            break;
+      if (app.layouts[socket.nsp.name] && app.layouts[socket.nsp.name][data.level]) {
+        switch (data.type) {
+          case 'structure':
+              index = app.layouts[socket.nsp.name][data.level][0].structures.findIndex(el => el.attributes.layoutId == data.layoutId);
+              if (index != -1) {
+                let structure = app.layouts[socket.nsp.name][data.level][0].structures[index];
+                structure.attributes = {...structure.attributes, ...data.payload};
+              }
+              break;
+          case 'item':
+              index = app.layouts[socket.nsp.name][data.level][0].items.findIndex(el => el.attributes.layoutId == data.layoutId);
+              if (index != -1) {
+                let item = app.layouts[socket.nsp.name][data.level][0].items[index];
+                item.attributes = {...item.attributes, ...data.payload};
+              }
+              break;
+          case 'entity':
+          case 'friendly':
+          case 'beast':
+              index = app.layouts[socket.nsp.name][data.level][0].entities.findIndex(el => el.attributes.layoutId == data.layoutId);
+              if (index != -1) {
+                let entity = app.layouts[socket.nsp.name][data.level][0].entities[index];
+                entity.attributes = {...entity.attributes, ...data.payload};
+              }
+              break;
+          case 'hero' :
+              updateHeroAttributes(data.level, data.payload);
+              break;
+            // TODO!!! handle hero attribute updates.  update template?
+
+        }
+
       }
 
       

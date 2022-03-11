@@ -39,10 +39,11 @@ export class Hero extends IntelligentForm {
         
         this.balloonFloat = true; // does the balloon float upwards or has it arrived at the hovering altitude?
         this.balloonFloatStart = 0;
+
+        this.attributes.shouldMove = true;
+        this.attributes.shouldAnimate = true;
+
         this.cacheHero();
-
-        this.attributes.heroNearby = true;
-
     }
 
     load(callback) {
@@ -326,9 +327,8 @@ export class Hero extends IntelligentForm {
         this.sceneController.formFactory.addSprites(watercan.model, spriteConfig, this.sceneController.scene, true, watercan.getWorldPosition());
 
         this.fadeToAction('ThumbsUp', 0.2);
-        // add 'water' to inventory;
         this.sceneController.eventDepot.fire('addToInventory', {itemName: 'water', quantity: 4});
-        console.log('test');
+        
     }
 
     addEventListeners() {
@@ -366,6 +366,7 @@ export class Hero extends IntelligentForm {
             this.model.translateZ(70);
             if (this.balloonRide) this.balloonRide = false;
             if (this.mountedUpon) this.mountedUpon = null;
+            this.updateAttributes({mountedUpon: null});
             this.mounted = false;
         });
 
@@ -795,10 +796,14 @@ export class Hero extends IntelligentForm {
                     }
                 } else {
                     for (let x = 0; x < item.quantity; x++) {   
-                        /** data: {location ..., itemName..., } */
-                        let dropData = {itemName: item.itemName, position: this.model.position};
-                        if (item.keyCode) dropData.attributes = { keyCode: item.keyCode };
-                        this.sceneController.dropItemToScene(dropData);
+
+                        if (item.itemName != "water") {
+                            /** data: {location ..., itemName..., } */
+                            let dropData = {itemName: item.itemName, position: this.model.position};
+                            if (item.keyCode) dropData.attributes = { keyCode: item.keyCode };
+                            this.sceneController.dropItemToScene(dropData);
+
+                        }
                     }
                 }
             }

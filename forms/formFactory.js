@@ -133,7 +133,7 @@ export class FormFactory {
                 flowY: .1
             };
 
-            var textureLoader = new THREE.TextureLoader();
+            // var textureLoader = new THREE.TextureLoader();
             var waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
             let water = new THREE.Water( waterGeometry, {
                 color: params.color,

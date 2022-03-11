@@ -624,7 +624,8 @@ export class IntelligentForm extends AnimatedForm{
                 if (item.attributes.rotateX) item.model.rotateX(degreesToRadians(item.attributes.rotateX));
                 if (item.attributes.rotateZ) item.model.rotateZ(degreesToRadians(item.attributes.rotateZ));
 
-                if (!this.attributes.flipWeapon) item.model.rotation.y = Math.PI;
+                if (item.model.attributes.rotateY) item.model.rotateY(degreesToRadians(item.model.attributes.rotateY));
+                if (!this.attributes.flipWeapon) item.model.rotateY(Math.PI); // player specific
 
                 let scale = item.attributes.equippedScale? item.attributes.equippedScale: 0.1;
                 if (this.attributes.handScaleFactor) scale *= this.attributes.handScaleFactor;
@@ -676,9 +677,10 @@ export class IntelligentForm extends AnimatedForm{
                             case "balloon":
                                 // special case for remote balloon ?!?
                                 if (this.objectSubtype == "remote") {
+                                    item.model.rotation.y += Math.PI;
                                     scale = scale/10;
                                     item.model.scale.copy(new THREE.Vector3( scale, scale, scale ));
-                                    item.model.position.y = this.attributes.height / 10;
+                                    item.model.position.y += this.attributes.height/10;
                                 } else {
                                     item.model.position.y += this.attributes.height;
                                 }
@@ -686,9 +688,15 @@ export class IntelligentForm extends AnimatedForm{
                             case "horse":
                             case "fireSteed":
                             case "fishingBoat":
-
-                                if (item.model.attributes.rotateY) item.model.rotateY(degreesToRadians(item.model.attributes.rotateY));
-                                item.model.position.y -= item.attributes.height;
+                                
+                                if (this.objectSubtype == "remote") {
+                                    item.model.rotation.y += Math.PI;
+                                    scale = scale/10;
+                                    item.model.scale.copy(new THREE.Vector3( scale, scale, scale ));
+                                    item.model.position.y -= item.attributes.height/10;
+                                } else {
+                                    item.model.position.y -= item.attributes.height;
+                                }
                                 break;
                         }
 
@@ -698,6 +706,8 @@ export class IntelligentForm extends AnimatedForm{
                         if (this.objectSubtype == "local") {
                             this.mounted = true;
                             this.mountedUpon = item;
+                            // updateAttributes for remote animation connection
+                            this.updateAttributes({mountedUpon: itemName});
                             switch (itemName) { 
                                 case "balloon":
                                     this.balloonFloat = true;

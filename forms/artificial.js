@@ -7,6 +7,11 @@ export class ArtificialForm extends IntelligentForm{
         super(template, sceneController);
 
         this.follower = this.template.attributes.follower;
+
+        // proximity to nearest Hero to animate
+        this.proximityToMove = 800;
+        this.proximityToAnimate = this.sceneController.scene.cameraReach;
+        
     }
 
     load(callback) {
@@ -37,16 +42,46 @@ export class ArtificialForm extends IntelligentForm{
 
     move(delta) {
         if (this.alive && !this.controlled) {
-            let closestHeroPosition = this.closestHeroPosition();
 
-            if (!this.attributes.heroNearby && closestHeroPosition && closestHeroPosition.distance < 1000) {
-                this.updateAttributes({heroNearby: true});
-            } else if (this.attributes.heroNearby && (!closestHeroPosition || closestHeroPosition.distance >= 1000)) {
-                // this.fadeToAction('Idle', 0.2); // force Idle animation
-                this.updateAttributes({heroNearby: false}); // stops movement
-            }
+            // What is the current distance to closest Hero?
+            let closestHeroPosition = this.closestHeroPosition();
+            let heroDistance = closestHeroPosition.distance;
             
-            if (this.attributes.heroNearby) {
+            if (!this.attributes.shouldMove) { // as of last cycle, should not move
+                if (heroDistance <= this.proximityToMove) {
+                    // console.log(`${this.objectName}: shouldMove = true`);
+                    this.updateAttributes({shouldMove: true});
+                    
+                }
+            } else { // as of last cycle, should move
+                if (heroDistance > this.proximityToMove) {
+                    // console.log(`${this.objectName}: shouldMove = false`)
+                    this.updateAttributes({shouldMove: false});
+                    // this.velocity.x = 0;
+                    // this.velocity.y = 0;
+                    // this.velocity.z = 0;
+                    
+                }
+            }
+
+            // Perform calculations for animation as well, since local instance has the heroDistance
+            if (!this.attributes.shouldAnimate) { // as of last cycle, should not animate
+                if (heroDistance <= this.proximityToAnimate) {
+                    // console.log(`${this.objectName}: shouldAnimate = true`);
+                    this.updateAttributes({shouldAnimate: true});
+                    // this.updateAttributes({paused: false});
+                    
+                }
+            } else { // as of last cycle, should animate
+                if (heroDistance > this.proximityToAnimate) {
+                    // console.log(`${this.objectName}: shouldAnimate = false`)
+                    this.updateAttributes({shouldAnimate: false});
+                    
+                    // this.updateAttributes({paused: true});
+                }
+            }
+
+            if (this.attributes.shouldMove) {
 
                 // TODO: If the velocity is already close to zero, maintain idle
                 this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
@@ -220,7 +255,7 @@ export class ArtificialForm extends IntelligentForm{
         })
 
         if (distance == Infinity) {
-            return null;
+            return { distance };
         } else {
             return { distance, heroLayoutId, position };
         }

@@ -56,6 +56,7 @@ export const Structures = {
         description: 'Rusty iron grate',
         type: 'structure',
         attributes: {
+            defaultSingleAction: true,
             animates: true,
             key: 'keyToShed',
             scale: 100,
@@ -238,6 +239,7 @@ export const Structures = {
         description: 'Control switch',
         type: 'structure',
         attributes: {
+            defaultSingleAction: true,
             animates: true,
             scale: 100,
             elevation: 0,

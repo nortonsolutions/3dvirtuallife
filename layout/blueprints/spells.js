@@ -151,7 +151,7 @@ export const Spells = {
         attributes: {
             manaCost: 1,
             effect: "fireDamage/3",
-            range: 80,
+            range: 40,
             animates: false,
             scale: .5,
             throwable: true,
