@@ -365,8 +365,12 @@ export class Hero extends IntelligentForm {
             this.sceneController.eventDepot.fire('dropItemToScene', dropData);
             this.model.translateZ(70);
             if (this.balloonRide) this.balloonRide = false;
-            if (this.mountedUpon) this.mountedUpon = null;
-            this.updateAttributes({mountedUpon: null});
+            // if (this.mountedUpon) {
+            //     this.mountedUpon = this.attributes.mountedUpon = null;
+            //     this.cacheHero();
+                
+            //     // this.updateAttributes({mountedUpon: null});
+            // }
             this.mounted = false;
         });
 

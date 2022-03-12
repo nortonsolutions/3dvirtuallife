@@ -166,11 +166,7 @@ database(mongoose, (db) => {
       if (x) x[1] = heroTemplate;
     }
 
-    const updateHeroAttributes = function (room,payload) {
-      let x = app.rooms[socket.nsp.name][room].find(el => el[0] == socket.id);
-      x[1].attributes = {...x[1].attributes, ...payload};
-      notifyRoomMembers(room, "updateHeroTemplate", x[1]);
-    }
+
 
     // Default namespace = "/" (equivalent to io.sockets)
     // if (!app.games[socket.nsp.name]) app.games[socket.nsp.name] = {};
@@ -320,6 +316,16 @@ database(mongoose, (db) => {
       //   removeFromRooms();
       // }
     });
+
+    const updateHeroAttributes = function (room,payload) {
+      let x = app.rooms[socket.nsp.name][room].find(el => el[0] == socket.id);
+      if (x) x[1].attributes = {...x[1].attributes, ...payload};
+      // notifyRoomMembers(room, "updateHeroAttributes", x[1]);
+    }
+
+    socket.on('cleanupForms', room => {
+      notifyRoomMembers(room, 'cleanupForms', {});
+    })
 
     socket.on('updateAttributes', data => { // include type 
       var index;

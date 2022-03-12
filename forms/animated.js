@@ -144,7 +144,7 @@ export class AnimatedForm extends StandardForm{
                     this.fadeToAction( 'Idle', 0.2);
                 }
 
-                if (controlled.attributes.animates) {
+                if (controlled && controlled.attributes.animates) {
                     this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
                     if (this.absVelocity < .1 && controlled.activeActionName != 'Idle' && controlled.activeActionName != 'Flopping') { // ((controlled.activeActionName == 'Walking' || controlled.activeActionName == 'Running' || controlled.activeActionName == 'Swimming' || controlled.activeActionName == 'horse_A_') || this.paused)) {
@@ -154,13 +154,10 @@ export class AnimatedForm extends StandardForm{
                         switch (controlled.objectName) {
                             
                             case "horse":
-                                // controlled.fadeToAction( 'horse_A_', 0.2);
-                                // break;
-
                             case "fishingBoat":
                                 controlled.attributes.movingAnimations.split('+').forEach(animation => {
-                                    let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent] = animation.split('/');
-                                    controlled.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore=="autorestore"), Boolean(concurrent=="concurrent"));
+                                    let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent,looprepeat] = animation.split('/');
+                                    controlled.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore=="autorestore"), Boolean(concurrent=="concurrent"), Boolean(looprepeat=="looprepeat"));
                                 })
                                 break;
                             default:
@@ -173,13 +170,19 @@ export class AnimatedForm extends StandardForm{
                         }
 
                     } else if (this.absVelocity >= 250 && controlled.activeActionName == 'Walking') {
-                        // console.log(`${controlled.objectName} running`)
-                        if (this.swimming) {
-                            controlled.fadeToAction( 'Swimming', 0.2);
-                        } else if (controlled.objectName == 'fireSteed') { // one-off
-                            controlled.fadeToAction( 'Walking', 0.2);
+
+                        if (controlled.objectName == 'horse'){
+                            controlled.attributes.runningAnimations.split('+').forEach(animation => {
+                                let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent,looprepeat] = animation.split('/');
+                                controlled.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore=="autorestore"), Boolean(concurrent=="concurrent"), Boolean(looprepeat=="looprepeat"));
+                            })
                         } else {
-                            controlled.fadeToAction( 'Running', 0.2);
+                            // console.log(`${controlled.objectName} running`)
+                            if (this.swimming) {
+                                controlled.fadeToAction( 'Swimming', 0.2);
+                            } else {
+                                controlled.fadeToAction( 'Running', 0.2);
+                            }
                         }
                     }
                     if (controlled.mixer) controlled.mixer.update( delta );
@@ -283,14 +286,14 @@ export class AnimatedForm extends StandardForm{
         }
     }
 
-    runAction(actionName, duration, fadeOutDuration = 0.2, fadeOutDelay = 0, autorestore = false, concurrent = false) {
+    runAction(actionName, duration, fadeOutDuration = 0.2, fadeOutDelay = 0, autorestore = false, concurrent = false, looprepeat = false) {
 
         if (concurrent || !this.currentlyRunningAction) {
             this.currentlyRunningAction = true;
 
             let action = this.actions[actionName];
-            action.loop = THREE.LoopOnce;
-            action.repetitions = 1;
+            action.loop = looprepeat? THREE.LoopRepeat : THREE.LoopOnce;
+            action.repetitions = looprepeat? Infinity : 1;
             action.setEffectiveTimeScale( 1 );
                 
             if (this.attributes.position == "down") {

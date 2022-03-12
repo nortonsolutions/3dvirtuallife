@@ -824,7 +824,7 @@ export const Entities = {
             width: 20,
             elevation: 0,
             equippedScale: .35,
-            scale: 100,
+            scale: 20,
             stats: {
                 health: "4/4/0",
                 mana: "0/0/0",
@@ -847,8 +847,8 @@ export const Entities = {
         description: 'Strong horse',
         type: 'friendly',
         attributes: {
-            movingAnimations: "horse_A_/2/1/1/false/false",
-            runningAnimations: "horse_A_/2/1/1/false/false",
+            movingAnimations: "horse_A_/2/1/1/false/false/looprepeat",
+            runningAnimations: "horse_A_/2/1/1/false/false/looprepeat",
             mountable: true,
             moves: true,
             animates: true,
@@ -880,6 +880,7 @@ export const Entities = {
         description: 'Mystical fire steed',
         type: 'friendly',
         attributes: {
+            shouldAnimate: true,
             emissiveIntensity: 3,
             mountable: true,
             moves: true,

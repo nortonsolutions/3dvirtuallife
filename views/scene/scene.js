@@ -114,8 +114,19 @@ class Scene {
             return el.attributes? el.attributes.layoutId == layoutId : false;
         })
         this.scene.remove(formToRemove);
+        //cleanup?
     }
-    
+
+    removeFromScenebyModel(model) {
+        let formToRemove = this.scene.children.find(el => {
+            return el == model;
+        })
+
+        if (formToRemove) formToRemove.parent.remove(formToRemove);
+        //cleanup?
+    }
+
+
     addBackground() {
 
         
@@ -355,7 +366,7 @@ class Scene {
             // Uncommented for lightning:
             if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
             this.controller.forms = this.controller.forms.filter(el => el != projectile.item);
-            this.removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
+            this.removeFromScenebyModel(projectile.item.model);  //removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
         }
         
         // filter out of projectiles
@@ -384,7 +395,7 @@ class Scene {
                 child.position.copy(projectile.item.model.position);
                 child.scale.set(5,5,5);
                 this.add(child);
-                let caught = this.controller.getFormByLayoutId(child.attributes.layoutId);
+                let caught = this.controller.getFormByModel(child); // getFormByLayoutId(child.attributes.layoutId);
                 caught.model.position.y = caught.determineElevationFromBase() + caught.attributes.elevation;
                 caught.attributes.stats.agility = "0/0/0";
                 caught.fadeToAction('Flopping', 0.2);
@@ -395,7 +406,7 @@ class Scene {
 
         if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
         this.controller.forms = this.controller.forms.filter(el => el != projectile.item);
-        this.removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
+        this.removeFromScenebyModel(projectile.item.model);  // removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
         this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
     }
 

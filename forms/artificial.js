@@ -314,7 +314,7 @@ export class ArtificialForm extends IntelligentForm{
 
     getCurrentConversation() {
 
-        let challenge = this.attributes.conversation.challenge;
+        let challenge = this.attributes.conversation? (this.attributes.conversation.challenge? this.attributes.conversation.challenge : null) : null;
         let special = this.attributes.conversation.conversationState != "complete" && this.attributes.conversation.special;
 
         // If special condition is already met and jumpToState is set, set to complete

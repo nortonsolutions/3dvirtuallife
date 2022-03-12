@@ -177,7 +177,7 @@ export class SceneController {
     
                 if (local) {
                     this.socket.emit('nextLayoutId', this.level, layoutId => {
-                        data.layoutId = form.model.attributes.layoutId = layoutId;
+                        data.layoutId = form.attributes.layoutId = form.model.attributes.layoutId = layoutId;
                         data.location = this.getLocationFromPosition(data.position);
                         if (typeof form.model.attributes.stage == "number") data.stage = form.model.attributes.stage;
                         this.eventDepot.fire('addItemToLayout', data);
@@ -198,6 +198,10 @@ export class SceneController {
     
     addEventListeners() {
         
+        this.socket.on('cleanupForms', data => {
+            this.cleanupForms(false);
+        })
+        
         // data { level, stat, layoutId, hitPointReduction });
         this.socket.on('changeStat', data => {
             this.hero.changeStat(data.stat, data.hitPointReduction, false);
@@ -215,29 +219,24 @@ export class SceneController {
             this.seedForm(heroTemplate, true, true); // no need to re-add to forms?
         });
 
+
+        // data: { level, layoutId, attributes }
+        this.socket.on('updateHeroAttributes', data => {
+            this.scene.removeFromScenebyLayoutId(heroTemplate.attributes.layoutId);
+            heroTemplate.subtype = "remote";
+            this.seedForm(heroTemplate, true, true); // no need to re-add to forms?
+        });
+
         // data: { itemName, position: item.model.position, rotation: item.model.rotation, hostile })
         this.socket.on('launch', data => {
             this.hero.launch(data.itemName, null, [], false, data, data.hostile);
         });
 
         this.socket.on('updateAttributes', (data) => {
-            switch (data.type) {
-                case 'structure':
-                    let structure = this.forms.find(el => el.attributes.layoutId == data.layoutId);
-                    if (structure) structure.updateAttributes(data.payload, false);
-                    break;
-                case 'item':
-                    let item = this.forms.find(el => el.attributes.layoutId == data.layoutId);
-                    if (item) item.updateAttributes(data.payload, false);
-                    break;
-                case 'entity':
-                case 'friendly':
-                case 'beast':
-                    let entity = this.forms.find(el => el.attributes.layoutId == data.layoutId);
-                    if (entity) entity.updateAttributes(data.payload, false);
-                    break;
-            }
-            
+
+            let entity = this.forms.find(el => el.attributes.layoutId == data.layoutId);
+            if (entity) entity.updateAttributes(data.payload, false);
+
         });
 
         // data: {layoutId: this.attributes.layoutId, hero: this.objectType=="hero"};
@@ -352,6 +351,12 @@ export class SceneController {
         } else {
             callback();
         }
+    }
+
+    cleanupForms(local = true) {
+        this.forms = this.forms.filter(el => el.attributes.layoutId);
+
+        if (local) this.socket.emit('cleanupForms', this.level);
     }
 
     addToScene(form, addToForms = true, addToScene = true, reseed = false, trackEntity = true) {
@@ -728,19 +733,19 @@ export class SceneController {
     /** 
      * loadFormByName is useful for loading objects in the local VM,
      * as with launching or equipping.  Use dropItemToScene to broadcast
-     * with a shared layoutId.
+     * with a shared layoutId.  No layoutId!!!
      */
     loadFormByName(formName, callback, addToForms, reseed = false, trackEntity = true) {
 
         let formTemplate = this.getTemplateByName(formName);
-        this.socket.emit('nextLayoutId', this.level, layoutId => {
-            formTemplate.attributes.layoutId = layoutId;
+        // this.socket.emit('nextLayoutId', this.level, layoutId => {
+        //     formTemplate.attributes.layoutId = layoutId;
 
             // if (formTemplate.type == "spell") addToForms = false;
             this.seedForm(formTemplate, reseed, addToForms, trackEntity).then(form => {
                callback(form);
             });
-        })
+        // })
     }
 
     positionOfClosestStructure(position) {
@@ -848,6 +853,10 @@ export class SceneController {
 
     getFormByLayoutId(layoutId) {
         return this.forms.find(el => el.attributes.layoutId == layoutId);
+    }
+
+    getFormByModel(model) {
+        return this.forms.find(el => el.model == model)
     }
 
     // getObjectNameByLayoutId(layoutId) {

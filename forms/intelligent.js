@@ -327,6 +327,7 @@ export class IntelligentForm extends AnimatedForm{
 
             diff.subVectors(this.positionWeapon, entity.model.position);
 
+            console.log(`Diff between weaponPos and entity model pos: ${diff.length()}; radius ${entity.radius}`);
             if ( diff.length() < entity.radius ) {
                 let hitPointReduction = (getRandomArbitrary(0,this.getEffectiveStat('strength'))/10);
                 this.inflictDamage(entity, hitPointReduction, "generalDamage");
@@ -616,7 +617,7 @@ export class IntelligentForm extends AnimatedForm{
         if (area.match('key')) {
             this.sceneController.eventDepot.fire('refreshSidebar', { equipped: this.equipped });
         } else {
-            this.sceneController.loadFormByName(itemName, (item) => {
+            this.sceneController.loadFormByName(itemName, (item) => { // no layoutId
 
                 item.model.position.set(0,0,0);
 
@@ -754,8 +755,19 @@ export class IntelligentForm extends AnimatedForm{
             let itemName = this.equipped[area][0];
 
             delete this.equipped[area];
+
+
             
             if (this.objectType == "hero" && this.objectSubtype == "local") {
+
+                if (area == 'mount' && this.mountedUpon) {
+                    this.mountedUpon = this.attributes.mountedUpon = null;
+                    // this.updateAttributes({mountedUpon: null});  // is this redundant?
+
+                    // clean up the forms for the item without layoutId
+                    this.sceneController.cleanupForms();
+                }
+                
                 this.cacheHero();
                 if (!death) this.sceneController.socket.emit('updateHeroTemplate', { level: this.sceneController.level, heroTemplate: this.returnTemplate() });
             }
@@ -768,8 +780,21 @@ export class IntelligentForm extends AnimatedForm{
     
                 if (area != "special") { // special = no model to remove
                     let thisItem = this.model.getObjectByProperty("objectName", itemName);
+                    // let layoutId = thisItem.attributes.layoutId;
+
+                    // let data = {
+                    //     layoutId,
+                    //     type: thisItem.objectType,
+                    //     level: this.sceneController.level
+                    // }
+                    // this.sceneController.takeItemFromScene(data);
+
+
+
+                    this.sceneController.forms = this.sceneController.forms.filter(el => el.model != thisItem);
                     thisItem.parent.remove(thisItem);
                     this.sceneController.scene.scene.remove(thisItem);
+                    
                 }
     
                 if (item.attributes.effect) {

@@ -227,7 +227,7 @@ export const levels = [
 
             // { name: "blacksmith" },
             // { name: "elfgirl" },
-            // { name: "pug", location: { x: 1, y: 0, z: 1} },
+            { name: "pug", location: { x: 1, y: 0, z: 1} },
             { name: "catFish", location: { x: -9, y: 0, z: 56}},
             { name: "catFish", location: { x: -8, y: 0, z: 56}},
             { name: "catFish", location: { x: -8.5, y: 0, z: 55}},
