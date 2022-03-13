@@ -686,7 +686,7 @@ export class SceneController {
 
             this.forms.forEach(form => {
                 
-                if (form.attributes.animates) {
+                if (form.attributes.animates && !form.attributes.controlled) {
                     form.animate(delta);
                 }
             });

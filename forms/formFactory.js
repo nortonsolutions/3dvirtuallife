@@ -263,7 +263,7 @@ export class FormFactory {
             } else {
                 if (model.children) {
                     model.children.forEach(m => {
-                        this.addSprites(m, spriteConfig, scene, position, broadcast);
+                        this.addSprites(m, spriteConfig, scene, broadcast, position);
                     })
                 }
             }

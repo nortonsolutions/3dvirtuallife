@@ -897,12 +897,22 @@ export const Entities = {
                 strength: "0/0/0",
                 agility: "1/1/0",
                 defense: "5/5/0", // rock, weapon, arrow damage defense
-                fire: "0/0/0",
+                fire: "10/10/0",
                 ice: "0/0/0",
                 poison: "0/0/0",
                 thunder: "0/0/0"
             },
-            grants: ["gold10"]
+            grants: ["gold10"],
+            sprites: [{ 
+                name: 'flame',
+                regex: "sconce",
+                frames: 40,
+                scale: 5,
+                elevation: 1,
+                flip: true,
+                animates: true,
+                showOnSeed: true
+            }]
         }
     },
 

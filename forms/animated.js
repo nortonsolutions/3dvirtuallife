@@ -145,8 +145,8 @@ export class AnimatedForm extends StandardForm{
                 }
 
                 if (controlled && controlled.attributes.animates) {
-                    this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
+                    this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
                     if (this.absVelocity < .1 && controlled.activeActionName != 'Idle' && controlled.activeActionName != 'Flopping') { // ((controlled.activeActionName == 'Walking' || controlled.activeActionName == 'Running' || controlled.activeActionName == 'Swimming' || controlled.activeActionName == 'horse_A_') || this.paused)) {
                         controlled.fadeToAction( 'Idle', 0.2);
                     } else if (this.absVelocity >= .1 && this.absVelocity < 250 && (controlled.activeActionName == 'Idle' || controlled.activeActionName == 'Running')) {// || controlled.objectName == 'horse' || controlled.objectName == 'fireSteed' )) {
@@ -169,7 +169,7 @@ export class AnimatedForm extends StandardForm{
                                 break;
                         }
 
-                    } else if (this.absVelocity >= 250 && controlled.activeActionName == 'Walking') {
+                    } else if (this.absVelocity >= 250 && (controlled.activeActionName == 'Walking' || controlled.activeActionName == 'Idle')) {
 
                         if (controlled.objectName == 'horse'){
                             controlled.attributes.runningAnimations.split('+').forEach(animation => {
@@ -199,9 +199,6 @@ export class AnimatedForm extends StandardForm{
 
     fadeToAction( actionName, duration ) {
 
-        if (this.objectName == "horse" || this.objectName == "fireSteed") {
-            console.log(`${this.objectName} fading to ${actionName}; currentAction is ${this.activeActionName}`);
-        }
         if (!this.actions[actionName]) { // if animation doesn't exist, fadeOut and set activeActionName
             this.previousActionName = this.activeActionName;
             this.previousAction = this.activeAction;

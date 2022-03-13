@@ -737,21 +737,30 @@ export class Hero extends IntelligentForm {
                 } else {
                     controlled.updateAttributes({animations});
                 }
-            } else if (this.standingUponImmediate) { // for entryMat and exitMat
+            } else if (this.standingUponImmediate) { // for entryMat and exitMat, and firesteedAltar
                 // this.standingUponImmediate = {
                 //     objectName: standingUponImmediate.name;
                 //     controls: standingUponImmediate.parent.attributes.layoutId;
                 //     keyCode: standingUponImmediate.parent.attributes.keyCode;
                 // }
                 let index = this.inventory.findIndex(el => {
-                    return el != undefined && el.itemName == "keyToHouse" && el.keyCode == this.standingUponImmediate.keyCode;
+                    return el != undefined && el.keyCode && el.keyCode == this.standingUponImmediate.keyCode;
                 });
 
                 if (index != -1) {
                     let controlled = this.sceneController.getFormByLayoutId(this.standingUponImmediate.controls);
-                    controlled.updateAttributes({animations: ['DoorAction/2/2/1/autorestore/false']});
-                    // controlled.runAction();
+                    
+                    let locked = controlled.attributes.locked;
+                    if (controlled.attributes.animations) controlled.updateAttributes({animations: [controlled.attributes.animations]});
+                    controlled.updateAttributes({locked: !locked});
+
+                    controlled.attributes.sprites.forEach(spriteConfig => {
+                        this.sceneController.formFactory.addSprites(controlled.model, spriteConfig, null, true);
+                    })
                 }
+
+                    // controlled.runAction();
+
             }
 
             this.identifySelectedForm();

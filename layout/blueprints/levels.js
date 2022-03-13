@@ -74,7 +74,7 @@ export const levels = [
             },
             { 
                 name: "portalStone", location: { x: 2.7, y: 0, z: 10.1 },
-                attributes: { routeTo: { level: 10, location: { x: 2, y: 0, z: 2} } } 
+                attributes: { routeTo: { level: 10, location: { x: -31, y: 0, z: 60 } } } 
             },
             { 
                 name: "portalStone", location: { x: -.02, y: 0, z: 10.3 },
@@ -138,10 +138,10 @@ export const levels = [
             { name: "watercan", location: { x: 1.1, y: 0.3, z: 4.4}, attributes: { staticStartingElevation: true }},
             { name: "miningHammer", location: { x: -3, y: 0, z: 0}},
             { name: "pickAxe", location: { x: -2, y: 0, z: 0}},
-            { 
-                name: "balloon", location: { x: -3, y: 0, z: -1},
-                attributes: { staticStartingElevation: false }
-            },
+            // { 
+            //     name: "balloon", location: { x: -3, y: 0, z: -1},
+            //     attributes: { staticStartingElevation: false }
+            // },
             { 
                 name: "fishingBoat", location: { x: -8, y: 0, z: 52},
                 attributes: { staticStartingElevation: false }
@@ -214,7 +214,7 @@ export const levels = [
             // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
             // { name: "rockyMan", type: "beast" },
             // { name: "demonLord", type: "beast" },
-            { name: "horse", location: { x: -2, y: 0, z: 2} },
+            { name: "horse" },
             // { name: "murderBear", type: "beast"  },
             // { name: "rosen", type: "beast"  },
             // { name: "iceGhoul", type: "beast"  },
@@ -227,7 +227,6 @@ export const levels = [
 
             // { name: "blacksmith" },
             // { name: "elfgirl" },
-            { name: "pug", location: { x: 1, y: 0, z: 1} },
             { name: "catFish", location: { x: -9, y: 0, z: 56}},
             { name: "catFish", location: { x: -8, y: 0, z: 56}},
             { name: "catFish", location: { x: -8.5, y: 0, z: 55}},
@@ -504,7 +503,8 @@ export const levels = [
             { name: "helmet" },
             { name: "copper" },
             { name: "iron" },
-            { name: "silver" }
+            { name: "silver" },
+            { name: "firesteedIncense", location: { x: -12.4, y: 0, z: -22.7 } }
         ],
         structures: [
             { 
@@ -520,7 +520,7 @@ export const levels = [
                 attributes: { routeTo: { level: 9, location: { x: 2, y: 0, z: 2} } } //volcano
             },
             { // fireSteedAltar
-                name: "platformBlock", location: { x: -17.5, y: 0, z: -12.4 }
+                name: "firesteedAltar", location: { x: -13.4, y: 0, z: -22.7 },
             }
         ],
         entities: [
@@ -532,7 +532,8 @@ export const levels = [
             { name: "ghoul", type: "beast" },
             { name: "ghoul", type: "beast" },
             { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"},
-            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"}
+            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"},
+            { name: "fireSteed", location: { x: -1, y: 0, z: 1}}
             
         ]
     },
@@ -598,6 +599,10 @@ export const levels = [
             { 
                 name: "platformBlock", location: { x: -92.4, y: 0, z: 100.8 },
                 attributes: { locked: false, elevation: 5, routeTo: { level: 7, location: { x: 6.4, y: 0, z: 21.1} } } //snowyLand
+            },
+            { 
+                name: "portalStone", location: { x: -3.3, y: 0, z: -67.5 },
+                attributes: { routeTo: { level: 10, location: { x: -29, y: 0, z: 60 }  } } // elvandor
             },
             { 
                 name: "tavernShop", location: { x: 1.1, y: 0, z: -34.5 },
@@ -673,6 +678,8 @@ export const levels = [
             { name: "centurion", location: { x: -10.8, y: 0, z: 28.4 } },
             { name: "viking", location: { x: -8.8, y: 0, z: 11.15 } },
             { name: "elfgirl", location: { x: -62.4, y: 0, z: 59.1} },
+            { name: "pug", location: { x: 1, y: 0, z: 1} },
+
         ]
     },
     {
@@ -861,7 +868,7 @@ export const levels = [
         structures: [
             { name: "ricketyPlatform", location: { x: -7.2, y: 0, z: 40 }  },
             { 
-                name: "platformBlock", location: { x: -2.5, y: 0, z: 38.4 }, 
+                name: "platformBlock", location: { x: -4, y: 0, z: 39.4 }, 
                 attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } }} //kingdom
             },
             { 
@@ -950,7 +957,7 @@ export const levels = [
                     intro: "volcanoIntro.mkv"    
                 },
                 emissiveIntensity: 10,
-                scale: 100,
+                scale: 40,
                 borderTrees: false,
                 light: {
                     sunLight: true,
@@ -968,14 +975,18 @@ export const levels = [
             
         ],
         structures: [
-            { 
-                name: "platformBlock", location: { x: -8.8, y: 0, z: 38.4 }, 
-                attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } }} //kingdom
-            },
+            // { 
+            //     name: "platformBlock", location: { x: -8.8, y: 0, z: 38.4 }, 
+            //     attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } }} //kingdom
+            // },
             { 
                 name: "platformBlock", location: { x: -19.5, y: 0, z: -6.5}, 
                 attributes: { routeTo: { level: 4, location: { x: -18.0, y: 0, z: -6.5 } } } //lavaField
-            }
+            },
+            { 
+                name: "portalStone", location: { x: -29, y: 0, z: 60 },
+                attributes: { routeTo: { level: 5, location: { x: -3.3, y: 0, z: -67.5 } } } // kingdom
+            },
         ],
         entities: [
             // { name: "lavaGhoul", type: "beast" },

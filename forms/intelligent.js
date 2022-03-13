@@ -718,6 +718,7 @@ export class IntelligentForm extends AnimatedForm{
                                 case "fireSteed":
                                 case "fishingBoat":
                                     this.mountedUpon.controlled = true;
+                                    this.mountedUpon.updateAttributes({controlled: true});
                                     break;
                             }
                         }

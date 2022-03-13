@@ -105,6 +105,29 @@ export const Structures = {
         }
     },
 
+    firesteedAltar: {
+        name: 'firesteedAltar',
+        gltf: 'firesteedAltar.glb',
+        description: 'Strange altar in the lava field',
+        type: 'structure',
+        attributes: {
+            scale: 100,
+            elevation: 0,
+            sprites: [{ 
+                name: 'flame',  
+                regex: "sconce",
+                frames: 40,
+                scale: 2.5,
+                elevation: -.5,
+                flip: true,
+                animates: true,
+                showOnSeed: false
+            }],
+            keyCode: 'firesteedAltar',
+            locked: true
+        }
+    },
+
     elevatorL_1m: {
         name: 'elevatorL_1m',
         gltf: 'elevatorL_1m.glb',
@@ -372,7 +395,9 @@ export const Structures = {
                 flip: false,
                 animates: true,
                 showOnSeed: true
-            }] 
+            }],
+            animations: 'DoorAction/2/2/1/autorestore/false',
+            locked: true
         }
     
     },
@@ -397,7 +422,9 @@ export const Structures = {
                 flip: false,
                 animates: true,
                 showOnSeed: true
-            }] 
+            }],
+            animations: 'DoorAction/2/2/1/autorestore/false',
+            locked: true
         }
     
     },
@@ -422,7 +449,9 @@ export const Structures = {
                 flip: false,
                 animates: true,
                 showOnSeed: true
-            }] 
+            }],
+            animations: 'DoorAction/2/2/1/autorestore/false',
+            locked: true
         }
     
     }

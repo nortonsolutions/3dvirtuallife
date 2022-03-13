@@ -88,6 +88,19 @@ export const Items = {
             elevation: 20
         }
     },
+    firesteedIncense: {
+        name: 'firesteedIncense',
+        gltf: 'key.gltf',
+        image: 'keyCopper.png',
+        description: 'Peculiar incense',
+        type: 'item',
+        attributes: {
+            animates: false,
+            scale: 30,
+            elevation: 20,
+            keyCode: 'firesteedAltar'
+        }
+    },
     keyToHouse: {
         name: 'keyToHouse',
         gltf: 'key.gltf',
