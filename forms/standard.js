@@ -316,7 +316,8 @@ export class StandardForm {
         this.sceneController.eventDepot.fire('updateAttributes', {layoutId: this.model.attributes.layoutId, attributes: payload, type: this.objectType});
 
         if (payload.animations && this.activeAction) {
-            payload.animations.forEach(animation => {
+            let animations = payload.animations.split('+');
+            animations.forEach(animation => {
                 let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent] = animation.split('/');
                 this.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore=="autorestore"), Boolean(concurrent=="concurrent"));
             })

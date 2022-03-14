@@ -904,12 +904,12 @@ export const Entities = {
             },
             grants: ["gold10"],
             sprites: [{ 
-                name: 'flame',
+                name: 'firesteed',
                 regex: "sconce",
-                frames: 40,
+                frames: 16,
                 scale: 5,
                 elevation: 1,
-                flip: true,
+                flip: false,
                 animates: true,
                 showOnSeed: true
             }]

@@ -205,9 +205,13 @@ export class IntelligentForm extends AnimatedForm{
             
             if (typeof this.sceneController.waterElevation == "number") {
                 
-                if (this.model.position.y < this.sceneController.waterElevation) {
-                    
-                    if (this.attributes.swims) {
+                if (this.model.position.y <= this.sceneController.waterElevation) {
+                    console.log(`this.model.position.y = ${this.model.position.y}`);
+                    if (this.mounted && this.mountedUpon.objectName == 'fireSteed') {
+                        console.log(`this.mounted = true`);
+                        this.velocity.y = 0;
+                        this.model.position.y = this.sceneController.waterElevation;
+                    } else if (this.attributes.swims) {
                         this.swimming = true;
                     } else {
                         let distanceBelowWater = Math.abs(this.sceneController.waterElevation - this.model.position.y);
@@ -408,7 +412,7 @@ export class IntelligentForm extends AnimatedForm{
                         attributes: standingUpon.attributes
                     }
 
-                    if (standingUponImmediate && standingUponImmediate.parent && standingUponImmediate.parent.attributes && standingUponImmediate.parent.attributes.keyCode) {
+                    if (standingUponImmediate && (standingUponImmediate.name == "entryMat" || standingUponImmediate.name == "exitMat" || standingUponImmediate.name == "Base")) {// standingUponImmediate.parent && standingUponImmediate.parent.attributes && standingUponImmediate.parent.attributes.keyCode) {
                         this.standingUponImmediate = {
                             objectName: standingUponImmediate.name,
                             controls: standingUponImmediate.parent.attributes.layoutId,

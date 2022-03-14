@@ -105,28 +105,6 @@ export const Structures = {
         }
     },
 
-    firesteedAltar: {
-        name: 'firesteedAltar',
-        gltf: 'firesteedAltar.glb',
-        description: 'Strange altar in the lava field',
-        type: 'structure',
-        attributes: {
-            scale: 100,
-            elevation: 0,
-            sprites: [{ 
-                name: 'flame',  
-                regex: "sconce",
-                frames: 40,
-                scale: 2.5,
-                elevation: -.5,
-                flip: true,
-                animates: true,
-                showOnSeed: false
-            }],
-            keyCode: 'firesteedAltar',
-            locked: true
-        }
-    },
 
     elevatorL_1m: {
         name: 'elevatorL_1m',
@@ -397,7 +375,6 @@ export const Structures = {
                 showOnSeed: true
             }],
             animations: 'DoorAction/2/2/1/autorestore/false',
-            locked: true
         }
     
     },
@@ -423,8 +400,7 @@ export const Structures = {
                 animates: true,
                 showOnSeed: true
             }],
-            animations: 'DoorAction/2/2/1/autorestore/false',
-            locked: true
+            animations: 'DoorAction/2/2/1/autorestore/false'
         }
     
     },
@@ -450,10 +426,34 @@ export const Structures = {
                 animates: true,
                 showOnSeed: true
             }],
-            animations: 'DoorAction/2/2/1/autorestore/false',
-            locked: true
+            animations: 'DoorAction/2/2/1/autorestore/false'
         }
     
-    }
+    },
+
+    firesteedAltar: {
+        name: 'firesteedAltar',
+        gltf: 'firesteedAltar.glb',
+        description: 'Strange altar in the lava field',
+        type: 'structure',
+        attributes: {
+            scale: 100,
+            elevation: 0,
+            sprites: [{ 
+                name: 'flame2',  
+                regex: "sconce",
+                frames: 16,
+                scale: 2.5,
+                elevation: -.5,
+                flip: false,
+                animates: true,
+                showOnSeed: false
+            }],
+            keyCode: 'firesteedAltar',
+            sealed: true,
+            releases: 'fireSteed'
+        }
+    },
+
 }
 

@@ -750,11 +750,43 @@ export class Hero extends IntelligentForm {
                 if (index != -1) {
                     let controlled = this.sceneController.getFormByLayoutId(this.standingUponImmediate.controls);
                     
-                    let locked = controlled.attributes.locked;
-                    if (controlled.attributes.animations) controlled.updateAttributes({animations: [controlled.attributes.animations]});
-                    controlled.updateAttributes({locked: !locked});
+                    if (typeof controlled.attributes.sealed == "boolean" && controlled.attributes.sealed) { // can things be unsealed?  how?
 
-                    controlled.attributes.sprites.forEach(spriteConfig => {
+                        // maybe put all this in an 'unseal' method for special structures
+                        // like the firesteedAltar
+                        let sprites = [{ 
+                            name: 'flame2',  
+                            regex: "sconce",
+                            frames: 16,
+                            scale: 2.5,
+                            elevation: -.5,
+                            flip: false,
+                            animates: true,
+                            showOnSeed: true // set to showOnSeed from this point forward
+                        }];
+
+                        controlled.updateAttributes({sealed: false, sprites });
+                        if (controlled.attributes.animations) {
+                            controlled.updateAttributes({animations: controlled.attributes.animations});
+                        }
+
+                        // drop the firesteed to the ground:
+                        let dropData = {
+                            itemName: controlled.attributes.releases,
+                            position: controlled.model.position,
+                            location: this.sceneController.getLocationFromPosition(controlled.model.position),
+                            source: "",
+                            type: "entity",
+                            // attributes: {stage: entity.attributes.stage }
+                        };
+
+                        this.sceneController.eventDepot.fire('dropItemToScene', dropData);
+
+                    } else {
+                        if (controlled.attributes.animations) controlled.updateAttributes({animations: controlled.attributes.animations});
+                    }
+                    
+                    if (controlled.attributes.sprites) controlled.attributes.sprites.forEach(spriteConfig => {
                         this.sceneController.formFactory.addSprites(controlled.model, spriteConfig, null, true);
                     })
                 }

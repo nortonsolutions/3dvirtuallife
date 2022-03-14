@@ -314,19 +314,19 @@ export const Items = {
             elevation: 20,
             effect: "strength/1",
             effect: "light/15",
-            sprites: [
-                { 
-                    name: "flame",
-                    frames: 40,
-                    scale: .05,
-                    scaleY: 1.5,
-                    translateZ: -.10,
-                    flip: true,
-                    showOnSeed: false,
-                    showOnEquip: true,
-                    elevation: 0
-                }
-            ],
+            // sprites: [
+            //     { 
+            //         name: "flame2",
+            //         frames: 40,
+            //         scale: .05,
+            //         scaleY: 1.5,
+            //         translateZ: -.10,
+            //         flip: true,
+            //         showOnSeed: false,
+            //         showOnEquip: true,
+            //         elevation: 0
+            //     }
+            // ],
         } 
     },
     lightSaber: {
@@ -791,12 +791,12 @@ export const Items = {
             elevation: 5,
             effect: "light/15",
             sprites: [{ 
-                name: "flame",
-                frames: 40,
+                name: "flame2",
+                frames: 16,
                 scale: .05,
                 scaleY: 1.5,
                 translateZ: -.30,
-                flip: true,
+                flip: false,
                 showOnSeed: false,
                 showOnEquip: true,
                 elevation: 0
