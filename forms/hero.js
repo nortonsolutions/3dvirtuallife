@@ -960,7 +960,13 @@ export class Hero extends IntelligentForm {
                     this.sceneController.eventDepot.fire('dismount', data);
                 } 
             } else {
-                baseline = this.determineElevationFromBase() + this.mountedUpon.attributes.height;
+
+                if (this.mountedUpon.objectName == 'fireSteed' && typeof this.sceneController.waterElevation == "number") {
+                    baseline = Math.max(this.sceneController.waterElevation + this.mountedUpon.attributes.height, this.determineElevationFromBase() + this.mountedUpon.attributes.height);
+                } else {
+                    baseline = this.determineElevationFromBase() + this.mountedUpon.attributes.height;
+                }
+                
             }
             
             if (Math.abs(this.velocity.z) > 0.01) {

@@ -469,6 +469,7 @@ export const levels = [
             description: 'lavafield',
             gltf: 'lavafield.glb',
             attributes: {
+                useTHREE: false,
                 cutScenes: {
                     intro: "volcanoIntro.mkv"    
                 },
@@ -479,15 +480,15 @@ export const levels = [
                     overheadPointLight: false,
                 },
                 fog: {
-                    color: 'whites',
+                    color: 'white',
                     density: 1.2
                 },
                 water: {
 
                     attributes: {
                         elevation: 0,
-                        color: "green",
-                        scale: 500,
+                        color: "red",
+                        scale: 100,
                         lava: true
                     },
                     gltf: 'lava.glb'
@@ -500,7 +501,7 @@ export const levels = [
             { name: "gold25", location: { x: 10, y: 0, z: -1 }},
             { name: "redpotion" },
             { name: "greenpotion" },
-            { name: "helmet" },
+            // { name: "helmet" },
             { name: "copper" },
             { name: "iron" },
             { name: "silver" },
@@ -524,16 +525,15 @@ export const levels = [
             }
         ],
         entities: [
-            { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5}, type: "beast" },
-            { name: "lavaMan", location: { x: -21.5, y: 0, z: -6.5}, type: "beast" },
+            { name: "lavaMan", type: "beast" },
+            { name: "lavaMan", type: "beast" },
             { name: "lavaMan", type: "beast" },
             { name: "lavaMan", type: "beast" },
             { name: "ghoul", type: "beast" },
             { name: "ghoul", type: "beast" },
             { name: "ghoul", type: "beast" },
-            { name: "dragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"},
-            { name: "daveDragon", location: { x: -21.5, y: 0, z: -6.5}, type: "beast"},
-            { name: "fireSteed", location: { x: -1, y: 0, z: 1}}
+            { name: "dragon", type: "beast"},
+            { name: "daveDragon", type: "beast"},
             
         ]
     },

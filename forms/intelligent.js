@@ -206,12 +206,7 @@ export class IntelligentForm extends AnimatedForm{
             if (typeof this.sceneController.waterElevation == "number") {
                 
                 if (this.model.position.y <= this.sceneController.waterElevation) {
-                    console.log(`this.model.position.y = ${this.model.position.y}`);
-                    if (this.mounted && this.mountedUpon.objectName == 'fireSteed') {
-                        console.log(`this.mounted = true`);
-                        this.velocity.y = 0;
-                        this.model.position.y = this.sceneController.waterElevation;
-                    } else if (this.attributes.swims) {
+                    if (this.attributes.swims) {
                         this.swimming = true;
                     } else {
                         let distanceBelowWater = Math.abs(this.sceneController.waterElevation - this.model.position.y);
@@ -295,6 +290,7 @@ export class IntelligentForm extends AnimatedForm{
 
 
     underWater(distanceBelowWater) {
+        // console.log(`under water!`)
         this.velocity.x *= Math.max((100-(distanceBelowWater*3))/100,.5);
         this.velocity.y *= Math.max((100-(distanceBelowWater*3))/100,.5);
         this.velocity.z *= Math.max((100-(distanceBelowWater*3))/100,.5);

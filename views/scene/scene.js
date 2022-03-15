@@ -526,12 +526,12 @@ class Scene {
         
         if (this.running) {
             
-            this.requestAnimationFrameID = requestAnimationFrame( this.animate );
+            
             if ( this.controls.isLocked === true && this.running ) {
 
                 this.time = performance.now();
                 this.delta = ( this.time - this.prevTime ) / 1000;
-    
+                
                 this.controller.handleMovement(this.delta);
                 this.handleSprites();
                 this.handleProjectiles(this.delta);
@@ -541,9 +541,8 @@ class Scene {
                 // }
 
                 if (this.backgroundMesh && this.controls) this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
-    
+                this.renderer.render( this.scene, this.camera );
                 this.prevTime = this.time;
-            
             } else {
                 this.prevTime = performance.now();
             }
@@ -555,9 +554,9 @@ class Scene {
                 if (this.compass) this.compass.model.lookAt( DUENORTH );
             }
     
-    
             this.stats.update();
-
+            this.requestAnimationFrameID = requestAnimationFrame( this.animate );
+            
         } else {
             cancelAnimationFrame( this.requestAnimationFrameID );
             this.dispose(this.scene);

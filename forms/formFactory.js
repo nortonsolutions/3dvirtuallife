@@ -44,7 +44,7 @@ export class FormFactory {
                 form = new AnimatedForm(template, this.sceneController);
                 break;
             case "water":
-                form = new WaterForm(template, this.sceneController,"Water" ); // ,"Water" );
+                form = new WaterForm(template, this.sceneController, template.attributes.useTHREE? "Water" : null ); // ,"Water" );
                 break;
             case "grass":
                 form = new GrassForm(template, this.sceneController ); // ,"Grass" );
@@ -63,8 +63,8 @@ export class FormFactory {
             name: 'flame2',
             regex: new RegExp('sconce', 'i'),
             frames: 16,
-            scale: .50 * scaleAdjust,
-            elevation: .2,
+            scale: .75 * scaleAdjust,
+            elevation: .3,
             flip: false,
             animates: true,
             time: null
