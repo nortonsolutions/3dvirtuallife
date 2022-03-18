@@ -137,7 +137,7 @@ handlePostTextResponse = (url, data, callback) => {
 
 getOptions = () => {
     return {
-        method: 'GET',
+        method: 'GET'
     }
 }
 

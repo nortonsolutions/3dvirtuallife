@@ -16,7 +16,7 @@ export class CharacterScreen {
 
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, 2/3, 0.25, 100 );
-        this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+        this.renderer = new THREE.WebGLRenderer( { antialias: true, precision: 'lowp' } );
 
         this.loader = new THREE.GLTFLoader();
         this.running = false;

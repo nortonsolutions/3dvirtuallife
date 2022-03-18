@@ -42,6 +42,7 @@ export const Structures = {
         gltf: 'tavern.glb',
         description: 'Old-fashioned tavern and shop',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             animates: false,
             scale: 20,
@@ -111,6 +112,7 @@ export const Structures = {
         gltf: 'elevatorL_1m.glb',
         description: 'Elevator',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             animates: true,
             scale: 200,
@@ -124,6 +126,7 @@ export const Structures = {
         gltf: 'elevatorS_1m.glb',
         description: 'Elevator',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             animates: true,
             scale: 200,
@@ -137,6 +140,7 @@ export const Structures = {
         gltf: 'elevatorL_4m.glb',
         description: 'Elevator',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             animates: true,
             scale: 200,
@@ -150,6 +154,7 @@ export const Structures = {
         gltf: 'elevatorS_4m.glb',
         description: 'Elevator',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             animates: true,
             scale: 200,
@@ -163,6 +168,7 @@ export const Structures = {
         gltf: 'elevatorL_6m.glb',
         description: 'Elevator',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             animates: true,
             scale: 200,
@@ -176,6 +182,7 @@ export const Structures = {
         gltf: 'elevatorS_6m.glb',
         description: 'Elevator',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             animates: true,
             scale: 200,
@@ -189,6 +196,7 @@ export const Structures = {
         gltf: 'tavernShop2.glb',
         description: 'Tavern and shop',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             transparentWindows: true,
             animates: true,
@@ -197,12 +205,28 @@ export const Structures = {
         }
     
     },
-
+    
+    swordRoom: {
+        name: 'swordRoom',
+        gltf: 'swordRoom.glb',
+        description: 'Sword Room',
+        type: 'structure',
+        attributes: {
+            transparentWindows: false,
+            animates: false,
+            scale: 7,
+            elevation: 40,
+            // staticStartingElevation: true,
+            rotateY: 90
+        }
+    
+    },
     vikingShop: {
         name: 'vikingShop',
         gltf: 'vikingShop.glb',
         description: 'Humble abode of a troubled family',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             animates: true,
             transparentWindows: true,
@@ -359,6 +383,7 @@ export const Structures = {
         image: 'houseLarge.png',
         description: 'Large house',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             transparentWindows: true,
             animates: true,
@@ -385,6 +410,7 @@ export const Structures = {
         image: 'houseMedium.png',
         description: 'Medium house',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             transparentWindows: true,
             animates: true,
@@ -411,6 +437,7 @@ export const Structures = {
         image: 'houseSmall.png',
         description: 'Large house',
         type: 'structure',
+        subtype: 'shelter',
         attributes: {
             transparentWindows: true,
             animates: true,

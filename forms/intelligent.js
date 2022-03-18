@@ -27,7 +27,7 @@ export class IntelligentForm extends AnimatedForm{
         this.direction = new THREE.Vector3();
         this.velocity = new THREE.Vector3();
         this.rotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
-
+        
         this.justJumped = false;
         this.standingUpon = null;
         this.canJump = true;
@@ -270,6 +270,24 @@ export class IntelligentForm extends AnimatedForm{
         }
     }
 
+    atMineralSource() { // returns mineral name or null
+        
+        // this.sceneController.waterSources -- arsay of waterSources, i.e.,
+        //  [[{position},radius],[{position},radius]]
+        for (let mineralSource of this.sceneController.mineralSources) {
+            let position = new THREE.Vector3(mineralSource[0].x, mineralSource[0].y, mineralSource[0].z);
+            let distance = mineralSource[1];
+
+            // test my distance
+            if (this.model.position.distanceTo(position) <= distance) {
+                // console.log(`${this.objectName} near mineral source`);
+                return mineralSource[2]; // mineral name
+            } 
+        }
+        
+        return null;
+    }
+
     atWaterSource() {
         
         // this.sceneController.waterSources -- array of waterSources, i.e.,
@@ -287,7 +305,6 @@ export class IntelligentForm extends AnimatedForm{
         
         return false;
     }
-
 
     underWater(distanceBelowWater) {
         // console.log(`under water!`)
@@ -329,7 +346,7 @@ export class IntelligentForm extends AnimatedForm{
 
             console.log(`Diff between weaponPos and entity model pos: ${diff.length()}; radius ${entity.radius}`);
             if ( diff.length() < entity.radius ) {
-                let hitPointReduction = (getRandomArbitrary(0,this.getEffectiveStat('strength'))/10);
+                let hitPointReduction = (getRandomArbitrary(0,this.getEffectiveStat('strength'))/3);
                 this.inflictDamage(entity, hitPointReduction, "generalDamage");
 
                 // Add hit sprites at the location of the hand:
@@ -347,7 +364,7 @@ export class IntelligentForm extends AnimatedForm{
      */
     inflictDamage(entity, hitPointReduction, type) {
         
-        console.log(`Inflicting ${hitPointReduction} damage, type ${type}, on ${entity.objectName}`);
+        console.log(`Inflicting ${hitPointReduction} damage, type ${type}, on ${entity.objectName}, health: ${entity.getEffectiveStat('health')}`);
         var defenseRating = entity.getEffectiveStat('defense');
         // check the defense level for this type of damage
         switch (type) {
@@ -405,6 +422,7 @@ export class IntelligentForm extends AnimatedForm{
                     this.standingUpon = {
                         objectName: standingUpon.objectName,
                         objectType: standingUpon.objectType,
+                        objectSubtype: standingUpon.objectSubtype,
                         attributes: standingUpon.attributes
                     }
 

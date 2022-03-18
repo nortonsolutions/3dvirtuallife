@@ -41,6 +41,8 @@ export class SceneController {
 
         // Other players tracked for movement, etc.
         this.others = [];
+        this.points = [];
+        this.materials = [];
         
         this.scene = null;
         this.floor = null;
@@ -66,6 +68,7 @@ export class SceneController {
 
         // An array of waterSources -- [[{position},radius],[{position},radius]]
         this.waterSources = [];
+        this.mineralSources = [];
         this.ponds = [];
 
         // this.refractors = [];
@@ -107,6 +110,8 @@ export class SceneController {
                         this.addLights();
                         this.addHero(() => {
                             this.seedForms(this.firstInRoom, () => {
+
+                                if (this.floor.attributes.snowflakes) this.addSnowflakes();
                                 this.introduce();
                                 this.scene.readyForLock = true;
                             });
@@ -341,6 +346,58 @@ export class SceneController {
         }
     }
 
+    addSnowflakes() {
+        var geometry = new THREE.BufferGeometry();
+        var vertices = [];
+
+        var textureLoader = new THREE.TextureLoader();
+
+        var sprite1 = textureLoader.load( '/textures/sprites/snowflake1.png' );
+        var sprite2 = textureLoader.load( '/textures/sprites/snowflake2.png' );
+        var sprite3 = textureLoader.load( '/textures/sprites/snowflake3.png' );
+        var sprite4 = textureLoader.load( '/textures/sprites/snowflake4.png' );
+        var sprite5 = textureLoader.load( '/textures/sprites/snowflake5.png' );
+
+        for ( var i = 0; i < 10000; i ++ ) {
+
+            var x = Math.random() * 2000 - 1000;
+            var y = Math.random() * 2000 - 1000;
+            var z = Math.random() * 2000 - 1000;
+
+            vertices.push( x, y, z );
+
+        }
+
+        geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+        this.parameters = [
+            [[ 1.0, 0.2, 0.5 ], sprite2, 20 ],
+            [[ 0.95, 0.1, 0.5 ], sprite3, 15 ],
+            [[ 0.90, 0.05, 0.5 ], sprite1, 10 ],
+            [[ 0.85, 0, 0.5 ], sprite5, 8 ],
+            [[ 0.80, 0, 0.5 ], sprite4, 5 ]
+        ];
+
+        for ( var i = 0; i < this.parameters.length; i ++ ) {
+
+            var color = this.parameters[ i ][ 0 ];
+            var sprite = this.parameters[ i ][ 1 ];
+            var size = this.parameters[ i ][ 2 ];
+
+            this.materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+            this.materials[ i ].color.setHSL( color[ 0 ], color[ 1 ], color[ 2 ] );
+
+            var particles = new THREE.Points( geometry, this.materials[ i ] );
+
+            particles.rotation.x = Math.random() * 6;
+            particles.rotation.y = Math.random() * 6;
+            particles.rotation.z = Math.random() * 6;
+
+            this.hero.model.add(particles);
+            this.points.push(particles);
+        }
+    }
+
     addGrass(callback) {
         if (this.layout.terrain.attributes.grass) {
             this.grass = this.formFactory.newForm("grass", this.layout.terrain.attributes.grass);
@@ -373,6 +430,7 @@ export class SceneController {
             }
         }
 
+        
         if (addToScene) this.scene.add( form.model );
         if (addToForms) this.forms.push( form );
 
@@ -382,7 +440,7 @@ export class SceneController {
             if (trackEntity) this.entities.push( form );
         } else if (form.objectType == "floor" || form.objectType == "structure" || form.attributes.addToStructureModels ) {
             this.structureModels.push ( form.model );
-        }
+        } 
     }
 
     addFloor(callback) {
@@ -418,6 +476,7 @@ export class SceneController {
             }
 
             this.addWaterSources();
+            this.addMineralSources();
 
             this.addToScene(this.floor);
             setTimeout(() => {
@@ -430,6 +489,14 @@ export class SceneController {
         if (this.floor.attributes.waterSources) {
             for (let waterSource of this.floor.attributes.waterSources) {
                 this.waterSources.push(waterSource);
+            }
+        }
+    }
+
+    addMineralSources() {
+        if (this.floor.attributes.mineralSources) {
+            for (let mineralSource of this.floor.attributes.mineralSources) {
+                this.mineralSources.push(mineralSource);
             }
         }
     }
@@ -699,7 +766,7 @@ export class SceneController {
                 this.overheadPointLight.translateZ(-80);
             }
     
-            if (this.scene && this.scene.controls) this.scene.handleAutoZoom();
+            if (this.scene && this.scene.controls) this.scene.handleCameraMovement();
         }
     }
 

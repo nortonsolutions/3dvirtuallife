@@ -99,6 +99,7 @@ export const levels = [
             description: 'valley',
             gltf: 'valley.glb',
             attributes: {
+                // snowflakes: true,
                 cutScenes: {
                     intro: "volcanoIntro.mkv"    
                 },
@@ -117,6 +118,9 @@ export const levels = [
                 waterSources: [
                     [{x: -16, y: 0, z: -175}, 80],
                     [{x: -1195, y: 0, z: 5750}, 800],
+                ],
+                mineralSources: [
+                    [{x: 719, y: -50, z: -598}, 100, 'aluminium'],
                 ]
             }
         },
@@ -124,20 +128,19 @@ export const levels = [
             { name: "keyToShed", location: { x: 2, y: 0, z: -1} },
             { name: "redpotion" },
             { name: "greenpotion", location: { x: -2, y: 0, z: 0} },
-            { name: "greenpotion", location: { x: -1, y: 0, z: 2} },
             { name: "gold3" },
             { name: "bow" },
             { name: "arrow25" },
             { name: "fishingPole", location: { x: 0, y: 0, z: -1} },
             { name: "bait25", location: { x: 0, y: 0, z: 2} },
-            // { name: "smallSword" },
+            { name: "smallSword" },
             // { name: "aluminium", location: { x: -1, y: 0, z: -1}},
             // { name: "gold" },
             // { name: "iron" },
             // { name: "silver" },
             { name: "watercan", location: { x: 1.1, y: 0.3, z: 4.4}, attributes: { staticStartingElevation: true }},
             { name: "miningHammer", location: { x: -3, y: 0, z: 0}},
-            { name: "pickAxe", location: { x: -2, y: 0, z: 0}},
+            { name: "miningPickAxe", location: { x: -2, y: 0, z: 0}},
             // { 
             //     name: "balloon", location: { x: -3, y: 0, z: -1},
             //     attributes: { staticStartingElevation: false }
@@ -153,6 +156,7 @@ export const levels = [
             }, 
             { name: "rock1" },
             { name: "cart", location: { x: -2, y: 0, z: 2} },
+            { name: "bucket", location: { x: -6, y: 0, z: 2}},
             { 
                 name: "grate", location: { x: 3, y: 0, z: 4},
                 attributes: { routeTo: { level: 1, location: { x: 16, y: 0, z: 4 } } } //dungeon
@@ -194,22 +198,23 @@ export const levels = [
             },
         ],
         entities: [
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
-            { name: "evilOne", type: "beast" },
             { name: "triceratops", type: "beast" },
-            // // { name: "trex", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+
+            { name: "trex", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+
             { name: "john" },
             { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
             { name: "sunSeed", location: { x: 1, y: 0, z: -1}},
             { name: "sunSeed", location: { x: 1, y: 0, z: -2}},
-            { name: "sunSeed", location: { x: 1, y: 0, z: -3}},
-            { name: "sunSeed", location: { x: -1, y: 0, z: 1}},
-            { name: "fireSteed", location: { x: -1, y: 0, z: 1}},
+            // { name: "sunSeed", location: { x: 1, y: 0, z: -3}},
+            // { name: "sunSeed", location: { x: -1, y: 0, z: 1}},
+            // { name: "fireSteed", location: { x: -1, y: 0, z: 1}},
             // { name: "ghoul", type: "beast"  },
             // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
             // { name: "rockyMan", type: "beast" },
@@ -229,7 +234,6 @@ export const levels = [
             // { name: "elfgirl" },
             { name: "catFish", location: { x: -9, y: 0, z: 56}},
             { name: "catFish", location: { x: -8, y: 0, z: 56}},
-            { name: "catFish", location: { x: -8.5, y: 0, z: 55}},
             { name: "carp", location: { x: -7, y: 0, z: 54}},
             { name: "carp", location: { x: -7.5, y: 0, z: 54}}
 
@@ -275,8 +279,8 @@ export const levels = [
             { name: "gold1" },
             { name: "gold10" },
             { name: "arrow25" },
-            { name: "aluminium" },
-            { name: "iron" }
+            // { name: "aluminium" },
+            // { name: "iron" }
         ],
         structures: [
             { 
@@ -343,9 +347,9 @@ export const levels = [
             { name: "gold25", location: { x: 10, y: 0, z: -2 }},
             { name: "redpotion" },
             { name: "greenpotion" },
-            { name: "aluminium" },
-            { name: "chromium" },
-            { name: "iron" }
+            // { name: "aluminium" },
+            // { name: "chromium" },
+            // { name: "iron" }
         ],
         structures: [
             { 
@@ -406,7 +410,7 @@ export const levels = [
             }
         },
         items: [
-            // { name: "busterboot", location: { x: 0, y: 0, z: 0} },
+            { name: "busterboot", location: { x: 0, y: 0, z: 0} },
             // { name: "lightSaber", location: { x: -1, y: 0, z: -1} },
             // { name: "rosenRelic" },
             // { name: "gold25", location: { x: 10, y: 0, z: -1 }},
@@ -415,8 +419,8 @@ export const levels = [
             { name: "smallSword" },
             { name: "blackpotion" },
             { name: "bagOfGems" },
-            { name: "chromium" },
-            { name: "copper" }
+            // { name: "chromium" },
+            // { name: "copper" }
         ],
         structures: [
             { name: "bridge", location: { x: -14.4, y: 0, z: 31.9} },
@@ -435,8 +439,8 @@ export const levels = [
             }
         ],
         entities: [
-            // { name: "crystalMan", type: "beast" },
-            // { name: "crystalMan", type: "beast" },
+            { name: "crystalMan", type: "beast" },
+            { name: "crystalMan", type: "beast" },
             { name: "crocodile", type: "beast" },
             { name: "crocodile", type: "beast" },
             { name: "crocodile", type: "beast" },
@@ -446,12 +450,12 @@ export const levels = [
             // { name: "crocodile", type: "beast" },
             // { name: "iceGhoul", type: "beast"  },
             // { name: "shockGhoul", type: "beast"  },
-            // { name: "gasGhoul", type: "beast"  },
+            { name: "gasGhoul", type: "beast"  },
             // { name: "ghostGhoul", type: "beast"  },
             // { name: "john" },
             // { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
             // { name: "evilOne", type: "beast" },
-            // { name: "ghoul", type: "beast"  },
+            { name: "ghoul", type: "beast"  },
             // { name: "triceratops", type: "beast" },
             // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
         ]
@@ -501,10 +505,10 @@ export const levels = [
             { name: "gold25", location: { x: 10, y: 0, z: -1 }},
             { name: "redpotion" },
             { name: "greenpotion" },
-            // { name: "helmet" },
-            { name: "copper" },
-            { name: "iron" },
-            { name: "silver" },
+            { name: "helmet" },
+            // { name: "copper" },
+            // { name: "iron" },
+            // { name: "silver" },
             { name: "firesteedIncense", location: { x: -12.4, y: 0, z: -22.7 } }
         ],
         structures: [
@@ -578,16 +582,19 @@ export const levels = [
         items: [
             // { name: "crystalBall" },
             { name: "mushroom" },
-            { name: "copper" },
-            { name: "iron" },
-            { name: "silver" },
-            { name: "titanium" },
-            { name: "wolfram" },
-            { name: "silver" },
+            // { name: "copper" },
+            // { name: "iron" },
+            // { name: "silver" },
+            // { name: "titanium" },
+            // { name: "wolfram" },
+            // { name: "silver" },
 
 
         ],
         structures: [
+            { 
+                name: "swordRoom", location: { x: -31.1, y: 7.1, z: -66.9 }, 
+            },
             { 
                 name: "platformBlock", location: { x: -5.3, y: 0, z: -67.5 }, 
                 attributes: { routeTo: { level: 8, location: { x: -3.5, y: 0, z: 40 } } } //lavaLabyrinth
@@ -713,16 +720,16 @@ export const levels = [
             }
         },
         items: [
-            { name: "iron" },
-            { name: "silver" },
-            { name: "titanium" },
-            { name: "wolfram" },
-            { name: "silver" },
-            { name: "iron" },
-            { name: "silver" },
-            { name: "titanium" },
-            { name: "wolfram" },
-            { name: "silver" }
+            // { name: "iron" },
+            // { name: "silver" },
+            // { name: "titanium" },
+            // { name: "wolfram" },
+            // { name: "silver" },
+            // { name: "iron" },
+            // { name: "silver" },
+            // { name: "titanium" },
+            // { name: "wolfram" },
+            // { name: "silver" }
         ],
         structures: [
             { 
@@ -759,6 +766,8 @@ export const levels = [
             description: 'swamp',
             gltf: 'snowyland.glb',
             attributes: {
+                useTHREE: false,
+                snowflakes: true,
                 cutScenes: {
                     intro: "volcanoIntro.mkv"    
                 },
@@ -772,26 +781,26 @@ export const levels = [
                     color: 'white',
                     density: 1.2
                 },
-                // water: {
+                water: {
 
-                //     attributes: {
-                //         elevation: 0,
-                //         color: "blue",
-                //         scale: 500,
-                //         lava: false
-                //     },
-                //     gltf: 'water.glb'
-                // },
+                    attributes: {
+                        elevation: 0,
+                        color: "white",
+                        scale: 500,
+                        lava: false
+                    },
+                    gltf: 'water.glb'
+                },
                 designateNPCs: true
 
             }
         },
         items: [
-            { name: "iron" },
-            { name: "silver" },
-            { name: "titanium" },
-            { name: "wolfram" },
-            { name: "silver" },
+            // { name: "iron" },
+            // { name: "silver" },
+            // { name: "titanium" },
+            // { name: "wolfram" },
+            // { name: "silver" },
             { name: "cavalier" }
 
         ],
@@ -881,14 +890,14 @@ export const levels = [
             { name: "lavaGhoul", type: "beast" },
             { name: "lavaGhoul", type: "beast" },
             { name: "lavaGhoul", type: "beast" },
-            // { name: "lavaGhoul", type: "beast" },
-            // { name: "ghoul", type: "beast"  },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "ghoul", type: "beast"  },
             // { name: "triceratops", type: "beast" },
             // { name: "triceratops", type: "beast" },
-            // { name: "iceGhoul", type: "beast"  },
-            // { name: "shockGhoul", type: "beast"  },
-            // { name: "gasGhoul", type: "beast"  },
-            // { name: "ghostGhoul", type: "beast"  },
+            { name: "iceGhoul", type: "beast"  },
+            { name: "shockGhoul", type: "beast"  },
+            { name: "gasGhoul", type: "beast"  },
+            { name: "ghostGhoul", type: "beast"  },
 
         ]
     },
@@ -934,10 +943,14 @@ export const levels = [
 
         ],
         entities: [
-            // { name: "lavaGhoul", type: "beast" },
-            // { name: "lavaGhoul", type: "beast" },
-            // { name: "lavaGhoul", type: "beast" },
-            // { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
         ]
     },
     {
@@ -989,10 +1002,10 @@ export const levels = [
             },
         ],
         entities: [
-            // { name: "lavaGhoul", type: "beast" },
-            // { name: "lavaGhoul", type: "beast" },
-            // { name: "lavaGhoul", type: "beast" },
-            // { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
+            { name: "lavaGhoul", type: "beast" },
         ]
     },
     {
@@ -1023,17 +1036,17 @@ export const levels = [
             }
         },
         items: [
-            // { name: "bagOfGems" },
-            // { name: "mace" },
-            // { name: "bluepotion" },
-            // { name: "busterbuckler" },
-            // { name: "torch", location: { x: 0, y: 0, z: 0}},
+            { name: "bagOfGems" },
+            { name: "mace" },
+            { name: "bluepotion" },
+            { name: "busterbuckler" },
+            { name: "torch", location: { x: 0, y: 0, z: 0}},
             // { name: "keyToChest", location: { x: 1, y: 0, z: 0 }},
-            // { name: "gold3" },
-            // { name: "gold25" },
-            // { name: "gold1" },
-            // { name: "gold10" },
-            // { name: "arrow25" },
+            { name: "gold3" },
+            { name: "gold25" },
+            { name: "gold1" },
+            { name: "gold10" },
+            { name: "arrow25" },
             // { name: "aluminium" },
             // { name: "iron" }
         ],
@@ -1054,18 +1067,18 @@ export const levels = [
         ],
         entities: [
             
-            // { name: "evilOne", type: "beast" },
-            // { name: "evilOne", type: "beast" },
-            // { name: "evilOne", type: "beast" },
-            // { name: "rat", type: "beast" },
-            // { name: "rat", type: "beast" },
-            // { name: "bat", type: "beast" },
-            // { name: "bat", type: "beast" },
-            // { name: "bat", type: "beast" },
-            // { name: "bat", type: "beast" },
-            // { name: "bat", type: "beast" },
-            // { name: "bat", type: "beast" },
-            // { name: "ghoul", type: "beast", attributes: { boss: false } },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "evilOne", type: "beast" },
+            { name: "rat", type: "beast" },
+            { name: "rat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "bat", type: "beast" },
+            { name: "ghoul", type: "beast", attributes: { boss: false } },
             // { name: "john" },
         ]
     },

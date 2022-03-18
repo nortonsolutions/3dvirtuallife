@@ -313,7 +313,7 @@ export const Items = {
             scale: 100,
             elevation: 20,
             effect: "strength/1",
-            effect: "light/15",
+            // effect: "light/15",
             // sprites: [
             //     { 
             //         name: "flame2",
@@ -1242,6 +1242,7 @@ export const Items = {
         image: 'miningHammer.png',
         description: 'Sturdy mining hammer',
         type: 'item',
+        subtype: 'miningTool',
         attributes: {
             // rotateY: 180,
             animates: false,
@@ -1256,12 +1257,13 @@ export const Items = {
         }
     },
 
-    pickAxe: {
-        name: 'pickAxe',
+    miningPickAxe: {
+        name: 'miningPickAxe',
         gltf: 'pickAxe.glb',
         image: 'pickAxe.png',
         description: 'Strong pickaxe',
         type: 'item',
+        subtype: 'miningTool',
         attributes: {
             // rotateY: 180,
             animates: false,
@@ -1292,6 +1294,24 @@ export const Items = {
             throwable: false,
             throws: "bait",
         }
-    }
+    },
+    bucket: {
+        name: 'bucket',
+        gltf: 'bucket.glb',
+        image: 'bucket.png',
+        description: 'Sturdy bucket',
+        type: 'item',
+        attributes: {
+            // rotateY: 180,
+            animates: false,
+            scale: 8,
+            equippedScale: .008,
+            elevation: 3,
+            // rotateY: 315, 
+            // rotateZ: 180
+            // rotateX: 315
+            // addToStructureModels: true
+        }
+    },
 
 }

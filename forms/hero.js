@@ -17,6 +17,9 @@ export class Hero extends IntelligentForm {
 
         super(template, sceneController);
 
+        this.pV = new THREE.Vector3(); // previous velocity
+        this.acceleration = {};
+
         this.controls = controls;
         this.name = this.template.name;
         this.selectedObject = null;
@@ -248,7 +251,7 @@ export class Hero extends IntelligentForm {
                             
                             let controlled = this.sceneController.forms.find(el => el.objectName == controlItem);
                             let newPositionControlled = controlled.attributes.position == "down" ? "up" : "down";
-                            animations = animations.split('+');
+                            // animations = animations.split('+');
 
                             if (typeof controlled.attributes.locked == "boolean") {
                                 let newLockstateControlled = !controlled.attributes.locked; 
@@ -282,32 +285,27 @@ export class Hero extends IntelligentForm {
                 if (watercan) {
                     this.drawWater(watercan);
                 }
+            } else if (this.atMineralSource()) { // no selected object:
+                let oreName = this.atMineralSource();
+                let tool = this.miningToolEquipped();
+                if (tool) {
+                    this.drawMinerals(tool,oreName);
+                }
             }
         }
     }
-
-    // water(entity) {
-    //     // show some sprite stuff upon the item
-    //     let spriteConfig = {
-    //         name: 'blueExplosion',
-    //         regex: '',
-    //         frames: 10,
-    //         scale: 1,
-    //         elevation: .1,
-    //         flip: false,
-    //         animates: true,
-    //         time: 3
-    //     }
-        
-    //     this.sceneController.formFactory.addSprites(entity.model, spriteConfig, this.sceneController.scene, true, entity.model.position);
-    // }
-
-
 
     watercanEquipped() {
 
         if ((this.equipped.Middle2R && this.equipped.Middle2R[0] == "watercan") || (this.equipped.Middle2L && this.equipped.MiddleL[0] == "watercan")) {
             return this.model.getObjectByProperty('objectName', 'watercan');
+        } else return null;
+    }
+
+    miningToolEquipped() {
+
+        if ((this.equipped.Middle2R && this.equipped.Middle2R[0].match(/mining/i)) || (this.equipped.Middle2L && this.equipped.MiddleL[0].match(/mining/i))) {
+            return this.model.getObjectByProperty('objectSubtype', 'miningTool');
         } else return null;
     }
 
@@ -317,17 +315,41 @@ export class Hero extends IntelligentForm {
             name: 'blueExplosion',
             regex: '',
             frames: 10,
-            scale: 100,
+            scale: 50,
             elevation: 60,
             flip: false,
             animates: true,
-            time: 3
+            time: 2
         }
         
-        this.sceneController.formFactory.addSprites(watercan.model, spriteConfig, this.sceneController.scene, true, watercan.getWorldPosition());
+        let wp = new THREE.Vector3();
+        wp = watercan.getWorldPosition(wp);
+        this.sceneController.formFactory.addSprites(watercan.model, spriteConfig, this.sceneController.scene, true, wp);
 
         this.fadeToAction('ThumbsUp', 0.2);
         this.sceneController.eventDepot.fire('addToInventory', {itemName: 'water', quantity: 4});
+        
+    }
+
+    drawMinerals(miningTool, oreName) {
+
+        let spriteConfig = {
+            name: 'hit1',
+            regex: '',
+            frames: 8,
+            scale: 50,
+            elevation: 60,
+            flip: false,
+            animates: true,
+            time: 2
+        }
+        
+        let wp = new THREE.Vector3();
+        wp = miningTool.getWorldPosition(wp);
+        this.sceneController.formFactory.addSprites(miningTool.model, spriteConfig, this.sceneController.scene, true, wp);
+
+        this.fadeToAction('Punch', 0.2);
+        this.sceneController.eventDepot.fire('addToInventory', {itemName: oreName, quantity: 1});
         
     }
 
@@ -665,6 +687,9 @@ export class Hero extends IntelligentForm {
     move(delta) {
         if (this.alive) {
 
+            this.pV.copy(this.velocity); // previous velocity
+            this.sheltered = false; // to make weather elements invisible
+
             // INERTIA
             this.velocity.x -= this.velocity.x * 10.0 * delta;
             this.velocity.z -= this.velocity.z * 10.0 * delta;
@@ -687,6 +712,10 @@ export class Hero extends IntelligentForm {
                 this.velocity.x *= .7;
             }
 
+            this.acceleration.x = this.velocity.x - this.pV.x;
+            this.acceleration.y = this.velocity.y - this.pV.y;
+            this.acceleration.z = this.velocity.z - this.pV.z;
+
             this.movementRaycaster.ray.origin.copy( this.model.position );
             this.rotation.copy(this.model.rotation);
 
@@ -704,6 +733,10 @@ export class Hero extends IntelligentForm {
                 this.velocity.z = 0;
 
             };
+            
+            if (this.standingUpon && this.sceneController.layout.terrain.attributes.snowflakes && this.standingUpon.objectSubtype == "shelter") {
+                this.sheltered = true;
+            }
             
             if (this.standingUpon && this.standingUpon.attributes.routeTo && typeof this.standingUpon.attributes.routeTo.level == "number") {
                 if (!this.standingUpon.attributes.locked) {
@@ -727,7 +760,7 @@ export class Hero extends IntelligentForm {
                 // controlled.fadeToAction(animation, 0.2);
 
                 let newPositionControlled = controlled.attributes.position == "down" ? "up" : "down";
-                animations = animations.split('+');
+                // animations = animations.split('+');
 
                 if (typeof controlled.attributes.locked == "boolean") {
                     let newLockstateControlled = !controlled.attributes.locked; 
@@ -738,61 +771,57 @@ export class Hero extends IntelligentForm {
                     controlled.updateAttributes({animations});
                 }
             } else if (this.standingUponImmediate) { // for entryMat and exitMat, and firesteedAltar
-                // this.standingUponImmediate = {
-                //     objectName: standingUponImmediate.name;
-                //     controls: standingUponImmediate.parent.attributes.layoutId;
-                //     keyCode: standingUponImmediate.parent.attributes.keyCode;
-                // }
-                let index = this.inventory.findIndex(el => {
-                    return el != undefined && el.keyCode && el.keyCode == this.standingUponImmediate.keyCode;
-                });
-
-                if (index != -1) {
-                    let controlled = this.sceneController.getFormByLayoutId(this.standingUponImmediate.controls);
-                    
-                    if (typeof controlled.attributes.sealed == "boolean" && controlled.attributes.sealed) { // can things be unsealed?  how?
-
-                        // maybe put all this in an 'unseal' method for special structures
-                        // like the firesteedAltar
-                        let sprites = [{ 
-                            name: 'flame2',  
-                            regex: "sconce",
-                            frames: 16,
-                            scale: 2.5,
-                            elevation: -.5,
-                            flip: false,
-                            animates: true,
-                            showOnSeed: true // set to showOnSeed from this point forward
-                        }];
-
-                        controlled.updateAttributes({sealed: false, sprites });
-                        if (controlled.attributes.animations) {
-                            controlled.updateAttributes({animations: controlled.attributes.animations});
+                
+                if (this.standingUponImmediate.keyCode) {
+                    let index = this.inventory.findIndex(el => {
+                        return el != undefined && el.keyCode && el.keyCode == this.standingUponImmediate.keyCode;
+                    });
+    
+                    if (index != -1) {
+                        let controlled = this.sceneController.getFormByLayoutId(this.standingUponImmediate.controls);
+                        
+                        if (typeof controlled.attributes.sealed == "boolean" && controlled.attributes.sealed) { // can things be unsealed?  how?
+    
+                            // maybe put all this in an 'unseal' method for special structures
+                            // like the firesteedAltar
+                            let sprites = [{ 
+                                name: 'flame2',  
+                                regex: "sconce",
+                                frames: 16,
+                                scale: 2.5,
+                                elevation: -.5,
+                                flip: false,
+                                animates: true,
+                                showOnSeed: true // set to showOnSeed from this point forward
+                            }];
+    
+                            controlled.updateAttributes({sealed: false, sprites });
+                            if (controlled.attributes.animations) {
+                                controlled.updateAttributes({animations: controlled.attributes.animations});
+                            }
+    
+                            // drop the firesteed to the ground:
+                            let dropData = {
+                                itemName: controlled.attributes.releases,
+                                position: controlled.model.position,
+                                location: this.sceneController.getLocationFromPosition(controlled.model.position),
+                                source: "",
+                                type: "entity",
+                                // attributes: {stage: entity.attributes.stage }
+                            };
+    
+                            this.sceneController.eventDepot.fire('dropItemToScene', dropData);
+    
+                        } else {
+                            if (controlled.attributes.animations) controlled.updateAttributes({animations: controlled.attributes.animations});
                         }
-
-                        // drop the firesteed to the ground:
-                        let dropData = {
-                            itemName: controlled.attributes.releases,
-                            position: controlled.model.position,
-                            location: this.sceneController.getLocationFromPosition(controlled.model.position),
-                            source: "",
-                            type: "entity",
-                            // attributes: {stage: entity.attributes.stage }
-                        };
-
-                        this.sceneController.eventDepot.fire('dropItemToScene', dropData);
-
-                    } else {
-                        if (controlled.attributes.animations) controlled.updateAttributes({animations: controlled.attributes.animations});
+                        
+                        if (controlled.attributes.sprites) controlled.attributes.sprites.forEach(spriteConfig => {
+                            this.sceneController.formFactory.addSprites(controlled.model, spriteConfig, null, true);
+                        })
                     }
-                    
-                    if (controlled.attributes.sprites) controlled.attributes.sprites.forEach(spriteConfig => {
-                        this.sceneController.formFactory.addSprites(controlled.model, spriteConfig, null, true);
-                    })
+    
                 }
-
-                    // controlled.runAction();
-
             }
 
             this.identifySelectedForm();

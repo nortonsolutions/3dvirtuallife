@@ -215,7 +215,7 @@ class Scene {
 
     }
 
-    handleAutoZoom = () => {
+    handleCameraMovement = () => {
         this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
         this.cameraBackray.ray.origin.y += this.controller.hero.attributes.height-10;
 
@@ -256,6 +256,11 @@ class Scene {
                 this.camera.position.y -= cameraElevationDefault / 100;
             } 
         }
+
+        // adjustment of the camera position based on acceleration:
+        this.camera.position.x -= (this.controller.hero.acceleration.x/30);
+        this.camera.position.z -= (this.controller.hero.acceleration.z/30);
+
     }
     
     handleSprites() {
@@ -531,24 +536,31 @@ class Scene {
 
                 this.time = performance.now();
                 this.delta = ( this.time - this.prevTime ) / 1000;
+                this.prevTime = this.time;
                 
                 this.controller.handleMovement(this.delta);
                 this.handleSprites();
                 this.handleProjectiles(this.delta);
+                this.handlePoints(this.delta);
 
                 // if (this.controller.layout.terrain.attributes.addPonds) {
                 //     this.handleRefractors();
                 // }
 
                 if (this.backgroundMesh && this.controls) this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
-                this.renderer.render( this.scene, this.camera );
-                this.prevTime = this.time;
-            } else {
-                this.prevTime = performance.now();
+                // this.renderer.render( this.scene, this.camera );
             }
+
             // this.renderer.setClearColor( 0x20252f );
+            let b = performance.now();
             this.renderer.render( this.scene, this.camera );
-            
+            let a = performance.now();
+            let rSpeed = a - b;
+
+            if ( !this.controls || !this.controls.isLocked || !this.running || rSpeed > 250 ) {
+                this.prevTime = a;
+            }
+
             if (minimap) {
                 this.rendererMinimap.render(this.scene, this.cameraMinimap);
                 if (this.compass) this.compass.model.lookAt( DUENORTH );
@@ -564,10 +576,33 @@ class Scene {
 
     }
 
+    handlePoints(delta) {
+
+        var time = Date.now() * 0.00005;
+
+        this.controller.points.forEach((points,i) => {
+            points.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
+
+            points.rotation.y -= this.controls.getObject().rotation.y;
+            points.rotation.z += this.controller.hero.velocity.z * delta / 1000;
+            points.rotation.x += this.controller.hero.velocity.x * delta / 1000;
+
+            points.visible = !this.controller.hero.sheltered;
+            
+        })
+
+        for ( var i = 0; i < this.controller.materials.length; i ++ ) {
+
+            var color = this.controller.parameters[ i ][ 0 ];
+
+            var h = ( 360 * ( color[ 0 ] + time ) % 360 ) / 360;
+            this.controller.materials[ i ].color.setHSL( h, color[ 1 ], color[ 2 ] );
+        }
+    }
+
     handleRefractors() {
         this.controller.refractors.forEach(refractor => {
             refractor.material.uniforms[ "time" ].value += this.clock.getDelta();
-            
         })
     }
 
@@ -821,7 +856,7 @@ class Scene {
         if (e.shiftKey) {
             this.controller.eventDepot.fire('wheel', e);
         } else {
-            this.camera.position.z += e.deltaY;
+            this.camera.position.z += e.deltaY;  // set limits?
             this.camera.position.y += e.deltaY/5;
         }
     }
