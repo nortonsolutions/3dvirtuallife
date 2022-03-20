@@ -340,7 +340,6 @@ function newHeroTemplate(name,height) {
             engagementState: 0,
             special: {
                 speech: "Most esteemed greetings to you, my friend!  Let's trade.",
-                action: 'showWares'
             }
         },
     }

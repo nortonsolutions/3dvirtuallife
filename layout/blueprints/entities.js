@@ -1,6 +1,6 @@
 let convo = {
-    accept: { text: "Yes, I accept", type: "engage" },
-    decline: { text: "No, thank you", type: "disengage" },
+    accept: { text: "Yes, I accept", type: "accept" },
+    decline: { text: "No, thank you", type: "decline" },
     engage: { text: "<Engage the conversation>", type: "engage" },
     disengage: { text: "<Disengage the conversation>", type: "disengage" },
     wellwish: { text: "Well wishes to you, my friend.", type: "neutral" },
@@ -1236,13 +1236,10 @@ export const Entities = {
 
     joe: {
         name: 'joe',
-        gltf: 'robot_blue.glb',
+        gltf: 'gamebot.glb',
         description: 'Another robot which seems different',
         type: 'friendly',
-        inventory: [
-            {itemName:"armor",quantity:1,price:"crystalBall/1"},
-            {itemName:"bluepotion",quantity:1,price:"crystalBall/1"}
-        ],
+        inventory: [],
         attributes: {
             moves: true,
             animates: true,
@@ -1251,14 +1248,15 @@ export const Entities = {
             length: 20,
             width: 20,
             elevation: 0,
-            scale: 10,
+            scale: 4,
             conversation: {
                 conversationState: "intro",
                 engagementState: 0,
                 special: {
                     condition: ["crystalBall"],
-                    speech: 'Ah, you have my crystal ball!  Please take what you will in exchange!',
-                    action: "showWares",
+                    speech: 'Ah, you have my crystal ball!  I would be honored to join your party!',
+                    responses: [convo.accept, convo.decline],
+                    action: "joinHero",
                     jumpToState: "complete"
                 },
                 intro: {
@@ -1292,7 +1290,7 @@ export const Entities = {
                 health: "2/2/0",
                 mana: "0/0/0",
                 strength: "1/1/0",
-                agility: "1/2/0",
+                agility: "2/2/0",
                 defense: "3/3/0", // rock, weapon, arrow damage defense
                 fire: "0/0/0",
                 ice: "0/0/0",

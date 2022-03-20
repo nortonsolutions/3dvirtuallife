@@ -133,6 +133,18 @@ export class DialogScreen {
         }
     }
 
+    dispose(item) {
+        if (item.children.length == 0) {
+            if (item.dispose) item.dispose();
+            return;
+        } else {
+            item.children.forEach(child => {
+                this.dispose(child);
+            })
+        }
+        if (item.dispose) item.dispose();
+    }
+
     fadeToAction( actionName, duration ) {
         
         if ( ! this.currentlyFadingToAction && this.activeActionName !== actionName ) { // 
@@ -220,6 +232,15 @@ export class DialogScreen {
                         break;
                     case "disengage":
                         this.entity.disengageConversation();
+                        break;
+                    case "accept":
+                        this.hero.accept(this.entity, this.getContext().action);
+                        this.closeModal();
+                        this.eventDepot.fire('closeModal', {});
+                        break;
+                    case "decline":
+                        this.closeModal();
+                        this.eventDepot.fire('closeModal', {});
                         break;
                     case "neutral":
                         break;

@@ -36,7 +36,7 @@ export class IntelligentForm extends AnimatedForm{
         this.inventory = this.template.inventory;
         this.attributes = this.template.attributes;
         this.spells = this.template.spells;
-        this.equipped = this.template.equipped;
+        this.equipped = this.template.equipped? this.template.equipped: [];
 
         this.movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.length/2 + 35 );
 
@@ -870,7 +870,8 @@ export class IntelligentForm extends AnimatedForm{
             gltf: this.template.gltf,
             inventory: this.inventory,
             spells: this.spells,
-            equipped: this.equipped
+            equipped: this.equipped,
+            party: this.party
         }
     }
 

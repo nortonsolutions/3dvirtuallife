@@ -6,8 +6,6 @@ export class ArtificialForm extends IntelligentForm{
     constructor(template, sceneController) {
         super(template, sceneController);
 
-        this.follower = this.template.attributes.follower;
-
         // proximity to nearest Hero to animate
         this.proximityToMove = 800;
         this.proximityToAnimate = this.sceneController.scene.cameraReach;
@@ -15,7 +13,7 @@ export class ArtificialForm extends IntelligentForm{
     }
 
     load(callback) {
-        super.load(() => {
+        super.load(() => {  
             switch (this.objectName) {
                 case "evilOne":
                     Object.values(this.actions).forEach(action => { action.setEffectiveTimeScale(8); });
@@ -148,13 +146,13 @@ export class ArtificialForm extends IntelligentForm{
                             this.moveToward(delta);
                         } 
                     
-                } else if (this.follower) {
+                } else if (this.attributes.follower) {
 
-                    let closestBeast = this.closestBeast(1000);
+                    let closestBeast = this.closestBeast(1500);
                     if (closestBeast) {
                         let b = closestBeast.beast;
                         let d = closestBeast.distance;
-                        if (d < 100) {
+                        if (d < 50) {
                             this.facePosition(b.model.position);
     
                             let side = ['L','R'][getRndInteger(0,1)];
@@ -174,14 +172,14 @@ export class ArtificialForm extends IntelligentForm{
                                 this.moveToward(delta);
                             }
     
-                        } else if (d < 700) {
+                        } else if (d < 1500) {
                             this.facePosition(b.model.position);
                             this.moveToward(delta);
                         }                      
                     } else {
                         let d = closestHeroPosition.distance;
 
-                        if (d < 1000 && d > 50) {
+                        if (d < 2000 && d > 50) {
                             this.facePosition(closestHeroPosition.position);
                             this.moveToward(delta);
                         } 
@@ -330,14 +328,21 @@ export class ArtificialForm extends IntelligentForm{
                 case "complete": 
                     this.completeConversation();
                     break;
+
             }
             return this.attributes.conversation[this.attributes.conversation.conversationState];
 
         } else {
             // If hero meets the 'special condition' then jump straight to it:
             if (special && this.sceneController.hero.inventoryContains(special.condition)) {
-                special.wares = this.inventory;
-                return special;
+                switch (this.attributes.conversation.special.action) {
+                    case "showWares": 
+                        special.wares = this.inventory;
+                        return special;
+                    case "joinHero":
+                        return this.attributes.conversation.special;
+                }
+
             } else {
                 if (this.attributes.conversation.conversationState == "engaged") {
                     return this.attributes.conversation[this.attributes.conversation.conversationState][this.attributes.conversation.engagementState];

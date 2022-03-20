@@ -966,4 +966,8 @@ export class SceneController {
     //     // this.scene.getObjectByName()
     // }
 
+    confirm(question) {
+        return confirm(question);
+    }
+
 }

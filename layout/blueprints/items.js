@@ -9,7 +9,7 @@ export const Items = {
         attributes: {
             value: 1, // in gold
             animates: false,
-            scale: 100,
+            scale: 5,
             elevation: 20
         }
     },    
@@ -22,7 +22,7 @@ export const Items = {
         attributes: {
             value: 1, // in gold
             animates: false,
-            scale: 100,
+            scale: 5,
             elevation: 20
         }
     },

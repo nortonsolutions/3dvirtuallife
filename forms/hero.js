@@ -46,6 +46,8 @@ export class Hero extends IntelligentForm {
         this.attributes.shouldMove = true;
         this.attributes.shouldAnimate = true;
 
+        this.party = [];
+
         this.cacheHero();
     }
 
@@ -1009,6 +1011,18 @@ export class Hero extends IntelligentForm {
         
         } else {
             super.setElevation();
+        }
+    }
+
+    accept(entity, actionName) {
+
+        switch (actionName) {
+            case "joinHero":
+                entity.updateAttributes({follower: true});
+                this.party.push(entity.returnTemplate());
+                this.cacheHero();
+                break;
+
         }
     }
 }
