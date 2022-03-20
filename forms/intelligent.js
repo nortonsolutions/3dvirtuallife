@@ -326,6 +326,13 @@ export class IntelligentForm extends AnimatedForm{
         this.velocity.x = 0;
         this.velocity.y = 0;
         this.velocity.z = 0;
+
+        if (this.acceleration) {
+            this.acceleration.x = -this.acceleration.x;
+            this.acceleration.y = -this.acceleration.y;
+            this.acceleration.z = -this.acceleration.z;
+    
+        }
         
     }
 
@@ -384,14 +391,14 @@ export class IntelligentForm extends AnimatedForm{
                 break;
         }
 
-        hitPointReduction = Math.max(hitPointReduction - defenseRating,0.01);
+        hitPointReduction = Math.max(hitPointReduction - defenseRating,0.03);
 
         console.log(`Defense rating is: ${defenseRating} ... total reduction: ${hitPointReduction}`);
         if (entity.changeStat('health', -hitPointReduction, false) <= 0) {
     
             this.attributes.experience += entity.getStatMax('health');
 
-            if (this.objectName == "hero" && this.levelUpEligibility().length > 0) {
+            if (this.objectType == "hero" && this.levelUpEligibility().length > 0) {
                 setTimeout(() => {
                     this.sceneController.eventDepot.fire('modal', { type: 'levelUp', title: 'Level Up', context: this.levelUpEligibility() });
                 }, 1500);
@@ -706,6 +713,12 @@ export class IntelligentForm extends AnimatedForm{
                                 break;
                             case "horse":
                             case "fireSteed":
+                            case "cosmichorse":
+                            case "brownhorse":
+                            case "blackhorse":
+                            case "whitehorse":
+                            case "chestnuthorse":
+                            case "painthorse":
                             case "fishingBoat":
                                 
                                 if (this.objectSubtype == "remote") {
@@ -734,6 +747,12 @@ export class IntelligentForm extends AnimatedForm{
                                     break;
                                 case "horse":
                                 case "fireSteed":
+                                case "cosmichorse":
+                                case "brownhorse":
+                                case "blackhorse":
+                                case "whitehorse":
+                                case "chestnuthorse":
+                                case "painthorse":
                                 case "fishingBoat":
                                     this.mountedUpon.controlled = true;
                                     this.mountedUpon.updateAttributes({controlled: true});

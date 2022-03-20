@@ -106,6 +106,8 @@ module.exports = function (app, db) {
 
     app.route('/clearActiveGames')
         .get(ensureAuthenticated, ensureAdmin, (req,res) => {
+            app.gameStarts = {}
+            app.gameTimes = {};
             app.games = {};
             app.rooms = {}; 
             app.layouts = {};

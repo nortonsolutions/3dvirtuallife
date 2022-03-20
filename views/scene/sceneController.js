@@ -51,7 +51,7 @@ export class SceneController {
         this.floorNPClocations = [];
         this.floorBossLocations = [];
 
-        if (this.firstInRoom) this.layout.dayTime = Math.random() < .9;
+        // if (this.firstInRoom) this.layout.dayTime = Math.random() < .9;
         
         this.sprites = [];
         this.projectiles = [];
@@ -71,6 +71,7 @@ export class SceneController {
         this.mineralSources = [];
         this.ponds = [];
 
+        this.dayPhase = 0;
         // this.refractors = [];
         // this.dudvMap = new THREE.TextureLoader().load( '/textures/waterdudv.jpg' );
         // this.dudvMap.wrapS = this.dudvMap.wrapT = THREE.RepeatWrapping;
@@ -203,6 +204,48 @@ export class SceneController {
     
     addEventListeners() {
         
+        this.socket.on('updateDayPhase', data => {
+            this.dayPhase = data;
+
+            // Adjust sunLight intensity and color 0x7777ff, change backgroundMesh, fog 
+            switch (this.dayPhase) {
+
+                case 0: // early AM
+                    if (this.sunLight) this.sunLight.intensity = 2;
+                    if (this.scene.backgroundNight) {
+                        this.scene.backgroundMesh.material = this.scene.backgroundNightMaterial;
+                        this.scene.scene.background = "red";
+                        this.scene.scene.fog.color = new THREE.Color( 'black' );
+                    }
+                    break;
+                case 1: // noon
+                    if (this.sunLight) this.sunLight.intensity = 2.4;
+                    if (this.scene.backgroundNight) {
+                        this.scene.backgroundMesh.material = this.scene.backgroundMaterial;
+                        this.scene.scene.background = "white";
+                        this.scene.scene.fog.color = new THREE.Color( this.layout.terrain.attributes.fog.color );
+                    }
+                    break;
+                case 2: // afternoon
+                    if (this.sunLight) this.sunLight.intensity = 2;
+                    if (this.scene.backgroundNight) {
+                        this.scene.backgroundMesh.material = this.scene.backgroundMaterial;
+                        this.scene.scene.background = "green";
+                        this.scene.scene.fog.color = new THREE.Color( this.layout.terrain.attributes.fog.color );
+                    }
+                    break;
+                case 3: // late PM
+                    if (this.sunLight) this.sunLight.intensity = 1.6;
+                    if (this.scene.backgroundNight) {
+                        this.scene.backgroundMesh.material = this.scene.backgroundNightMaterial;
+                        this.scene.scene.background = "black";
+                        this.scene.scene.fog.color = new THREE.Color( 'black' );
+                    }
+                    break;
+            }
+
+        })
+
         this.socket.on('cleanupForms', data => {
             this.cleanupForms(false);
         })
@@ -542,24 +585,17 @@ export class SceneController {
                 shadowBias: - 0.008
             };
 
-            var sunLight;
-            if (this.layout.dayTime) {
-                sunLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 1.2 );
-            } else {
-                sunLight = new THREE.SpotLight( 0x7777ff, 1.6, 0, Math.PI / 1.2 );
-            }
+            this.sunLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 1.2 );
+            this.sunLight.position.set( 500, 1000, 500);
+            this.sunLight.castShadow = true;
 
-            sunLight.position.set( 500, 1000, 500);
+            this.sunLight.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( shadowConfig.shadowCameraFov, 1, shadowConfig.shadowCameraNear, shadowConfig.shadowCameraFar ) );
+            this.sunLight.shadow.bias = shadowConfig.shadowBias;
 
-            sunLight.castShadow = true;
-
-            sunLight.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( shadowConfig.shadowCameraFov, 1, shadowConfig.shadowCameraNear, shadowConfig.shadowCameraFar ) );
-            sunLight.shadow.bias = shadowConfig.shadowBias;
-
-            this.scene.add (sunLight );
+            this.scene.add (this.sunLight );
 
             if (shadowConfig.shadowCameraVisible) {
-                var shadowCameraHelper = new THREE.CameraHelper( sunLight.shadow.camera );
+                var shadowCameraHelper = new THREE.CameraHelper( this.sunLight.shadow.camera );
                 shadowCameraHelper.visible = shadowConfig.shadowCameraVisible;
 
                 this.scene.add( shadowCameraHelper );

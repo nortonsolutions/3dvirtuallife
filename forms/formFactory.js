@@ -98,7 +98,7 @@ export class FormFactory {
             regex: new RegExp('grass', 'i'),
             frames: 1,
             scale: 70,
-            elevation: 10,
+            elevation: 20,
             flip: false,
             animates: false,
             time: null

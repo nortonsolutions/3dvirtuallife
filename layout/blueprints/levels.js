@@ -125,6 +125,7 @@ export const levels = [
             }
         },
         items: [
+            { name: "crystalBall", location: { x: 0, y: 0, z: 0 }},
             { name: "keyToShed", location: { x: 2, y: 0, z: -1} },
             { name: "redpotion" },
             { name: "greenpotion", location: { x: -2, y: 0, z: 0} },
@@ -203,23 +204,25 @@ export const levels = [
             { name: "evilOne", type: "beast" },
             { name: "evilOne", type: "beast" },
 
-            { name: "trex", type: "beast" },
+            // { name: "trex", type: "beast" },
+            { name: "crocodile", type: "beast" },
             { name: "evilOne", type: "beast" },
             { name: "evilOne", type: "beast" },
             { name: "evilOne", type: "beast" },
 
             { name: "john" },
+            { name: "joe", location: { x: 1, y: 0, z: 0} },
             { name: "shopkeep", location: { x: 1, y: 0, z: 1} },
             { name: "sunSeed", location: { x: 1, y: 0, z: -1}},
             { name: "sunSeed", location: { x: 1, y: 0, z: -2}},
             // { name: "sunSeed", location: { x: 1, y: 0, z: -3}},
             // { name: "sunSeed", location: { x: -1, y: 0, z: 1}},
-            // { name: "fireSteed", location: { x: -1, y: 0, z: 1}},
+            { name: "cosmichorse", location: { x: -1, y: 0, z: 1}},
             // { name: "ghoul", type: "beast"  },
             // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
             // { name: "rockyMan", type: "beast" },
             // { name: "demonLord", type: "beast" },
-            { name: "horse" },
+            // { name: "horse" },
             // { name: "murderBear", type: "beast"  },
             // { name: "rosen", type: "beast"  },
             // { name: "iceGhoul", type: "beast"  },
@@ -400,6 +403,7 @@ export const levels = [
                 },
                 water: {
                     attributes: {
+                        useTHREE: true,
                         elevation: -120,
                         color: "green",
                         scale: 200
@@ -444,8 +448,8 @@ export const levels = [
             { name: "crocodile", type: "beast" },
             { name: "crocodile", type: "beast" },
             { name: "crocodile", type: "beast" },
-            // { name: "crocodile", type: "beast" },
-            // { name: "crocodile", type: "beast" },
+            { name: "crocodile", type: "beast" },
+            { name: "crocodile", type: "beast" },
             // { name: "crocodile", type: "beast" },
             // { name: "crocodile", type: "beast" },
             // { name: "iceGhoul", type: "beast"  },
@@ -473,7 +477,7 @@ export const levels = [
             description: 'lavafield',
             gltf: 'lavafield.glb',
             attributes: {
-                useTHREE: false,
+                
                 cutScenes: {
                     intro: "volcanoIntro.mkv"    
                 },
@@ -490,6 +494,7 @@ export const levels = [
                 water: {
 
                     attributes: {
+                        useTHREE: false,
                         elevation: 0,
                         color: "red",
                         scale: 100,
@@ -595,6 +600,12 @@ export const levels = [
             { 
                 name: "swordRoom", location: { x: -31.1, y: 7.1, z: -66.9 }, 
             },
+            // { 
+            //     name: "barnHouse", location: { x: -32.6, y: 7.1, z: 34 }, 
+            // },
+            { 
+                name: "well", location: { x: -23, y: 7.1, z: 32 }, 
+            },
             { 
                 name: "platformBlock", location: { x: -5.3, y: 0, z: -67.5 }, 
                 attributes: { routeTo: { level: 8, location: { x: -3.5, y: 0, z: 40 } } } //lavaLabyrinth
@@ -686,6 +697,12 @@ export const levels = [
             { name: "viking", location: { x: -8.8, y: 0, z: 11.15 } },
             { name: "elfgirl", location: { x: -62.4, y: 0, z: 59.1} },
             { name: "pug", location: { x: 1, y: 0, z: 1} },
+            { name: "cosmichorse" },
+            { name: "painthorse" },
+            { name: "whitehorse" },
+            { name: "blackhorse" },
+            { name: "chestnuthorse" },
+            { name: "brownhorse" },
 
         ]
     },
@@ -766,7 +783,7 @@ export const levels = [
             description: 'swamp',
             gltf: 'snowyland.glb',
             attributes: {
-                useTHREE: false,
+                
                 snowflakes: true,
                 cutScenes: {
                     intro: "volcanoIntro.mkv"    
@@ -784,6 +801,7 @@ export const levels = [
                 water: {
 
                     attributes: {
+                        useTHREE: false,
                         elevation: 0,
                         color: "white",
                         scale: 500,
@@ -892,8 +910,6 @@ export const levels = [
             { name: "lavaGhoul", type: "beast" },
             { name: "lavaGhoul", type: "beast" },
             { name: "ghoul", type: "beast"  },
-            // { name: "triceratops", type: "beast" },
-            // { name: "triceratops", type: "beast" },
             { name: "iceGhoul", type: "beast"  },
             { name: "shockGhoul", type: "beast"  },
             { name: "gasGhoul", type: "beast"  },

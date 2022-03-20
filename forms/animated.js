@@ -111,7 +111,7 @@ export class AnimatedForm extends StandardForm{
             if (typeof this.attributes.position && this.attributes.position == "up") {
                 // if (this.activeAction) this.activeAction.play();
                     if (this.activeAction) this.animations.forEach(animation => {
-                        this.runAction(animation.name, 0.2);
+                        this.runAction(animation.name, animation.duration, animation.duration, 1, false, "concurrent");
                     })
                 
             } else if (this.actions[ this.activeActionName ]) this.activeAction.play();
@@ -127,8 +127,6 @@ export class AnimatedForm extends StandardForm{
 
             if (this.attributes.shouldAnimate) {
                     
-                // if (this.mixer.timeScale == 0) this.mixer.timeScale = 1; //unpause all animations
-                
                 var controlled;
                 if (this.mountedUpon) {
                     controlled = this.mountedUpon
@@ -139,7 +137,6 @@ export class AnimatedForm extends StandardForm{
                     controlled = this;
                 }
                 
-                // let controlled = this.mountedUpon? this.mountedUpon : this;
                 if (this.objectType == "hero" && this.mounted) {
                     this.fadeToAction( 'Idle', 0.2);
                 }
@@ -147,10 +144,9 @@ export class AnimatedForm extends StandardForm{
                 if (controlled && controlled.attributes.animates) {
 
                     this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
-                    if (this.absVelocity < .1 && controlled.activeActionName != 'Idle' && controlled.activeActionName != 'Flopping') { // ((controlled.activeActionName == 'Walking' || controlled.activeActionName == 'Running' || controlled.activeActionName == 'Swimming' || controlled.activeActionName == 'horse_A_') || this.paused)) {
+                    if (this.absVelocity < .1 && controlled.activeActionName != 'Idle' && controlled.activeActionName != 'Flopping') {
                         controlled.fadeToAction( 'Idle', 0.2);
-                    } else if (this.absVelocity >= .1 && this.absVelocity < 250 && (controlled.activeActionName == 'Idle' || controlled.activeActionName == 'Running')) {// || controlled.objectName == 'horse' || controlled.objectName == 'fireSteed' )) {
-                        // console.log(`${controlled.objectName} walking`)
+                    } else if (this.absVelocity >= .1 && this.absVelocity < 250 && (controlled.activeActionName == 'Idle' || controlled.activeActionName == 'Running')) {
                         switch (controlled.objectName) {
                             
                             case "horse":
@@ -177,7 +173,6 @@ export class AnimatedForm extends StandardForm{
                                 controlled.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore=="autorestore"), Boolean(concurrent=="concurrent"), Boolean(looprepeat=="looprepeat"));
                             })
                         } else {
-                            // console.log(`${controlled.objectName} running`)
                             if (this.swimming) {
                                 controlled.fadeToAction( 'Swimming', 0.2);
                             } else {
@@ -292,18 +287,35 @@ export class AnimatedForm extends StandardForm{
             action.loop = looprepeat? THREE.LoopRepeat : THREE.LoopOnce;
             action.repetitions = looprepeat? Infinity : 1;
             action.setEffectiveTimeScale( 1 );
+            action.setEffectiveWeight( 1 );
                 
             if (this.attributes.position == "down") {
                 setTimeout(() => {
-                    action.fadeOut( fadeOutDuration );
+                    
+                    if (fadeOutDuration != 0) {
+                        action.fadeOut( fadeOutDuration );
+                        action.play();
+                    } else { // 0 fadeout means just play backwards
+                        action.paused = false;
+                        action.timeScale = -1;  
+                        action._effectiveTimeScale = -1;
+                        action.play();
+                    }
+
                 }, fadeOutDelay*1000)
+
             } else {
                 action.reset();
-                action.setEffectiveTimeScale( 1 );
-                action.fadeIn( duration );
+                
+                if (duration != 0) {
+                    action.fadeIn( duration );
+                    action.play();
+                } else {
+                    action.play();
+                }
             }
     
-            action.play();
+            
     
             const restoreState = () => {
                 setTimeout(() => {

@@ -24,6 +24,33 @@ export const Structures = {
     
     },
 
+    barnHouse: {
+        name: 'barnHouse',
+        gltf: 'barnHouse.glb',
+        description: 'Playhouse Jamal',
+        type: 'structure',
+        attributes: {
+            animates: false,
+            scale: 200,
+            elevation: 0
+        }
+    },
+
+    well: {
+        name: 'well',
+        gltf: 'Well.glb',
+        description: 'Ancient Well',
+        type: 'structure',
+        attributes: {
+            defaultSingleSimultanousActions: true,
+            animates: true,
+            position: "down",
+            scale: 20,
+            elevation: 0,
+            animations: 'Cylinder.006Action.001/0/0/1/false/concurrent/false+Cylinder.007Action/0/0/1/false/concurrent/false+KeyAction/0/0/1/false/concurrent/false',
+        }
+    },
+
     bridge: {
         name: 'bridge',
         gltf: 'bridge.glb',

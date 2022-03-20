@@ -155,7 +155,7 @@ export class Hero extends IntelligentForm {
 
             case "health":
                 this.fadeToAction("Yes", 0.2);
-                if (this.changeStat(stat, change, false) <= 0) {
+                if (this.changeStat(type, change, false) <= 0) {
                     this.fadeToAction("Dance", 0.2);
                 }
 
@@ -235,12 +235,13 @@ export class Hero extends IntelligentForm {
                     
                     if (accessible) {
                         let newPosition = this.selectedObject.attributes.position == "down" ? "up" : "down";
+                        let myAnimations = this.selectedObject.attributes.animations;
 
                         if (typeof this.selectedObject.attributes.locked == "boolean") {
                             let newLockstate = !this.selectedObject.attributes.locked; 
-                            this.selectedObject.updateAttributes({locked: newLockstate, position: newPosition});
+                            this.selectedObject.updateAttributes({locked: newLockstate, position: newPosition, animations: myAnimations});
                         } else if (this.selectedObject.attributes.position) { // if it has a position, alternate
-                            this.selectedObject.updateAttributes({position: newPosition});
+                            this.selectedObject.updateAttributes({position: newPosition, animations: myAnimations});
                         }
 
                         // Check to see if this switch/lever controls something:
@@ -921,7 +922,7 @@ export class Hero extends IntelligentForm {
         let eligibility = [];
         Object.keys(this.attributes.xpLevels).forEach(category => {
             let nextLevel = Number(this.attributes.xpLevels[category]) + 1;
-            let reqPoints = Math.pow(2, nextLevel+1);
+            let reqPoints = Math.pow(2, nextLevel+2);
             if (this.attributes.experience >= reqPoints) eligibility.push({
                 category,
                 nextLevel

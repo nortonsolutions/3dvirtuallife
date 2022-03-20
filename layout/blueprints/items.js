@@ -1,4 +1,31 @@
 export const Items = {
+
+    food: {
+        name: 'food',
+        gltf: 'food.glb',
+        image: 'food.png',
+        description: 'Food',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 100,
+            elevation: 20
+        }
+    },    
+    animalskin: {
+        name: 'animalskin',
+        gltf: 'animalskin.glb',
+        image: 'animalskin.png',
+        description: 'Animal skin',
+        type: 'item',
+        attributes: {
+            value: 1, // in gold
+            animates: false,
+            scale: 100,
+            elevation: 20
+        }
+    },
     gold: {
         name: 'gold',
         gltf: 'gold1.glb',
@@ -537,7 +564,7 @@ export const Items = {
             animates: false,
             scale: 40,
             equippedScale: 0.02,
-            elevation: 0,
+            elevation: 10,
             effect: "agility/1"
         } 
     },

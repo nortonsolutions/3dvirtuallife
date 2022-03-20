@@ -29,6 +29,8 @@ const app = express();
 
 // TODO: Thread safety may become a concern for app.rooms
 
+app.gameStarts = {}; // catalog of startTime per namespace
+app.gameTimes = {}; // catalog of periodSinceStart intervals per namespace
 app.games = {}; // catalog of 'namespaces' (games)
 app.rooms = {}; // current room membership; app.rooms[nsp][room] is an array of [socket.id,heroTemplate,firstInRoom]
 app.layouts = {}; // layouts for each room/level; app.layouts[nsp][room] = [{layout},maxLayoutId] 
@@ -106,6 +108,32 @@ database(mongoose, (db) => {
   io.on('connection', (socket) => {
     console.log(`Made socket connection - ${socket.id}`);
 
+    // provides a phase of the day, 0-3, based on time since server start
+    const checkDayPhase = function(roomNumber) {
+
+      // when was the game started?
+      var gameStart;
+      if (app.gameStarts[socket.nsp.name]) {
+        gameStart = app.gameStarts[socket.nsp.name];
+      } else {
+        gameStart = app.gameStarts[socket.nsp.name] = new Date();
+      }
+
+      let p = Number(Number((new Date() - gameStart)/1000/60%3).toFixed(0)); // 0..3
+      // last periodSinceStart
+      if (app.gameTimes[socket.nsp.name]) {
+        if (app.gameTimes[socket.nsp.name] != p) {
+          app.gameTimes[socket.nsp.name] = p;
+          console.log(p);
+          notifyAllRoomMembers(roomNumber, 'updateDayPhase', p);
+        }
+      } else {
+        app.gameTimes[socket.nsp.name] = p;
+        
+        notifyAllRoomMembers(roomNumber, 'updateDayPhase', p);
+      } 
+    }
+
     const notifyRoomMembers = function (roomNumber, messageType, data) {
 
       let sender = socket.id;
@@ -114,8 +142,22 @@ database(mongoose, (db) => {
       if (!app.rooms[nsp]) app.rooms[nsp] = [];
       if (app.rooms[nsp][roomNumber]) {
         app.rooms[nsp][roomNumber].forEach(member => {
-          if (member != sender) socket.to(member[0]).emit(messageType, data);
+          if (member[0] != sender) socket.to(member[0]).emit(messageType, data);
         });
+      }
+
+      if (Math.random()<.05) checkDayPhase(roomNumber);
+    }
+
+    // notify all including the original socket
+    const notifyAllRoomMembers = function (roomNumber, messageType, data) {
+      let nsp = socket.nsp.name;
+      if (!app.rooms[nsp]) app.rooms[nsp] = [];
+      if (app.rooms[nsp][roomNumber]) {
+        app.rooms[nsp][roomNumber].forEach(member => {
+          socket.to(member[0]).emit(messageType, data);
+        });
+        socket.emit(messageType, data);
       }
     }
 
@@ -270,7 +312,7 @@ database(mongoose, (db) => {
       playerName = data.heroTemplate.name;
       socket.nsp.emit('chat', { message: `<is in the ${data.description}>`, playerName });
       notifyRoomMembers(data.level, "introduce", data.heroTemplate);
-
+      
     });
 
     socket.on('pullLayout', (level, callback) => {
@@ -357,8 +399,6 @@ database(mongoose, (db) => {
           case 'hero' :
               updateHeroAttributes(data.level, data.payload);
               break;
-            // TODO!!! handle hero attribute updates.  update template?
-
         }
 
       }

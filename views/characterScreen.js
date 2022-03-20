@@ -325,7 +325,7 @@ function newHeroTemplate(name,height) {
         model: null,
         inventory: [{"itemName":"gold", "quantity": 3}],
         spells: [
-            // {"itemName":"healSpell"},
+            {"itemName":"healSpell"},
             // {"itemName":"healAllSpell"},
             // {"itemName":"poisonSpell"},
             // {"itemName":"poisonProjectileSpell"},

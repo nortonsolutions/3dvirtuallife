@@ -129,36 +129,24 @@ class Scene {
 
     addBackground() {
 
-        
-        if (this.backgroundNight && this.backgroundNight.length > 0 && !this.controller.layout.dayTime) {
-
+        if (this.background) {
             // simplistic equirectangular mapping to the inverse of a sphere geometry:
             var geometry = new THREE.SphereBufferGeometry(cameraReach - 200);
             geometry.scale (-1,1,1);
 
-
-            var material = new THREE.MeshBasicMaterial( {
-                map: new THREE.TextureLoader().load("/textures/" + this.backgroundNight)
-            });
-
-            this.backgroundMesh = new THREE.Mesh(geometry, material);
-            this.backgroundMesh.rotateZ(Math.PI);
-            this.scene.background = BLACK;
-            this.controls.getObject().add( this.backgroundMesh );
-
-        } else if (this.background && this.background.length > 0 && this.controller.layout.dayTime) {
-
-            // simplistic equirectangular mapping to the inverse of a sphere geometry:
-            var geometry = new THREE.SphereBufferGeometry(cameraReach - 200);
-            geometry.scale (-1,1,1);
-
-            var material = new THREE.MeshBasicMaterial( {
+            this.backgroundMaterial = new THREE.MeshBasicMaterial( {
                 map: new THREE.TextureLoader().load("/textures/" + this.background)
             });
 
-            // Match the background color to the fog for best fadeout
+            if (this.backgroundNight) {
+                this.backgroundNightMaterial = new THREE.MeshBasicMaterial( {
+                    map: new THREE.TextureLoader().load("/textures/" + this.backgroundNight)
+                });
+            }
+            
+            this.backgroundMesh = new THREE.Mesh(geometry, this.backgroundMaterial);
+            this.backgroundMesh.rotateZ(Math.PI);
             this.scene.background = WHITE;
-            this.backgroundMesh = new THREE.Mesh(geometry, material);
             this.controls.getObject().add( this.backgroundMesh );
 
         } else {
@@ -166,19 +154,11 @@ class Scene {
         }
 
         if (this.controller.layout.terrain.attributes.fog) {
-            if (this.controller.layout.terrain.attributes.fog && this.controller.layout.dayTime) {
-                this.scene.fog = new THREE.Fog( 
-                    this.controller.layout.terrain.attributes.fog.color, 
-                    700/(this.controller.layout.terrain.attributes.fog.density? 
-                        this.controller.layout.terrain.attributes.fog.density : 1), 
-                    cameraReach-100 );
-            } else if (this.controller.layout.dayTime == false) {
-                this.scene.fog = new THREE.Fog( 
-                    'black', 
-                    700/(this.controller.layout.terrain.attributes.fog.density? 
-                        this.controller.layout.terrain.attributes.fog.density : 1), 
-                    cameraReach-100 );
-            }
+            this.scene.fog = new THREE.Fog( 
+                this.controller.layout.terrain.attributes.fog.color, 
+                700/(this.controller.layout.terrain.attributes.fog.density? 
+                    this.controller.layout.terrain.attributes.fog.density : 1), 
+                cameraReach-100 );
         }
     }
 
@@ -216,7 +196,14 @@ class Scene {
     }
 
     handleCameraMovement = () => {
-        this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
+
+        
+        // adjustment of the camera position based on acceleration:
+        // console.dir(this.controller.hero.acceleration);
+        this.camera.position.x -= (this.controller.hero.acceleration.x/30);
+        this.camera.position.z -= (this.controller.hero.acceleration.z/30);
+
+                this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
         this.cameraBackray.ray.origin.y += this.controller.hero.attributes.height-10;
 
         // NEEDS PITCH as well
@@ -246,21 +233,24 @@ class Scene {
             this.controller.hero.healthSprite.visible = true;
             this.controller.hero.manaSprite.visible = true;
 
-            if (this.camera.position.z <= cameraDistanceDefault) {
-                this.camera.position.z += cameraDistanceDefault / 100;
+            if (this.camera.position.z < cameraDistanceDefault - 10) {
+                this.camera.position.z += cameraDistanceDefault / 50;
+                if (this.scene.fog) this.scene.fog.far = cameraReach-100;
+            } else if (this.camera.position.z > cameraDistanceDefault + 10) {
+                this.camera.position.z -= cameraDistanceDefault / 100;
                 if (this.scene.fog) this.scene.fog.far = cameraReach-100;
             }
-            if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height) {
-                this.camera.position.y += cameraElevationDefault / 100;
-            } else if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height) {
+
+            if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height - 10) {
+                this.camera.position.y += cameraElevationDefault / 50;
+            } else if (this.camera.position.y > cameraElevationDefault + this.controller.hero.attributes.height + 10) {
                 this.camera.position.y -= cameraElevationDefault / 100;
             } 
         }
 
-        // adjustment of the camera position based on acceleration:
-        this.camera.position.x -= (this.controller.hero.acceleration.x/30);
-        this.camera.position.z -= (this.controller.hero.acceleration.z/30);
-
+        if (this.camera.position.x > 10 || this.camera.position.x < -10) {
+            this.camera.position.x -= this.camera.position.x / 100;
+        } 
     }
     
     handleSprites() {
@@ -535,7 +525,8 @@ class Scene {
             if ( this.controls.isLocked === true && this.running ) {
 
                 this.time = performance.now();
-                this.delta = ( this.time - this.prevTime ) / 1000;
+                this.delta = ( Math.min(this.time - this.prevTime, 250) ) / 1000;
+
                 this.prevTime = this.time;
                 
                 this.controller.handleMovement(this.delta);
@@ -552,14 +543,14 @@ class Scene {
             }
 
             // this.renderer.setClearColor( 0x20252f );
-            let b = performance.now();
+            // let b = performance.now();
             this.renderer.render( this.scene, this.camera );
-            let a = performance.now();
-            let rSpeed = a - b;
+            // let a = performance.now();
+            // let rSpeed = a - b;
 
-            if ( !this.controls || !this.controls.isLocked || !this.running || rSpeed > 250 ) {
-                this.prevTime = a;
-            }
+            // if ( !this.controls || !this.controls.isLocked || !this.running || rSpeed > 250 ) {
+            //     this.prevTime = a;
+            // }
 
             if (minimap) {
                 this.rendererMinimap.render(this.scene, this.cameraMinimap);
@@ -852,12 +843,16 @@ class Scene {
      * 
      */
     onMouseWheel(e) {
+        // if (this.camera.position.z < cameraDistanceDefault - 10) {
+        // if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height - 10) {
 
         if (e.shiftKey) {
             this.controller.eventDepot.fire('wheel', e);
         } else {
             this.camera.position.z += e.deltaY;  // set limits?
-            this.camera.position.y += e.deltaY/5;
+            if (this.camera.position.y > cameraElevationDefault + this.controller.hero.attributes.height + 10) {
+                this.camera.position.y += e.deltaY/5;
+            }
         }
     }
 
