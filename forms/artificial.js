@@ -84,7 +84,7 @@ export class ArtificialForm extends IntelligentForm{
                 // TODO: If the velocity is already close to zero, maintain idle
                 this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
 
-                if (this.absVelocity < .1 && Math.random() < .95) {
+                if (!this.attributes.follower && (this.absVelocity < .1 && Math.random() < .95)) {
                     // DO NOTHING, maintain idle state
 
                 } else {
@@ -100,7 +100,7 @@ export class ArtificialForm extends IntelligentForm{
                         this.direction.normalize();
                     }
 
-                    let agility = this.getEffectiveStat('agility');
+                    let agility = this.attributes.follower? this.sceneController.hero.getEffectiveStat('agility') : this.getEffectiveStat('agility');
 
                     if (Math.random() < .2) { // percentage of moving
                         this.velocity.z += this.direction.z * 1000.0 * agility * delta;
@@ -179,7 +179,7 @@ export class ArtificialForm extends IntelligentForm{
                     } else {
                         let d = closestHeroPosition.distance;
 
-                        if (d < 2000 && d > 50) {
+                        if (d < 2000 && d > 100) {
                             this.facePosition(closestHeroPosition.position);
                             this.moveToward(delta);
                         } 

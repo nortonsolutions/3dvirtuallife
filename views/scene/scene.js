@@ -202,8 +202,9 @@ class Scene {
         // console.dir(this.controller.hero.acceleration);
         this.camera.position.x -= (this.controller.hero.acceleration.x/30);
         this.camera.position.z -= (this.controller.hero.acceleration.z/30);
-
-                this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
+        this.camera.rotation.y -= (this.controller.hero.acceleration.x/2000);
+        
+        this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
         this.cameraBackray.ray.origin.y += this.controller.hero.attributes.height-10;
 
         // NEEDS PITCH as well
@@ -250,7 +251,17 @@ class Scene {
 
         if (this.camera.position.x > 10 || this.camera.position.x < -10) {
             this.camera.position.x -= this.camera.position.x / 100;
-        } 
+        }
+
+        if (this.camera.rotation.y > 10 || this.camera.rotation.y < -10) {
+            this.camera.rotation.y -= this.camera.rotation.y / 100;
+            
+        }  
+
+        if (this.camera.rotation.y > 10 || this.camera.rotation.y < -10) {
+            this.camera.rotation.y -= this.camera.rotation.y / 100;
+        }  
+        
     }
     
     handleSprites() {

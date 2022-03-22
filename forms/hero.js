@@ -716,6 +716,10 @@ export class Hero extends IntelligentForm {
             
             let agility = this.getEffectiveStat('agility');
 
+            if (this.mountedUpon && this.mountedUpon.objectType == 'friendly') {
+                agility = this.mountedUpon.getEffectiveStat('agility');
+            }
+
             if ( this.moveForward || this.moveBackward ) this.velocity.z += this.direction.z * 1000.0 * agility * delta;
             if ( this.moveLeft || this.moveRight ) this.velocity.x += this.direction.x * 1000.0 * agility * delta;
 

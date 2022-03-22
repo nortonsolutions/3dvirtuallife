@@ -47,10 +47,12 @@ export class CharacterScreen {
             newTemplate.attributes.xpLevels = {...newTemplate.attributes.xpLevels, ...template.attributes.xpLevels};
             newTemplate.attributes.scale = template.attributes.scale? template.attributes.scale : newTemplate.attributes.scale;
             newTemplate.attributes.handScaleFactor = template.attributes.handScaleFactor? template.attributes.handScaleFactor : 1;
+            newTemplate.attributes.mountScaleFactor = template.attributes.mountScaleFactor? template.attributes.mountScaleFactor : 1;
             newTemplate.attributes.flipWeapon = template.attributes.flipWeapon? template.attributes.flipWeapon : false;
             newTemplate.gltf = template.gltf;
             newTemplate.png = template.png;
             newTemplate.description = template.description;
+            newTemplate.class = template.class;
             templates.push(newTemplate);
         })
         return templates;
@@ -60,7 +62,7 @@ export class CharacterScreen {
     initialize = () => {
         handleGet('/listSavedHeroes', (response) => {
             let savedHeroes = JSON.parse(response); // .map(el => JSON.parse(el));
-            this.heroTemplates = [...this.heroTemplates, ...savedHeroes];
+            this.heroTemplates = [...this.getBaselineHeroTemplates(), ...savedHeroes];
             this.refresh();
         });
     }
@@ -304,9 +306,9 @@ function newHeroTemplate(name,height) {
             experience: 0,
             stats: {
                 health: "3/5/0",  // min/max/boost
-                mana: "3/3/0",
+                mana: "2/2/0",
                 strength: "1/1/0",
-                agility: "3/3/0",
+                agility: "2/2/0",
                 defense: "0/0/0", // rock, weapon, arrow damage defense
                 fire: "0/0/0",
                 ice: "0/0/0",

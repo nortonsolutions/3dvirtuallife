@@ -1,0 +1,102 @@
+export const Snowyland = {
+  level: 7,
+  width: 26, //26
+  length: 26, //26
+  description: "Snowyland",
+  background: "clouds.png",
+  backgroundNight: "stars.png",
+  terrain: {
+    name: "floor",
+    type: "floor",
+    description: "swamp",
+    gltf: "snowyland.glb",
+    attributes: {
+      snowflakes: true,
+      cutScenes: {
+        intro: "volcanoIntro.mkv"
+      },
+      scale: 100,
+      borderTrees: true,
+      light: {
+        sunLight: true,
+        overheadPointLight: false
+      },
+      fog: {
+        color: "white",
+        density: 1.2
+      },
+      water: {
+        attributes: {
+          useTHREE: false,
+          elevation: 0,
+          color: "white",
+          scale: 500,
+          lava: false
+        },
+        gltf: "water.glb"
+      },
+      designateNPCs: true
+    }
+  },
+  items: [
+    // { name: "iron" },
+    // { name: "silver" },
+    // { name: "titanium" },
+    // { name: "wolfram" },
+    // { name: "silver" },
+    { name: "cavalier" }
+  ],
+  structures: [
+    {
+      name: "platformBlock",
+      location: { x: 18.4, y: 0, z: -23.1 },
+      attributes: {
+        locked: false,
+        routeTo: { level: 3, location: { x: 40.45, y: 0, z: 19.9 } }
+      } //swamp
+    },
+    {
+      name: "platformBlock",
+      location: { x: 4.4, y: 0, z: 21.1 },
+      attributes: {
+        locked: false,
+        elevation: 5,
+        routeTo: { level: 5, location: { x: -90.4, y: 0, z: 100.8 } }
+      } //kingdom
+    },
+    { name: "tavernShop", location: { x: -3.5, y: 0, z: 0 } },
+    {
+      name: "platformBlock",
+      location: { x: -0.5, y: 0, z: 0.15 },
+      attributes: {
+        elevation: -5,
+        footControls: "tavernShop:Walking in/1/0/0/0/0"
+      }
+    },
+    {
+      name: "platformWood",
+      location: { x: -1.5, y: 0, z: 0.15 },
+      attributes: {
+        elevation: 5,
+        footControls: "tavernShop:Walking out/1/0/0/0/0"
+      }
+    }
+  ],
+  entities: [
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "crystalMan", type: "beast" },
+    { name: "crystalMan", type: "beast" },
+    { name: "ghoul", type: "beast" },
+    { name: "ghoul", type: "beast" },
+    { name: "viking", location: { x: -7.5, y: 0, z: 2.7 } },
+    {
+      name: "viking",
+      location: { x: -0, y: 0, z: 1.9 },
+      attributes: { follower: true }
+    }
+  ]
+};

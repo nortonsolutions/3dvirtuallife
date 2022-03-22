@@ -653,10 +653,11 @@ l
                 if (item.attributes.rotateZ) item.model.rotateZ(degreesToRadians(item.attributes.rotateZ));
 
                 if (item.model.attributes.rotateY) item.model.rotateY(degreesToRadians(item.model.attributes.rotateY));
-                if (!this.attributes.flipWeapon) item.model.rotateY(Math.PI); // player specific
+                if (!this.attributes.flipWeapon || (this.attributes.flipWeapon && item.attributes.mountable)) item.model.rotateY(Math.PI); // player specific
 
                 let scale = item.attributes.equippedScale? item.attributes.equippedScale: 0.1;
-                if (this.attributes.handScaleFactor) scale *= this.attributes.handScaleFactor;
+                if (this.attributes.handScaleFactor && !item.attributes.mountable) scale *= this.attributes.handScaleFactor;
+                // if (this.attributes.mountScaleFactor && item.attributes.mountable) scale *= this.attributes.mountScaleFactor;
                 item.model.scale.copy(new THREE.Vector3( scale, scale, scale ));
 
                 // if (itemName == "torch") {
