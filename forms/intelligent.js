@@ -553,7 +553,7 @@ export class IntelligentForm extends AnimatedForm{
         var newQuantity;
         var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
         if (itemIndex != -1) {
-            newQuantity = this.inventory[itemIndex].quantity + quantity;
+            newQuantity = this.inventory[itemIndex]? this.inventory[itemIndex].quantity + quantity : 1;
         } else {
 
             // If desiredIndex is already defined, use the first inventory slot
@@ -610,8 +610,10 @@ export class IntelligentForm extends AnimatedForm{
     getInventory() {
         return this.inventory;
     }
-
+l
     inventoryContains(items) {
+
+        if (items == 'all') return true;
         var found = false;
         items.forEach(item => {
             if (this.inventory.map(el => el? el.itemName: null).includes(item)) found = true;

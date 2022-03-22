@@ -395,3 +395,12 @@ main {
     width: 100%;
     max-height: 60px;
 }
+
+.response:hover {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#speech {
+    color: blue;
+}

@@ -46,7 +46,7 @@ export class Hero extends IntelligentForm {
         this.attributes.shouldMove = true;
         this.attributes.shouldAnimate = true;
 
-        this.party = [];
+        this.party = template.party? template.party: [];
 
         this.cacheHero();
     }
@@ -184,6 +184,26 @@ export class Hero extends IntelligentForm {
         }
     }
 
+    mount(selectedObject) {
+
+        let objectType = selectedObject.objectType;
+        let objectSubtype = selectedObject.objectSubtype;
+        let itemName = selectedObject.attributes.baseItemName? selectedObject.attributes.baseItemName : selectedObject.objectName;
+
+        let data = {    
+            itemName, 
+            quantity: selectedObject.attributes.quantity? selectedObject.attributes.quantity : 1,
+            layoutId: selectedObject.model.attributes.layoutId,
+            type: objectType
+        }
+
+        // Place immediately in 'mount' equipped position
+        this.sceneController.eventDepot.fire('takeItemFromSceneAndAddToInventory', data);
+        this.sceneController.eventDepot.fire('removeFromInventory', itemName)
+        this.sceneController.eventDepot.fire('equipItem', {bodyPart: "mount", itemName });
+
+    }
+
     // e.g. this.handleMouseClick('L', shift)
     handleMouseClick(side, shift) {
         if (this.alive) {
@@ -194,19 +214,13 @@ export class Hero extends IntelligentForm {
                 let objectSubtype = this.selectedObject.objectSubtype;
                 let itemName = this.selectedObject.attributes.baseItemName? this.selectedObject.attributes.baseItemName : this.selectedObject.objectName;
 
-                if (this.selectedObject.attributes.mountable) {
-
-                    let data = {    
-                        itemName, 
-                        quantity: this.selectedObject.attributes.quantity? this.selectedObject.attributes.quantity : 1,
-                        layoutId: this.selectedObject.model.attributes.layoutId,
-                        type: objectType
-                    }
-
-                    // Place immediately in 'mount' equipped position
-                    this.sceneController.eventDepot.fire('takeItemFromSceneAndAddToInventory', data);
-                    this.sceneController.eventDepot.fire('removeFromInventory', itemName)
-                    this.sceneController.eventDepot.fire('equipItem', {bodyPart: "mount", itemName });
+                if (objectType == "friendly" && this.selectedObject.getCurrentConversation) {
+                    
+                    this.sceneController.eventDepot.fire('unlockControls', {});
+                    this.sceneController.eventDepot.fire('modal', { type: 'dialog', title: this.selectedObject.objectName, entity: this.selectedObject, hero: this });
+                
+                } else if (this.selectedObject.attributes.mountable) {
+                    this.mount(this.selectedObject);
 
                 } else if (objectType == "item" || objectSubtype == "tree" || objectSubtype == "fish") {
 
@@ -220,11 +234,6 @@ export class Hero extends IntelligentForm {
                     if (this.selectedObject.attributes.keyCode) data.keyCode =this.selectedObject.attributes.keyCode;
                     this.sceneController.eventDepot.fire('takeItemFromSceneAndAddToInventory', data);
 
-                } else if (objectType == "friendly") {
-                    
-                    this.sceneController.eventDepot.fire('unlockControls', {});
-                    this.sceneController.eventDepot.fire('modal', { type: 'dialog', title: this.selectedObject.objectName, entity: this.selectedObject, hero: this });
-                
                 } else if (objectType == "beast") {
 
                     if (this.selectedObject.alive) this.attack(side, shift);
@@ -1014,15 +1023,13 @@ export class Hero extends IntelligentForm {
         }
     }
 
-    accept(entity, actionName) {
+    addToParty(template) {
+        this.party.push(template);
+        this.cacheHero();
+    }
 
-        switch (actionName) {
-            case "joinHero":
-                entity.updateAttributes({follower: true});
-                this.party.push(entity.returnTemplate());
-                this.cacheHero();
-                break;
-
-        }
+    removeFromParty(name) {
+        this.party = this.party.filter(el => el.name != name);
+        this.cacheHero();
     }
 }

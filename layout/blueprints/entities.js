@@ -1,11 +1,18 @@
 let convo = {
     accept: { text: "Yes, I accept", type: "accept" },
-    decline: { text: "No, thank you", type: "decline" },
+    decline: { text: "No, thank you", type: "end" },
     engage: { text: "<Engage the conversation>", type: "engage" },
     disengage: { text: "<Disengage the conversation>", type: "disengage" },
-    wellwish: { text: "Well wishes to you, my friend.", type: "neutral" },
+    wellwish: { text: "Well wishes to you, my friend.", type: "end" },
     empathize: { text: "<Empathize and ask more>", type: "engage" },
-    shop: { type: "shop" }
+    trade: { text: "Let us trade.", type: "trade" },
+    reset: { text: "Let's start over.", type: "reset"}, 
+    grant: { text: "Please accept the item.", type: "grant"},
+    goodbye: { text: "Good bye.", type: "end" },
+    enlist: { text: "I need your help, old friend!  Join me.", type: "enlist" },
+    release: { text: "Your help has been appreciated.  Get some rest!", type: "release" },
+    mount: { text: "Let's ride!", type: "mount"}
+
 }
 
 export const Entities = {
@@ -287,7 +294,6 @@ export const Entities = {
             grants: ["gold10"]
         }
     },
-
     carp: {
         name: 'carp',
         gltf: 'carp.glb',
@@ -539,12 +545,11 @@ export const Entities = {
             scale: 17,
             goldValue: 1.1, // Slightly higher value of gold on exchanges
             conversation: {
-                conversationState: "intro",
+                state: "intro",
                 engagementState: 0,
-                special: {
-                    condition: ["bagOfGems","gold","aluminium","smallSword"],
+                trade: {
+                    wants: ["bagOfGems","gold","aluminium","smallSword"],
                     speech: 'Welcome to my shop, my friend.',
-                    action: 'showWares'
                 },
                 intro: {
                     speech: "Hello there, stranger.  Come back when you have something to trade.", 
@@ -588,12 +593,11 @@ export const Entities = {
             scale: 30,
             goldValue: 1.1, // Slightly higher value of gold on exchanges
             conversation: {
-                conversationState: "intro",
+                state: "intro",
                 engagementState: 0,
-                special: {
-                    condition: ["bagOfGems","gold"],
-                    speech: 'Welcome to my shop, my friend.',
-                    action: 'showWares'
+                trade: {
+                    wants: ["bagOfGems","gold"],
+                    speech: 'Welcome to my shop, young robot.',
                 },
                 intro: {
                     speech: "Hello there, stranger.  Come back when you have something to trade.", 
@@ -922,12 +926,16 @@ export const Entities = {
         image: 'cosmichorse.png',
         description: 'Mystical steed',
         type: 'friendly',
+        inventory: [],
+        equipped: [],
         attributes: {
             shouldAnimate: true,
             mountable: true,
             moves: true,
             animates: true,
             height: 40,
+            dialogHeight: 50,   
+            dialogCameraDistance: 35,         
             length: 50,
             width: 20,
             elevation: 0,
@@ -937,14 +945,35 @@ export const Entities = {
                 health: "4/4/0",
                 mana: "0/0/0",
                 strength: "0/0/0",
-                agility: "1/1/0",
+                agility: "3/3/0",
                 defense: "5/5/0", // rock, weapon, arrow damage defense
                 fire: "10/10/0",
                 ice: "0/0/0",
                 poison: "0/0/0",
                 thunder: "0/0/0"
             },
-            grants: ["gold10"],
+            conversation: {
+                state: "intro",
+                engagementState: 0,
+                special: {
+                    condition: ["food"],
+                    speech: '<Whimpering at the sight of food>',
+                    responses: [convo.grant, convo.decline],
+                    jumpToState: "loyal" // if special condition is met
+                },
+                intro: {
+                    speech: "Neigh!", 
+                    responses: [convo.wellwish]
+                },
+                loyalSubject: {
+                    speech: "Neigh!", 
+                    responses: [convo.enlist, convo.goodbye, convo.mount]
+                },
+                loyalFollower: {
+                    speech: "Neigh!", 
+                    responses: [convo.release, convo.goodbye, convo.mount]
+                }
+            },
         }
     },
 
@@ -1185,40 +1214,12 @@ export const Entities = {
             elevation: 0,
             scale: 10,
             conversation: {
-                conversationState: "intro",
+                state: "intro",
                 engagementState: 0,
-                special: {
-                    condition: ["crystalBall"],
-                    speech: 'Ah, you have my crystal ball!  Please take what you will in exchange!',
-                    action: "showWares",
-                    jumpToState: "complete"
-                },
                 intro: {
-                    speech: "Hello there, stranger.", 
-                    responses: [convo.engage, convo.disengage]
-                },
-                engaged: [ // ordered to allow progression
-                    {
-                        speech: "These are terrible times here, so beware.  The place is overrun with horrors from the depths.", 
-                        responses: [convo.engage, convo.disengage]
-                    },
-                    {
-                        speech: "Yes, yes....  I'll tell you, the thieves running rampant have no regard for anyone or anything but themselves.  Recently they stole my crystal ball.", 
-                        responses: [convo.empathize, convo.disengage]
-                    },
-                    {
-                        speech: "Thank you for your concern, fellow man.  If you could find and return my crystal ball, I will reward your efforts.", 
-                        responses: [convo.disengage, convo.wellwish],
-                    }
-                ],
-                disengaged: {
-                    speech: "Have a fine day, stranger.",
-                    responses: [convo.engage, convo.disengage]
-                },
-                complete: {
-                    speech: "Most esteemed greetings to you, my friend!",
+                    speech: "Hello there.", 
                     responses: [convo.wellwish]
-                }
+                },
             },
             stats: {
                 health: "2/2/0",
@@ -1239,8 +1240,11 @@ export const Entities = {
         gltf: 'gamebot.glb',
         description: 'Another robot which seems different',
         type: 'friendly',
-        inventory: [],
+        inventory: [
+            {itemName:"armor",quantity:1,price:"gold/1"},
+        ],
         attributes: {
+            // loyalTo: "whom"?
             moves: true,
             animates: true,
             height: 30,
@@ -1250,18 +1254,22 @@ export const Entities = {
             elevation: 0,
             scale: 4,
             conversation: {
-                conversationState: "intro",
+                state: "intro",
                 engagementState: 0,
+                trade: {
+                    wants: 'all',
+                    speech: 'Let us trade.',
+                    responses: [convo.reset]
+                },
                 special: {
                     condition: ["crystalBall"],
-                    speech: 'Ah, you have my crystal ball!  I would be honored to join your party!',
-                    responses: [convo.accept, convo.decline],
-                    action: "joinHero",
-                    jumpToState: "complete"
+                    speech: 'Ah, you have the crystal ball!  Please grant the item and you will have my loyalty!',
+                    responses: [convo.grant, convo.decline],
+                    jumpToState: "loyal" // if special condition is met
                 },
                 intro: {
-                    speech: "Hello there, stranger.", 
-                    responses: [convo.engage, convo.disengage]
+                    speech: "Hello there.", 
+                    responses: [convo.engage, convo.wellwish]
                 },
                 engaged: [ // ordered to allow progression
                     {
@@ -1273,17 +1281,21 @@ export const Entities = {
                         responses: [convo.empathize, convo.disengage]
                     },
                     {
-                        speech: "Thank you for your concern, fellow man.  If you could find and return my crystal ball, I will reward your efforts.", 
-                        responses: [convo.disengage, convo.wellwish],
+                        speech: "Thank you for your concern, fellow man.  If you could find and return my crystal ball, I will reward your efforts.  Care to trade in the meantime?", 
+                        responses: [convo.trade, convo.wellwish],
                     }
                 ],
                 disengaged: {
                     speech: "Have a fine day, stranger.",
-                    responses: [convo.engage, convo.disengage]
+                    responses: [convo.engage, convo.wellwish]
                 },
-                complete: {
-                    speech: "Most esteemed greetings to you, my friend!",
-                    responses: [convo.wellwish]
+                loyalSubject: {
+                    speech: "Hello master!", 
+                    responses: [convo.trade, convo.enlist, convo.goodbye]
+                },
+                loyalFollower: {
+                    speech: "Yes?", 
+                    responses: [convo.trade, convo.release, convo.goodbye]
                 }
             },
             stats: {
@@ -1321,14 +1333,13 @@ export const Entities = {
             scale: 25,
             goldValue: 1.1, // Slightly higher value of gold on exchanges
             conversation: {
-                conversationState: "intro",
-                engagementState: 0,
-                special: {
-                    condition: ["bagOfGems","gold"],
+                defaultState: "trade",
+                state: "trade",
+                trade: {
+                    wants: ["bagOfGems","gold"],
                     speech: 'Welcome to my shop, my friend.',
-                    action: 'showWares'
                 },
-                intro: {
+                comeback: {
                     speech: "Hello there, stranger.  Come back when you have something to trade.", 
                     responses: [convo.wellwish]
                 }
@@ -1362,7 +1373,7 @@ export const Entities = {
             scale: 45,
             rotateY: 180,
             conversation: {
-                conversationState: "intro",
+                state: "intro",
                 engagementState: 0,
                 challenge: {
                     condition: ["keyToKingdom"],
@@ -1419,12 +1430,11 @@ export const Entities = {
             scale: 35,
             goldValue: 1.1, // Slightly higher value of gold on exchanges
             conversation: {
-                conversationState: "intro",
+                state: "intro",
                 engagementState: 0,
-                special: {
-                    condition: ["bagOfGems","gold","aluminium","smallSword"],
+                trade: {
+                    wants: 'all', // ["bagOfGems","gold","aluminium","smallSword"],
                     speech: 'Welcome to my shop, my friend.',
-                    action: 'showWares'
                 },
                 intro: {
                     speech: "Hello there, stranger.  Come back when you have something to trade.", 

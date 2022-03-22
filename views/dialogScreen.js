@@ -35,9 +35,16 @@ export class DialogScreen {
         light.position.set( 0, 20, 0 );
         this.scene.add( light );
 
-        light = new THREE.DirectionalLight( 0xffffff );
-        light.position.set( 0, 20, 10 );
-        this.scene.add( light );
+        let light2 = new THREE.DirectionalLight( 0xffffff );
+        light2.position.set( 0, 20, 10 );
+        this.scene.add( light2 );
+
+        // var ambientLight = new THREE.AmbientLight( 0xcccccc, 2 );
+        // this.scene.add( ambientLight );
+
+        let light3 = new THREE.DirectionalLight( 0xffffff );
+        light3.position.set( 60, 40, 10 );
+        this.scene.add( light3 );
 
         var closer = document.getElementsByClassName("close")[0];
         closer.onclick = () => {
@@ -50,7 +57,7 @@ export class DialogScreen {
     }
 
     initCanvas = () => {
-
+        this.tempSpeech = null;
         // stop the existing animation cycle
         if (this.animationId) cancelAnimationFrame( this.animationId );
         
@@ -79,6 +86,7 @@ export class DialogScreen {
 
             this.scene.add( this.currentModel );
             this.camera.position.z = 40;
+            if (this.entity.template.attributes.dialogCameraDistance) this.camera.position.z += this.entity.template.attributes.dialogCameraDistance;
             this.camera.position.y = this.entity.template.attributes.dialogHeight;
 
             this.animations.forEach((animation,index) => {
@@ -225,27 +233,76 @@ export class DialogScreen {
         Array.from(document.querySelectorAll('.response')).forEach(el => {
             el.addEventListener('click', e => {
                 // e.target.id;
+
+                var tempSpeech = null;
                 let responseType = this.getContext().responses[e.target.id].type;
                 switch (responseType) {
+
                     case "engage":
                         this.entity.engageConversation();
                         break;
+
                     case "disengage":
                         this.entity.disengageConversation();
                         break;
-                    case "accept":
-                        this.hero.accept(this.entity, this.getContext().action);
+
+                    case "trade":
+                        this.entity.attributes.conversation.state = "trade";
+                        break;
+
+                    case "reset":
+                        let d = this.entity.attributes.conversation.defaultState;
+                        this.entity.attributes.conversation.state = d ? d: "intro";
+                        this.entity.attributes.conversation.engagementState = 0;
+                        this.reset();
+                        break;
+
+                    case "enlist":
+                        this.entity.follow(this.hero);
+                        this.reset();
+                        this.fadeToAction('Yes', 0.2);
+                        tempSpeech = "As you wish!"
+                        break;
+
+                    case "release":
+                        this.entity.unfollow(this.hero);
+                        this.reset();
+                        this.fadeToAction('Yes', 0.2);
+                        tempSpeech = "As you wish!"
+                        break;
+
+                    // case "accept": // when 
+                    //     this.hero.accept(this.entity, this.getContext().action);
+                    //     this.closeModal();
+                    //     this.eventDepot.fire('closeModal', {});
+                    //     break;
+
+                    case "grant": // grant special condition items
+                        this.getContext().condition.forEach((item) => {
+                            this.entity.addToInventory(item, 0, 1);
+                            this.hero.removeFromInventory(item); 
+                        }) 
+                        this.entity.joinParty(this.hero);
+                        this.reset();
+                        this.entity.attributes.conversation.state = 'intro';
+                        this.fadeToAction('Yes', 0.2);
+                        tempSpeech = "God bless you!"
+                        break;
+
+                    case "mount":
+                        this.hero.mount(this.entity);
+                        tempSpeech = "Let's go!"
+                        break;
+
+                    case "end":
                         this.closeModal();
                         this.eventDepot.fire('closeModal', {});
                         break;
-                    case "decline":
-                        this.closeModal();
-                        this.eventDepot.fire('closeModal', {});
-                        break;
+
                     case "neutral":
                         break;
                 }
-                this.refresh();
+                this.refresh(tempSpeech);
             })
         })
 
@@ -318,15 +375,16 @@ export class DialogScreen {
     }
 
     reset() {
+        this.tempSpeech = null;
         this.acceptDisabled = true;
         this.tab = { items: {}, totalPrice: {} } ;
         this.payment = { };
-        this.tempSpeech = null;
         this.negotiation = false;
     }
 
     refresh = (tempSpeech) => {
         this.currentlyFadingToAction = false;
+        
         if (tempSpeech) {
             this.updateSpeech(tempSpeech);
         } else this.tempSpeech = null;
@@ -593,10 +651,13 @@ export class DialogScreen {
             }
 
             // look at special conditions to determine wants
-            let specialConditions = this.entity.attributes.conversation.special.condition;
+            let wants = this.entity.attributes.conversation.trade.wants;
 
-            for (let index = 0; index < specialConditions.length; index++) {
-                let objectName = specialConditions[index] ? specialConditions[index] : undefined;
+            if (wants == 'all') wants = this.hero.inventory
+            .filter(e => e != null).map(e => e.itemName);
+
+            for (let index = 0; index < wants.length; index++) {
+                let objectName = wants[index] ? wants[index] : undefined;
 
                 context.wants[index] = {
                     index: index,

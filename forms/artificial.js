@@ -288,10 +288,10 @@ export class ArtificialForm extends IntelligentForm{
 
     engageConversation() {
 
-        switch (this.attributes.conversation.conversationState) {
+        switch (this.attributes.conversation.state) {
             case "intro": 
             case "disengaged":
-                this.attributes.conversation.conversationState = "engaged";
+                this.attributes.conversation.state = "engaged";
                 this.attributes.conversation.engagementState = 0;
                 break;
             case "engaged":
@@ -300,56 +300,96 @@ export class ArtificialForm extends IntelligentForm{
         }
     }
 
-    completeConversation() {
-        this.attributes.conversation.conversationState = "complete";
+    jumpToConversation(state) {
+        this.attributes.conversation.state = state;
         this.attributes.conversation.engagementState = 0;
     }
 
     disengageConversation() {
-        this.attributes.conversation.conversationState = "disengaged";
+        this.attributes.conversation.state = "disengaged";
         this.attributes.conversation.engagementState = 0;
     }
 
     getCurrentConversation() {
 
-        let challenge = this.attributes.conversation? (this.attributes.conversation.challenge? this.attributes.conversation.challenge : null) : null;
-        let special = this.attributes.conversation.conversationState != "complete" && this.attributes.conversation.special;
+        let loyalTo = this.attributes.loyalTo;
+        let convo = this.attributes.conversation;
+        let challenge = convo? (convo.challenge? convo.challenge : null) : null;
+        let special = convo.state != "complete" && convo.special;
+        let trade = convo.trade;
+        
+        if (loyalTo && loyalTo == this.sceneController.hero.objectName) {
 
-        // If special condition is already met and jumpToState is set, set to complete
-
-        if (challenge) {
+            if (convo.state == "trade") {
+                if (this.sceneController.hero.inventoryContains(trade.wants)) {
+                    let context = Object.assign({}, trade);
+                    context.wares = this.inventory;
+                    return context;
+                } else {
+                    return convo.comeback;
+                }
+            } else {
+                return this.attributes.follower? convo.loyalFollower : convo.loyalSubject;
+            }
+            
+        } else if (challenge) { // handle challenges
             if (this.sceneController.hero.inventoryContains(challenge.condition)) {
-                return this.attributes.conversation[this.attributes.conversation.conversationState];
+                return this.attributes.conversation[this.attributes.conversation.state];
             } else {
                 return challenge;
             }
-        } else if (special && this.inventoryContainsAll(special.condition) && this.attributes.conversation.special.jumpToState) {
-            switch (this.attributes.conversation.special.jumpToState) {
-                case "complete": 
-                    this.completeConversation();
-                    break;
 
-            }
-            return this.attributes.conversation[this.attributes.conversation.conversationState];
-
-        } else {
-            // If hero meets the 'special condition' then jump straight to it:
-            if (special && this.sceneController.hero.inventoryContains(special.condition)) {
-                switch (this.attributes.conversation.special.action) {
-                    case "showWares": 
-                        special.wares = this.inventory;
-                        return special;
-                    case "joinHero":
-                        return this.attributes.conversation.special;
+        // If special condition is already met and jumpToState is set, set to complete
+        } else if (special) { // handle special
+            if (this.inventoryContainsAll(special.condition) && special.jumpToState) {
+                // AI already has his special condition
+                switch (special.jumpToState) {
+                    case "loyal": // return wares and loyalty info
+                        return {
+                            wares: this.inventory,
+                            loyalTo: this.attributes.loyalTo
+                        };
                 }
-
-            } else {
-                if (this.attributes.conversation.conversationState == "engaged") {
-                    return this.attributes.conversation[this.attributes.conversation.conversationState][this.attributes.conversation.engagementState];
-                } else {
-                    return this.attributes.conversation[this.attributes.conversation.conversationState];
-                }
+    
+                // default convo state:
+                return convo[convo.state];
+    
+            } else if (this.sceneController.hero.inventoryContains(special.condition)) {
+                // Hero meets special condition
+                return special;
             }
         }
+        
+        if (convo.state == "trade") {
+            if (this.sceneController.hero.inventoryContains(trade.wants)) {
+                let context = Object.assign({}, trade);
+                context.wares = this.inventory;
+                return context;
+            } else {
+                return convo.comeback;
+            }
+        } else {
+            if (convo.state == "engaged") {
+                return convo[convo.state][convo.engagementState];
+            } else {
+                return convo[convo.state];
+            }
+        }
+    }
+
+    joinParty(hero) {
+        this.updateAttributes({loyalTo: hero.objectName});
+    }
+
+    follow(hero) {
+        this.updateAttributes({follower: true});
+        hero.addToParty(this.returnTemplate());
+        hero.cacheHero();
+    }
+
+    unfollow(hero) {
+        this.updateAttributes({follower: false});
+        hero.removeFromParty(this.returnTemplate().name);
+        hero.cacheHero();
     }
 }

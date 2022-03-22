@@ -668,23 +668,32 @@ export class SceneController {
             this.seedForm(template).then(form => {});
         });
 
-        this.layout.entities.forEach(({name,location,attributes}, index) => {
+        // Update the location for each party member to match the hero, and 
+        // filter this.layout.entities to avoid dupes:
+        this.hero.party.forEach(member => {
+            member.location = this.hero.location;
+            this.layout.entities = this.layout.entities.filter(el => el.name != member.name);
+        });
+
+        let comboEntities = [...this.layout.entities, ...this.hero.party];
+
+        comboEntities.forEach(({name,location,attributes}, index) => {
             let template = this.getTemplateByName(name);
             if (location) template.location = location;
             if (attributes) template.attributes = {...template.attributes, ...attributes};
             
             if (firstInRoom) {
-                if (!this.layout.entities[index].attributes) this.layout.entities[index].attributes = {};
-                this.layout.entities[index].attributes.layoutId = template.attributes.layoutId = nextLayoutId++;
+                if (!comboEntities[index].attributes) comboEntities[index].attributes = {};
+                comboEntities[index].attributes.layoutId = template.attributes.layoutId = nextLayoutId++;
 
                 if (this.layout.terrain.attributes.designateNPCs && template.type == "beast" && template.subtype != "fish" && index < this.floorNPClocations.length) {
                     template.location = this.getLocationFromPosition(this.floorNPClocations[index], 100/this.layout.terrain.attributes.scale);
-                    this.layout.entities[index].location = template.location;
+                    comboEntities[index].location = template.location;
                 }
 
                 if (this.layout.terrain.attributes.designateNPCs && template.attributes.boss ) {
                     template.location = this.getLocationFromPosition(this.floorBossLocations[0], 100/this.layout.terrain.attributes.scale);
-                    this.layout.entities[index].location = template.location;
+                    comboEntities[index].location = template.location;
                 }
             }
             this.seedForm(template).then(form => {});
