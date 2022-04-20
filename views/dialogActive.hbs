@@ -20,7 +20,7 @@
                             <div class="card-body tooltipper dragSpot" id={{index}}>
                                 <img id="{{name}}" class="draggable" draggable="true" src="/models/png/{{image}}" quant="{{name}}quant" describedBy="{{name}}desc">
                                 <span id="{{name}}desc" class="tooltippertext noClick">{{description}}</span>
-                                <span id="{{name}}quant" class="noClick small">{{quantity}} for {{priceString}}</span>
+                                <span id="{{name}}quant" class="noClick small">{{priceString}}</span>
                                 <div class="row d-flex justify-content-center mx-0 px-0">
                                     <div class="col-6 mx-0 px-0"><button type="button" class="btn btn-secondary btn-sm changeTabItem" data-item="{{name}}:{{price}}" data-quantity="1"><i class="fas fa-plus noClick"></i></button></div>
                                     <div class="col-6 mx-0 px-0"><button type="button" class="btn btn-secondary btn-sm changeTabItem" data-item="{{name}}:{{price}}" data-quantity="-1"><i class="fas fa-minus noClick"></i></button></div>

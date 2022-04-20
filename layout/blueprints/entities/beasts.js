@@ -53,6 +53,7 @@ export const Beasts = {
       grants: ["gold25"]
     }
   },
+
   rockyMan: {
     name: "rockyMan",
     gltf: "rockyMan.glb",
@@ -81,6 +82,7 @@ export const Beasts = {
       rangedSpell: "rockProjectileSpell"
     }
   },
+
   crystalMan: {
     name: "crystalMan",
     gltf: "crystalMan.glb",
@@ -108,60 +110,7 @@ export const Beasts = {
       grants: ["gold25"]
     }
   },
-  rosen: {
-    name: "rosen",
-    gltf: "rosen.glb",
-    description: "UDC Inmate",
-    type: "beast",
-    attributes: {
-      moves: true,
-      animates: true,
-      height: 50,
-      length: 20,
-      width: 20,
-      elevation: 100,
-      scale: 10,
-      stats: {
-        health: "2/2/0",
-        mana: "0/0/0",
-        strength: "2/2/0",
-        agility: "2/2/0",
-        defense: "0/0/0", // rock, weapon, arrow damage defense
-        fire: "0/0/0",
-        ice: "0/0/0",
-        poison: "0/0/0",
-        thunder: "0/0/0"
-      },
-      grants: ["gold3"]
-    }
-  },
-  lobot: {
-    name: "lobot",
-    gltf: "lobot.glb",
-    description: "Gnomish freakazoid",
-    type: "beast",
-    attributes: {
-      moves: true,
-      animates: true,
-      height: 30,
-      length: 20,
-      width: 20,
-      elevation: 100,
-      scale: 10,
-      stats: {
-        health: "2/2/0",
-        mana: "0/0/0",
-        strength: "2/2/0",
-        agility: "2/2/0",
-        defense: "0/0/0", // rock, weapon, arrow damage defense
-        fire: "0/0/0",
-        ice: "0/0/0",
-        poison: "0/0/0",
-        thunder: "0/0/0"
-      },
-      grants: ["gold3"]
-    }
-  },
+
   rat: {
     name: "rat",
     gltf: "rat.glb",
@@ -189,6 +138,7 @@ export const Beasts = {
       grants: ["gold10"]
     }
   },
+  
   crocodile: {
     name: "crocodile",
     gltf: "crocodile.glb",
@@ -214,9 +164,10 @@ export const Beasts = {
         poison: "0/0/0",
         thunder: "0/0/0"
       },
-      grants: ["gold10"]
+      grants: ["dragonPelt"]
     }
   },
+
   catFish: {
     name: "catFish",
     gltf: "catFish.glb",
@@ -247,9 +198,9 @@ export const Beasts = {
         poison: "0/0/0",
         thunder: "0/0/0"
       },
-      grants: ["gold10"]
     }
   },
+
   carp: {
     name: "carp",
     gltf: "carp.glb",
@@ -280,9 +231,9 @@ export const Beasts = {
         poison: "0/0/0",
         thunder: "0/0/0"
       },
-      grants: ["gold10"]
     }
   },
+
   dragon: {
     name: "dragon",
     gltf: "dragon.glb",
@@ -307,10 +258,11 @@ export const Beasts = {
         poison: "1/1/0",
         thunder: "0/0/0"
       },
-      grants: ["gold10"],
+      grants: ["dragonPelt", "food"],
       rangedSpell: "fireProjectileSpell"
     }
   },
+
   triceratops: {
     name: "triceratops",
     gltf: "triceratops.glb",
@@ -335,10 +287,10 @@ export const Beasts = {
         poison: "0/0/0",
         thunder: "0/0/0"
       },
-      grants: ["animalskin", "food"]
-      // rangedSpell: 'fireProjectileSpell'
+      grants: ["dragonPelt", "food"]
     }
   },
+
   trex: {
     name: "trex",
     gltf: "trex.glb",
@@ -363,14 +315,14 @@ export const Beasts = {
         poison: "0/0/0",
         thunder: "2/2/0"
       },
-      grants: ["gold10"]
-      // rangedSpell: 'fireProjectileSpell'
+      grants: ["dragonPelt", "food"],
     }
   },
+  
   daveDragon: {
     name: "daveDragon",
     gltf: "daveDragon.glb",
-    description: "Lobato Dragon",
+    description: "Huge Dragon",
     type: "beast",
     attributes: {
       moves: true,
@@ -391,10 +343,11 @@ export const Beasts = {
         poison: "7/7/0",
         thunder: "3/3/0"
       },
-      grants: ["gold10"],
+      grants: ["dragonPelt", "food"],
       rangedSpell: "fireProjectileSpell"
     }
   },
+
   bat: {
     name: "bat",
     gltf: "bat.glb",
@@ -422,6 +375,7 @@ export const Beasts = {
       grants: ["gold10"]
     }
   },
+
   murderBear: {
     name: "murderBear",
     gltf: "murderBear.glb",
@@ -449,6 +403,7 @@ export const Beasts = {
       grants: ["gold10", "katana"]
     }
   },
+
   zombie: {
     name: "zombie",
     gltf: "zombie.glb",
@@ -477,6 +432,7 @@ export const Beasts = {
       grants: ["gold10"]
     }
   },
+
   ghoul: {
     name: "ghoul",
     gltf: "ghoul.glb",
@@ -505,6 +461,7 @@ export const Beasts = {
       // rangedSpell: 'poisonProjectileSpell'
     }
   },
+
   lavaGhoul: {
     name: "lavaGhoul",
     gltf: "lavaGhoul.glb",
@@ -533,6 +490,7 @@ export const Beasts = {
       rangedSpell: "fireProjectileSpell"
     }
   },
+
   shockGhoul: {
     name: "shockGhoul",
     gltf: "shockGhoul.glb",
@@ -561,6 +519,7 @@ export const Beasts = {
       rangedSpell: "lightningBoltSpell"
     }
   },
+
   iceGhoul: {
     name: "iceGhoul",
     gltf: "iceGhoul.glb",
@@ -589,6 +548,7 @@ export const Beasts = {
       rangedSpell: "iceProjectileSpell"
     }
   },
+
   ghostGhoul: {
     name: "ghostGhoul",
     gltf: "ghostGhoul.glb",
@@ -617,6 +577,7 @@ export const Beasts = {
       rangedSpell: "lightningBoltSpell"
     }
   },
+
   gasGhoul: {
     name: "gasGhoul",
     gltf: "gasGhoul.glb",
@@ -645,6 +606,7 @@ export const Beasts = {
       rangedSpell: "poisonProjectileSpell"
     }
   },
+
   demonLord: {
     name: "demonLord",
     gltf: "demonLord.glb",

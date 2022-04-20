@@ -23,7 +23,7 @@ export const Buildings = {
           showOnSeed: true
         }
       ],
-      animations: "DoorAction/2/2/1/autorestore/false"
+      animations: "DoorAction/1/autoRestore"
     }
   },
 
@@ -51,7 +51,7 @@ export const Buildings = {
           showOnSeed: true
         }
       ],
-      animations: "DoorAction/2/2/1/autorestore/false"
+      animations: "DoorAction/1/autoRestore"
     }
   },
 
@@ -79,7 +79,7 @@ export const Buildings = {
           showOnSeed: true
         }
       ],
-      animations: "DoorAction/2/2/1/autorestore/false"
+      animations: "DoorAction/1/autoRestore"
     }
   },
 
@@ -177,14 +177,16 @@ export const Buildings = {
     gltf: "Well.glb",
     description: "Ancient Well",
     type: "structure",
+    inventory: [],
     attributes: {
-      defaultSingleSimultanousActions: true,
+      multipleSimultanousActions: true,
       animates: true,
       position: "down",
+      whenUp: "addWaterSource",
+      whenDown: "fillWaterBucket",
       scale: 20,
       elevation: 0,
-      animations:
-        "Cylinder.006Action.001/0/0/1/false/concurrent/false+Cylinder.007Action/0/0/1/false/concurrent/false+KeyAction/0/0/1/false/concurrent/false"
+      animations: "Cylinder.006Action.001/1//concurrent//+Cylinder.007Action/1//concurrent+KeyAction/1//concurrent"
     }
   }
 };

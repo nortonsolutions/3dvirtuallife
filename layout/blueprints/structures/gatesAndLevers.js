@@ -7,6 +7,7 @@ export const GatesAndLevers = {
     type: "structure",
     attributes: {
       defaultSingleAction: true,
+      timeScale: 0.1,
       animates: true,
       key: "keyToShed",
       scale: 100,

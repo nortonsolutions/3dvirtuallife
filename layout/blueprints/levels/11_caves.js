@@ -56,18 +56,18 @@ export const Caves = {
     // },
   ],
   entities: [
-    { name: "evilOne", type: "beast" },
-    { name: "evilOne", type: "beast" },
-    { name: "evilOne", type: "beast" },
-    { name: "rat", type: "beast" },
-    { name: "rat", type: "beast" },
-    { name: "bat", type: "beast" },
-    { name: "bat", type: "beast" },
-    { name: "bat", type: "beast" },
-    { name: "bat", type: "beast" },
-    { name: "bat", type: "beast" },
-    { name: "bat", type: "beast" },
-    { name: "ghoul", type: "beast", attributes: { boss: false } }
+    // { name: "evilOne", type: "beast" },
+    // { name: "evilOne", type: "beast" },
+    // { name: "evilOne", type: "beast" },
+    // { name: "rat", type: "beast" },
+    // { name: "rat", type: "beast" },
+    // { name: "bat", type: "beast" },
+    // { name: "bat", type: "beast" },
+    // { name: "bat", type: "beast" },
+    // { name: "bat", type: "beast" },
+    // { name: "bat", type: "beast" },
+    // { name: "bat", type: "beast" },
+    // { name: "ghoul", type: "beast", attributes: { boss: false } }
     // { name: "john" },
   ]
 };

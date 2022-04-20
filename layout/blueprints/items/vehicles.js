@@ -20,21 +20,21 @@ export const Vehicles = {
 
   fishingBoat: {
     name: "fishingBoat",
-    gltf: "fishingBoat2.glb",
+    gltf: "fishingBoat3.glb",
     image: "fishingBoat.png",
     description: "Fishing boat",
     type: "item",
     attributes: {
       height: 10,
-      movingAnimations: "RowAction/2/1/1/false/false",
+      movingAnimations: "RowAction/1",
       mountable: true,
       floats: true,
       equippedScale: 15,
-      rotateY: 90,
+      // rotateY: -90,
       animates: true,
       scale: 15,
-      elevation: 0,
-      translateZ: 20
+      elevation: 10,
+      // translateZ: -40
       // addToStructureModels: true
     }
   }

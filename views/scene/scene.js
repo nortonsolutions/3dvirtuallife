@@ -197,12 +197,13 @@ class Scene {
 
     handleCameraMovement = () => {
 
-        
         // adjustment of the camera position based on acceleration:
         // console.dir(this.controller.hero.acceleration);
-        this.camera.position.x -= (this.controller.hero.acceleration.x/30);
-        this.camera.position.z -= (this.controller.hero.acceleration.z/30);
-        this.camera.rotation.y -= (this.controller.hero.acceleration.x/2000);
+        // this.camera.position.x -= (this.controller.hero.acceleration.x/30);
+        // this.camera.position.z -= (this.controller.hero.acceleration.z/30);
+        // this.camera.rotation.y -= (this.controller.hero.acceleration.x/2000);
+
+
         
         this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
         this.cameraBackray.ray.origin.y += this.controller.hero.attributes.height-10;
@@ -249,18 +250,18 @@ class Scene {
             } 
         }
 
-        if (this.camera.position.x > 10 || this.camera.position.x < -10) {
-            this.camera.position.x -= this.camera.position.x / 100;
-        }
+        // if (this.camera.position.x > 10 || this.camera.position.x < -10) {
+        //     this.camera.position.x -= this.camera.position.x / 100;
+        // }
 
-        if (this.camera.rotation.y > 10 || this.camera.rotation.y < -10) {
-            this.camera.rotation.y -= this.camera.rotation.y / 100;
+        // if (this.camera.position.z > 10 || this.camera.position.z < -10) {
+        //     this.camera.position.z -= this.camera.position.z / 100;
+        // }
+
+        // if (this.camera.rotation.y > 10 || this.camera.rotation.y < -10) {
+        //     this.camera.rotation.y -= this.camera.rotation.y / 100;
             
-        }  
-
-        if (this.camera.rotation.y > 10 || this.camera.rotation.y < -10) {
-            this.camera.rotation.y -= this.camera.rotation.y / 100;
-        }  
+        // }  
         
     }
     
@@ -279,6 +280,7 @@ class Scene {
     /* 'local' items exert an effect while non-local are just for appearances */
     handleAction(projectile, entitiesInRange) {
 
+        if (entitiesInRange.length > 0) console.dir(entitiesInRange);
         // Sprite effects:
         if (projectile.local && projectile.item.attributes.sprites) {
             projectile.item.attributes.sprites.forEach(spriteConfig => {
@@ -304,7 +306,9 @@ class Scene {
                 let [type, change] = projectile.item.attributes.effect.split("/");
 
                 if (projectile.hostile) {
-                    this.controller.hero.changeStat('health', -change, false);
+                    entitiesInRange.forEach(entity => {
+                        entity.receiveDamage(change, type);
+                    })
                 } else {
                     entitiesInRange.forEach(entity => {
                         this.controller.hero.inflictDamage(entity, change, type);
@@ -320,15 +324,12 @@ class Scene {
                     type: "entity"
                 };
     
-                // console.log(`scene: dropping plantable item to scene:`)
-                // console.dir(dropData);
                 this.controller.dropItemToScene(dropData);
             
             } else if (projectile.item.objectSubtype == 'lifegiving') {
                 
                 let [type, change] = projectile.item.attributes.effect.split("/");
-                // console.log(`Inside Entities in range:`);
-                // console.dir(entitiesInRange);
+
                 entitiesInRange.forEach(entity => {
 
                     entity.changeStat(type, change, true);
@@ -468,17 +469,18 @@ class Scene {
 
 
                 } else if (projectile.item.objectSubtype != "bait") { // weapons/spells
-                    if (projectile.hostile && this.controller.heroInRange(projectile.item.attributes.range, projectile.item.model.position)) {
-                        this.handleAction(projectile, null);
-                        continue;
-                    } else if (!projectile.hostile) { // projectiles launched by hero
-                        var entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
-                        if (entitiesInRange.length > 0) {
-                            this.handleAction(projectile, entitiesInRange);
-                            continue;
-                        }
+                    var entitiesInRange;
+                    if (projectile.hostile) {
+                        entitiesInRange = this.controller.allFriendliesInRange(projectile.item.attributes.range, projectile.item.model.position, true);
+                    } else { // projectiles launched by hero
+                        entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
                     }
-        
+
+                    if (entitiesInRange.length > 0) {
+                        this.handleAction(projectile, entitiesInRange);
+                        continue;
+                    }
+
                     // if I hit a structure, handleAction
                     this.projectileMovementRaycaster.ray.origin.copy(projectile.item.model.position);
                     let pIntersects = this.projectileMovementRaycaster.intersectObjects(this.controller.structureModels, true);
@@ -583,9 +585,9 @@ class Scene {
         var time = Date.now() * 0.00005;
 
         this.controller.points.forEach((points,i) => {
-            points.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
+            points.rotation.y = -this.controls.getObject().rotation.y + time * ( i < 4 ? i + 1 : - ( i + 1 ) );
 
-            points.rotation.y -= this.controls.getObject().rotation.y;
+            // points.rotation.y -= ;
             points.rotation.z += this.controller.hero.velocity.z * delta / 1000;
             points.rotation.x += this.controller.hero.velocity.x * delta / 1000;
 

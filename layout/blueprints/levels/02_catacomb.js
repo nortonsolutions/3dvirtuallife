@@ -31,9 +31,6 @@ export const Catacomb = {
     { name: "gold25", location: { x: 10, y: 0, z: -2 } },
     { name: "redpotion" },
     { name: "greenpotion" }
-    // { name: "aluminium" },
-    // { name: "chromium" },
-    // { name: "iron" }
   ],
   structures: [
     {

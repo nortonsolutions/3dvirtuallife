@@ -55,6 +55,14 @@ export const Lavalabyrinth = {
     { name: "iceGhoul", type: "beast" },
     { name: "shockGhoul", type: "beast" },
     { name: "gasGhoul", type: "beast" },
-    { name: "ghostGhoul", type: "beast" }
+    { name: "ghostGhoul", type: "beast" },
+    { name: "lavaGhoul", type: "beast" },
+    { name: "lavaGhoul", type: "beast" },
+    { name: "lavaGhoul", type: "beast" },
+    { name: "lavaGhoul", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
   ]
 };

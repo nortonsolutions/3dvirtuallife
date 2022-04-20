@@ -42,7 +42,7 @@ export const Potions = {
       equippedScale: 0.005,
       elevation: 10,
       effect: "poisonDamage/3",
-      range: 40,
+      range: 50,
       sprites: [
         {
           name: "greenExplosion",
@@ -99,7 +99,7 @@ export const Potions = {
       equippedScale: 0.005,
       elevation: 10,
       effect: "thunderDamage/3",
-      range: 40,
+      range: 50,
       sprites: [
         {
           name: "hitEffect",

@@ -72,9 +72,30 @@ export class SceneController {
         this.ponds = [];
 
         this.dayPhase = 0;
+        this.countDowns = [];
         // this.refractors = [];
         // this.dudvMap = new THREE.TextureLoader().load( '/textures/waterdudv.jpg' );
         // this.dudvMap.wrapS = this.dudvMap.wrapT = THREE.RepeatWrapping;
+    }
+
+    addToIntervals(minutes, recurring, fn) {
+        this.countDowns.push({
+            cur: new Date(),
+            minutes,
+            recurring,
+            fn
+        })
+    }
+
+    processIntervals() { 
+        setInterval(() => {
+            this.countDowns.forEach(c => { // only run this about once a minute
+                // test to see if the time has passed
+                let timePassed = (new Date() - c.cur)/1000/60; //minutes
+                if (timePassed >= c.minutes) c.fn();
+                if (!c.recurring) this.countDowns = this.countDowns.filter(e => e != c);
+            });
+        }, 60000);
     }
 
     introduce() {
@@ -115,6 +136,8 @@ export class SceneController {
                                 if (this.floor.attributes.snowflakes) this.addSnowflakes();
                                 this.introduce();
                                 this.scene.readyForLock = true;
+
+                                this.processIntervals();
                             });
                         });
     
@@ -126,27 +149,44 @@ export class SceneController {
 
     /** 
      * Technically not just for 'items'; provide 'type' to take entities/structures
-     * data: {itemName: ..., layoutId: ..., quantity: ..., type: ....} 
+     * data: {itemName: ..., layoutId: ..., quantity: ..., type: ...., [uuid: ....]}
+     * 
+     * uuid is only included for local/temp items that are not part of the layout. 
      * 
      */
     takeItemFromScene(data, local = true) {
 
-        this.scene.removeFromScenebyLayoutId(data.layoutId);
-        this.forms = this.forms.filter(el => {
-            return el.model.attributes.layoutId != data.layoutId;
-        });
-
-        if (data.type == "entity" || data.type == "beast" || data.type == "friendly") {
-            this.entities = this.entities.filter(el => {
+        if (data.layoutId) {
+            this.scene.removeFromScenebyLayoutId(data.layoutId);
+            this.forms = this.forms.filter(el => {
                 return el.model.attributes.layoutId != data.layoutId;
             });
-        }
+    
+            if (data.type == "entity" || data.type == "beast" || data.type == "friendly") {
+                this.entities = this.entities.filter(el => {
+                    return el.model.attributes.layoutId != data.layoutId;
+                });
+            }
+    
+            this.eventDepot.fire('removeFromLayoutByLayoutId', data.layoutId);
 
-        this.eventDepot.fire('removeFromLayoutByLayoutId', data.layoutId);
+            if (local) {
+                data.level = this.level;
+                this.socket.emit('takeItemFromScene', data);
+            }
 
-        if (local) {
-            data.level = this.level;
-            this.socket.emit('takeItemFromScene', data);
+        } else { // remove by uuid, for temp local items like arrows, fruit
+
+            this.scene.removeFromScenebyModel(data.model);
+            this.forms = this.forms.filter(el => {
+                return el.model != data.model;
+            });
+    
+            if (data.type == "entity" || data.type == "beast" || data.type == "friendly") {
+                this.entities = this.entities.filter(el => {
+                    return el.model != data.model;
+                });
+            }
         }
     }
 
@@ -159,47 +199,44 @@ export class SceneController {
 
         let itemTemplate = this.getTemplateByName(data.itemName);
 
-        // if (itemTemplate.type == 'item' || itemTemplate.type == 'structure') {
-            if (data.attributes) itemTemplate.attributes = {...itemTemplate.attributes, ...data.attributes};
+        if (data.attributes) itemTemplate.attributes = {...itemTemplate.attributes, ...data.attributes};
 
-            if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
-            if (data.keyCode) itemTemplate.attributes.keyCode = data.keyCode;
-            if (typeof data.stage == "number") itemTemplate.attributes.stage = data.stage;
+        if (data.layoutId) itemTemplate.attributes.layoutId = data.layoutId;
+        if (data.keyCode) itemTemplate.attributes.keyCode = data.keyCode;
+        if (typeof data.stage == "number") itemTemplate.attributes.stage = data.stage;
 
-            this.seedForm(itemTemplate).then(form => {
-    
-                if (!data.position) {
-                    data.position = new THREE.Vector3();
-                    data.position.copy(this.hero.model.position);
+        this.seedForm(itemTemplate).then(form => {
 
-                    if (data.itemName == "fishingBoat") {
-                        data.position.y = this.hero.determinePondElevation() + itemTemplate.attributes.elevation;
-                    } else {
-                        data.position.y = this.hero.determineElevationFromBase() + itemTemplate.attributes.elevation;
-                    }
-                }
+            if (!data.position) {
+                data.position = new THREE.Vector3();
+                data.position.copy(this.hero.model.position);
 
-                form.model.position.copy(data.position);
-    
-                if (local) {
-                    this.socket.emit('nextLayoutId', this.level, layoutId => {
-                        data.layoutId = form.attributes.layoutId = form.model.attributes.layoutId = layoutId;
-                        data.location = this.getLocationFromPosition(data.position);
-                        if (typeof form.model.attributes.stage == "number") data.stage = form.model.attributes.stage;
-                        this.eventDepot.fire('addItemToLayout', data);
-        
-                        // if (this.multiplayer) {
-                            data.level = this.level;
-                            data.position = form.model.position;
-                            this.socket.emit('dropItemToScene', data);
-                        // }
-                    })
-        
+                if (data.itemName == "fishingBoat") {
+                    data.position.y = this.hero.determinePondElevation() + itemTemplate.attributes.elevation;
                 } else {
-                    this.eventDepot.fire('addItemToLayout', data);
+                    data.position.y = this.hero.determineElevationFromBase() + itemTemplate.attributes.elevation;
                 }
-            })
-        // }
+            }
+
+            form.model.position.copy(data.position);
+
+            if (local) {
+                this.socket.emit('nextLayoutId', this.level, layoutId => {
+                    data.layoutId = form.attributes.layoutId = form.model.attributes.layoutId = layoutId;
+                    data.location = this.getLocationFromPosition(data.position);
+                    if (typeof form.model.attributes.stage == "number") data.stage = form.model.attributes.stage;
+                    this.eventDepot.fire('addItemToLayout', data);
+    
+                    data.level = this.level;
+                    data.position = form.model.position;
+                    this.socket.emit('dropItemToScene', data);
+                })
+    
+            } else {
+                this.eventDepot.fire('addItemToLayout', data);
+            }
+        })
+
     }
     
     addEventListeners() {
@@ -252,7 +289,11 @@ export class SceneController {
         
         // data { level, stat, layoutId, hitPointReduction });
         this.socket.on('changeStat', data => {
-            this.hero.changeStat(data.stat, data.hitPointReduction, false);
+            if (data.layoutId == this.hero.attributes.layoutId) {
+                this.hero.changeStat(data.stat, data.hitPointReduction, false);
+            } else {
+                this.getFormByLayoutId(data.layoutId).changeStat(data.stat, data.hitPointReduction, false);
+            }
         })
 
         // data: { level: this.sceneController.level, spriteConfig, spritePosition });
@@ -670,12 +711,12 @@ export class SceneController {
 
         // Update the location for each party member to match the hero, and 
         // filter this.layout.entities to avoid dupes:
-        this.hero.party.forEach(member => {
+        this.hero.partyTemplates.forEach(member => {
             member.location = this.hero.location;
             this.layout.entities = this.layout.entities.filter(el => el.name != member.name);
         });
 
-        let comboEntities = [...this.layout.entities, ...this.hero.party];
+        let comboEntities = [...this.layout.entities, ...this.hero.partyTemplates];
 
         comboEntities.forEach(({name,location,attributes}, index) => {
             let template = this.getTemplateByName(name);
@@ -696,7 +737,11 @@ export class SceneController {
                     comboEntities[index].location = template.location;
                 }
             }
-            this.seedForm(template).then(form => {});
+            this.seedForm(template).then(form => {
+                if (form.attributes.follower && form.attributes.loyalTo == this.hero.objectName) {
+                    this.hero.addToParty(form);
+                } 
+            });
         });
 
         if (firstInRoom) { // Update layouts with layoutIds assigned....
@@ -707,6 +752,27 @@ export class SceneController {
 
         callback();
 
+    }
+
+    addProducer(position, fruit) {
+        this.addToIntervals(1, true, () => {
+            // Drop items to scene locally, non-broadcast; everybody gets their own
+            this.loadFormByName(fruit, (form) => {
+                form.model.position.copy(position);
+                form.model.translateZ(Math.random() * 20);
+                form.model.translateX(Math.random() * 20);
+            },true,false,false);
+        });
+    }
+
+    addWaterSource(p, radius) {
+        this.waterSources.push([p, radius]);
+    }
+
+    removeWaterSource(p) {
+        this.waterSources = this.waterSources.filter(el => {
+            return (el[0].x != p.x && el[0].y != p.y && el[0].z != p.z)
+        });
     }
 
     /** 
@@ -737,8 +803,12 @@ export class SceneController {
                 })
             }
 
+            if (form.attributes.stage && form.attributes.stage >= 4) {
+                this.addProducer(form.model.position, form.attributes.bears);
+            }
+
             this.addToScene(form, addToForms, true, reseed, trackEntity);
-        
+
             if (this.firstInRoom && form.attributes.contentItems) {
                 form.attributes.contentItems.forEach(contentItemName => {
                     let contentItem = this.getTemplateByName(contentItemName);
@@ -872,34 +942,45 @@ export class SceneController {
         return response;
     }
 
-    allFriendliesInRange(range, position) { 
+    allFriendliesInRange(range, position, includeHero = false) { 
+        
+        let diff = new THREE.Vector3();
+        let entityPosition = new THREE.Vector3();
+        let arr = [...this.entities.filter(el => el.objectType != "beast"), ...this.others];
+        if (includeHero) arr.push(this.hero);
         
         var response = [];
-        this.entities.filter(el => el.objectType != "beast").forEach(entity => {
-            if (position.distanceTo(entity.model.position) < range) {
+        arr.forEach(entity => {
+            entityPosition.copy(entity.model.position);
+            entityPosition.y += entity.attributes.height;
+            diff.subVectors(position, entityPosition);
+
+            if (diff.length() < 60) {
+                console.log(`entityPosition: ${entityPosition.x},${entityPosition.y},${entityPosition.z}; proPosition: ${position.x},${position.y},${position.z}, diff: ${diff.length()}; range: ${range}`)
+            }
+            if ( diff.length() < range ) {
                 response.push(entity);
             }
         })
-
-        this.others.forEach(entity => {
-            if (position.distanceTo(entity.model.position) < range) {
-                response.push(entity);
-            }
-        })
-
+        
         return response;
     }
 
     allEnemiesInRange(range, position) {
         var response = [];
-        
+        var entityPosition = new THREE.Vector3();
+
         this.entities.filter(el => el.objectType == "beast").forEach(entity => {
             // apply height
-            let enemyPosition = new THREE.Vector3();
-            enemyPosition.copy(entity.model.position);
-            enemyPosition.y += entity.attributes.height;
-            // console.log(`${entity.objectName} found at ${enemyPosition.x},${enemyPosition.y},${enemyPosition.z} @ distance of ${position.distanceTo(enemyPosition)}; range = ${range}`);
-            if (position.distanceTo(enemyPosition) < range) {
+            
+            entityPosition.copy(entity.model.position);
+            entityPosition.y += entity.attributes.height;
+            
+            
+            if (range < 100 && position.distanceTo(entityPosition) < 60) {
+                console.log(`entityPosition: ${entityPosition.x},${entityPosition.y},${entityPosition.z}; proPosition: ${position.x},${position.y},${position.z}, diff: ${position.distanceTo(entityPosition)}; range: ${range}`)
+            }
+            if (position.distanceTo(entityPosition) < range) {
                 response.push(entity);
             }
         })
@@ -959,7 +1040,8 @@ export class SceneController {
         if (layoutId == this.hero.attributes.layoutId) {
             return this.hero;
         } else {
-            return this.others.find(el => el.attributes.layoutId == layoutId);
+            let others = [...this.others, ...this.hero.party];
+            return others.find(el => el.attributes.layoutId == layoutId);
         }
     }
 
@@ -970,10 +1052,6 @@ export class SceneController {
     getFormByModel(model) {
         return this.forms.find(el => el.model == model)
     }
-
-    // getObjectNameByLayoutId(layoutId) {
-    //     // this.scene.getObjectByName()
-    // }
 
     confirm(question) {
         return confirm(question);

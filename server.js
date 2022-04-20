@@ -119,7 +119,7 @@ database(mongoose, (db) => {
         gameStart = app.gameStarts[socket.nsp.name] = new Date();
       }
 
-      let p = Number(Number((new Date() - gameStart)/1000/60%3).toFixed(0)); // 0..3
+      let p = 3 - Number(Number((new Date() - gameStart)/1000/60/60%3).toFixed(0)); // 0..3
       // last periodSinceStart
       if (app.gameTimes[socket.nsp.name]) {
         if (app.gameTimes[socket.nsp.name] != p) {

@@ -179,7 +179,7 @@ export class ArtificialForm extends IntelligentForm{
                     } else {
                         let d = closestHeroPosition.distance;
 
-                        if (d < 2000 && d > 100) {
+                        if (d < 4000 && d > 100) {
                             this.facePosition(closestHeroPosition.position);
                             this.moveToward(delta);
                         } 
@@ -242,7 +242,8 @@ export class ArtificialForm extends IntelligentForm{
             heroLayoutId = this.sceneController.hero.attributes.layoutId;
         }
 
-        this.sceneController.others.forEach(other => {
+        let others = [...this.sceneController.hero.party, ...this.sceneController.others];
+        others.filter(el => el != this).forEach(other => {
             let p = other.model.position
             let d = this.model.position.distanceTo(p);
             if (d < distance) {
@@ -277,9 +278,10 @@ export class ArtificialForm extends IntelligentForm{
             if (thisHero.alive) {
                 
                 if (layoutId == this.sceneController.hero.attributes.layoutId) {
-                    this.sceneController.hero.changeStat('health', -hitPointReduction, false);
+                    thisHero.changeStat('health', -hitPointReduction, false);
                 } else {
-                    // { level, stat, layoutId, hitPointReduction }                    
+                    // { level, stat, layoutId, hitPointReduction }
+                    thisHero.changeStat('health', -hitPointReduction, false);
                     this.sceneController.socket.emit('changeStat', { level: this.sceneController.level, stat: 'health', layoutId, hitPointReduction: -hitPointReduction });
                 }
             }
@@ -377,19 +379,17 @@ export class ArtificialForm extends IntelligentForm{
         }
     }
 
-    joinParty(hero) {
+    giveLoyalty(hero) {
         this.updateAttributes({loyalTo: hero.objectName});
     }
 
     follow(hero) {
         this.updateAttributes({follower: true});
-        hero.addToParty(this.returnTemplate());
-        hero.cacheHero();
+        hero.addToParty(this);
     }
 
     unfollow(hero) {
         this.updateAttributes({follower: false});
-        hero.removeFromParty(this.returnTemplate().name);
-        hero.cacheHero();
+        hero.removeFromParty(this);
     }
 }

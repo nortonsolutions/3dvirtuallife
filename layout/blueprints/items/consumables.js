@@ -18,7 +18,7 @@ export const Consumables = {
         speed: 4 // 1 = full walking speed
       },
       elevation: 10,
-      range: 140
+      range: 50
       // continuousSprites: true,
       // sprites: [{
       //     name: "blueExplosion",
@@ -35,6 +35,7 @@ export const Consumables = {
   bait25: {
     name: "bait25",
     gltf: "worm.glb",
+    image: "worm.png",
     description: "Twenty-five nightcrawlers",
     type: "item",
     attributes: {
@@ -87,6 +88,7 @@ export const Consumables = {
       elevation: 10
     }
   },
+
   food: {
     name: "food",
     gltf: "food.glb",
@@ -100,11 +102,12 @@ export const Consumables = {
       elevation: 20
     }
   },
-  animalskin: {
-    name: "animalskin",
-    gltf: "animalskin.glb",
-    image: "animalskin.png",
-    description: "Animal skin",
+
+  animalPelt: {
+    name: "animalPelt",
+    gltf: "leopardskin.glb",
+    image: "leopardskin.png",
+    description: "Animal pelt",
     type: "item",
     attributes: {
       value: 1, // in gold
@@ -113,6 +116,35 @@ export const Consumables = {
       elevation: 20
     }
   },
+
+  dragonPelt: {
+    name: "dragonPelt",
+    gltf: "animalskin.glb",
+    image: "animalskin.png",
+    description: "Dragon pelt",
+    type: "item",
+    attributes: {
+      value: 1, // in gold
+      animates: false,
+      scale: 5,
+      elevation: 20
+    }
+  },
+
+  masterDragonPelt: {
+    name: "masterDragonPelt",
+    gltf: "animalskin.glb",
+    image: "animalskin.png",
+    description: "Master Dragon pelt",
+    type: "item",
+    attributes: {
+      value: 1, // in gold
+      animates: false,
+      scale: 5,
+      elevation: 20
+    }
+  },
+
   mushroom: {   
     name: 'mushroom',
     gltf: 'mushroom.glb',
@@ -124,6 +156,29 @@ export const Consumables = {
         scale: 100,
         elevation: 10,
         effect: "scale/1.5",
+        sprites: [{ 
+            name: "Heal",
+            regex: "",
+            frames: 15,
+            scale: 50,
+            elevation: 30,
+            flip: false,
+            time: 1
+        }]
+    }
+  },
+  
+  sunFruit: {   
+    name: 'sunFruit',
+    gltf: 'sunFruit.glb',
+    image: 'sunFruit.png',
+    description: 'Beautiful white fruit',
+    type: 'item',
+    attributes: {
+        animates: false,
+        scale: 3,
+        elevation: 0,
+        effect: "health/3",
         sprites: [{ 
             name: "Heal",
             regex: "",

@@ -37,14 +37,8 @@ export const Kingdom = {
     }
   },
   items: [
-    // { name: "crystalBall" },
-    { name: "mushroom" }
-    // { name: "copper" },
-    // { name: "iron" },
-    // { name: "silver" },
-    // { name: "titanium" },
-    // { name: "wolfram" },
-    // { name: "silver" },
+    { name: "mushroom" },
+    { name: "watercan", location: { x: -25, y: 7.1, z: 32 }}
   ],
   structures: [
     {
@@ -92,12 +86,12 @@ export const Kingdom = {
       attributes: { rotateY: 180 }
     },
     {
-      // animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent
+      // animationName,duration,fadeOutDuration,fadeOutDelay,autoRestore,concurrent
       name: "platformBlock",
       location: { x: -2.1, y: 0, z: -34.6 },
       attributes: {
         elevation: -5,
-        footControls: "tavernShop:Walking in/1/0/0/0/0"
+        footControls: "tavernShop:Walking in/1"
       }
     },
     {
@@ -105,7 +99,7 @@ export const Kingdom = {
       location: { x: -0.7, y: 0, z: -34.6 },
       attributes: {
         elevation: 0,
-        footControls: "tavernShop:Walking out/1/0/0/0/0"
+        footControls: "tavernShop:Walking out/1"
       }
     },
 
@@ -121,7 +115,7 @@ export const Kingdom = {
         locked: true,
         key: "keyToKingdom",
         controls:
-          "kingdomGate:OpenL/3/5/1/noAutorestore/concurrent+OpenR/3/5/1/noAutorestore/concurrent+OpenBars/3/5/1/noAutorestore/concurrent"
+          "kingdomGate:OpenL/0.5//concurrent+OpenR/0.5//concurrent+OpenBars/0.5//concurrent"
       }
     },
     {
@@ -132,7 +126,7 @@ export const Kingdom = {
         locked: true,
         key: "keyToKingdom",
         controls:
-          "kingdomGate:OpenL/3/5/1/noAutorestore/concurrent+OpenR/3/5/1/noAutorestore/concurrent+OpenBars/3/5/1/noAutorestore/concurrent",
+          "kingdomGate:OpenL/0.5//concurrent+OpenR/0.5//concurrent+OpenBars/0.5//concurrent",
         position: "up"
       }
     },
@@ -143,13 +137,13 @@ export const Kingdom = {
     {
       name: "lever",
       location: { x: -7, y: 0, z: 24.4 },
-      attributes: { controls: "elevatorL_6m:Move/5/9/1", rotateY: 45 }
+      attributes: { controls: "elevatorL_6m:Move/0.5", rotateY: 45 }
     },
     {
       name: "lever",
       location: { x: -6.2, y: 12.4, z: 24.8 },
       attributes: {
-        controls: "elevatorL_6m:Move/5/9/1",
+        controls: "elevatorL_6m:Move/0.5",
         staticStartingElevation: true,
         position: "up",
         rotateY: 45
@@ -162,13 +156,13 @@ export const Kingdom = {
     {
       name: "lever",
       location: { x: -24.2, y: 0, z: 25 },
-      attributes: { controls: "elevatorS_6m:Move/5/9/1", rotateY: 315 }
+      attributes: { controls: "elevatorS_6m:Move/0.5", rotateY: 315 }
     },
     {
       name: "lever",
       location: { x: -27.2, y: 12.3, z: 24.3 },
       attributes: {
-        controls: "elevatorS_6m:Move/5/9/1",
+        controls: "elevatorS_6m:Move/0.5",
         staticStartingElevation: true,
         position: "up",
         rotateY: 45
@@ -184,15 +178,15 @@ export const Kingdom = {
       location: { x: -64.5, y: 0, z: 55 },
       attributes: {
         elevation: -2,
-        footControls: "vikingShop:doorAction/3/3/1/autorestore"
-      } // duration/fadeOutDuration/fadeOutDelay/autorestore
+        footControls: "vikingShop:doorAction/0.5/autoRestore"
+      }
     },
     {
       name: "platformWood",
       location: { x: -64.5, y: 0, z: 57 },
       attributes: {
         elevation: 2,
-        footControls: "vikingShop:doorAction/3/3/1/autorestore"
+        footControls: "vikingShop:doorAction/0.5/autoRestore"
       }
     }
   ],
@@ -200,22 +194,38 @@ export const Kingdom = {
     { name: "rockyMan", type: "beast" },
     { name: "rockyMan", type: "beast" },
     { name: "rockyMan", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
     { name: "ghoul", type: "beast" },
     { name: "ghoul", type: "beast" },
     { name: "ghoul", type: "beast" },
-    { name: "ghoul", type: "beast" },
-    { name: "ghoul", type: "beast" },
-    { name: "ghoul", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
     { name: "blacksmith", location: { x: 5, y: 0, z: -37.1 } },
     { name: "centurion", location: { x: -10.8, y: 0, z: 28.4 } },
-    { name: "viking", location: { x: -8.8, y: 0, z: 11.15 } },
     { name: "elfgirl", location: { x: -62.4, y: 0, z: 59.1 } },
-    { name: "pug", location: { x: 1, y: 0, z: 1 } },
+    { name: "pug" },
     { name: "cosmichorse" },
     { name: "painthorse" },
     { name: "whitehorse" },
     { name: "blackhorse" },
     { name: "chestnuthorse" },
-    { name: "brownhorse" }
+    { name: "brownhorse" },
+    { name: "elfgirl2" },
+    { name: "elfgirl3" },
+    { name: "elfgirl5" },
+    { name: "elfgirl4" },
+    { name: "elfgirl6" },
+    { name: "joe2" },
+    { name: "joe3" },
+    { name: "joe4" },
+    { name: "joe5" },
+    { name: "joe6" },
+    { name: "joe7" },
+    
   ]
 };

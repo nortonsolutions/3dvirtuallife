@@ -80,6 +80,15 @@ export const Lavafield = {
     { name: "ghoul", type: "beast" },
     { name: "ghoul", type: "beast" },
     { name: "dragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "lavaMan", type: "beast" },
+    { name: "lavaMan", type: "beast" },
+    { name: "lavaMan", type: "beast" },
+    { name: "lavaMan", type: "beast" },
+    { name: "ghoul", type: "beast" },
+    { name: "ghoul", type: "beast" },
+    { name: "ghoul", type: "beast" },
+    { name: "dragon", type: "beast" },
     { name: "daveDragon", type: "beast" }
   ]
 };

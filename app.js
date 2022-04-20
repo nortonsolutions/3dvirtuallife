@@ -187,8 +187,8 @@ export const app = () => {
         
         // let uniqueNamespace = heroTemplate.name + getRndInteger(1,1000000);
         
-        if (socket) socket.disconnect('http://192.168.109.2:3001'); socket = null;
-        socket = io.connect(`http://192.168.109.2:3001${namespace}`);
+        if (socket) socket.disconnect('http://172.16.0.20:3001'); socket = null;
+        socket = io.connect(`http://172.16.0.20:3001${namespace}`);
         
         eventDepot = null; gameAPI = null; modal = null; sidebar = null; chatbar = null; 
         

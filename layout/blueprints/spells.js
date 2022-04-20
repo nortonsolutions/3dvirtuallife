@@ -113,29 +113,29 @@ export const Spells = {
     },
     rockProjectileSpell: {
         name: 'rockProjectileSpell',
-        gltf: 'greenpotion.glb',
-        image: 'rockProjectileSpell.png',
+        gltf: 'iron.glb',
+        image: 'iron.png',
         description: 'A rock projectile spell',
         type: 'spell',
         attributes: {
             manaCost: 1,
-            effect: "generalDamage/3",
-            range: 40,
+            effect: "generalDamage/2",
+            range: 30,
             animates: false,
-            scale: .5,
+            scale: 1000,
             throwable: true,
             throwableAttributes: {
                 pitch: .5, // angle up (percentage of 90 degrees)
-                weight: .5, // lbs
+                weight: .75, // lbs
                 distance: 1200, // px
                 speed: 3 // 1 = full walking speed
             },
-            continuousSprites: false,
+            continuousSprites: true,
             sprites: [{ 
                 name: "rock1",
                 regex: "",
                 frames: 8,
-                scale: 200,
+                scale: .05,
                 elevation: 0,
                 flip: false,
                 time: 1
@@ -150,7 +150,7 @@ export const Spells = {
         type: 'spell',
         attributes: {
             manaCost: 1,
-            effect: "fireDamage/3",
+            effect: "fireDamage/2",
             range: 40,
             animates: false,
             scale: .5,
@@ -159,7 +159,7 @@ export const Spells = {
                 pitch: .5, // angle up (percentage of 90 degrees)
                 weight: .5, // lbs
                 distance: 1200, // px
-                speed: 3 // 1 = full walking speed
+                speed: 2 // 1 = full walking speed
             },
             continuousSprites: true,
             sprites: [{ 
@@ -200,7 +200,7 @@ export const Spells = {
         attributes: {
             manaCost: 1,
             effect: "fireDamage/3",
-            range: 80,
+            range: 60,
             animates: false,
             scale: .5,
             throwable: true,
@@ -249,7 +249,7 @@ export const Spells = {
         attributes: {
             manaCost: 1,
             effect: "iceDamage/3",
-            range: 80,
+            range: 90,
             animates: false,
             scale: .5,
             throwable: true,
@@ -289,7 +289,7 @@ export const Spells = {
         attributes: {
             manaCost: 1,
             effect: "thunderDamage/3",
-            range: 80,
+            range: 100,
             animates: true,
             scale: 10,
             throwable: true,

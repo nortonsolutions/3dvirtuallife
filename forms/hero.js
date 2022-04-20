@@ -46,8 +46,8 @@ export class Hero extends IntelligentForm {
         this.attributes.shouldMove = true;
         this.attributes.shouldAnimate = true;
 
-        this.party = template.party? template.party: [];
-
+        this.party = [];
+        this.partyTemplates = template.partyTemplates? template.partyTemplates: [];
         this.cacheHero();
     }
 
@@ -56,13 +56,13 @@ export class Hero extends IntelligentForm {
         super.load(() => {
 
             /** For the hero, the controls obj IS the model, which contains the gltf model */
-            let modelCopy = this.model;
-            modelCopy.rotation.y = Math.PI;
-            modelCopy.position.set(0,0,0); // hero model is always centered in the controls
+            this.heroModel = this.model;
+            this.heroModel.rotation.y = Math.PI;
+            this.heroModel.position.set(0,0,0); // hero model is centered in the controls
 
             this.model = this.controls;
 
-            this.model.add( modelCopy );
+            this.model.add( this.heroModel );
             this.model.add( this.proximityLight );
 
             if (this.template.location) {
@@ -112,7 +112,7 @@ export class Hero extends IntelligentForm {
         
     }
 
-    takeEffect(item) {
+    takeEffect(item) { // for items and spells
 
         // What is the item effect?
         let [type, change] = item.attributes.effect.split("/");
@@ -224,12 +224,16 @@ export class Hero extends IntelligentForm {
 
                 } else if (objectType == "item" || objectSubtype == "tree" || objectSubtype == "fish") {
 
+
                     let data = {
                         itemName, 
                         quantity: this.selectedObject.attributes.quantity? this.selectedObject.attributes.quantity : 1,
                         layoutId: this.selectedObject.model.attributes.layoutId,
                         type: objectType
                     }
+
+                    // add model for temp/local items only, e.g. arrows and fruit
+                    if (!data.layoutId) data.model = this.selectedObject.model;
 
                     if (this.selectedObject.attributes.keyCode) data.keyCode =this.selectedObject.attributes.keyCode;
                     this.sceneController.eventDepot.fire('takeItemFromSceneAndAddToInventory', data);
@@ -240,39 +244,45 @@ export class Hero extends IntelligentForm {
 
                 } else if (objectType == "structure") {
                     
-                    var accessible = this.selectedObject.attributes.key ? 
-                        this.inventory.map(el => el? el.itemName: null).includes(this.selectedObject.attributes.key) :
-                        true;
-                    
-                    if (accessible) {
-                        let newPosition = this.selectedObject.attributes.position == "down" ? "up" : "down";
-                        let myAnimations = this.selectedObject.attributes.animations;
+                    if (this.watercanEquipped() && this.atWaterSource()) { 
 
-                        if (typeof this.selectedObject.attributes.locked == "boolean") {
-                            let newLockstate = !this.selectedObject.attributes.locked; 
-                            this.selectedObject.updateAttributes({locked: newLockstate, position: newPosition, animations: myAnimations});
-                        } else if (this.selectedObject.attributes.position) { // if it has a position, alternate
-                            this.selectedObject.updateAttributes({position: newPosition, animations: myAnimations});
+                        let watercan = this.watercanEquipped();
+                        if (watercan) {
+                            this.drawWater(watercan, this.selectedObject);
                         }
 
-                        // Check to see if this switch/lever controls something:
-                        // attributes: { controls: "kingdomGate:OpenR+OpenL+OpenBars" }  -> Open/Close correspond to up/down
-                        if (this.selectedObject.attributes.controls) {
-                            
-                            var [controlItem,animations] = this.selectedObject.attributes.controls.split(":");
-                            
-                            let controlled = this.sceneController.forms.find(el => el.objectName == controlItem);
-                            let newPositionControlled = controlled.attributes.position == "down" ? "up" : "down";
-                            // animations = animations.split('+');
+                    } else {
+                        var accessible = this.selectedObject.attributes.key ? this.inventory.map(el => el? el.itemName: null).includes(this.selectedObject.attributes.key) : true;
+                    
+                        if (accessible) {
+                            let newPosition = this.selectedObject.attributes.position == "down" ? "up" : "down";
+                            let myAnimations = this.selectedObject.attributes.animations;
 
-                            if (typeof controlled.attributes.locked == "boolean") {
-                                let newLockstateControlled = !controlled.attributes.locked; 
-                                controlled.updateAttributes({locked: newLockstateControlled, position: newPositionControlled, animations});
-                            } else if (controlled.attributes.position) { // if it has a position, alternate
-                                controlled.updateAttributes({position: newPositionControlled, animations});
+                            if (typeof this.selectedObject.attributes.locked == "boolean") {
+                                let newLockstate = !this.selectedObject.attributes.locked; 
+                                this.selectedObject.updateAttributes({locked: newLockstate, position: newPosition, animations: myAnimations});
+                            } else if (this.selectedObject.attributes.position) { // if it has a position, alternate
+                                this.selectedObject.updateAttributes({position: newPosition, animations: myAnimations});
                             }
-                        } 
+
+                            if (this.selectedObject.attributes.controls) {
+                                
+                                var [controlItem,animations] = this.selectedObject.attributes.controls.split(":");
+                                
+                                let controlled = this.sceneController.forms.find(el => el.objectName == controlItem);
+                                let newPositionControlled = controlled.attributes.position == "down" ? "up" : "down";
+                                
+                                if (typeof controlled.attributes.locked == "boolean") {
+                                    let newLockstateControlled = !controlled.attributes.locked; 
+                                    controlled.updateAttributes({locked: newLockstateControlled, position: newPositionControlled, animations});
+                                } else if (controlled.attributes.position) { // if it has a position, alternate
+                                    controlled.updateAttributes({position: newPositionControlled, animations});
+                                }
+                            } 
+                        }
                     }
+
+                    
 
                 } else if ( objectType == "hero") {
                     
@@ -291,13 +301,14 @@ export class Hero extends IntelligentForm {
 
                     this.sceneController.eventDepot.fire('modal', dialogData);
                 } 
-            } else if (this.atWaterSource()) { // no selected object:
+            } else if (this.watercanEquipped() && this.atWaterSource()) { 
 
                 let watercan = this.watercanEquipped();
                 if (watercan) {
                     this.drawWater(watercan);
                 }
-            } else if (this.atMineralSource()) { // no selected object:
+                
+            } else if (this.miningToolEquipped() && this.atMineralSource()) {
                 let oreName = this.atMineralSource();
                 let tool = this.miningToolEquipped();
                 if (tool) {
@@ -321,25 +332,31 @@ export class Hero extends IntelligentForm {
         } else return null;
     }
 
-    drawWater(watercan) {
+    drawWater(watercan, selectedObject) {
 
-        let spriteConfig = {
-            name: 'blueExplosion',
-            regex: '',
-            frames: 10,
-            scale: 50,
-            elevation: 60,
-            flip: false,
-            animates: true,
-            time: 2
+        if (!selectedObject || selectedObject.hasWater()) {
+
+            let spriteConfig = {
+                name: 'blueExplosion',
+                regex: '',
+                frames: 10,
+                scale: 50,
+                elevation: 60,
+                flip: false,
+                animates: true,
+                time: 2
+            }
+            
+            let wp = new THREE.Vector3();
+            wp = watercan.getWorldPosition(wp);
+            this.sceneController.formFactory.addSprites(watercan.model, spriteConfig, this.sceneController.scene, true, wp);
+    
+            this.fadeToAction('ThumbsUp', 0.2);
+            this.sceneController.eventDepot.fire('addToInventory', {itemName: 'water', quantity: 4});
+    
+        } else {
+
         }
-        
-        let wp = new THREE.Vector3();
-        wp = watercan.getWorldPosition(wp);
-        this.sceneController.formFactory.addSprites(watercan.model, spriteConfig, this.sceneController.scene, true, wp);
-
-        this.fadeToAction('ThumbsUp', 0.2);
-        this.sceneController.eventDepot.fire('addToInventory', {itemName: 'water', quantity: 4});
         
     }
 
@@ -388,23 +405,22 @@ export class Hero extends IntelligentForm {
 
         // data: { vehicle: 'balloon', type: 'entity|item' }
         this.sceneController.eventDepot.addListener('dismount', (data) => {
-
+            
+            // Inch back a bit for the drop position
+            this.model.translateZ(50);
             let dropData = {
                 itemName: data.vehicle,
                 location: this.location,
                 source: "mount",
-                type: data.type
+                type: data.type,
+                position: new THREE.Vector3().copy(this.model.position)
             };
 
             this.sceneController.eventDepot.fire('dropItemToScene', dropData);
-            this.model.translateZ(70);
+
+            // Move forward after drop
+            this.model.translateZ(-100);
             if (this.balloonRide) this.balloonRide = false;
-            // if (this.mountedUpon) {
-            //     this.mountedUpon = this.attributes.mountedUpon = null;
-            //     this.cacheHero();
-                
-            //     // this.updateAttributes({mountedUpon: null});
-            // }
             this.mounted = false;
         });
 
@@ -678,13 +694,18 @@ export class Hero extends IntelligentForm {
             let distance = o.model.position.distanceTo(this.proximityLight.position);
 
             if (o.attributes.contentItems) distance -= 20;
+            if (o.objectType=="beast") distance -= 20; // to avoid selected friends during battle
 
             if (distance <= 70 && distance < closest) {
                 
                 if (!o.attributes.contentItems || (o.attributes.contentItems && o.attributes.locked)) {
-                    closest = distance;
-                    this.selectedObject = o;
-                    this.sceneController.eventDepot.fire('showDescription', { objectType: o.objectType, objectName: o.objectName }); 
+                    
+                    // a few more exclusions:
+                    if (o.objectName != "floor" && !(o.attributes.stage && o.attributes.stage > 0)) {
+                        closest = distance;
+                        this.selectedObject = o;
+                        this.sceneController.eventDepot.fire('showDescription', { objectType: o.objectType, objectName: o.objectName });
+                    }
                 }
             }
         })
@@ -723,7 +744,7 @@ export class Hero extends IntelligentForm {
             if ( this.moveForward || this.moveBackward ) this.velocity.z += this.direction.z * 1000.0 * agility * delta;
             if ( this.moveLeft || this.moveRight ) this.velocity.x += this.direction.x * 1000.0 * agility * delta;
 
-            if (this.balloonRide) {
+            if (this.balloonRide || (this.mountedUpon && this.mountedUpon.attributes.floats)) {
                 this.velocity.z *= .7;
                 this.velocity.x *= .7;
             }
@@ -750,95 +771,10 @@ export class Hero extends IntelligentForm {
 
             };
             
-            if (this.standingUpon && this.sceneController.layout.terrain.attributes.snowflakes && this.standingUpon.objectSubtype == "shelter") {
-                this.sheltered = true;
-            }
+            this.handleStandingUpon();
             
-            if (this.standingUpon && this.standingUpon.attributes.routeTo && typeof this.standingUpon.attributes.routeTo.level == "number") {
-                if (!this.standingUpon.attributes.locked) {
-                    this.sceneController.eventDepot.fire('unlockControls', {});
-                    this.sceneController.eventDepot.fire('cacheLayout', {});
 
-                    let loadData = {
-
-                        level: this.standingUpon.attributes.routeTo.level,
-                        location: this.standingUpon.attributes.routeTo.location,
-                    }
-
-                    this.sceneController.scene.removeFromScenebyLayoutId(this.attributes.layoutId);
-                    this.sceneController.eventDepot.fire('loadLevel', loadData);
-                }
-            } else if (this.standingUpon && this.standingUpon.attributes.footControls && !(typeof this.standingUpon.attributes.locked == "boolean")) {
-                // Check to see if this switch/lever controls something:
-                // attributes: { controls: "floor:Open/Close" }  -> Open/Close correspond to up/down
-                var [controlItem,animations] = this.standingUpon.attributes.footControls.split(":");
-                let controlled = this.sceneController.forms.find(el => el.objectName == controlItem);
-                // controlled.fadeToAction(animation, 0.2);
-
-                let newPositionControlled = controlled.attributes.position == "down" ? "up" : "down";
-                // animations = animations.split('+');
-
-                if (typeof controlled.attributes.locked == "boolean") {
-                    let newLockstateControlled = !controlled.attributes.locked; 
-                    controlled.updateAttributes({locked: newLockstateControlled, position: newPositionControlled, animations});
-                } else if (controlled.attributes.position) { // if it has a position, alternate
-                    controlled.updateAttributes({position: newPositionControlled, animations});
-                } else {
-                    controlled.updateAttributes({animations});
-                }
-            } else if (this.standingUponImmediate) { // for entryMat and exitMat, and firesteedAltar
-                
-                if (this.standingUponImmediate.keyCode) {
-                    let index = this.inventory.findIndex(el => {
-                        return el != undefined && el.keyCode && el.keyCode == this.standingUponImmediate.keyCode;
-                    });
-    
-                    if (index != -1) {
-                        let controlled = this.sceneController.getFormByLayoutId(this.standingUponImmediate.controls);
-                        
-                        if (typeof controlled.attributes.sealed == "boolean" && controlled.attributes.sealed) { // can things be unsealed?  how?
-    
-                            // maybe put all this in an 'unseal' method for special structures
-                            // like the firesteedAltar
-                            let sprites = [{ 
-                                name: 'flame2',  
-                                regex: "sconce",
-                                frames: 16,
-                                scale: 2.5,
-                                elevation: -.5,
-                                flip: false,
-                                animates: true,
-                                showOnSeed: true // set to showOnSeed from this point forward
-                            }];
-    
-                            controlled.updateAttributes({sealed: false, sprites });
-                            if (controlled.attributes.animations) {
-                                controlled.updateAttributes({animations: controlled.attributes.animations});
-                            }
-    
-                            // drop the firesteed to the ground:
-                            let dropData = {
-                                itemName: controlled.attributes.releases,
-                                position: controlled.model.position,
-                                location: this.sceneController.getLocationFromPosition(controlled.model.position),
-                                source: "",
-                                type: "entity",
-                                // attributes: {stage: entity.attributes.stage }
-                            };
-    
-                            this.sceneController.eventDepot.fire('dropItemToScene', dropData);
-    
-                        } else {
-                            if (controlled.attributes.animations) controlled.updateAttributes({animations: controlled.attributes.animations});
-                        }
-                        
-                        if (controlled.attributes.sprites) controlled.attributes.sprites.forEach(spriteConfig => {
-                            this.sceneController.formFactory.addSprites(controlled.model, spriteConfig, null, true);
-                        })
-                    }
-    
-                }
-            }
+            this.adjustPositionAndRotation();
 
             this.identifySelectedForm();
 
@@ -858,6 +794,157 @@ export class Hero extends IntelligentForm {
             this.sceneController.socket.emit('updateHeroPosition', heroData);
 
         }
+
+    }
+
+    handleStandingUpon() {
+
+        if (this.standingUpon && this.sceneController.layout.terrain.attributes.snowflakes && this.standingUpon.objectSubtype == "shelter") {
+            this.sheltered = true;
+        }
+        
+        if (this.standingUpon && this.standingUpon.attributes.routeTo && typeof this.standingUpon.attributes.routeTo.level == "number") {
+            if (!this.standingUpon.attributes.locked) {
+                this.sceneController.eventDepot.fire('unlockControls', {});
+                this.sceneController.eventDepot.fire('cacheLayout', {});
+
+                let loadData = {
+
+                    level: this.standingUpon.attributes.routeTo.level,
+                    location: this.standingUpon.attributes.routeTo.location,
+                }
+
+                this.sceneController.scene.removeFromScenebyLayoutId(this.attributes.layoutId);
+                this.sceneController.eventDepot.fire('loadLevel', loadData);
+            }
+        } else if (this.standingUpon && this.standingUpon.attributes.footControls && !(typeof this.standingUpon.attributes.locked == "boolean")) {
+            // Check to see if this switch/lever controls something:
+            var [controlItem,animations] = this.standingUpon.attributes.footControls.split(":");
+            let controlled = this.sceneController.forms.find(el => el.objectName == controlItem);
+            let newPositionControlled = controlled.attributes.position == "down" ? "up" : "down";
+            
+            if (typeof controlled.attributes.locked == "boolean") {
+                let newLockstateControlled = !controlled.attributes.locked; 
+                controlled.updateAttributes({locked: newLockstateControlled, position: newPositionControlled, animations});
+            } else if (controlled.attributes.position) { // if it has a position, alternate
+                controlled.updateAttributes({position: newPositionControlled, animations});
+            } else {
+                controlled.updateAttributes({animations});
+            }
+        } else if (this.standingUponImmediate) { // for entryMat and exitMat, and firesteedAltar
+            
+            if (this.standingUponImmediate.keyCode) {
+                let index = this.inventory.findIndex(el => {
+                    return el != undefined && el.keyCode && el.keyCode == this.standingUponImmediate.keyCode;
+                });
+
+                if (index != -1) {
+                    let controlled = this.sceneController.getFormByLayoutId(this.standingUponImmediate.controls);
+                    
+                    if (typeof controlled.attributes.sealed == "boolean" && controlled.attributes.sealed) { // can things be unsealed?  how?
+
+                        // maybe put all this in an 'unseal' method for special structures
+                        // like the firesteedAltar
+                        let sprites = [{ 
+                            name: 'flame2',  
+                            regex: "sconce",
+                            frames: 16,
+                            scale: 2.5,
+                            elevation: -.5,
+                            flip: false,
+                            animates: true,
+                            showOnSeed: true // set to showOnSeed from this point forward
+                        }];
+
+                        controlled.updateAttributes({sealed: false, sprites });
+                        if (controlled.attributes.animations) {
+                            controlled.updateAttributes({animations: controlled.attributes.animations});
+                        }
+
+                        // drop the firesteed to the ground:
+                        let dropData = {
+                            itemName: controlled.attributes.releases,
+                            position: controlled.model.position,
+                            location: this.sceneController.getLocationFromPosition(controlled.model.position),
+                            source: "",
+                            type: "entity",
+                            // attributes: {stage: entity.attributes.stage }
+                        };
+
+                        this.sceneController.eventDepot.fire('dropItemToScene', dropData);
+
+                    } else {
+                        if (controlled.attributes.animations) controlled.updateAttributes({animations: controlled.attributes.animations});
+                    }
+                    
+                    if (controlled.attributes.sprites) controlled.attributes.sprites.forEach(spriteConfig => {
+                        this.sceneController.formFactory.addSprites(controlled.model, spriteConfig, null, true);
+                    })
+                }
+
+            }
+        }
+    }
+
+    adjustPositionAndRotation() {
+
+        // if (!this.balloonRide && !(this.mountedUpon && this.mountedUpon.attributes.floats)) {
+            this.heroModel.position.x += (this.acceleration.x/40);
+            this.heroModel.position.z += (this.acceleration.z/40);
+    
+            let yRotation = 0;
+            if (this.acceleration.x != 0) {
+                yRotation =  Math.pow(this.acceleration.x,3) * 1/10000;
+                if (yRotation > .05) {
+                    yRotation = .05;
+                } else if (yRotation < -.05) {
+                    yRotation = -.05;
+                }
+                this.heroModel.rotation.y -= yRotation;
+            }
+    
+            
+            // console.log(this.acceleration.x);
+            if (this.heroModel.position.x > 1 || this.heroModel.position.x < -1) {
+                this.heroModel.position.x -= this.heroModel.position.x / 30;
+            }
+            
+            if (this.heroModel.position.z > 1 || this.heroModel.position.z < -1) {
+                this.heroModel.position.z -= this.heroModel.position.z / 30;
+            }
+    
+            if (this.heroModel.rotation.y > Math.PI + Math.PI/16)  {
+                this.heroModel.rotation.y -= 1/100;
+            } else if (this.heroModel.rotation.y < Math.PI - Math.PI/16) {
+                this.heroModel.rotation.y += 1/100;
+            }
+    
+            if (this.mountedUpon) {
+    
+    
+                let m = this.mountedUpon.model;
+                // let defaultRotation = degreesToRadians(m.attributes.rotateY);
+                m.position.x += (this.acceleration.x/40);
+                m.position.z += (this.acceleration.z/40);
+                m.rotation.y += yRotation;
+                
+                if (m.position.x > 1 || m.position.x < -1) {
+                    m.position.x -= m.position.x / 30;
+                }
+                
+                if (m.position.z > 1 || m.position.z < -1) {
+                    m.position.z -= m.position.z / 30;
+                }
+        
+                if (m.rotation.y > Math.PI/16)  {
+                    m.rotation.y -= 1/100;
+                } else if (m.rotation.y < -Math.PI/16) {
+                    m.rotation.y += 1/100;
+                }
+            }
+        // }
+
+        
 
     }
 
@@ -998,7 +1085,7 @@ export class Hero extends IntelligentForm {
                 let pondLine = this.determinePondElevation();
                 let floorLine = this.determineElevationFromBase();
                 baseline = pondLine + this.mountedUpon.attributes.height;
-                if (floorLine > pondLine + 10) {
+                if (floorLine > pondLine) {
                     let data = {}
                     data.vehicle = this.mountedUpon.objectName;
                     data.type = this.mountedUpon.objectType;
@@ -1027,13 +1114,15 @@ export class Hero extends IntelligentForm {
         }
     }
 
-    addToParty(template) {
-        this.party.push(template);
+    addToParty(entity) {
+        this.party.push(entity);
+        this.partyTemplates.push(entity.returnTemplate());
         this.cacheHero();
     }
 
-    removeFromParty(name) {
-        this.party = this.party.filter(el => el.name != name);
+    removeFromParty(entity) {
+        this.party = this.party.filter(el => el != entity);
+        this.partyTemplates = this.partyTemplates.filter(el => el.name != name);
         this.cacheHero();
     }
 }

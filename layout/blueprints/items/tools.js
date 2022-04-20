@@ -10,7 +10,7 @@ export const Tools = {
       animates: false,
       scale: 100,
       elevation: 5,
-      effect: "light/15",
+      equipEffects: "light/15",
       sprites: [
         {
           name: "flame2",

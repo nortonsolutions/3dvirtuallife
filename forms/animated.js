@@ -109,9 +109,8 @@ export class AnimatedForm extends StandardForm{
             this.previousAction = null;
     
             if (typeof this.attributes.position && this.attributes.position == "up") {
-                // if (this.activeAction) this.activeAction.play();
                     if (this.activeAction) this.animations.forEach(animation => {
-                        this.runAction(animation.name, animation.duration, animation.duration, 1, false, "concurrent");
+                        this.runAction(animation.name, 1, false, true); // concurrent
                     })
                 
             } else if (this.actions[ this.activeActionName ]) this.activeAction.play();
@@ -152,8 +151,8 @@ export class AnimatedForm extends StandardForm{
                             case "horse":
                             case "fishingBoat":
                                 controlled.attributes.movingAnimations.split('+').forEach(animation => {
-                                    let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent,looprepeat] = animation.split('/');
-                                    controlled.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore=="autorestore"), Boolean(concurrent=="concurrent"), Boolean(looprepeat=="looprepeat"));
+                                    let [animationName,timeScale,autoRestore,concurrent,loopRepeat] = animation.split('/');
+                                    controlled.runAction(animationName, timeScale, autoRestore, concurrent, loopRepeat);
                                 })
                                 break;
                             default:
@@ -169,8 +168,8 @@ export class AnimatedForm extends StandardForm{
 
                         if (controlled.objectName == 'horse'){
                             controlled.attributes.runningAnimations.split('+').forEach(animation => {
-                                let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent,looprepeat] = animation.split('/');
-                                controlled.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore=="autorestore"), Boolean(concurrent=="concurrent"), Boolean(looprepeat=="looprepeat"));
+                                let [animationName,timeScale,autoRestore,concurrent,loopRepeat] = animation.split('/');
+                                controlled.runAction(animationName, timeScale, autoRestore, concurrent, loopRepeat);
                             })
                         } else {
                             if (this.swimming) {
@@ -194,6 +193,7 @@ export class AnimatedForm extends StandardForm{
 
     fadeToAction( actionName, duration ) {
 
+        // console.log(`${this.objectName} fading to ${actionName}`);
         if (!this.actions[actionName]) { // if animation doesn't exist, fadeOut and set activeActionName
             this.previousActionName = this.activeActionName;
             this.previousAction = this.activeAction;
@@ -278,61 +278,53 @@ export class AnimatedForm extends StandardForm{
         }
     }
 
-    runAction(actionName, duration, fadeOutDuration = 0.2, fadeOutDelay = 0, autorestore = false, concurrent = false, looprepeat = false) {
+    /**
+     * For direct actions without fading
+     */
+    runAction(actionName, timeScale = 1, autoRestore = false, concurrent = false, loopRepeat = false, downCallback, upCallback) {
 
         if (concurrent || !this.currentlyRunningAction) {
             this.currentlyRunningAction = true;
 
             let action = this.actions[actionName];
-            action.loop = looprepeat? THREE.LoopRepeat : THREE.LoopOnce;
-            action.repetitions = looprepeat? Infinity : 1;
-            action.setEffectiveTimeScale( 1 );
-            action.setEffectiveWeight( 1 );
+            action.loop = loopRepeat? THREE.LoopRepeat : THREE.LoopOnce;
+            action.repetitions = loopRepeat? Infinity : 1;
+            action.setEffectiveTimeScale( timeScale );
                 
             if (this.attributes.position == "down") {
-                setTimeout(() => {
-                    
-                    if (fadeOutDuration != 0) {
-                        action.fadeOut( fadeOutDuration );
-                        action.play();
-                    } else { // 0 fadeout means just play backwards
-                        action.paused = false;
-                        action.timeScale = -1;  
-                        action._effectiveTimeScale = -1;
-                        action.play();
-                    }
-
-                }, fadeOutDelay*1000)
-
+                action.paused = false;
+                action.setEffectiveTimeScale( -timeScale );
+                action.play();
             } else {
-                action.reset();
-                
-                if (duration != 0) {
-                    action.fadeIn( duration );
-                    action.play();
-                } else {
-                    action.play();
-                }
+                if (timeScale < 0) {
+                    action.paused = false;
+                } else action.reset();
+                action.play();
             }
-    
-            
     
             const restoreState = () => {
                 setTimeout(() => {
-                    action.fadeOut( fadeOutDuration );
+                    this.currentlyRunningAction = false;
+                    this.runAction(actionName, -timeScale, false, concurrent, loopRepeat, downCallback, upCallback)
                     setTimeout(() => {
                         this.currentlyRunningAction = false;
                         this.mixer.removeEventListener('finished', restoreState );
-                    }, fadeOutDuration * 1000);
-                }, duration * 1000);
+                    }, action._clip.duration * 1000);
+                }, 1000);
             }
             
-            if (autorestore) {
+            if (autoRestore) {
                 this.mixer.addEventListener( 'finished', restoreState );
             } else {
                 setTimeout(() => {
                     this.currentlyRunningAction = false;
-                }, duration * 1000);
+                }, action._clip.duration * 1000);
+            }
+
+            if (this.attributes.position == "up" && upCallback) { // run something when 'up' like the well
+                this.mixer.addEventListener( 'finished', this[upCallback] );
+            } else if (this.attributes.position == "up" && downCallback) {
+                this.mixer.addEventListener( 'finished', this[downCallback] );
             }
         }
     }

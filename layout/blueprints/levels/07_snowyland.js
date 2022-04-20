@@ -44,7 +44,8 @@ export const Snowyland = {
     // { name: "titanium" },
     // { name: "wolfram" },
     // { name: "silver" },
-    { name: "cavalier" }
+    { name: "cavalier" },
+    { name: "masterDragonPelt", location: { x: 2.5, y: 0, z: 21.1 } }
   ],
   structures: [
     {
@@ -70,7 +71,7 @@ export const Snowyland = {
       location: { x: -0.5, y: 0, z: 0.15 },
       attributes: {
         elevation: -5,
-        footControls: "tavernShop:Walking in/1/0/0/0/0"
+        footControls: "tavernShop:Walking in/0.5"
       }
     },
     {
@@ -78,7 +79,7 @@ export const Snowyland = {
       location: { x: -1.5, y: 0, z: 0.15 },
       attributes: {
         elevation: 5,
-        footControls: "tavernShop:Walking out/1/0/0/0/0"
+        footControls: "tavernShop:Walking out/0.5"
       }
     }
   ],
@@ -92,7 +93,18 @@ export const Snowyland = {
     { name: "crystalMan", type: "beast" },
     { name: "ghoul", type: "beast" },
     { name: "ghoul", type: "beast" },
-    { name: "viking", location: { x: -7.5, y: 0, z: 2.7 } },
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
+    { name: "daveDragon", type: "beast",
+      attributes: {
+        grants: ["masterDragonPelt"]
+      } 
+    },
     {
       name: "viking",
       location: { x: -0, y: 0, z: 1.9 },

@@ -40,12 +40,20 @@ export const Volcano = {
   ],
   entities: [
     { name: "lavaGhoul", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
     { name: "lavaGhoul", type: "beast" },
     { name: "lavaGhoul", type: "beast" },
     { name: "lavaGhoul", type: "beast" },
     { name: "lavaGhoul", type: "beast" },
     { name: "lavaGhoul", type: "beast" },
     { name: "lavaGhoul", type: "beast" },
-    { name: "lavaGhoul", type: "beast" }
+    { name: "lavaGhoul", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "dragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
+    { name: "daveDragon", type: "beast" },
   ]
 };

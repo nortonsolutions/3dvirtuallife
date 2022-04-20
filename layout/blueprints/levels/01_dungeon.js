@@ -69,7 +69,10 @@ export const Dungeon = {
     { name: "bat", type: "beast" },
     { name: "bat", type: "beast" },
     { name: "bat", type: "beast" },
+    { name: "evilOne", type: "beast" },
+    { name: "rat", type: "beast" },
+    { name: "rat", type: "beast" },
     { name: "ghoul", type: "beast", attributes: { boss: false } },
-    { name: "john" }
+    // { name: "john" }
   ]
 };

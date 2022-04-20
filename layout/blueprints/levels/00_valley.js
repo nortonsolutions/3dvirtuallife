@@ -11,7 +11,7 @@ export const Valley = {
     description: "valley",
     gltf: "valley.glb",
     attributes: {
-      // snowflakes: true,
+      snowflakes: true,
       cutScenes: {
         intro: "volcanoIntro.mkv"
       },
@@ -31,38 +31,33 @@ export const Valley = {
         [{ x: -16, y: 0, z: -175 }, 80],
         [{ x: -1195, y: 0, z: 5750 }, 800]
       ],
-      mineralSources: [[{ x: 719, y: -50, z: -598 }, 100, "aluminium"]]
+      mineralSources: [
+        [{ x: 719, y: -50, z: -598 }, 100, "aluminium"],
+        [{ x: 2640, y: 370, z: 2508 }, 100, "iron"]
+      ]
     }
   },
   items: [
-    { name: "crystalBall", location: { x: 0, y: 0, z: 0 } },
     { name: "keyToShed", location: { x: 2, y: 0, z: -1 } },
-    { name: "redpotion" },
-    { name: "greenpotion", location: { x: -2, y: 0, z: 0 } },
+    { name: "miningHammer", location: { x: 2, y: 0, z: -1 } },
+    { name: "bow", location: { x: 2, y: 0, z: -1 } },
+    { name: "arrow25", location: { x: 2, y: 0, z: -1 } },
     { name: "gold3" },
-    { name: "bow" },
-    { name: "arrow25" },
-    { name: "fishingPole", location: { x: 0, y: 0, z: -1 } },
-    { name: "bait25", location: { x: 0, y: 0, z: 2 } },
-    { name: "smallSword" },
-    // { name: "aluminium", location: { x: -1, y: 0, z: -1}},
-    // { name: "gold" },
-    // { name: "iron" },
-    // { name: "silver" },
-    {
-      name: "watercan",
-      location: { x: 1.1, y: 0.3, z: 4.4 },
+    { name: "aluminium", location: { x: 7.2, y: -.50, z: -6 }},
+    { name: "aluminium", location: { x: 6.2, y: -.50, z: -6 }},
+    { name: "aluminium", location: { x: 8.2, y: -.50, z: -6 }},
+    { name: "iron", location: { x: 25.8, y: 3.7, z: 23.7 }},
+    { name: "iron", location: { x: 24.8, y: 3.7, z: 23.7 }},
+    { name: "iron", location: { x: 25.3, y: 3.7, z: 23.7 }},
+    { name: "watercan", location: { x: 1.1, y: 0.3, z: 4.4 },
       attributes: { staticStartingElevation: true }
     },
-    { name: "miningHammer", location: { x: -3, y: 0, z: 0 } },
-    { name: "miningPickAxe", location: { x: -2, y: 0, z: 0 } },
-    // {
-    //     name: "balloon", location: { x: -3, y: 0, z: -1},
-    //     attributes: { staticStartingElevation: false }
-    // },
     {
-      name: "fishingBoat",
-      location: { x: -8, y: 0, z: 52 },
+        name: "balloon", location: { x: 3.77, y: 2.8, z: -3.75},
+        attributes: { staticStartingElevation: true }
+    },
+    {
+      name: "fishingBoat", location: { x: -6.7, y: 0, z: 52.2 },
       attributes: { staticStartingElevation: false }
     }
   ],
@@ -117,13 +112,13 @@ export const Valley = {
     {
       name: "lever",
       location: { x: -4, y: 0, z: 3.1 },
-      attributes: { controls: "elevatorS_1m:Move/3/3/0", rotateY: 270 }
+      attributes: { controls: "elevatorS_1m:Move/0.7", rotateY: 270 }
     },
     {
       name: "lever",
       location: { x: -4.5, y: 2.6, z: 3.45 },
       attributes: {
-        controls: "elevatorS_1m:Move/3/3/1",
+        controls: "elevatorS_1m:Move/0.7",
         staticStartingElevation: true,
         position: "up",
         rotateY: 315
@@ -134,7 +129,7 @@ export const Valley = {
       location: { x: -0.8, y: 0, z: 4.1 },
       attributes: {
         controls:
-          "shed:gateaction/2/2/1/false/concurrent+invgateaction/2/2/1/false/concurrent"
+          "shed:gateaction/0.5//concurrent+invgateaction/0.5//concurrent"
       }
     },
     {
@@ -143,7 +138,7 @@ export const Valley = {
       attributes: {
         rotateY: 180,
         controls:
-          "shed:gateaction/2/2/1/false/concurrent+invgateaction/2/2/1/false/concurrent",
+          "shed:gateaction/0.5//concurrent+invgateaction/0.5//concurrent",
         position: "up"
       }
     }
@@ -154,7 +149,11 @@ export const Valley = {
     { name: "evilOne", type: "beast" },
     { name: "evilOne", type: "beast" },
 
-    // { name: "trex", type: "beast" },
+    { name: "crocodile", type: "beast" },
+    { name: "evilOne", type: "beast" },
+    { name: "evilOne", type: "beast" },
+    { name: "evilOne", type: "beast" },
+
     { name: "crocodile", type: "beast" },
     { name: "evilOne", type: "beast" },
     { name: "evilOne", type: "beast" },
@@ -164,30 +163,11 @@ export const Valley = {
     { name: "joe", location: { x: 1, y: 0, z: 0 } },
     { name: "shopkeep", location: { x: 1, y: 0, z: 1 } },
     { name: "sunSeed", location: { x: 1, y: 0, z: -1 } },
-    { name: "sunSeed", location: { x: 1, y: 0, z: -2 } },
-    // { name: "sunSeed", location: { x: 1, y: 0, z: -3}},
-    // { name: "sunSeed", location: { x: -1, y: 0, z: 1}},
-    { name: "cosmichorse", location: { x: -1, y: 0, z: 1 } },
-    // { name: "ghoul", type: "beast"  },
-    // { name: "crocodile", type: "beast", location: { x: 1, y: 0, z: 1} },
-    // { name: "rockyMan", type: "beast" },
-    // { name: "demonLord", type: "beast" },
-    // { name: "horse" },
-    // { name: "murderBear", type: "beast"  },
-    // { name: "rosen", type: "beast"  },
-    // { name: "iceGhoul", type: "beast"  },
-    // { name: "shockGhoul", type: "beast"  },
-    // { name: "gasGhoul", type: "beast"  },
-    // { name: "ghostGhoul", type: "beast"  },
-    // { name: "zombie", type: "beast" },
-    // { name: "daveDragon", type: "beast"},
-    // { name: "jelly", location: { x: -1, y: 0, z: -1}, type: "beast"}
 
-    // { name: "blacksmith" },
-    // { name: "elfgirl" },
     { name: "catFish", location: { x: -9, y: 0, z: 56 } },
     { name: "catFish", location: { x: -8, y: 0, z: 56 } },
     { name: "carp", location: { x: -7, y: 0, z: 54 } },
-    { name: "carp", location: { x: -7.5, y: 0, z: 54 } }
+    { name: "carp", location: { x: -7.5, y: 0, z: 54 } },
+    { name: "cosmichorse", location: { x: -1, y: 0, z: 1 } },
   ]
 };

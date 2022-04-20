@@ -19,7 +19,7 @@ export const Elementals = {
         speed: 1 // 1 = full walking speed
       },
       elevation: 10,
-      effect: "health/1",
+      effect: "health/.5",
       range: 100,
       continuousSprites: true,
       sprites: [

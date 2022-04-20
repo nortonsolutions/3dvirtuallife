@@ -189,18 +189,6 @@ export class DialogScreen {
         }
     }
 
-    runActiveAction(duration) {
-
-        if (this.activeAction) {
-            this.activeAction
-                .reset()
-                .setEffectiveTimeScale( 1 )
-                .setEffectiveWeight( 1 )
-                .fadeIn( duration )
-                .play();
-        }
-    }
-
     addDialogEvents() {
 
         /**
@@ -258,6 +246,7 @@ export class DialogScreen {
                         break;
 
                     case "enlist":
+                        this.entity.attributes.conversation.state = "loyalFollower";
                         this.entity.follow(this.hero);
                         this.reset();
                         this.fadeToAction('Yes', 0.2);
@@ -265,24 +254,23 @@ export class DialogScreen {
                         break;
 
                     case "release":
+                        this.entity.attributes.conversation.state = "loyalSubject";
                         this.entity.unfollow(this.hero);
                         this.reset();
                         this.fadeToAction('Yes', 0.2);
                         tempSpeech = "As you wish!"
                         break;
 
-                    // case "accept": // when 
-                    //     this.hero.accept(this.entity, this.getContext().action);
-                    //     this.closeModal();
-                    //     this.eventDepot.fire('closeModal', {});
-                    //     break;
-
                     case "grant": // grant special condition items
-                        this.getContext().condition.forEach((item) => {
-                            this.entity.addToInventory(item, 0, 1);
-                            this.hero.removeFromInventory(item); 
-                        }) 
-                        this.entity.joinParty(this.hero);
+                    
+                        for (let item of this.getContext().condition) {
+                            if (this.hero.inventoryContains([item])) {
+                                this.entity.addToInventory(item, 0, 1);
+                                this.hero.removeFromInventory(item); 
+                                break;
+                            } 
+                        }
+                        this.entity.giveLoyalty(this.hero);
                         this.reset();
                         this.entity.attributes.conversation.state = 'intro';
                         this.fadeToAction('Yes', 0.2);

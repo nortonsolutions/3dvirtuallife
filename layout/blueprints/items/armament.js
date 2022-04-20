@@ -1,5 +1,5 @@
 export const Armament = {
-  iceSword: {
+  iceSword: { // elfgirl
     name: "iceSword",
     gltf: "iceSword.glb",
     image: "iceSword.png",
@@ -13,10 +13,10 @@ export const Armament = {
       animates: false,
       scale: 3,
       elevation: 0,
-      effect: "strength/3"
+      equipEffects: "strength/3"
     }
   },
-  heavyAxe: {
+  heavyAxe: { //viking
     name: "heavyAxe",
     gltf: "heavyAxe.glb",
     image: "heavyAxe.png",
@@ -30,10 +30,10 @@ export const Armament = {
       animates: false,
       scale: 3,
       elevation: 0,
-      effect: "strength/3"
+      equipEffects: "strength/3"
     }
   },
-  katana: {
+  katana: { // elfgirl
     name: "katana",
     gltf: "katana.glb",
     image: "katana.png",
@@ -47,10 +47,10 @@ export const Armament = {
       animates: false,
       scale: 15,
       elevation: 0,
-      effect: "strength/3"
+      equipEffects: "strength/3"
     }
   },
-  zyphosSword: {
+  zyphosSword: { // elfgirl
     name: "zyphosSword",
     gltf: "zyphosSword.glb",
     image: "zyphosSword.png",
@@ -64,10 +64,10 @@ export const Armament = {
       animates: false,
       scale: 3,
       elevation: 0,
-      effect: "strength/3"
+      equipEffects: "strength/3"
     }
   },
-  gladiusSword: {
+  gladiusSword: { // elfgirl
     name: "gladiusSword",
     gltf: "gladiusSword.glb",
     image: "gladiusSword.png",
@@ -81,10 +81,10 @@ export const Armament = {
       animates: false,
       scale: 2,
       elevation: 0,
-      effect: "strength/3"
+      equipEffects: "strength/3"
     }
   },
-  cavalier: {
+  cavalier: { // elfgirl
     name: "cavalier",
     gltf: "cavalier.glb",
     image: "cavalier.png",
@@ -98,10 +98,10 @@ export const Armament = {
       animates: false,
       scale: 1.5,
       elevation: 0,
-      effect: "strength/3"
+      equipEffects: "strength/3"
     }
   },
-  crusader: {
+  crusader: { // elfgirl
     name: "crusader",
     gltf: "crusader.glb",
     image: "crusader.png",
@@ -115,10 +115,10 @@ export const Armament = {
       animates: false,
       scale: 3,
       elevation: 0,
-      effect: "strength/3"
+      equipEffects: "strength/3"
     }
   },
-  mace: {
+  mace: { //shopkeep
     name: "mace",
     gltf: "mace.glb",
     image: "mace.png",
@@ -130,10 +130,10 @@ export const Armament = {
       animates: false,
       scale: 100,
       elevation: 0,
-      effect: "strength/2"
+      equipEffects: "strength/2"
     }
   },
-  direMace: {
+  direMace: { //elfgirl
     name: "direMace",
     gltf: "direMace.glb",
     image: "direMace.png",
@@ -146,10 +146,10 @@ export const Armament = {
       equippedScale: 0.003,
       scale: 3,
       elevation: 0,
-      effect: "strength/2"
+      equipEffects: "strength/2"
     }
   },
-  busterblade: {
+  busterblade: { //shopkeep
     name: "busterblade",
     gltf: "busterblade.glb",
     image: "busterblade.png",
@@ -161,10 +161,10 @@ export const Armament = {
       animates: false,
       scale: 100,
       elevation: 20,
-      effect: "strength/2"
+      equipEffects: "strength/2"
     }
   },
-  busterbuckler: {
+  busterbuckler: { //shopkeep
     name: "busterbuckler",
     gltf: "busterbuckler.glb",
     image: "busterbuckler.png",
@@ -176,10 +176,10 @@ export const Armament = {
       animates: false,
       scale: 100,
       elevation: 20,
-      effect: "defense/1"
+      equipEffects: "defense/1"
     }
   },
-  waterShield: {
+  waterShield: { //blacksmith
     name: "waterShield",
     gltf: "waterShield.glb",
     image: "waterShield.png",
@@ -191,10 +191,10 @@ export const Armament = {
       animates: false,
       scale: 100,
       elevation: 20,
-      effect: "defense/2"
+      equipEffects: "defense/2"
     }
   },
-  thunderShield: {
+  thunderShield: { //blacksmith
     name: "thunderShield",
     gltf: "thunderShield.glb",
     image: "thunderShield.png",
@@ -206,10 +206,10 @@ export const Armament = {
       animates: false,
       scale: 100,
       elevation: 20,
-      effect: "defense/3"
+      equipEffects: "defense/3"
     }
   },
-  blazingShield: {
+  blazingShield: { //blacksmith
     name: "blazingShield",
     gltf: "blazingShield.glb",
     image: "blazingShield.png",
@@ -221,7 +221,7 @@ export const Armament = {
       animates: false,
       scale: 100,
       elevation: 20,
-      effect: "defense/3"
+      equipEffects: "defense/3"
     }
   },
   arrow: {
@@ -245,12 +245,13 @@ export const Armament = {
       },
       elevation: 10,
       effect: "generalDamage/5",
-      range: 20
+      range: 30
     }
   },
-  arrow25: {
+  arrow25: { //shopkeep
     name: "arrow25",
     gltf: "arrow25.glb",
+    image: "arrow.png",
     description: "Twenty-five arrows",
     type: "item",
     attributes: {
@@ -261,7 +262,7 @@ export const Armament = {
       elevation: 10
     }
   },
-  blazingBlade: {
+  blazingBlade: { //blacksmith
     name: "blazingBlade",
     gltf: "blazingBlade.glb",
     image: "blazingBlade.png",
@@ -274,11 +275,11 @@ export const Armament = {
       scale: 60,
       equippedScale: 0.06,
       elevation: 20,
-      effect: "strength/1",
+      equipEffects: "strength/1",
       animationOnEquip: false
     }
   },
-  natureBlade: {
+  natureBlade: { //blacksmith
     name: "natureBlade",
     gltf: "natureBlade.glb",
     image: "natureBlade.png",
@@ -291,11 +292,11 @@ export const Armament = {
       scale: 60,
       equippedScale: 0.06,
       elevation: 20,
-      effect: "strength/1",
+      equipEffects: "strength/1",
       animationOnEquip: false
     }
   },
-  waterBlade: {
+  waterBlade: { //blacksmith
     name: "waterBlade",
     gltf: "waterBlade.glb",
     image: "waterBlade.png",
@@ -308,11 +309,11 @@ export const Armament = {
       scale: 60,
       equippedScale: 0.06,
       elevation: 20,
-      effect: "strength/1",
+      equipEffects: "strength/1",
       animationOnEquip: false
     }
   },
-  axe2: {
+  axe2: { //viking
     name: "axe2",
     gltf: "axe2.glb",
     image: "axe2.png",
@@ -325,11 +326,11 @@ export const Armament = {
       scale: 1,
       equippedScale: 0.001,
       elevation: 20,
-      effect: "strength/1",
+      equipEffects: "strength/3",
       animationOnEquip: false
     }
   },
-  armor: {
+  armor: { //shopkeep, viking
     name: "armor",
     gltf: "armor.glb",
     image: "armor.png",
@@ -341,10 +342,10 @@ export const Armament = {
       scale: 20,
       equippedScale: 0.02,
       elevation: 20,
-      effect: "defense/1"
+      equipEffects: "defense/1"
     }
   },
-  supermanArmor: {
+  supermanArmor: { //blacksmith
     name: "supermanArmor",
     gltf: "supermanArmor.glb",
     image: "supermanArmor.png",
@@ -356,10 +357,10 @@ export const Armament = {
       scale: 20,
       equippedScale: 0.02,
       elevation: 20,
-      effect: "defense/3"
+      equipEffects: "defense/3"
     }
   },
-  legacyArmor: {
+  legacyArmor: { //blacksmith
     name: "legacyArmor",
     gltf: "legacyArmor.glb",
     image: "legacyArmor.png",
@@ -371,10 +372,10 @@ export const Armament = {
       scale: 20,
       equippedScale: 0.02,
       elevation: 20,
-      effect: "defense/3"
+      equipEffects: "defense/3"
     }
   },
-  chevyArmor: {
+  chevyArmor: { //blacksmith
     name: "chevyArmor",
     gltf: "chevyArmor.glb",
     image: "chevyArmor.png",
@@ -386,10 +387,10 @@ export const Armament = {
       scale: 20,
       equippedScale: 0.02,
       elevation: 20,
-      effect: "defense/2"
+      equipEffects: "defense/2"
     }
   },
-  busterboot: {
+  busterboot: { //shopkeep
     name: "busterboot",
     gltf: "busterboot.glb",
     image: "busterboot.png",
@@ -401,10 +402,10 @@ export const Armament = {
       scale: 40,
       equippedScale: 0.02,
       elevation: 10,
-      effect: "agility/1"
+      equipEffects: "agility/1"
     }
   },
-  helmet: {
+  helmet: { //shopkeep
     name: "helmet",
     gltf: "helmet.glb",
     image: "helmet.png",
@@ -416,10 +417,10 @@ export const Armament = {
       scale: 40,
       equippedScale: 0.035,
       elevation: 20,
-      effect: "defense/1"
+      equipEffects: "defense/1"
     }
   },
-  bow: {
+  bow: { //shopkeep
     name: "bow",
     gltf: "bow.glb",
     image: "bow.png",
@@ -435,10 +436,10 @@ export const Armament = {
       scale: 200,
       equippedScale: 0.2,
       elevation: 20,
-      effect: "strength/1"
+      equipEffects: "strength/1"
     }
   },
-  smallSword: {
+  smallSword: { //shopkeep
     name: "smallSword",
     gltf: "broadsword.glb",
     image: "broadsword.png",
@@ -451,8 +452,8 @@ export const Armament = {
       animates: false,
       scale: 100,
       elevation: 20,
-      effect: "strength/1"
-      // effect: "light/15",
+      equipEffects: "strength/1"
+      // equipEffects: "light/15",
       // sprites: [
       //     {
       //         name: "flame2",
@@ -481,11 +482,11 @@ export const Armament = {
       scale: 3,
       equippedScale: 0.003,
       elevation: 20,
-      effect: "strength/1",
+      equipEffects: "strength/1",
       animationOnEquip: true
     }
   },
-  axe: {
+  axe: { //viking, blacksmith
     name: "axe",
     gltf: "axe.glb",
     image: "axe.png",
@@ -498,11 +499,11 @@ export const Armament = {
       scale: 30,
       equippedScale: 0.03,
       elevation: 20,
-      effect: "strength/1",
+      equipEffects: "strength/1",
       animationOnEquip: false
     }
   },
-  blackBlade: {
+  blackBlade: { //blacksmith
     name: "blackBlade",
     gltf: "blackBlade.glb",
     image: "blackBlade.png",
@@ -516,11 +517,11 @@ export const Armament = {
       scale: 60,
       equippedScale: 0.06,
       elevation: 20,
-      effect: "strength/1",
+      equipEffects: "strength/1",
       animationOnEquip: false
     }
   },
-  hammer: {
+  hammer: { //viking
     name: "hammer",
     gltf: "hammer.glb",
     image: "hammer.png",
@@ -533,7 +534,7 @@ export const Armament = {
       scale: 30,
       equippedScale: 0.03,
       elevation: 20,
-      effect: "strength/1",
+      equipEffects: "strength/1",
       animationOnEquip: false
     }
   }

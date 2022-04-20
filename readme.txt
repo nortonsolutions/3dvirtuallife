@@ -2,15 +2,22 @@
 
 
 ## 3D Virtual Life
-#### Copyright Norton 2022
+#### Copyright Dave Norton 2022
 #### Testing framework (Chai/Mocha) from FCC, though not used much
 #### pointerLockControls concept from mrdoob & Mugen87
 
 This production version assumes MongoDB is up and running on port 27017 
 and uses the DB called "nortonAdventure" (wiredtiger) by default.
 
+Unzip cdn.zip, png.zip, and 3d.zip in their respective directories for stock libraries/graphics.
+
+Also change the reference to 172.16.0.20 to your own public IP address for socket handling.
+
+Thanks to the graphics team: Mike Tidwell, Chris Lobato, Rodney Thinn, and Steve Leavitt.
+
 -----
 
+# Only applicable for auto-startup with pm2:
 To configure auto-startup for pm2.exe service with pm2-windows-service module:
 
 Launch Git Bash in Administrative Mode, then run the following:
@@ -41,21 +48,27 @@ $ pm2 save
 
 -----
 
-Manual startup of the production server:
+Manual startup of the production server (pm2 only):
 
 Assuming the MongoDB process is running, start 3D Virtual Life with:
 
 pm2 start 3Dvirtuallife
 
-... which essentially runs "node /c/3Dvirtuallife/server.js" in daemon mode.
+Logs are in utils/node/logs
+
+----
+
+Manual startup of the production server (standard node):
+
+node server.js
 
 -----
 
-Logs are in C:\3Dvirtuallife\utils\node\logs
+
 
 -----
 
-Development mode:
+Development mode (only if you have the /utils directory):
 
 If you want to run in development mode with a standalone DB (mmapv1), 
 you can startup a local MongoDB using 'startDB.bat' instead (port 27018).  

@@ -26,6 +26,7 @@ export class StandardForm {
         this.objectType = this.template.type;
         this.objectSubtype = this.template.subtype;
         
+        this.inventory = this.template.inventory ? this.template.inventory : [];
         this.attributes = this.template.attributes;
         this.random = Math.random();
         
@@ -318,16 +319,22 @@ export class StandardForm {
         if (payload.animations && payload.animations.length > 0 && this.activeAction) {
             let animations = payload.animations.split('+');
             animations.forEach(animation => {
-                let [animationName,duration,fadeOutDuration,fadeOutDelay,autorestore,concurrent] = animation.split('/');
-                this.runAction(animationName, Number(duration), Number(fadeOutDuration), Number(fadeOutDelay), Boolean(autorestore=="autorestore"), Boolean(concurrent=="concurrent"));
+                let [animationName,timeScale,autoRestore,concurrent,loopRepeat,downCallback,upCallback] = animation.split('/');
+                this.runAction(animationName, timeScale, autoRestore, concurrent, loopRepeat, downCallback, upCallback);
             })
         } 
         
         if (this.attributes.defaultSingleAction && this.activeAction) {
-            this.runAction(this.activeAction._clip.name, 3, 3, 1, false);
+            this.runAction(this.activeAction._clip.name, this.attributes.timeScale? this.attributes.timeScale : 1);
         }
 
         if (local) this.sceneController.socket.emit('updateAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level, type: this.objectType });
+    }
+
+    addWaterSource() {
+        let p = { x: this.model.position.x, y: this.model.position.y, z: this.model.position.z };
+        let radius = 100; // make variable?
+        this.sceneController.addWaterSource(p, radius);
     }
 
     /** Intermittently recharge mana and health for the player based on strength and agility */
@@ -418,5 +425,112 @@ export class StandardForm {
 
     getEffectiveStat(stat) {
         return Math.max(this.getStat(stat) + this.getStatBoost(stat),0);
+    }
+
+    addToInventory(itemName, desiredIndex, quantity = 1, keyCode = null) {
+
+        var newQuantity;
+        var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
+        if (itemIndex != -1) {
+            newQuantity = this.inventory[itemIndex]? this.inventory[itemIndex].quantity + quantity : 1;
+        } else {
+
+            // If desiredIndex is already defined, use the first inventory slot
+            if (desiredIndex == undefined || this.inventory[desiredIndex]) {
+                itemIndex = this.firstInventorySlot();
+            } else itemIndex = desiredIndex;
+
+            newQuantity = quantity;
+        }
+
+        this.inventory[itemIndex] = {
+            itemName: itemName,
+            quantity: newQuantity
+        }
+
+        if (keyCode) this.inventory[itemIndex].keyCode = keyCode;
+
+        if (this.objectSubtype == "local") this.cacheHero();
+        return {itemIndex, quantity: newQuantity};
+    }
+
+    /**
+     * returns the remaining quantity
+     */
+    removeFromInventory(itemName) {
+
+        let index = this.inventory.findIndex(el => {
+            return el != undefined && el.itemName == itemName
+        });
+
+        var quantityRemaining;
+        if (index != -1) {
+            if (this.inventory[index].quantity > 1) {
+                this.inventory[index].quantity--;
+                quantityRemaining = this.inventory[index].quantity;
+            } else {
+                this.inventory[index] = null;
+                quantityRemaining = 0;
+            }
+        } else quantityRemaining = -1;
+
+        if (this.objectSubtype == "local") this.cacheHero();
+        return quantityRemaining;
+    }
+
+    swapInventoryPositions(first,second) {
+        let temp = {...this.inventory[first]};
+        let temp2 = {...this.inventory[second]};
+        this.inventory[first] = temp2;
+        this.inventory[second] = temp;
+        if (this.objectSubtype == "local") this.cacheHero();
+    }
+
+    getInventory() {
+        return this.inventory;
+    }
+l
+    inventoryContains(items) {
+
+        if (items == 'all') return true;
+        var found = false;
+        items.forEach(item => {
+            if (this.inventory.map(el => el? el.itemName: null).includes(item)) found = true;
+        })
+        return found;
+    }
+
+    inventoryContainsAll(items) {
+        for (const item of items) {
+            if (!(this.inventory.map(el => el? el.itemName: null).includes(item))) return false;
+        }
+        return true;
+    }
+
+    inventoryDoesNotContain(item) {
+        if ((this.inventory.map(el => el? el.itemName: null).includes(item))) return false;
+        return true;
+    }
+
+    firstInventorySlot() {
+        let max = this.inventory.length;
+        for (let i = 0; i < this.inventory.length; i++ ) {
+            if (!this.inventory[i] || !this.inventory[i].itemName) return i;
+        }
+        return max;
+    }
+
+    getInventoryQuantity(itemName) {
+        var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
+        if (itemIndex != -1) {
+            return this.inventory[itemIndex].quantity;
+        } else return 0;
+    }
+
+    getInventoryKeyCode(itemName) {
+        var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
+        if (itemIndex != -1 && this.inventory[itemIndex].keyCode) {
+            return this.inventory[itemIndex].keyCode;
+        } else return null;
     }
 }

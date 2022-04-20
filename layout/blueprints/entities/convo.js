@@ -11,5 +11,6 @@ export const convo = {
   carryon: { text: "Carry on my friend.", type: "end" },
   enlist: { text: "I need your help, old friend!  Join me.", type: "enlist" },
   release: { text: "Your help has been appreciated.  Get some rest!", type: "release" },
-  mount: { text: "Let's ride!", type: "mount" }
+  mount: { text: "Let's ride!", type: "mount" },
+  thank: { text: "Thank you!", type: "end" }
 };

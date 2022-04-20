@@ -33,8 +33,6 @@ export class IntelligentForm extends AnimatedForm{
         this.canJump = true;
         this.alive = true;
 
-        this.inventory = this.template.inventory;
-        this.attributes = this.template.attributes;
         this.spells = this.template.spells;
         this.equipped = this.template.equipped? this.template.equipped: [];
 
@@ -102,7 +100,7 @@ export class IntelligentForm extends AnimatedForm{
      */
     identifyPrincipalGeometry(el)  {
         // let possibleNames = ['Torso_0', 'Head_0', 'Icosphere', 'Body', "Cube.001_0", "Cube", "Body_0", "Rat_Geometry", 'Mesh_0', "Leg.R_0", "Elf_0", "Elf01_posed.002_0"];
-        let possibleNames = ['Torso_0', 'Head_0'];
+        let possibleNames = ['Torso_0', 'Head_0','Icosphere'];
         for (const name of possibleNames) {
             if (el.getObjectByName(name)) {
                 return el.getObjectByName(name).geometry;
@@ -256,13 +254,13 @@ export class IntelligentForm extends AnimatedForm{
 
             if ((this.objectType == 'hero' && this.objectSubtype == 'local') || this.objectType == 'friendly') {
                 if (this.handAttackR){
-                    this.handleAttack('Middle2R');
+                    this.handleAttack(this.attributes.handR? this.attributes.handR: 'Middle2R');
                 } else if (this.handAttackL){
-                    this.handleAttack('Middle2L');
+                    this.handleAttack(this.attributes.handL? this.attributes.handL: 'Middle2L');
                 } else if (this.kickAttackR){
-                    this.handleAttack('FootR');
+                    this.handleAttack(this.attributes.footR? this.attributes.footR: 'FootR');
                 } else if (this.kickAttackL){
-                    this.handleAttack('FootL');
+                    this.handleAttack(this.attributes.footL? this.attributes.footL: 'FootL');
                 }
             }
 
@@ -349,9 +347,12 @@ export class IntelligentForm extends AnimatedForm{
         
         for (const entity of this.sceneController.allEnemiesInRange(100, this.model.position)) {
 
-            diff.subVectors(this.positionWeapon, entity.model.position);
+            let entityPosition = new THREE.Vector3();
+            entityPosition.copy(entity.model.position);
+            entityPosition.y += entity.attributes.height;
+            diff.subVectors(this.positionWeapon, entityPosition);
 
-            console.log(`Diff between weaponPos and entity model pos: ${diff.length()}; radius ${entity.radius}`);
+            // console.log(`Diff between weaponPos and entity model pos: ${diff.length()}; radius ${entity.radius}`);
             if ( diff.length() < entity.radius ) {
                 let hitPointReduction = (getRandomArbitrary(0,this.getEffectiveStat('strength'))/3);
                 this.inflictDamage(entity, hitPointReduction, "generalDamage");
@@ -371,43 +372,46 @@ export class IntelligentForm extends AnimatedForm{
      */
     inflictDamage(entity, hitPointReduction, type) {
         
-        console.log(`Inflicting ${hitPointReduction} damage, type ${type}, on ${entity.objectName}, health: ${entity.getEffectiveStat('health')}`);
-        var defenseRating = entity.getEffectiveStat('defense');
+        entity.receiveDamage(hitPointReduction, type, (statMax) => {
+            this.attributes.experience += statMax;
+            if (this.objectType == "hero" && this.levelUpEligibility().length > 0) {
+                setTimeout(() => {
+                    this.sceneController.eventDepot.fire('modal', { type: 'levelUp', title: 'Level Up', context: this.levelUpEligibility() });
+                    this.sceneController.eventDepot.fire('updateXP', this.attributes.experience); 
+                }, 1500);
+            }
+        });
+    }
+
+    receiveDamage(hitPointReduction, type, callback) {
+
+        // console.log(`${this.objectName} receiving ${hitPointReduction} damage, type ${type}, on ${this.objectName}, health: ${this.getEffectiveStat('health')}`);
+        var defenseRating = this.getEffectiveStat('defense');
         // check the defense level for this type of damage
         switch (type) {
             case "iceDamage":
-                defenseRating += entity.getEffectiveStat('ice');
+                defenseRating += this.getEffectiveStat('ice');
                 break;
             case "fireDamage":
-                defenseRating += entity.getEffectiveStat('fire');
+                defenseRating += this.getEffectiveStat('fire');
                 break;
             case "poisonDamage":
-                defenseRating += entity.getEffectiveStat('poison');
+                defenseRating += this.getEffectiveStat('poison');
                 break;
             case "thunderDamage":
-                defenseRating += entity.getEffectiveStat('thunder');
+                defenseRating += this.getEffectiveStat('thunder');
                 break;
             default:
                 break;
         }
 
         hitPointReduction = Math.max(hitPointReduction - defenseRating,0.03);
+        // console.log(`Defense rating is: ${defenseRating} ... total reduction: ${hitPointReduction}`);
 
-        console.log(`Defense rating is: ${defenseRating} ... total reduction: ${hitPointReduction}`);
-        if (entity.changeStat('health', -hitPointReduction, false) <= 0) {
-    
-            this.attributes.experience += entity.getStatMax('health');
-
-            if (this.objectType == "hero" && this.levelUpEligibility().length > 0) {
-                setTimeout(() => {
-                    this.sceneController.eventDepot.fire('modal', { type: 'levelUp', title: 'Level Up', context: this.levelUpEligibility() });
-                }, 1500);
-            }
-
-            this.sceneController.eventDepot.fire('updateXP', this.attributes.experience); 
-        };
+        if (this.changeStat('health', -hitPointReduction, false) <= 0 && callback) {
+            callback(this.getStatMax('health'))
+        }
     }
-
 
     setElevation() {
         
@@ -504,28 +508,6 @@ export class IntelligentForm extends AnimatedForm{
         }, 4000);
     }
 
-    firstInventorySlot() {
-        let max = this.inventory.length;
-        for (let i = 0; i < this.inventory.length; i++ ) {
-            if (!this.inventory[i] || !this.inventory[i].itemName) return i;
-        }
-        return max;
-    }
-
-    getInventoryQuantity(itemName) {
-        var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
-        if (itemIndex != -1) {
-            return this.inventory[itemIndex].quantity;
-        } else return 0;
-    }
-
-    getInventoryKeyCode(itemName) {
-        var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
-        if (itemIndex != -1 && this.inventory[itemIndex].keyCode) {
-            return this.inventory[itemIndex].keyCode;
-        } else return null;
-    }
-
     getGoldValue(itemName) {
 
         let obj = this.sceneController.getTemplateByName(itemName);
@@ -546,91 +528,6 @@ export class IntelligentForm extends AnimatedForm{
             }
         })
         return worth;
-    }
-
-    addToInventory(itemName, desiredIndex, quantity = 1, keyCode = null) {
-
-        var newQuantity;
-        var itemIndex = this.inventory.map(el => el != undefined? el.itemName: null ).indexOf(itemName);
-        if (itemIndex != -1) {
-            newQuantity = this.inventory[itemIndex]? this.inventory[itemIndex].quantity + quantity : 1;
-        } else {
-
-            // If desiredIndex is already defined, use the first inventory slot
-            if (desiredIndex == undefined || this.inventory[desiredIndex]) {
-                itemIndex = this.firstInventorySlot();
-            } else itemIndex = desiredIndex;
-
-            newQuantity = quantity;
-        }
-
-        this.inventory[itemIndex] = {
-            itemName: itemName,
-            quantity: newQuantity
-        }
-
-        if (keyCode) this.inventory[itemIndex].keyCode = keyCode;
-
-        if (this.objectSubtype == "local") this.cacheHero();
-        return {itemIndex, quantity: newQuantity};
-    }
-
-    /**
-     * returns the remaining quantity
-     */
-    removeFromInventory(itemName) {
-
-        let index = this.inventory.findIndex(el => {
-            return el != undefined && el.itemName == itemName
-        });
-
-        var quantityRemaining;
-        if (index != -1) {
-            if (this.inventory[index].quantity > 1) {
-                this.inventory[index].quantity--;
-                quantityRemaining = this.inventory[index].quantity;
-            } else {
-                this.inventory[index] = null;
-                quantityRemaining = 0;
-            }
-        } else quantityRemaining = -1;
-
-        if (this.objectSubtype == "local") this.cacheHero();
-        return quantityRemaining;
-    }
-
-    swapInventoryPositions(first,second) {
-        let temp = {...this.inventory[first]};
-        let temp2 = {...this.inventory[second]};
-        this.inventory[first] = temp2;
-        this.inventory[second] = temp;
-        if (this.objectSubtype == "local") this.cacheHero();
-    }
-
-    getInventory() {
-        return this.inventory;
-    }
-l
-    inventoryContains(items) {
-
-        if (items == 'all') return true;
-        var found = false;
-        items.forEach(item => {
-            if (this.inventory.map(el => el? el.itemName: null).includes(item)) found = true;
-        })
-        return found;
-    }
-
-    inventoryContainsAll(items) {
-        for (const item of items) {
-            if (!(this.inventory.map(el => el? el.itemName: null).includes(item))) return false;
-        }
-        return true;
-    }
-
-    inventoryDoesNotContain(item) {
-        if ((this.inventory.map(el => el? el.itemName: null).includes(item))) return false;
-        return true;
     }
 
     equip(area, itemName, throwable = false, throws = null, initial = false) {
@@ -664,28 +561,33 @@ l
                 //     this.sceneController.formFactory.addTorchLight(item.model);
                 // } 
 
-                if (item.attributes.effect && !item.attributes.throwable) { // body parts (non 'key' positions)
+                if (item.attributes.equipEffects && !item.attributes.throwable) { // body parts (non 'key' positions)
                     
-                    // What is the item effect?
-                    let stat = item.attributes.effect.split("/")[0];
-                    let change = Number(item.attributes.effect.split("/")[1]);
-    
-                    switch (stat) {
-                        case "health":
-                        case "mana":
-                        case "strength":
-                        case "agility":
-                        case "defense":
-                        case "fire":
-                        case "ice":
-                        case "thunder":
-                        case "poison": 
-                            this.changeStatBoost(stat, change);
-                            break;
-                        case "light":
-                            if (this.sceneController.overheadPointLight) this.sceneController.overheadPointLight.intensity += 10;
-                            break;
-                    }
+                    // What are the item equip effects?
+                    let effects = item.attributes.equipEffects.split("+");
+
+                    effects.forEach(effect => {
+                        let stat = effect.split("/")[0];
+                        let change = Number(effect.split("/")[1]);
+        
+                        switch (stat) {
+                            case "health":
+                            case "mana":
+                            case "strength":
+                            case "agility":
+                            case "defense":
+                            case "fire":
+                            case "ice":
+                            case "thunder":
+                            case "poison": 
+                                this.changeStatBoost(stat, change);
+                                break;
+                            case "light":
+                                if (this.sceneController.overheadPointLight) this.sceneController.overheadPointLight.intensity += change;
+                                break;
+                        }
+                    })
+
                 }
                 
                 switch (area) {
@@ -838,21 +740,32 @@ l
                     
                 }
     
-                if (item.attributes.effect) {
-                    let stat = item.attributes.effect.split("/")[0];
-                    let change = Number(item.attributes.effect.split("/")[1]);
+                if (item.attributes.equipEffects) {
+
+                    // What are the item equip effects?
+                    let effects = item.attributes.equipEffects.split("+");
+
+                    effects.forEach(effect => {
+                        let stat = effect.split("/")[0];
+                        let change = Number(effect.split("/")[1]);
         
-                    switch (stat) {
-                        case "health":
-                        case "mana":
-                        case "strength":
-                        case "agility": 
-                            this.changeStatBoost(stat, -change);
-                            break;
-                        case "light":
-                            if (this.sceneController.overheadPointLight) this.sceneController.overheadPointLight.intensity -= change;
-                            break;
-                    }
+                        switch (stat) {
+                            case "health":
+                            case "mana":
+                            case "strength":
+                            case "agility":
+                            case "defense":
+                            case "fire":
+                            case "ice":
+                            case "thunder":
+                            case "poison": 
+                                this.changeStatBoost(stat, -change);
+                                break;
+                            case "light":
+                                if (this.sceneController.overheadPointLight) this.sceneController.overheadPointLight.intensity -= change;
+                                break;
+                        }
+                    })
                 }
     
                 if (item.attributes.animates) {
@@ -874,7 +787,7 @@ l
             inventory: this.inventory,
             spells: this.spells,
             equipped: this.equipped,
-            party: this.party
+            partyTemplates: this.partyTemplates
         }
     }
 
@@ -1012,6 +925,8 @@ l
      */
     attack(side, shift) {
         
+        if (this.kickAttacks.length == 0) shift = false;
+
         if (side=='R' && !shift && this.handAttacksR.length == 0) {
             side = 'L';
         } else if (side=='L' && !shift && this.handAttacksL.length == 0) {
@@ -1022,12 +937,6 @@ l
             side = 'R';
         }
         
-        // this.handAttacksR = [];
-        // this.kickAttacksR = [];
-        // this.handAttacksL = [];
-        // this.kickAttacksL = [];
-
-        if (this.kickAttacks.length == 0) shift = false;
         let possibleAttacks = shift ? "kickAttacks" + side: "handAttacks" + side;
         
         // Choose an attack
