@@ -11,7 +11,7 @@ export const Valley = {
     description: "valley",
     gltf: "valley.glb",
     attributes: {
-      snowflakes: true,
+      snowflakes: false,
       cutScenes: {
         intro: "volcanoIntro.mkv"
       },

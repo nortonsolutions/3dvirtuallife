@@ -6,6 +6,12 @@
 #### Testing framework (Chai/Mocha) from FCC, though not used much
 #### pointerLockControls concept from mrdoob & Mugen87
 
+<img src="3dvirtuallife_1.png" width="400"/>
+<img src="3dvirtuallife_2.png" width="400"/>
+<img src="3dvirtuallife_3.png" width="400"/>
+<img src="3dvirtuallife_4.png" width="400"/>
+<img src="3dvirtuallife_5.png" width="400"/>
+
 This production version assumes MongoDB is up and running on port 27017 
 and uses the DB called "nortonAdventure" (wiredtiger) by default.
 
