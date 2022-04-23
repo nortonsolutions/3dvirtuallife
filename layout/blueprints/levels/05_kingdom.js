@@ -127,7 +127,7 @@ export const Kingdom = {
         key: "keyToKingdom",
         controls:
           "kingdomGate:OpenL/0.5//concurrent+OpenR/0.5//concurrent+OpenBars/0.5//concurrent",
-        position: "up"
+        direction: "up"
       }
     },
     {
@@ -145,7 +145,7 @@ export const Kingdom = {
       attributes: {
         controls: "elevatorL_6m:Move/0.5",
         staticStartingElevation: true,
-        position: "up",
+        direction: "up",
         rotateY: 45
       }
     },
@@ -164,7 +164,7 @@ export const Kingdom = {
       attributes: {
         controls: "elevatorS_6m:Move/0.5",
         staticStartingElevation: true,
-        position: "up",
+        direction: "up",
         rotateY: 45
       }
     },
@@ -218,14 +218,8 @@ export const Kingdom = {
     { name: "elfgirl2" },
     { name: "elfgirl3" },
     { name: "elfgirl5" },
-    { name: "elfgirl4" },
-    { name: "elfgirl6" },
     { name: "joe2" },
     { name: "joe3" },
-    { name: "joe4" },
-    { name: "joe5" },
     { name: "joe6" },
-    { name: "joe7" },
-    
   ]
 };

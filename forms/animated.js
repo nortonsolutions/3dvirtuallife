@@ -108,7 +108,7 @@ export class AnimatedForm extends StandardForm{
             this.previousActionName = '';
             this.previousAction = null;
     
-            if (typeof this.attributes.position && this.attributes.position == "up") {
+            if (typeof this.attributes.direction && this.attributes.direction == "up") {
                     if (this.activeAction) this.animations.forEach(animation => {
                         this.runAction(animation.name, 1, false, true); // concurrent
                     })
@@ -266,7 +266,7 @@ export class AnimatedForm extends StandardForm{
             action.repetitions = 1;
             action.setEffectiveTimeScale( 1 );
                 
-            if (this.attributes.position == "down") {
+            if (this.attributes.direction == "down") {
                 action.fadeOut( duration );
             } else {
                 action.reset();
@@ -291,11 +291,13 @@ export class AnimatedForm extends StandardForm{
             action.repetitions = loopRepeat? Infinity : 1;
             action.setEffectiveTimeScale( timeScale );
                 
-            if (this.attributes.position == "down") {
+            if (this.attributes.direction == "down") { // go back down to origin
+                this.currentlyGoingDown = true;
                 action.paused = false;
                 action.setEffectiveTimeScale( -timeScale );
                 action.play();
-            } else {
+            } else { // play standard animation
+                this.currentlyGoingUp = true;
                 if (timeScale < 0) {
                     action.paused = false;
                 } else action.reset();
@@ -318,12 +320,14 @@ export class AnimatedForm extends StandardForm{
             } else {
                 setTimeout(() => {
                     this.currentlyRunningAction = false;
+                    this.currentlyGoingUp = false;
+                    this.currentlyGoingDown = false;
                 }, action._clip.duration * 1000);
             }
 
-            if (this.attributes.position == "up" && upCallback) { // run something when 'up' like the well
+            if (this.attributes.direction == "up" && upCallback) { // run something when 'up' like the well
                 this.mixer.addEventListener( 'finished', this[upCallback] );
-            } else if (this.attributes.position == "up" && downCallback) {
+            } else if (this.attributes.direction == "down" && downCallback) {
                 this.mixer.addEventListener( 'finished', this[downCallback] );
             }
         }

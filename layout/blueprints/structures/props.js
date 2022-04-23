@@ -46,7 +46,7 @@ export const Props = {
             elevation: 0,
             animates: true,
             locked: true,
-            position: "down"
+            direction: "down"
         }
     },
 }

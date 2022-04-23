@@ -120,7 +120,7 @@ export const Valley = {
       attributes: {
         controls: "elevatorS_1m:Move/0.7",
         staticStartingElevation: true,
-        position: "up",
+        direction: "up",
         rotateY: 315
       }
     },
@@ -139,7 +139,7 @@ export const Valley = {
         rotateY: 180,
         controls:
           "shed:gateaction/0.5//concurrent+invgateaction/0.5//concurrent",
-        position: "up"
+        direction: "up"
       }
     }
   ],

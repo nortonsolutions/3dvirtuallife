@@ -247,22 +247,30 @@ export class Hero extends IntelligentForm {
                     if (this.watercanEquipped() && this.atWaterSource()) { 
 
                         let watercan = this.watercanEquipped();
+
                         if (watercan) {
-                            this.drawWater(watercan, this.selectedObject);
+                            if (!this.drawWater(watercan, this.selectedObject)) { // try to draw water; if it fails, remove waterSource
+                                let pos = this.selectedObject.model.position;
+                                this.sceneController.removeWaterSource({x: pos.x, y: pos.y, z: pos.z});
+
+                                let parentBodyPart = watercan.parent.name;
+                                this.unequip(parentBodyPart);
+                                this.addToInventory(watercan.objectName, 0, 1);
+                            };
                         }
 
                     } else {
                         var accessible = this.selectedObject.attributes.key ? this.inventory.map(el => el? el.itemName: null).includes(this.selectedObject.attributes.key) : true;
                     
                         if (accessible) {
-                            let newPosition = this.selectedObject.attributes.position == "down" ? "up" : "down";
+                            let newDirection = this.selectedObject.attributes.direction == "down" ? "up" : "down";
                             let myAnimations = this.selectedObject.attributes.animations;
 
                             if (typeof this.selectedObject.attributes.locked == "boolean") {
                                 let newLockstate = !this.selectedObject.attributes.locked; 
-                                this.selectedObject.updateAttributes({locked: newLockstate, position: newPosition, animations: myAnimations});
-                            } else if (this.selectedObject.attributes.position) { // if it has a position, alternate
-                                this.selectedObject.updateAttributes({position: newPosition, animations: myAnimations});
+                                this.selectedObject.updateAttributes({locked: newLockstate, direction: newDirection, animations: myAnimations});
+                            } else if (this.selectedObject.attributes.direction) { // if it has a position, alternate
+                                this.selectedObject.updateAttributes({direction: newDirection, animations: myAnimations});
                             }
 
                             if (this.selectedObject.attributes.controls) {
@@ -270,13 +278,13 @@ export class Hero extends IntelligentForm {
                                 var [controlItem,animations] = this.selectedObject.attributes.controls.split(":");
                                 
                                 let controlled = this.sceneController.forms.find(el => el.objectName == controlItem);
-                                let newPositionControlled = controlled.attributes.position == "down" ? "up" : "down";
+                                let newDirectionControlled = controlled.attributes.direction == "down" ? "up" : "down";
                                 
                                 if (typeof controlled.attributes.locked == "boolean") {
                                     let newLockstateControlled = !controlled.attributes.locked; 
-                                    controlled.updateAttributes({locked: newLockstateControlled, position: newPositionControlled, animations});
-                                } else if (controlled.attributes.position) { // if it has a position, alternate
-                                    controlled.updateAttributes({position: newPositionControlled, animations});
+                                    controlled.updateAttributes({locked: newLockstateControlled, direction: newDirectionControlled, animations});
+                                } else if (controlled.attributes.direction) { // if it has a position, alternate
+                                    controlled.updateAttributes({direction: newDirectionControlled, animations});
                                 }
                             } 
                         }
@@ -301,14 +309,14 @@ export class Hero extends IntelligentForm {
 
                     this.sceneController.eventDepot.fire('modal', dialogData);
                 } 
-            } else if (this.watercanEquipped() && this.atWaterSource()) { 
+            } else if (this.watercanEquipped() && this.atWaterSource()) { // no selected object
 
                 let watercan = this.watercanEquipped();
                 if (watercan) {
                     this.drawWater(watercan);
                 }
                 
-            } else if (this.miningToolEquipped() && this.atMineralSource()) {
+            } else if (this.miningToolEquipped() && this.atMineralSource()) { // no selected object
                 let oreName = this.atMineralSource();
                 let tool = this.miningToolEquipped();
                 if (tool) {
@@ -332,16 +340,16 @@ export class Hero extends IntelligentForm {
         } else return null;
     }
 
-    drawWater(watercan, selectedObject) {
+    drawWater(watercan, selectedObject) { // return true if successful, false if not
 
-        if (!selectedObject || selectedObject.hasWater()) {
+        if (!selectedObject || selectedObject.inventoryContains(['water'])) {
 
             let spriteConfig = {
                 name: 'blueExplosion',
                 regex: '',
                 frames: 10,
-                scale: 50,
-                elevation: 60,
+                scale: 30,
+                elevation: 55,
                 flip: false,
                 animates: true,
                 time: 2
@@ -351,11 +359,16 @@ export class Hero extends IntelligentForm {
             wp = watercan.getWorldPosition(wp);
             this.sceneController.formFactory.addSprites(watercan.model, spriteConfig, this.sceneController.scene, true, wp);
     
+
             this.fadeToAction('ThumbsUp', 0.2);
             this.sceneController.eventDepot.fire('addToInventory', {itemName: 'water', quantity: 4});
+
+            if (selectedObject.inventoryContains(['water'])) selectedObject.removeFromInventory('water');
+            
+            return true;
     
         } else {
-
+            return false;
         }
         
     }
@@ -821,13 +834,13 @@ export class Hero extends IntelligentForm {
             // Check to see if this switch/lever controls something:
             var [controlItem,animations] = this.standingUpon.attributes.footControls.split(":");
             let controlled = this.sceneController.forms.find(el => el.objectName == controlItem);
-            let newPositionControlled = controlled.attributes.position == "down" ? "up" : "down";
+            let newDirectionControlled = controlled.attributes.direction == "down" ? "up" : "down";
             
             if (typeof controlled.attributes.locked == "boolean") {
                 let newLockstateControlled = !controlled.attributes.locked; 
-                controlled.updateAttributes({locked: newLockstateControlled, position: newPositionControlled, animations});
-            } else if (controlled.attributes.position) { // if it has a position, alternate
-                controlled.updateAttributes({position: newPositionControlled, animations});
+                controlled.updateAttributes({locked: newLockstateControlled, direction: newDirectionControlled, animations});
+            } else if (controlled.attributes.direction) { // if it has a direction, alternate
+                controlled.updateAttributes({direction: newDirectionControlled, animations});
             } else {
                 controlled.updateAttributes({animations});
             }

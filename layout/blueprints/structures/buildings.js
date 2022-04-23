@@ -142,7 +142,7 @@ export const Buildings = {
     type: "structure",
     attributes: {
       animates: true,
-      position: "down",
+      direction: "down",
       scale: 100,
       elevation: -6,
       sprites: [
@@ -177,16 +177,17 @@ export const Buildings = {
     gltf: "Well.glb",
     description: "Ancient Well",
     type: "structure",
-    inventory: [],
+    inventory: [
+      { itemName: "water", quantity: 100 }
+    ],
     attributes: {
       multipleSimultanousActions: true,
       animates: true,
-      position: "down",
-      whenUp: "addWaterSource",
-      whenDown: "fillWaterBucket",
+      direction: "up",
       scale: 20,
       elevation: 0,
-      animations: "Cylinder.006Action.001/1//concurrent//+Cylinder.007Action/1//concurrent+KeyAction/1//concurrent"
+      animations: "Cylinder.006Action.001/1//concurrent///addWaterSource+Cylinder.007Action/1//concurrent+KeyAction/1//concurrent"
+      // [animationName,timeScale,autoRestore,concurrent,loopRepeat,downCallback,upCallback] = animation.split('/');
     }
   }
 };

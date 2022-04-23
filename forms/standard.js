@@ -312,29 +312,47 @@ export class StandardForm {
 
     // sample payload: {locked: newLockstateControlled, position: newPositionControlled, animations}
     updateAttributes(payload, local = true) {
-        this.attributes = {...this.attributes, ...payload};
-        this.model.attributes = {...this.attributes, ...payload};
-        this.sceneController.eventDepot.fire('updateAttributes', {layoutId: this.model.attributes.layoutId, attributes: payload, type: this.objectType});
 
-        if (payload.animations && payload.animations.length > 0 && this.activeAction) {
-            let animations = payload.animations.split('+');
-            animations.forEach(animation => {
-                let [animationName,timeScale,autoRestore,concurrent,loopRepeat,downCallback,upCallback] = animation.split('/');
-                this.runAction(animationName, timeScale, autoRestore, concurrent, loopRepeat, downCallback, upCallback);
-            })
-        } 
-        
-        if (this.attributes.defaultSingleAction && this.activeAction) {
-            this.runAction(this.activeAction._clip.name, this.attributes.timeScale? this.attributes.timeScale : 1);
+        // skip if alternate direction is still running
+        if ((payload.direction == "down" && this.currentlyGoingUp) || (payload.direction == "up" && this.currentlyGoingDown)) {
+
+        } else {
+            this.attributes = {...this.attributes, ...payload};
+            this.model.attributes = {...this.attributes, ...payload};
+            this.sceneController.eventDepot.fire('updateAttributes', {layoutId: this.model.attributes.layoutId, attributes: payload, type: this.objectType});
+    
+            if (payload.animations && payload.animations.length > 0 && this.activeAction) {
+    
+                let animations = payload.animations.split('+');
+                animations.forEach(animation => {
+                    let [animationName,timeScale,autoRestore,concurrent,loopRepeat,downCallback,upCallback] = animation.split('/');
+    
+                    this.runAction(animationName, timeScale, autoRestore, concurrent, loopRepeat, downCallback, upCallback);
+                })
+            } 
+            
+            if (this.attributes.defaultSingleAction && this.activeAction) {
+                this.runAction(this.activeAction._clip.name, this.attributes.timeScale? this.attributes.timeScale : 1);
+            }
+    
+            if (local) this.sceneController.socket.emit('updateAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level, type: this.objectType });
         }
-
-        if (local) this.sceneController.socket.emit('updateAttributes', {layoutId: this.model.attributes.layoutId, payload, level: this.sceneController.level, type: this.objectType });
     }
 
-    addWaterSource() {
-        let p = { x: this.model.position.x, y: this.model.position.y, z: this.model.position.z };
-        let radius = 100; // make variable?
-        this.sceneController.addWaterSource(p, radius);
+    addWaterSource = () => {
+        this.mixer.removeEventListener( 'finished', this['fillWaterBucket'] );
+        this.mixer.removeEventListener( 'finished', this['addWaterSource'] );
+        if (this.inventoryContains(['water'])) {
+            let p = { x: this.model.position.x, y: this.model.position.y, z: this.model.position.z };
+            let radius = 100; // make variable?
+            this.sceneController.addWaterSource(p, radius);
+        }
+    }
+
+    fillWaterBucket = () => {
+        this.mixer.removeEventListener( 'finished', this['addWaterSource'] );
+        this.mixer.removeEventListener( 'finished', this['fillWaterBucket'] );
+        this.addToInventory('water',0,100);
     }
 
     /** Intermittently recharge mana and health for the player based on strength and agility */

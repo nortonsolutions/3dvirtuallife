@@ -31,7 +31,7 @@ export const Platforms = {
       animates: true,
       scale: 200,
       elevation: 0,
-      position: "down"
+      direction: "down"
     }
   },
 
@@ -45,7 +45,7 @@ export const Platforms = {
       animates: true,
       scale: 200,
       elevation: 0,
-      position: "down"
+      direction: "down"
     }
   },
 
@@ -59,7 +59,7 @@ export const Platforms = {
       animates: true,
       scale: 200,
       elevation: -5,
-      position: "down"
+      direction: "down"
     }
   },
 
@@ -73,7 +73,7 @@ export const Platforms = {
       animates: true,
       scale: 200,
       elevation: -5,
-      position: "down"
+      direction: "down"
     }
   },
 
@@ -87,7 +87,7 @@ export const Platforms = {
       animates: true,
       scale: 200,
       elevation: -5,
-      position: "down"
+      direction: "down"
     }
   },
 
@@ -101,7 +101,7 @@ export const Platforms = {
       animates: true,
       scale: 200,
       elevation: -5,
-      position: "down"
+      direction: "down"
     }
   },
 

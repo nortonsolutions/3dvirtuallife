@@ -13,7 +13,7 @@ export const GatesAndLevers = {
       scale: 100,
       elevation: 0,
       locked: true,
-      position: "down"
+      direction: "down"
     }
   },
 
@@ -28,7 +28,7 @@ export const GatesAndLevers = {
       elevation: 0,
       key: "passphrase", // switch to passphrase
       locked: true, // lock and require password
-      position: "down"
+      direction: "down"
     }
   },
 
@@ -42,7 +42,7 @@ export const GatesAndLevers = {
       animates: true,
       scale: 100,
       elevation: 0,
-      position: "down"
+      direction: "down"
     }
   },
 
@@ -55,7 +55,7 @@ export const GatesAndLevers = {
       animates: true,
       scale: 100,
       elevation: 0,
-      position: "middle"
+      direction: "middle"
     }
   }
 };
