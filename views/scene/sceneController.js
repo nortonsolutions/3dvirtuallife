@@ -242,6 +242,8 @@ export class SceneController {
     addEventListeners() {
         
         this.socket.on('updateDayPhase', data => {
+
+            if (this.scene.terrain.attributes.alwaysDaytime) return;
             this.dayPhase = data;
 
             // Adjust sunLight intensity and color 0x7777ff, change backgroundMesh, fog 
