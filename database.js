@@ -1,3 +1,6 @@
+const dotenv = require('dotenv');
+dotenv.config({ path: './.env'});
+
 module.exports = function (mongoose, callback) {
 
     const CONNECTION_STRING = process.env.DB || "mongodb://localhost:27017/nortonAdventure";
@@ -22,7 +25,12 @@ module.exports = function (mongoose, callback) {
     
     const UserModel = mongoose.model('User', userSchema);
 
-    mongoose.connect(CONNECTION_STRING, { useMongoClient: true })
+    const clientOptions = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+
+    mongoose.connect(CONNECTION_STRING, clientOptions)
     .then(
 
       (db) => {

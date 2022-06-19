@@ -10,6 +10,7 @@ const bodyParser  = require('body-parser');
 const cors        = require('cors');
 // const fs          = require('fs');
 // const multer      = require('multer');
+const dotenv      = require('dotenv');
 
 const auth                     = require('./auth.js');
 const apiRoutes                = require('./routes/api.js');
@@ -24,6 +25,7 @@ const passport                 = require('passport');
 const runner                   = require('./test-runner');
 const database                 = require('./database.js');
 const socket                   = require('socket.io');
+dotenv.config({ path: './.env'});
 
 const app = express();
 

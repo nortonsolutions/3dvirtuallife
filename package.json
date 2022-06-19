@@ -4,45 +4,45 @@
 	"description": "3D Multiplayer RPG/Adventure game built with THREE.js, Mongo/Mongoose, Express, Node, Handlebars, Passport, JavaScript, HTML/CSS, etc.",
 	"main": "server.js",
 	"directories": {
-	  "test": "tests"
+		"test": "tests"
 	},
 	"scripts": {
-	  "test": "echo \"Error: no test specified\" && exit 1",
-	  "start": "node server.js"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node server.js"
 	},
 	"dependencies": {
-	  "bcrypt": "^5.0.1",
-	  "body-parser": "^1.15.2",
-	  "chai": "^3.5.0",
-	  "chai-http": "^3.0.0",
-	  "cors": "^2.8.1",
-	  "express": "^4.14.0",
-	  "express-hbs": "^2.4.0",
-	  "express-session": "^1.17.2",
-	  "helmet": "^3.1.0",
-	  "mocha": "^3.2.0",
-	  "mongodb": "^2.2.16",
-	  "mongoose": "^4.13.18",
-	  "passport": "^0.5.2",
-	  "passport-local": "^1.0.0",
-	  "socket.io": "^4.4.1",
-	  "zombie": "^5.0.5"
+		"bcrypt": "^5.0.1",
+		"body-parser": "^1.15.2",
+		"chai": "^3.5.0",
+		"chai-http": "^3.0.0",
+		"cors": "^2.8.1",
+		"dotenv": "^16.0.1",
+		"express": "^4.14.0",
+		"express-hbs": "^2.4.0",
+		"express-session": "^1.17.2",
+		"helmet": "^3.1.0",
+		"mocha": "^3.2.0",
+		"mongodb": "^2.2.16",
+		"mongoose": "^6.4.0",
+		"passport": "^0.5.2",
+		"passport-local": "^1.0.0",
+		"socket.io": "^4.4.1",
+		"zombie": "^5.0.5"
 	},
 	"repository": {
-	  "type": "git",
-	  "url": "git+https://github.com/dnorton211153/3dvirtuallife.git"
+		"type": "git",
+		"url": "git+https://github.com/dnorton211153/3dvirtuallife.git"
 	},
 	"keywords": [
-	  "Dave",
-	  "Norton",
-	  "Utah",
-	  "3dvirtuallife"
+		"Dave",
+		"Norton",
+		"Utah",
+		"3dvirtuallife"
 	],
 	"author": "Dave Norton",
 	"license": "ISC",
 	"bugs": {
-	  "url": "https://github.com/dnorton211153/3dvirtuallife/issues"
+		"url": "https://github.com/dnorton211153/3dvirtuallife/issues"
 	},
 	"homepage": "https://github.com/dnorton211153/3dvirtuallife#readme"
-  }
-  
+}
