@@ -242,7 +242,7 @@ export class ArtificialForm extends IntelligentForm{
             heroLayoutId = this.sceneController.hero.attributes.layoutId;
         }
 
-        let others = [...this.sceneController.hero.party, ...this.sceneController.others];
+        let others = [...this.sceneController?.hero?.party, ...this.sceneController?.others];
         others.filter(el => el != this).forEach(other => {
             let p = other.model.position
             let d = this.model.position.distanceTo(p);

@@ -778,7 +778,7 @@ class Scene {
 
             case 32: // space
                 
-                if (this.controller.hero.mountedUpon) {
+                if (this.controller.hero?.mountedUpon) {
                     this.controller.eventDepot.fire('descend', { vehicle: this.controller.hero.mountedUpon.objectName });
                 } else {
                     this.controller.eventDepot.fire('jump', {});
