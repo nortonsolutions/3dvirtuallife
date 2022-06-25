@@ -12,6 +12,39 @@
 <img src="3dvirtuallife_4.png" width="400"/>
 <img src="3dvirtuallife_5.png" width="400"/>
 
+###Controls:
+*mouse movement* - visual field
+*scroll wheel* - adjust zoom
+
+*left/right mouse buttons*
+Talk with friendlies
+Use or activate the selected object (like switches)
+
+*Only when in attack range*
+left/right attack (hold shift for kick attacks if the model supports)
+
+*middle mouse button* - launch/throw/toss item equipped in hand 
+(e.g. planting sunseeds, watering from watercan, or firing arrows with bow equipped)
+
+*arrow keys* - movement
+*space bar* - jump
+*i* - inventory (use the toggle to view spells; both allow multiple pages)
+*h* - hotkey sidebar (shows the items/spells that have been equipped to hotkeys)
+*1-8* - hotkeys; use the item/spell for each mapped key
+*m* - mini-map
+*alt-t* - toggle chat 
+
+##Things to beginners to try:
+* Talk and trade with friendlies
+* Attack beasts at close range (or launch arrows)
+* Pick up the key and open the hatch to the dungeon
+* Go rafting on the lake by mounting the fishing boat
+* Gain enough money to buy the fishing pole and go fishing at the lake
+* Take the elevator up and see the sights by mounting the hot-air balloon
+* Plant a sunseed, fill the watering can at a water source, and water the seed
+* Use sunfruit to feed a horse and gain his loyalty for a while
+
+
 This production version assumes MongoDB is up and running on port 27017 
 and uses the DB called "nortonAdventure" (wiredtiger) by default.
 

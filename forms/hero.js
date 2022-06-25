@@ -342,7 +342,7 @@ export class Hero extends IntelligentForm {
 
     drawWater(watercan, selectedObject) { // return true if successful, false if not
 
-        if (!selectedObject || selectedObject.inventoryContains(['water'])) {
+        if (!selectedObject || selectedObject?.inventoryContains(['water'])) {
 
             let spriteConfig = {
                 name: 'blueExplosion',
