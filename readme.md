@@ -17,7 +17,7 @@
 *scroll wheel* - adjust zoom
 
 *left/right mouse buttons*
-Talk with friendlies
+Talk with friendlies /
 Use or activate the selected object (like switches)
 
 *Only when in attack range*
@@ -33,6 +33,8 @@ left/right attack (hold shift for kick attacks if the model supports)
 *1-8* - hotkeys; use the item/spell for each mapped key
 *m* - mini-map
 *alt-t* - toggle chat 
+
+When you're on the inventory screen, drop an item by dragging it to the red square.  This is also how you place a house.
 
 ##Things to beginners to try:
 * Talk and trade with friendlies

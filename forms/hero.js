@@ -731,7 +731,7 @@ export class Hero extends IntelligentForm {
     }
 
     move(delta) {
-        if (this.alive) {
+        if (this.alive && this.model) {
 
             this.pV.copy(this.velocity); // previous velocity
             this.sheltered = false; // to make weather elements invisible
