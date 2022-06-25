@@ -28,7 +28,15 @@ export const Lavalabyrinth = {
       designateNPCs: true
     }
   },
-  items: [{ name: "balloon", location: { x: -7.2, y: 6.0, z: 40 } }],
+  items: [
+    { 
+      name: "balloon", 
+      location: { x: -7.2, y: 6.0, z: 40 },
+      attributes: {
+        staticStartingElevation: true,
+      }
+    }
+  ],
   structures: [
     { name: "ricketyPlatform", location: { x: -7.2, y: 0, z: 40 } },
     {
