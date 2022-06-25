@@ -406,7 +406,7 @@ export const Friendlies = {
       length: 20,
       width: 20,
       elevation: 0,
-      scale: 25,
+      scale: 10,
       conversation: {
         state: "intro",
         engagementState: 0,

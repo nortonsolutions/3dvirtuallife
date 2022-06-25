@@ -16,8 +16,19 @@ This production version assumes MongoDB is up and running on port 27017
 and uses the DB called "nortonAdventure" (wiredtiger) by default.
 
 Unzip cdn.zip, png.zip, and 3d.zip in their respective directories for stock libraries/graphics.
+You may need to rename some graphics to lowercase the extensions, etc.  I'm too lazy to go re-zip
+this massive file or change the references.  I was running on Windows before (case-insensitive)
+and found I had to do some mass-renaming on Ubuntu.  Just watch F12/devtools in the browser to
+see which files are causing trouble.  Here's a quick way to mass-lowercase the extensions:
 
-Also change the reference to 172.16.0.20 to your own public IP address for socket handling.
+```
+find . -name '*.*' -exec sh -c '
+  a=$(echo "$0" | sed -r "s/([^.]*)\$/\L\1/");
+  [ "$a" != "$0" ] && mv "$0" "$a" ' {} \;
+```
+
+Also change the references to localhost to your own public IP address for socket handling
+(unless you only want to play locally).
 
 Thanks to the graphics team: Mike Tidwell, Chris Lobato, Rodney Thinn, and Steve Leavitt.
 
@@ -27,7 +38,7 @@ Thanks to the graphics team: Mike Tidwell, Chris Lobato, Rodney Thinn, and Steve
 To configure auto-startup for pm2.exe service with pm2-windows-service module:
 
 Launch Git Bash in Administrative Mode, then run the following:
-
+```
 [ /c/util/courseApp/utils/yarn-pm2-windows-service/node_modules/pm2-windows-service ]
 
 $ bin/pm2-service-install -n pm2
@@ -38,17 +49,22 @@ $ bin/pm2-service-install -n pm2
 ? Set PM2_SERVICE_PM2_DIR (the location of the global pm2 to use with the service? Y
 ? Specify the directory containing the pm2 version to be used by the service:
 C:\util\courseApp\utils\node\node_modules\pm2
+```
 
 PM2 service installed and started.
 
 Then again in administrative mode,
 
+```
 $ sc \\DESKTOP-83JAE79 config pm2.exe depend= MongoDB
+```
 
 To check pm2 services, login to cmd or bash in Administrative mode.
 
+```
 $ pm2 start /c/3Dvirtuallife/server.js -i 1 --name 3Dvirtuallife
 $ pm2 save
+```
 
 (The 'pm2 save' will cause pm2 to pick up from where it leaves off on the next restart.)
 
@@ -58,7 +74,9 @@ Manual startup of the production server (pm2 only):
 
 Assuming the MongoDB process is running, start 3D Virtual Life with:
 
+```
 pm2 start 3Dvirtuallife
+```
 
 Logs are in utils/node/logs
 
@@ -66,7 +84,9 @@ Logs are in utils/node/logs
 
 Manual startup of the production server (standard node):
 
+```
 node server.js
+```
 
 -----
 
@@ -81,10 +101,6 @@ you can startup a local MongoDB using 'startDB.bat' instead (port 27018).
 Use F5 in Visual Studio Code to launch with .env settings.
 
 -----
-
-DeprecationWarning: Mongoose: mpromise (mongoose's default promise library) 
-is deprecated, plug in your own promise library instead: 
-http://mongoosejs.com/docs/promises.html
 
 Express-Session Warning: connect.session() MemoryStore 
 is not designed for a production environment, as it will leak memory, 
