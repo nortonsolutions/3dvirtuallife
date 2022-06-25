@@ -363,7 +363,7 @@ export class Hero extends IntelligentForm {
             this.fadeToAction('ThumbsUp', 0.2);
             this.sceneController.eventDepot.fire('addToInventory', {itemName: 'water', quantity: 4});
 
-            if (selectedObject.inventoryContains(['water'])) selectedObject.removeFromInventory('water');
+            if (selectedObject?.inventoryContains(['water'])) selectedObject.removeFromInventory('water');
             
             return true;
     
