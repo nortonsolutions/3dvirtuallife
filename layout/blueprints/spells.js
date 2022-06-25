@@ -101,7 +101,7 @@ export const Spells = {
                 time: 1
             },
             { 
-                name: "Heal",
+                name: "heal",
                 regex: "",
                 frames: 15,
                 scale: 50,
@@ -301,7 +301,7 @@ export const Spells = {
             },
             continuousSprites: true,
             sprites: [{ 
-                name: "heal",
+                name: "Heal",
                 regex: "",
                 frames: 10,
                 scale: 50,

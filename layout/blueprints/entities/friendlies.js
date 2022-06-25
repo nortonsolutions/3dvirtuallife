@@ -1181,7 +1181,7 @@ export const Friendlies = {
       continuousSprites: true,
       sprites: [
         {
-          name: "heal",
+          name: "Heal",
           regex: "",
           frames: 10,
           scale: 5,
