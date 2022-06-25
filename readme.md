@@ -44,7 +44,11 @@ left/right attack (hold shift for kick attacks if the model supports)
 * Plant a sunseed, fill the watering can at a water source, and water the seed
 * Use sunfruit to feed a horse and gain his loyalty for a while
 * If you find some ore on the ground, it's probably a good place to mine for more...
-* Can you find the swamp or the lava field?
+* Can you find the swamp or the lava field?  How about the kingdom or snowy land?
+* Buy a house from the elfgirl in the outer kingdom and place it wherever you want, with a personalized key
+* Help the vikings to defend their land and learn the passphrase to enter the inner kingdom
+
+This is still just a demo and may never finish entirely.  I'm putting this on ice for a while!  It was a good learning experience, challenging and fun.
 
 This production version assumes MongoDB is up and running on port 27017 
 and uses the DB called "nortonAdventure" (wiredtiger) by default.
