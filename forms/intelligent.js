@@ -637,7 +637,7 @@ export class IntelligentForm extends AnimatedForm{
                                 break;
                         }
 
-
+                        // TODO: debug balloon double model on Lava Labyrinth only
                         this.model.add(item.model);
                         
                         if (this.objectSubtype == "local") {
