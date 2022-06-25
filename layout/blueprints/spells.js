@@ -82,15 +82,7 @@ export const Spells = {
                 speed: 3 // 1 = full walking speed
             },
             continuousSprites: true,
-            sprites: [{ 
-                name: "greenExplosion",
-                regex: "",
-                frames: 10,
-                scale: 300,
-                elevation: 20,
-                flip: false,
-                time: 1
-            },
+            sprites: [
             { 
                 name: "greencloud",
                 regex: "",
@@ -100,8 +92,17 @@ export const Spells = {
                 flip: false,
                 time: 1
             },
+            // { 
+            //     name: "greenExplosion",
+            //     regex: "",
+            //     frames: 10,
+            //     scale: 300,
+            //     elevation: 20,
+            //     flip: false,
+            //     time: 1
+            // },
             { 
-                name: "heal",
+                name: "Heal",
                 regex: "",
                 frames: 15,
                 scale: 50,
@@ -171,15 +172,15 @@ export const Spells = {
                 flip: false,
                 time: 1
             },
-            { 
-                name: "fireball",
-                regex: "",
-                frames: 8,
-                scale: 300,
-                elevation: 20,
-                flip: false,
-                time: 1
-            },
+            // { 
+            //     name: "fireball",
+            //     regex: "",
+            //     frames: 8,
+            //     scale: 300,
+            //     elevation: 20,
+            //     flip: false,
+            //     time: 1
+            // },
             { 
                 name: "Heal",
                 regex: "",

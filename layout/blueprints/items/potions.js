@@ -12,7 +12,7 @@ export const Potions = {
       effect: "mana/2",
       sprites: [
         {
-          name: "heal",
+          name: "Heal",
           regex: "",
           frames: 10,
           scale: 50,
