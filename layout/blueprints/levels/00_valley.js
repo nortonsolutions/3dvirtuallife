@@ -44,7 +44,7 @@ export const Valley = {
     { name: "bow", location: { x: 1, y: 0, z: -1 } },
     { name: "arrow25", location: { x: 2, y: 0, z: 0 } },
     { name: "gold3" },
-    { name: "gold10 "},
+    { name: "gold10" },
     { name: "smallSword"},  
     { name: "aluminium", location: { x: 7.2, y: -.50, z: -6 }},
     { name: "aluminium", location: { x: 6.2, y: -.50, z: -6 }},
