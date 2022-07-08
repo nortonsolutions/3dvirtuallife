@@ -1,5 +1,3 @@
-
-
 var cameraReach = 2000;
 var cameraDistanceDefault = 200;
 var cameraElevationDefault = 40;
@@ -7,418 +5,493 @@ var cameraElevationDefault = 40;
 var cameraMinimapReach = 1200;
 var cameraMinimapElevationDefault = 1000;
 
-var DUENORTH = new THREE.Vector3( 0, 0, 2000 );
+var DUENORTH = new THREE.Vector3(0, 0, 2000);
 
-var WHITE = new THREE.Color('white');
-var BLACK = new THREE.Color('black');
+var WHITE = new THREE.Color("white");
+var BLACK = new THREE.Color("black");
 
 var navbarHeight;
 
-var minimap = false, sidebar = false, chatbar = false;
+var minimap = false,
+  sidebar = false,
+  chatbar = false;
 
 /**
  * The Scene has graphical display (THREE.js), animates using requestAnimationFrame,
- * and uses controls.  It accepts an initial layout of objects to setup the layout, 
+ * and uses controls.  It accepts an initial layout of objects to setup the layout,
  * then updates the objects array with locations after each animation.
  */
 
 class Scene {
+  constructor(controller) {
+    this.prevTime = performance.now();
+    this.readyForLock = false;
 
-    constructor(controller) {
+    // SceneController has access to layoutManager, which has levelBuilder
+    this.controller = controller;
+    this.running = true;
 
+    this.background = controller.layout.background;
+    this.backgroundNight = controller.layout.backgroundNight;
 
-        this.prevTime = performance.now();
-        this.readyForLock = false;
-        
-        // SceneController has access to layoutManager, which has levelBuilder
-        this.controller = controller;
-        this.running = true;
+    this.animate = this.animate.bind(this);
+    this.deanimate = this.deanimate.bind(this);
+    this.onWindowResize = this.onWindowResize.bind(this);
+    this.addControls = this.addControls.bind(this);
 
-        this.background = controller.layout.background;
-        this.backgroundNight = controller.layout.backgroundNight;
-        
-        this.animate = this.animate.bind(this);
-        this.deanimate = this.deanimate.bind(this);
-        this.onWindowResize = this.onWindowResize.bind(this);
-        this.addControls = this.addControls.bind(this);
+    this.onMouseClick = this.onMouseClick.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseWheel = this.onMouseWheel.bind(this);
+    this.controlsLocked = this.controlsLocked.bind(this);
+    this.controlsUnlocked = this.controlsUnlocked.bind(this);
+    this.instructionsLock = this.instructionsLock.bind(this);
 
-        this.onMouseClick = this.onMouseClick.bind(this);
-        this.onMouseDown = this.onMouseDown.bind(this);
-        this.onMouseUp = this.onMouseUp.bind(this);
-        this.onMouseWheel = this.onMouseWheel.bind(this);
-        this.controlsLocked = this.controlsLocked.bind(this);
-        this.controlsUnlocked = this.controlsUnlocked.bind(this);
-        this.instructionsLock = this.instructionsLock.bind(this);
+    this.controls = null;
+    this.scene = null;
 
-        this.controls = null;
-        this.scene = null;
-        
-        this.requestAnimationFrameID = null;
+    this.requestAnimationFrameID = null;
 
-        this.projectileMovementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(0,0,1), 0, 40 );
-        this.cameraReach = cameraReach;
-        // this.clock = new THREE.Clock(); // for use by refractor uniform updates
-    }
+    this.projectileMovementRaycaster = new THREE.Raycaster(
+      new THREE.Vector3(),
+      new THREE.Vector3(0, 0, 1),
+      0,
+      40
+    );
+    this.cameraReach = cameraReach;
+    // this.clock = new THREE.Clock(); // for use by refractor uniform updates
+  }
 
-    init(callback) {
-        this.scene = new THREE.Scene();
+  init(callback) {
+    this.scene = new THREE.Scene();
 
-        navbarHeight = 0; // document.querySelector('.navbar').clientHeight;
-        
-        this.camera = new THREE.PerspectiveCamera( 35, window.innerWidth / (window.innerHeight - navbarHeight), 1, cameraReach );
+    navbarHeight = 0; // document.querySelector('.navbar').clientHeight;
 
-        // 20 should match this.hero.attributes.height?
-        this.camera.position.set( 0, cameraElevationDefault + 20, cameraDistanceDefault );
-        
-        this.renderer = new THREE.WebGLRenderer( { antialias: true } );
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.setPixelRatio( window.devicePixelRatio );
-        this.renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight));
-        // this.renderer.gammaInput = true;
-        // this.renderer.gammaOutput = true;
+    this.camera = new THREE.PerspectiveCamera(
+      35,
+      window.innerWidth / (window.innerHeight - navbarHeight),
+      1,
+      cameraReach
+    );
 
-        this.stats = new Stats();
-        document.body.appendChild( this.stats.dom );
+    // 20 should match this.hero.attributes.height?
+    this.camera.position.set(
+      0,
+      cameraElevationDefault + 20,
+      cameraDistanceDefault
+    );
 
-        this.addControls();
-        this.addBackground();
-        this.addEventListeners();
-        // this.addHelper();
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setSize(window.innerWidth, window.innerHeight - navbarHeight);
+    // this.renderer.gammaInput = true;
+    // this.renderer.gammaOutput = true;
 
-        if (callback) setTimeout(() => {
-            callback();
-        }, 200);
-        
-    }
+    this.stats = new Stats();
+    document.body.appendChild(this.stats.dom);
 
-    addControls() {
-        this.controls = new THREE.PointerLockControls( this.camera );
+    this.addControls();
+    this.addBackground();
+    this.addEventListeners();
+    // this.addHelper();
 
-        this.addMinimap();
-        
-        this.cameraBackray = new THREE.Raycaster( new THREE.Vector3( ), new THREE.Vector3( 0, 0, 1 ), 0, cameraDistanceDefault + 230);
-        this.scene.add( this.controls.getObject() );
+    if (callback)
+      setTimeout(() => {
+        callback();
+      }, 200);
+  }
 
-        document.addEventListener( 'keydown', this.onF8, false );
-        document.addEventListener( 'keydown', this.onKeyDown, false );
-        document.addEventListener( 'keyup', this.onKeyUp, false );
-    }
+  addControls() {
+    this.controls = new THREE.PointerLockControls(this.camera);
 
-    add ( model ) {
-        this.scene.add( model );
-    }
+    this.addMinimap();
 
-    removeFromScenebyLayoutId(layoutId) {
-        let formToRemove = this.scene.children.find(el => {
-            return el.attributes? el.attributes.layoutId == layoutId : false;
-        })
-        this.scene.remove(formToRemove);
-        //cleanup?
-    }
+    this.cameraBackray = new THREE.Raycaster(
+      new THREE.Vector3(),
+      new THREE.Vector3(0, 0, 1),
+      0,
+      cameraDistanceDefault + 230
+    );
+    this.scene.add(this.controls.getObject());
 
-    removeFromScenebyModel(model) {
-        let formToRemove = this.scene.children.find(el => {
-            return el == model;
-        })
+    document.addEventListener("keydown", this.onF8, false);
+    document.addEventListener("keydown", this.onKeyDown, false);
+    document.addEventListener("keyup", this.onKeyUp, false);
+  }
 
-        if (formToRemove) formToRemove.parent.remove(formToRemove);
-        //cleanup?
-    }
+  add(model) {
+    this.scene.add(model);
+  }
 
+  removeFromScenebyLayoutId(layoutId) {
+    let formToRemove = this.scene.children.find((el) => {
+      return el.attributes ? el.attributes.layoutId == layoutId : false;
+    });
+    this.scene.remove(formToRemove);
+    //cleanup?
+  }
 
-    addBackground() {
+  removeFromScenebyModel(model) {
+    let formToRemove = this.scene.children.find((el) => {
+      return el == model;
+    });
 
-        if (this.background) {
-            // simplistic equirectangular mapping to the inverse of a sphere geometry:
-            var geometry = new THREE.SphereBufferGeometry(cameraReach - 200);
-            geometry.scale (-1,1,1);
+    if (formToRemove) formToRemove.parent.remove(formToRemove);
+    //cleanup?
+  }
 
-            this.backgroundMaterial = new THREE.MeshBasicMaterial( {
-                map: new THREE.TextureLoader().load("/textures/" + this.background)
-            });
+  addBackground() {
+    if (this.background) {
+      // simplistic equirectangular mapping to the inverse of a sphere geometry:
+      var geometry = new THREE.SphereBufferGeometry(cameraReach - 200);
+      geometry.scale(-1, 1, 1);
 
-            if (this.backgroundNight) {
-                this.backgroundNightMaterial = new THREE.MeshBasicMaterial( {
-                    map: new THREE.TextureLoader().load("/textures/" + this.backgroundNight)
-                });
-            }
-            
-            this.backgroundMesh = new THREE.Mesh(geometry, this.backgroundMaterial);
-            this.backgroundMesh.rotateZ(Math.PI);
-            this.scene.background = WHITE;
-            this.controls.getObject().add( this.backgroundMesh );
+      this.backgroundMaterial = new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load("/textures/" + this.background),
+      });
 
-        } else {
-            this.scene.background = BLACK;
-        }
-
-        if (this.controller.layout.terrain.attributes.fog) {
-            this.scene.fog = new THREE.Fog( 
-                this.controller.layout.terrain.attributes.fog.color, 
-                700/(this.controller.layout.terrain.attributes.fog.density? 
-                    this.controller.layout.terrain.attributes.fog.density : 1), 
-                cameraReach-100 );
-        }
-    }
-
-    addMinimap() {
-
-        this.rendererMinimap = new THREE.WebGLRenderer( { antialias: true } );
-        document.getElementById('minimap').appendChild( this.rendererMinimap.domElement );
-        this.cameraMinimap = new THREE.PerspectiveCamera( 45, 1, 1, cameraMinimapReach );
-        this.cameraMinimap.position.set( 0, cameraMinimapElevationDefault, 0);
-        this.cameraMinimap.rotation.set( -Math.PI / 2, 0, 0 );
-        this.controls.getObject().add(this.cameraMinimap);
-
-        let compassTemplate = {
-            gltf: "arrow.gltf",
-            attributes: {
-                scale: 100
-            }
-        }
-
-        this.compass = this.controller.formFactory.newForm("compass", compassTemplate);
-        this.compass.load(() => {
-            this.compass.model.children[0].material.side = THREE.FrontSide;
-            this.compass.model.position.set( 0, cameraMinimapElevationDefault/2, -cameraMinimapElevationDefault/10);
-            this.controls.getObject().add(this.compass.model);
+      if (this.backgroundNight) {
+        this.backgroundNightMaterial = new THREE.MeshBasicMaterial({
+          map: new THREE.TextureLoader().load(
+            "/textures/" + this.backgroundNight
+          ),
         });
+      }
 
+      this.backgroundMesh = new THREE.Mesh(geometry, this.backgroundMaterial);
+      this.backgroundMesh.rotateZ(Math.PI);
+      this.scene.background = WHITE;
+      this.controls.getObject().add(this.backgroundMesh);
+    } else {
+      this.scene.background = BLACK;
     }
 
-    addHelper() {
-
-        this.helper = new THREE.Mesh ( new THREE.SphereBufferGeometry(10), new THREE.MeshBasicMaterial({ color: 'blue' }));
-        this.helper.visible = true;
-        this.scene.add( this.helper );
-
+    if (this.controller.layout.terrain.attributes.fog) {
+      this.scene.fog = new THREE.Fog(
+        this.controller.layout.terrain.attributes.fog.color,
+        700 /
+          (this.controller.layout.terrain.attributes.fog.density
+            ? this.controller.layout.terrain.attributes.fog.density
+            : 1),
+        cameraReach - 100
+      );
     }
+  }
 
-    handleCameraMovement = () => {
+  addMinimap() {
+    this.rendererMinimap = new THREE.WebGLRenderer({ antialias: true });
+    document
+      .getElementById("minimap")
+      .appendChild(this.rendererMinimap.domElement);
+    this.cameraMinimap = new THREE.PerspectiveCamera(
+      45,
+      1,
+      1,
+      cameraMinimapReach
+    );
+    this.cameraMinimap.position.set(0, cameraMinimapElevationDefault, 0);
+    this.cameraMinimap.rotation.set(-Math.PI / 2, 0, 0);
+    this.controls.getObject().add(this.cameraMinimap);
 
-        // adjustment of the camera position based on acceleration:
-        // console.dir(this.controller.hero.acceleration);
-        // this.camera.position.x -= (this.controller.hero.acceleration.x/30);
-        // this.camera.position.z -= (this.controller.hero.acceleration.z/30);
-        // this.camera.rotation.y -= (this.controller.hero.acceleration.x/2000);
+    let compassTemplate = {
+      gltf: "arrow.gltf",
+      attributes: {
+        scale: 100,
+      },
+    };
 
+    this.compass = this.controller.formFactory.newForm(
+      "compass",
+      compassTemplate
+    );
+    this.compass.load(() => {
+      this.compass.model.children[0].material.side = THREE.FrontSide;
+      this.compass.model.position.set(
+        0,
+        cameraMinimapElevationDefault / 2,
+        -cameraMinimapElevationDefault / 10
+      );
+      this.controls.getObject().add(this.compass.model);
+    });
+  }
 
-        
-        this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
-        this.cameraBackray.ray.origin.y += this.controller.hero.attributes.height-10;
+  addHelper() {
+    this.helper = new THREE.Mesh(
+      new THREE.SphereBufferGeometry(10),
+      new THREE.MeshBasicMaterial({ color: "blue" })
+    );
+    this.helper.visible = true;
+    this.scene.add(this.helper);
+  }
 
-        // NEEDS PITCH as well
-        let cameraDirection = this.controls.getDirection(new THREE.Vector3( 0, 0, 0 ));
+  handleCameraMovement = () => {
+    // adjustment of the camera position based on acceleration:
+    // console.dir(this.controller.hero.acceleration);
+    // this.camera.position.x -= (this.controller.hero.acceleration.x/30);
+    // this.camera.position.z -= (this.controller.hero.acceleration.z/30);
+    // this.camera.rotation.y -= (this.controller.hero.acceleration.x/2000);
 
-        this.cameraBackray.ray.direction.x = -cameraDirection.x;
-        this.cameraBackray.ray.direction.y = -cameraDirection.y + 0.25;
-        this.cameraBackray.ray.direction.z = -cameraDirection.z;
+    this.cameraBackray.ray.origin.copy(this.controls.getObject().position);
+    this.cameraBackray.ray.origin.y +=
+      this.controller.hero.attributes.height - 10;
 
-        var backrayIntersections;
-        backrayIntersections = this.cameraBackray.intersectObjects(this.controller.structureModels, true);
+    // NEEDS PITCH as well
+    let cameraDirection = this.controls.getDirection(
+      new THREE.Vector3(0, 0, 0)
+    );
 
-        // if (!backrayIntersections[0] && this.controller.hero.balloonRide) {
-        //     backrayIntersections = this.cameraBackray.intersectObject(this.controller.hero.balloonModel, true);
+    this.cameraBackray.ray.direction.x = -cameraDirection.x;
+    this.cameraBackray.ray.direction.y = -cameraDirection.y + 0.25;
+    this.cameraBackray.ray.direction.z = -cameraDirection.z;
+
+    var backrayIntersections;
+    backrayIntersections = this.cameraBackray.intersectObjects(
+      this.controller.structureModels,
+      true
+    );
+
+    // if (!backrayIntersections[0] && this.controller.hero.balloonRide) {
+    //     backrayIntersections = this.cameraBackray.intersectObject(this.controller.hero.balloonModel, true);
+    // }
+    if (
+      this.controller.hero &&
+      this.controller.hero.healthSprite &&
+      this.controller.hero.manaSprite
+    ) {
+      if (
+        backrayIntersections[0] &&
+        backrayIntersections[0].object.type != "Sprite"
+      ) {
+        this.controller.hero.healthSprite.visible = false;
+        this.controller.hero.manaSprite.visible = false;
+        let distance = backrayIntersections[0].distance;
+        if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
+          this.camera.position.z = distance - 20;
+          if (
+            this.camera.position.y >
+            cameraElevationDefault + this.controller.hero.attributes.height
+          )
+            this.camera.position.y -= cameraElevationDefault / 30;
+        }
+      } else {
+        this.controller.hero.healthSprite.visible = true;
+        this.controller.hero.manaSprite.visible = true;
+
+        if (this.camera.position.z < cameraDistanceDefault - 10) {
+          this.camera.position.z += cameraDistanceDefault / 50;
+          if (this.scene.fog) this.scene.fog.far = cameraReach - 100;
+        } else if (this.camera.position.z > cameraDistanceDefault + 10) {
+          this.camera.position.z -= cameraDistanceDefault / 100;
+          if (this.scene.fog) this.scene.fog.far = cameraReach - 100;
+        }
+
+        if (
+          this.camera.position.y <
+          cameraElevationDefault + this.controller.hero.attributes.height - 10
+        ) {
+          this.camera.position.y += cameraElevationDefault / 50;
+        } else if (
+          this.camera.position.y >
+          cameraElevationDefault + this.controller.hero.attributes.height + 10
+        ) {
+          this.camera.position.y -= cameraElevationDefault / 100;
+        }
+      }
+    }
+    // if (this.camera.position.x > 10 || this.camera.position.x < -10) {
+    //     this.camera.position.x -= this.camera.position.x / 100;
+    // }
+
+    // if (this.camera.position.z > 10 || this.camera.position.z < -10) {
+    //     this.camera.position.z -= this.camera.position.z / 100;
+    // }
+
+    // if (this.camera.rotation.y > 10 || this.camera.rotation.y < -10) {
+    //     this.camera.rotation.y -= this.camera.rotation.y / 100;
+
+    // }
+  };
+
+  handleSprites() {
+    if (this.requestAnimationFrameID % 3 == 0) {
+      this.controller.sprites.forEach((sprite) => {
+        let offsetX = sprite.sprite.material.map.offset.x + 1 / sprite.frames;
+        if (offsetX >= 0.99) offsetX = 0;
+        sprite.sprite.material.map.offset.x = offsetX;
+      });
+    }
+  }
+
+  /* Distribute damage to enemies, make item disappear or fall to ground */
+  /* 'local' items exert an effect while non-local are just for appearances */
+  handleAction(projectile, entitiesInRange) {
+    if (entitiesInRange.length > 0) console.dir(entitiesInRange);
+    // Sprite effects:
+    if (projectile.local && projectile.item.attributes.sprites) {
+      projectile.item.attributes.sprites.forEach((spriteConfig) => {
+        spriteConfig.scale = spriteConfig.scale / 10;
+        spriteConfig.elevation = spriteConfig.elevation - 20;
+
+        this.controller.formFactory.addSprites(
+          projectile.item.model,
+          spriteConfig,
+          this,
+          true,
+          projectile.item.model.position
+        );
+
+        // if (hostile) {
+        //     this.controller.formFactory.addSprites(this.controller.hero.model, spriteConfig, this, true, projectile.item.model.position);
+        // } else {
+        //     entitiesInRange.forEach(entity => {
+        //         this.controller.formFactory.addSprites(entity.model, spriteConfig, this, true, projectile.item.model.position);
+        //     })
         // }
+      });
+    }
 
-        if (backrayIntersections[0] && backrayIntersections[0].object.type != "Sprite") {
-            
-            this.controller.hero.healthSprite.visible = false;
-            this.controller.hero.manaSprite.visible = false;
-            let distance = backrayIntersections[0].distance;
-            if (distance < cameraDistanceDefault && this.camera.position.z > -5) {
-                this.camera.position.z = distance - 20;
-                if (this.camera.position.y > cameraElevationDefault + this.controller.hero.attributes.height) this.camera.position.y -= cameraElevationDefault / 30;
-            }
+    if (projectile.local) {
+      if (
+        projectile.item.attributes.effect &&
+        !(projectile.item.objectSubtype == "lifegiving")
+      ) {
+        let [type, change] = projectile.item.attributes.effect.split("/");
+
+        if (projectile.hostile) {
+          entitiesInRange.forEach((entity) => {
+            entity.receiveDamage(change, type);
+          });
         } else {
-            this.controller.hero.healthSprite.visible = true;
-            this.controller.hero.manaSprite.visible = true;
-
-            if (this.camera.position.z < cameraDistanceDefault - 10) {
-                this.camera.position.z += cameraDistanceDefault / 50;
-                if (this.scene.fog) this.scene.fog.far = cameraReach-100;
-            } else if (this.camera.position.z > cameraDistanceDefault + 10) {
-                this.camera.position.z -= cameraDistanceDefault / 100;
-                if (this.scene.fog) this.scene.fog.far = cameraReach-100;
-            }
-
-            if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height - 10) {
-                this.camera.position.y += cameraElevationDefault / 50;
-            } else if (this.camera.position.y > cameraElevationDefault + this.controller.hero.attributes.height + 10) {
-                this.camera.position.y -= cameraElevationDefault / 100;
-            } 
+          entitiesInRange.forEach((entity) => {
+            this.controller.hero.inflictDamage(entity, change, type);
+          });
         }
+      } else if (projectile.item.attributes.plantable) {
+        let dropData = {
+          itemName: projectile.item.objectName,
+          position: projectile.item.model.position,
+          location: this.controller.getLocationFromPosition(
+            projectile.item.model.position
+          ),
+          source: "",
+          type: "entity",
+        };
 
-        // if (this.camera.position.x > 10 || this.camera.position.x < -10) {
-        //     this.camera.position.x -= this.camera.position.x / 100;
-        // }
+        this.controller.dropItemToScene(dropData);
+      } else if (projectile.item.objectSubtype == "lifegiving") {
+        let [type, change] = projectile.item.attributes.effect.split("/");
 
-        // if (this.camera.position.z > 10 || this.camera.position.z < -10) {
-        //     this.camera.position.z -= this.camera.position.z / 100;
-        // }
+        entitiesInRange.forEach((entity) => {
+          entity.changeStat(type, change, true);
+          // this.controller.hero.inflictDamage(entity, change, type);
+          if (
+            entity.attributes.stage < 4 &&
+            entity.getEffectiveStat("health") >=
+              10 * (entity.attributes.stage + 1)
+          ) {
+            entity.attributes.stage++;
 
-        // if (this.camera.rotation.y > 10 || this.camera.rotation.y < -10) {
-        //     this.camera.rotation.y -= this.camera.rotation.y / 100;
-            
-        // }  
-        
-    }
-    
-    handleSprites() {
-        if (this.requestAnimationFrameID % 3 == 0) {
-            this.controller.sprites.forEach(sprite => {
+            // remove and re-add to layout:
+            let data = {
+              itemName: entity.objectName,
+              quantity: entity.attributes.quantity
+                ? entity.attributes.quantity
+                : 1,
+              layoutId: entity.attributes.layoutId,
+              type: entity.objectType,
+            };
 
-                let offsetX = sprite.sprite.material.map.offset.x + (1 / sprite.frames);
-                if (offsetX >= .99) offsetX = 0;
-                sprite.sprite.material.map.offset.x = offsetX;
-            })
-        }
-    }
+            this.controller.takeItemFromScene(data);
 
-    /* Distribute damage to enemies, make item disappear or fall to ground */
-    /* 'local' items exert an effect while non-local are just for appearances */
-    handleAction(projectile, entitiesInRange) {
+            let dropData = {
+              itemName: entity.objectName,
+              position: entity.model.position,
+              location: this.controller.getLocationFromPosition(
+                entity.model.position
+              ),
+              source: "",
+              type: "entity",
+              attributes: { stage: entity.attributes.stage },
+            };
 
-        if (entitiesInRange.length > 0) console.dir(entitiesInRange);
-        // Sprite effects:
-        if (projectile.local && projectile.item.attributes.sprites) {
-            projectile.item.attributes.sprites.forEach(spriteConfig => {
-
-                spriteConfig.scale = spriteConfig.scale/10;
-                spriteConfig.elevation = spriteConfig.elevation-20;
-
-                this.controller.formFactory.addSprites(projectile.item.model, spriteConfig, this, true, projectile.item.model.position);
-
-                // if (hostile) {
-                //     this.controller.formFactory.addSprites(this.controller.hero.model, spriteConfig, this, true, projectile.item.model.position);
-                // } else {
-                //     entitiesInRange.forEach(entity => {
-                //         this.controller.formFactory.addSprites(entity.model, spriteConfig, this, true, projectile.item.model.position);
-                //     })
-                // }
-            });
-        }
-
-        if (projectile.local) {
-
-            if (projectile.item.attributes.effect && !(projectile.item.objectSubtype == 'lifegiving')) {
-                let [type, change] = projectile.item.attributes.effect.split("/");
-
-                if (projectile.hostile) {
-                    entitiesInRange.forEach(entity => {
-                        entity.receiveDamage(change, type);
-                    })
-                } else {
-                    entitiesInRange.forEach(entity => {
-                        this.controller.hero.inflictDamage(entity, change, type);
-                    })
-                }
-    
-            } else if (projectile.item.attributes.plantable) {
-                let dropData = {
-                    itemName: projectile.item.objectName,
-                    position: projectile.item.model.position,
-                    location: this.controller.getLocationFromPosition(projectile.item.model.position),
-                    source: "",
-                    type: "entity"
-                };
-    
-                this.controller.dropItemToScene(dropData);
-            
-            } else if (projectile.item.objectSubtype == 'lifegiving') {
-                
-                let [type, change] = projectile.item.attributes.effect.split("/");
-
-                entitiesInRange.forEach(entity => {
-
-                    entity.changeStat(type, change, true);
-                    // this.controller.hero.inflictDamage(entity, change, type);
-                    if (entity.attributes.stage < 4 && entity.getEffectiveStat('health') >= 10 * (entity.attributes.stage + 1)) {
-                        entity.attributes.stage++;
-            
-                        // remove and re-add to layout:
-                        let data = {    
-                            itemName: entity.objectName, 
-                            quantity: entity.attributes.quantity? entity.attributes.quantity : 1,
-                            layoutId: entity.attributes.layoutId,
-                            type: entity.objectType
-                        }
-
-                        this.controller.takeItemFromScene(data);
-                        
-                        let dropData = {
-                            itemName: entity.objectName,
-                            position: entity.model.position,
-                            location: this.controller.getLocationFromPosition(entity.model.position),
-                            source: "",
-                            type: "entity",
-                            attributes: {stage: entity.attributes.stage }
-                        };
-            
-                        this.controller.dropItemToScene(dropData);
-                    }
-                })
-
-            } 
-        }
-
-
-        if (projectile.item.objectType == 'item' && 
-            projectile.item.objectSubtype != "tree" && projectile.item.objectSubtype != 'lifegiving' &&
-            projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround && 
-            Math.random() < projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround) {
-            projectile.item.model.position.y = projectile.item.determineElevationFromBase() + projectile.item.attributes.elevation;
-        } else {  // remove the item
-            // Uncommented for lightning:
-            if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
-            this.controller.forms = this.controller.forms.filter(el => el != projectile.item);
-            this.removeFromScenebyModel(projectile.item.model);  //removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
-        }
-        
-        // filter out of projectiles
-        this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
-    }
-    
-    catch(projectile, entitiesInRange) {
-        
-        entitiesInRange.forEach(e => {
-            // console.error(`${e.objectName} caught @ ${e.model.position.x},${e.model.position.y},${e.model.position.z}`)
-            if (e.attributes.catchable) { // just apply locally; do not broadcast
-                e.fadeToAction("Thrashing", 0.2);
-                e.model.position.x = 0;
-                e.model.position.y = 0;
-                e.model.position.z = 0;
-                e.model.scale.set(.01,.01,.01);
-                
-                projectile.item.model.add(e.model);
-            }
-        })    
+            this.controller.dropItemToScene(dropData);
+          }
+        });
+      }
     }
 
-    release(projectile) {
-        projectile.item.model.children.forEach(child => {
-            if (child.attributes && child.attributes.catchable) {
-                child.position.copy(projectile.item.model.position);
-                child.scale.set(5,5,5);
-                this.add(child);
-                let caught = this.controller.getFormByModel(child); // getFormByLayoutId(child.attributes.layoutId);
-                caught.model.position.y = caught.determineElevationFromBase() + caught.attributes.elevation;
-                caught.attributes.stats.agility = "0/0/0";
-                caught.fadeToAction('Flopping', 0.2);
-
-                
-            }
-        })
-
-        if (projectile.item.model.parent) projectile.item.model.parent.remove(projectile.item.model);
-        this.controller.forms = this.controller.forms.filter(el => el != projectile.item);
-        this.removeFromScenebyModel(projectile.item.model);  // removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
-        this.controller.projectiles = this.controller.projectiles.filter(el => el != projectile);
+    if (
+      projectile.item.objectType == "item" &&
+      projectile.item.objectSubtype != "tree" &&
+      projectile.item.objectSubtype != "lifegiving" &&
+      projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround &&
+      Math.random() <
+        projectile.item.attributes.throwableAttributes.chanceToLeaveOnGround
+    ) {
+      projectile.item.model.position.y =
+        projectile.item.determineElevationFromBase() +
+        projectile.item.attributes.elevation;
+    } else {
+      // remove the item
+      // Uncommented for lightning:
+      if (projectile.item.model.parent)
+        projectile.item.model.parent.remove(projectile.item.model);
+      this.controller.forms = this.controller.forms.filter(
+        (el) => el != projectile.item
+      );
+      this.removeFromScenebyModel(projectile.item.model); //removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
     }
 
+    // filter out of projectiles
+    this.controller.projectiles = this.controller.projectiles.filter(
+      (el) => el != projectile
+    );
+  }
 
-    /** 
+  catch(projectile, entitiesInRange) {
+    entitiesInRange.forEach((e) => {
+      // console.error(`${e.objectName} caught @ ${e.model.position.x},${e.model.position.y},${e.model.position.z}`)
+      if (e.attributes.catchable) {
+        // just apply locally; do not broadcast
+        e.fadeToAction("Thrashing", 0.2);
+        e.model.position.x = 0;
+        e.model.position.y = 0;
+        e.model.position.z = 0;
+        e.model.scale.set(0.01, 0.01, 0.01);
+
+        projectile.item.model.add(e.model);
+      }
+    });
+  }
+
+  release(projectile) {
+    projectile.item.model.children.forEach((child) => {
+      if (child.attributes && child.attributes.catchable) {
+        child.position.copy(projectile.item.model.position);
+        child.scale.set(5, 5, 5);
+        this.add(child);
+        let caught = this.controller.getFormByModel(child); // getFormByLayoutId(child.attributes.layoutId);
+        caught.model.position.y =
+          caught.determineElevationFromBase() + caught.attributes.elevation;
+        caught.attributes.stats.agility = "0/0/0";
+        caught.fadeToAction("Flopping", 0.2);
+      }
+    });
+
+    if (projectile.item.model.parent)
+      projectile.item.model.parent.remove(projectile.item.model);
+    this.controller.forms = this.controller.forms.filter(
+      (el) => el != projectile.item
+    );
+    this.removeFromScenebyModel(projectile.item.model); // removeFromScenebyLayoutId(projectile.item.attributes.layoutId);
+    this.controller.projectiles = this.controller.projectiles.filter(
+      (el) => el != projectile
+    );
+  }
+
+  /** 
      * Each projectile looks like this:
      * {
             item,
@@ -430,231 +503,268 @@ class Scene {
         }
      *
      */
-    handleProjectiles(delta) {
-        if (this.controller.projectiles.length > 0) {
+  handleProjectiles(delta) {
+    if (this.controller.projectiles.length > 0) {
+      for (let projectile of this.controller.projectiles) {
+        // console.log(`${projectile.item.objectName}: ${projectile.velocity.z} @ ${projectile.item.model.position.x}, ${projectile.item.model.position.y}, ${projectile.item.model.position.z}`);
 
-            for (let projectile of this.controller.projectiles) {
-                
-                // console.log(`${projectile.item.objectName}: ${projectile.velocity.z} @ ${projectile.item.model.position.x}, ${projectile.item.model.position.y}, ${projectile.item.model.position.z}`);
-                
-                if (projectile.distanceTraveled == 0) { // first iteration, set velocities
-                    projectile.startingPosition = new THREE.Vector3();
-                    projectile.startingPosition.copy(projectile.item.model.position);
-                    projectile.velocity.y = (projectile.item.direction.y) * 500;
-                    projectile.velocity.z = projectile.item.attributes.throwableAttributes.speed * 500;
-                    
-                } else { // subsequent iterations
-    
-                    // INERTIA/GRAVITY
-                    projectile.velocity.z -= projectile.velocity.z * delta;
-                    if (!projectile.returning) projectile.velocity.y -= 9.8 * projectile.item.attributes.throwableAttributes.weight * 100 * delta;
-                }
-    
-                if (!projectile.returning) projectile.item.model.translateY( projectile.velocity.y * delta );
-                projectile.item.model.translateZ( -projectile.velocity.z * delta );
-
-                if (projectile.item.attributes.plantable) { // seeds (plantable)
-
-                    if (projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+5) {
-                        this.handleAction(projectile, []);
-                        continue;
-                    }
-
-                } else if (projectile.item.objectSubtype == "lifegiving") { // e.g. water
-                    var entitiesInRange = this.controller.allFriendliesInRange(projectile.item.attributes.range, projectile.item.model.position);
-                    if (entitiesInRange.length > 0) {
-                        this.handleAction(projectile, entitiesInRange);
-                        continue;
-                    }
-
-
-                } else if (projectile.item.objectSubtype != "bait") { // weapons/spells
-                    var entitiesInRange;
-                    if (projectile.hostile) {
-                        entitiesInRange = this.controller.allFriendliesInRange(projectile.item.attributes.range, projectile.item.model.position, true);
-                    } else { // projectiles launched by hero
-                        entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
-                    }
-
-                    if (entitiesInRange.length > 0) {
-                        this.handleAction(projectile, entitiesInRange);
-                        continue;
-                    }
-
-                    // if I hit a structure, handleAction
-                    this.projectileMovementRaycaster.ray.origin.copy(projectile.item.model.position);
-                    let pIntersects = this.projectileMovementRaycaster.intersectObjects(this.controller.structureModels, true);
-                    if (pIntersects.length > 0 && pIntersects[0].object.type != "Sprite") { 
-                        this.handleAction(projectile, []);
-                        continue;
-                    }
-                }
-
-                // Otherwise if I hit the max range, expire
-                projectile.distanceTraveled += (Math.abs(projectile.velocity.z * delta) + Math.abs(projectile.velocity.y * delta));
-                let maxDistance = projectile.item.attributes.throwableAttributes.distance;
-
-                // console.log(`traveled: ${projectile.distanceTraveled}, y: ${projectile.item.model.position.y}, elev: ${projectile.item.determineElevationFromBase()}`)
-                if (projectile.distanceTraveled > maxDistance || projectile.item.model.position.y <= projectile.item.determineElevationFromBase()+15 || this.returning) {
-                    if (projectile.item.objectSubtype == 'bait') {
-                        // turn around and reset velocity, then head back until I reach the caster
-                        if (!projectile.returning) {
-                            // console.log(`Turning AROUND.`)
-                            projectile.item.model.lookAt(projectile.startingPosition);
-                            projectile.velocity.z = -projectile.item.attributes.throwableAttributes.speed * 350;
-                            projectile.returning = true;
-                        } else {
-                            projectile.item.model.lookAt(projectile.startingPosition);
-                        }
-                        
-                        let distanceToOrigin = projectile.item.model.position.distanceTo(projectile.startingPosition);
-                        // console.log(`distanceToOrigin: ${distanceToOrigin}`);
-                        if (distanceToOrigin < 100) {
-                            this.release(projectile);
-                        } else {
-                            var entitiesInRange = this.controller.allEnemiesInRange(projectile.item.attributes.range, projectile.item.model.position);
-                            if (entitiesInRange.length > 0) {
-                                this.catch(projectile, entitiesInRange);
-                                continue;
-                            }
-                        }
-                    } else {
-                        this.handleAction(projectile, []);
-                    }
-                    continue;
-                } else {
-
-                }
-            }
-        }
-    }
-
-    animate() {
-        
-        
-        if (this.running) {
-            
-            
-            if ( this.controls.isLocked === true && this.running ) {
-
-                this.time = performance.now();
-                this.delta = ( Math.min(this.time - this.prevTime, 250) ) / 1000;
-
-                this.prevTime = this.time;
-                
-                this.controller.handleMovement(this.delta);
-                this.handleSprites();
-                this.handleProjectiles(this.delta);
-                this.handlePoints(this.delta);
-
-                // if (this.controller.layout.terrain.attributes.addPonds) {
-                //     this.handleRefractors();
-                // }
-
-                if (this.backgroundMesh && this.controls) this.backgroundMesh.rotation.y = -this.controls.getObject().rotation.y;
-                // this.renderer.render( this.scene, this.camera );
-            }
-
-            // this.renderer.setClearColor( 0x20252f );
-            // let b = performance.now();
-            this.renderer.render( this.scene, this.camera );
-            // let a = performance.now();
-            // let rSpeed = a - b;
-
-            // if ( !this.controls || !this.controls.isLocked || !this.running || rSpeed > 250 ) {
-            //     this.prevTime = a;
-            // }
-
-            if (minimap) {
-                this.rendererMinimap.render(this.scene, this.cameraMinimap);
-                if (this.compass) this.compass.model.lookAt( DUENORTH );
-            }
-    
-            this.stats.update();
-            this.requestAnimationFrameID = requestAnimationFrame( this.animate );
-            
+        if (projectile.distanceTraveled == 0) {
+          // first iteration, set velocities
+          projectile.startingPosition = new THREE.Vector3();
+          projectile.startingPosition.copy(projectile.item.model.position);
+          projectile.velocity.y = projectile.item.direction.y * 500;
+          projectile.velocity.z =
+            projectile.item.attributes.throwableAttributes.speed * 500;
         } else {
-            cancelAnimationFrame( this.requestAnimationFrameID );
-            this.dispose(this.scene);
+          // subsequent iterations
+
+          // INERTIA/GRAVITY
+          projectile.velocity.z -= projectile.velocity.z * delta;
+          if (!projectile.returning)
+            projectile.velocity.y -=
+              9.8 *
+              projectile.item.attributes.throwableAttributes.weight *
+              100 *
+              delta;
         }
 
-    }
+        if (!projectile.returning)
+          projectile.item.model.translateY(projectile.velocity.y * delta);
+        projectile.item.model.translateZ(-projectile.velocity.z * delta);
 
-    handlePoints(delta) {
+        if (projectile.item.attributes.plantable) {
+          // seeds (plantable)
 
-        var time = Date.now() * 0.00005;
+          if (
+            projectile.item.model.position.y <=
+            projectile.item.determineElevationFromBase() + 5
+          ) {
+            this.handleAction(projectile, []);
+            continue;
+          }
+        } else if (projectile.item.objectSubtype == "lifegiving") {
+          // e.g. water
+          var entitiesInRange = this.controller.allFriendliesInRange(
+            projectile.item.attributes.range,
+            projectile.item.model.position
+          );
+          if (entitiesInRange.length > 0) {
+            this.handleAction(projectile, entitiesInRange);
+            continue;
+          }
+        } else if (projectile.item.objectSubtype != "bait") {
+          // weapons/spells
+          var entitiesInRange;
+          if (projectile.hostile) {
+            entitiesInRange = this.controller.allFriendliesInRange(
+              projectile.item.attributes.range,
+              projectile.item.model.position,
+              true
+            );
+          } else {
+            // projectiles launched by hero
+            entitiesInRange = this.controller.allEnemiesInRange(
+              projectile.item.attributes.range,
+              projectile.item.model.position
+            );
+          }
 
-        this.controller.points.forEach((points,i) => {
-            points.rotation.y = -this.controls.getObject().rotation.y + time * ( i < 4 ? i + 1 : - ( i + 1 ) );
+          if (entitiesInRange.length > 0) {
+            this.handleAction(projectile, entitiesInRange);
+            continue;
+          }
 
-            // points.rotation.y -= ;
-            points.rotation.z += this.controller.hero.velocity.z * delta / 1000;
-            points.rotation.x += this.controller.hero.velocity.x * delta / 1000;
-
-            points.visible = !this.controller.hero.sheltered;
-            
-        })
-
-        for ( var i = 0; i < this.controller.materials.length; i ++ ) {
-
-            var color = this.controller.parameters[ i ][ 0 ];
-
-            var h = ( 360 * ( color[ 0 ] + time ) % 360 ) / 360;
-            this.controller.materials[ i ].color.setHSL( h, color[ 1 ], color[ 2 ] );
+          // if I hit a structure, handleAction
+          this.projectileMovementRaycaster.ray.origin.copy(
+            projectile.item.model.position
+          );
+          let pIntersects = this.projectileMovementRaycaster.intersectObjects(
+            this.controller.structureModels,
+            true
+          );
+          if (
+            pIntersects.length > 0 &&
+            pIntersects[0].object.type != "Sprite"
+          ) {
+            this.handleAction(projectile, []);
+            continue;
+          }
         }
-    }
 
-    handleRefractors() {
-        this.controller.refractors.forEach(refractor => {
-            refractor.material.uniforms[ "time" ].value += this.clock.getDelta();
-        })
-    }
+        // Otherwise if I hit the max range, expire
+        projectile.distanceTraveled +=
+          Math.abs(projectile.velocity.z * delta) +
+          Math.abs(projectile.velocity.y * delta);
+        let maxDistance =
+          projectile.item.attributes.throwableAttributes.distance;
 
-    dispose(item) {
-        if (item.children.length == 0) {
-            if (item.dispose) item.dispose();
-            return;
+        // console.log(`traveled: ${projectile.distanceTraveled}, y: ${projectile.item.model.position.y}, elev: ${projectile.item.determineElevationFromBase()}`)
+        if (
+          projectile.distanceTraveled > maxDistance ||
+          projectile.item.model.position.y <=
+            projectile.item.determineElevationFromBase() + 15 ||
+          this.returning
+        ) {
+          if (projectile.item.objectSubtype == "bait") {
+            // turn around and reset velocity, then head back until I reach the caster
+            if (!projectile.returning) {
+              // console.log(`Turning AROUND.`)
+              projectile.item.model.lookAt(projectile.startingPosition);
+              projectile.velocity.z =
+                -projectile.item.attributes.throwableAttributes.speed * 350;
+              projectile.returning = true;
+            } else {
+              projectile.item.model.lookAt(projectile.startingPosition);
+            }
+
+            let distanceToOrigin = projectile.item.model.position.distanceTo(
+              projectile.startingPosition
+            );
+            // console.log(`distanceToOrigin: ${distanceToOrigin}`);
+            if (distanceToOrigin < 100) {
+              this.release(projectile);
+            } else {
+              var entitiesInRange = this.controller.allEnemiesInRange(
+                projectile.item.attributes.range,
+                projectile.item.model.position
+              );
+              if (entitiesInRange.length > 0) {
+                this.catch(projectile, entitiesInRange);
+                continue;
+              }
+            }
+          } else {
+            this.handleAction(projectile, []);
+          }
+          continue;
         } else {
-            item.children.forEach(child => {
-                this.dispose(child);
-            })
         }
-        if (item.dispose) item.dispose();
+      }
     }
+  }
 
-    deanimate(callback) {
-        this.running = false;
-        if (document.getElementById('minimap').firstElementChild) document.getElementById('minimap').firstElementChild.remove();
-        this.controls = null;
-        callback();
+  animate() {
+    if (this.running) {
+      if (this.controls.isLocked === true && this.running) {
+        this.time = performance.now();
+        this.delta = Math.min(this.time - this.prevTime, 250) / 1000;
+
+        this.prevTime = this.time;
+
+        this.controller.handleMovement(this.delta);
+        this.handleSprites();
+        this.handleProjectiles(this.delta);
+        this.handlePoints(this.delta);
+
+        // if (this.controller.layout.terrain.attributes.addPonds) {
+        //     this.handleRefractors();
+        // }
+
+        if (this.backgroundMesh && this.controls)
+          this.backgroundMesh.rotation.y =
+            -this.controls.getObject().rotation.y;
+        // this.renderer.render( this.scene, this.camera );
+      }
+
+      // this.renderer.setClearColor( 0x20252f );
+      // let b = performance.now();
+      this.renderer.render(this.scene, this.camera);
+      // let a = performance.now();
+      // let rSpeed = a - b;
+
+      // if ( !this.controls || !this.controls.isLocked || !this.running || rSpeed > 250 ) {
+      //     this.prevTime = a;
+      // }
+
+      if (minimap) {
+        this.rendererMinimap.render(this.scene, this.cameraMinimap);
+        if (this.compass) this.compass.model.lookAt(DUENORTH);
+      }
+
+      this.stats.update();
+      this.requestAnimationFrameID = requestAnimationFrame(this.animate);
+    } else {
+      cancelAnimationFrame(this.requestAnimationFrameID);
+      this.dispose(this.scene);
     }
+  }
 
+  handlePoints(delta) {
+    var time = Date.now() * 0.00005;
 
+    this.controller.points.forEach((points, i) => {
+      points.rotation.y =
+        -this.controls.getObject().rotation.y +
+        time * (i < 4 ? i + 1 : -(i + 1));
 
-    unregisterEventListeners = () => {
+      // points.rotation.y -= ;
+      points.rotation.z += (this.controller.hero.velocity.z * delta) / 1000;
+      points.rotation.x += (this.controller.hero.velocity.x * delta) / 1000;
 
-        this.instructions.removeEventListener( 'click', this.instructionsLock, false );
-        this.controls.removeEventListener( 'lock', this.controlsLocked );
-        // this.controls.removeEventListener( 'unlock', this.controlsUnlocked );
+      points.visible = !this.controller.hero.sheltered;
+    });
 
-        document.removeEventListener( 'keydown', this.onKeyDown, false );
-        document.removeEventListener( 'keydown', this.onF8, false );
-        document.removeEventListener( 'keyup', this.onKeyUp, false );
-        window.removeEventListener( 'resize', this.onWindowResize, false );
+    for (var i = 0; i < this.controller.materials.length; i++) {
+      var color = this.controller.parameters[i][0];
 
-        this.controller.eventDepot.removeListeners('setHeroStat');
-        this.controller.eventDepot.removeListeners('setHeroStatMax');
-        this.controller.eventDepot.removeListeners('updateHelper');
-        this.controller.eventDepot.removeListeners('updateXP');
-        this.controller.eventDepot.removeListeners('lockControls');
-        this.controller.eventDepot.removeListeners('unlockControls');
-        this.controller.eventDepot.removeListeners('disableKeyDownListener');
-        this.controller.eventDepot.removeListeners('enableKeyDownListener');
+      var h = ((360 * (color[0] + time)) % 360) / 360;
+      this.controller.materials[i].color.setHSL(h, color[1], color[2]);
     }
+  }
 
-    addEventListeners() {
-        let main = document.querySelector('main');
-        main.innerHTML = `<div id="blocker" style="display: block;">
+  handleRefractors() {
+    this.controller.refractors.forEach((refractor) => {
+      refractor.material.uniforms["time"].value += this.clock.getDelta();
+    });
+  }
+
+  dispose(item) {
+    if (item.children.length == 0) {
+      if (item.dispose) item.dispose();
+      return;
+    } else {
+      item.children.forEach((child) => {
+        this.dispose(child);
+      });
+    }
+    if (item.dispose) item.dispose();
+  }
+
+  deanimate(callback) {
+    this.running = false;
+    if (document.getElementById("minimap").firstElementChild)
+      document.getElementById("minimap").firstElementChild.remove();
+    this.controls = null;
+    callback();
+  }
+
+  unregisterEventListeners = () => {
+    this.instructions.removeEventListener(
+      "click",
+      this.instructionsLock,
+      false
+    );
+    this.controls.removeEventListener("lock", this.controlsLocked);
+    // this.controls.removeEventListener( 'unlock', this.controlsUnlocked );
+
+    document.removeEventListener("keydown", this.onKeyDown, false);
+    document.removeEventListener("keydown", this.onF8, false);
+    document.removeEventListener("keyup", this.onKeyUp, false);
+    window.removeEventListener("resize", this.onWindowResize, false);
+
+    this.controller.eventDepot.removeListeners("setHeroStat");
+    this.controller.eventDepot.removeListeners("setHeroStatMax");
+    this.controller.eventDepot.removeListeners("updateHelper");
+    this.controller.eventDepot.removeListeners("updateXP");
+    this.controller.eventDepot.removeListeners("lockControls");
+    this.controller.eventDepot.removeListeners("unlockControls");
+    this.controller.eventDepot.removeListeners("disableKeyDownListener");
+    this.controller.eventDepot.removeListeners("enableKeyDownListener");
+  };
+
+  addEventListeners() {
+    let main = document.querySelector("main");
+    main.innerHTML = `<div id="blocker" style="display: block;">
 
         <div id="instructions" style="">
             <span style="font-size:40px">Click to play</span>
@@ -664,251 +774,251 @@ class Scene {
 
         </div>`;
 
-        this.blocker = document.getElementById( 'blocker' );
-        this.instructions = document.getElementById( 'instructions' );
+    this.blocker = document.getElementById("blocker");
+    this.instructions = document.getElementById("instructions");
 
-        this.controller.eventDepot.addListener('setHeroStat', (data) => {
-            if (data.type == "health" || data.type == "mana") {
-                let el = document.getElementById(data.type);
-                el.value = data.points;
-                el.innerText = data.points;
-            }
-        })
+    this.controller.eventDepot.addListener("setHeroStat", (data) => {
+      if (data.type == "health" || data.type == "mana") {
+        let el = document.getElementById(data.type);
+        el.value = data.points;
+        el.innerText = data.points;
+      }
+    });
 
-        this.controller.eventDepot.addListener('setHeroStatMax', (data) => {
-            if (data.type == "health" || data.type == "mana") {
-                let el = document.getElementById(data.type);
-                el.max = data.points;
-                el.optimum = Math.floor(data.points*.9);
-                el.low = Math.floor(data.points*.3);
-                el.high = Math.floor(data.points*.7);
-            }
-        })
+    this.controller.eventDepot.addListener("setHeroStatMax", (data) => {
+      if (data.type == "health" || data.type == "mana") {
+        let el = document.getElementById(data.type);
+        el.max = data.points;
+        el.optimum = Math.floor(data.points * 0.9);
+        el.low = Math.floor(data.points * 0.3);
+        el.high = Math.floor(data.points * 0.7);
+      }
+    });
 
-        this.controller.eventDepot.addListener('updateXP', (data) => {
-            document.getElementById('xp').innerText = data;
-        })
+    this.controller.eventDepot.addListener("updateXP", (data) => {
+      document.getElementById("xp").innerText = data;
+    });
 
-        this.controller.eventDepot.addListener('lockControls', () => {
-            this.time = this.prevTime = performance.now(); // reset the deltas
-            this.controls.lock();
-        })
+    this.controller.eventDepot.addListener("lockControls", () => {
+      this.time = this.prevTime = performance.now(); // reset the deltas
+      this.controls.lock();
+    });
 
-        this.controller.eventDepot.addListener('unlockControls', () => {
-            this.controls.unlock();
-        })
+    this.controller.eventDepot.addListener("unlockControls", () => {
+      this.controls.unlock();
+    });
 
-        this.controller.eventDepot.addListener('updateHelper', (data) => {
-            this.helper.position.copy(data.position);
-            this.helper.material.color = data.color;
-        })
+    this.controller.eventDepot.addListener("updateHelper", (data) => {
+      this.helper.position.copy(data.position);
+      this.helper.material.color = data.color;
+    });
 
-        this.controller.eventDepot.addListener('disableKeyDownListener', () => {
-            document.removeEventListener( 'keydown', this.onKeyDown, false );
-        })
+    this.controller.eventDepot.addListener("disableKeyDownListener", () => {
+      document.removeEventListener("keydown", this.onKeyDown, false);
+    });
 
-        this.controller.eventDepot.addListener('enableKeyDownListener', () => {
-            document.addEventListener( 'keydown', this.onKeyDown, false );
-        })
+    this.controller.eventDepot.addListener("enableKeyDownListener", () => {
+      document.addEventListener("keydown", this.onKeyDown, false);
+    });
 
-        this.instructions.addEventListener( 'click', this.instructionsLock, false );
-        this.controls.addEventListener( 'lock', this.controlsLocked);
-        this.controls.addEventListener( 'unlock', this.controlsUnlocked );
+    this.instructions.addEventListener("click", this.instructionsLock, false);
+    this.controls.addEventListener("lock", this.controlsLocked);
+    this.controls.addEventListener("unlock", this.controlsUnlocked);
 
-        main.appendChild(this.renderer.domElement);
-        window.addEventListener( 'resize', this.onWindowResize, false );
+    main.appendChild(this.renderer.domElement);
+    window.addEventListener("resize", this.onWindowResize, false);
+  }
+
+  instructionsLock() {
+    if (this.readyForLock && !this.controls.isLocked) {
+      this.controls.lock();
     }
+  }
 
-    instructionsLock() {
-        if (this.readyForLock && !this.controls.isLocked) {
-            this.controls.lock();
-        }
+  controlsLocked() {
+    this.instructions.style.display = "none";
+    this.blocker.style.display = "none";
+    document.addEventListener("mousedown", this.onMouseDown, false);
+    document.addEventListener("mouseup", this.onMouseUp, false);
+    document.addEventListener("wheel", this.onMouseWheel, false);
+    document.addEventListener("click", this.onMouseClick, false);
+  }
+
+  controlsUnlocked() {
+    this.blocker.style.display = "block";
+    this.instructions.style.display = "";
+    document.removeEventListener("mousedown", this.onMouseDown, false);
+    document.removeEventListener("mouseup", this.onMouseUp, false);
+    document.removeEventListener("wheel", this.onMouseWheel, false);
+    document.removeEventListener("click", this.onMouseClick, false);
+  }
+
+  /** Separate keyhandling for F8 because it controls other keyhandler */
+  onF8 = (event) => {
+    if (event.keyCode == 119 || (event.altKey && event.keyCode == 84)) {
+      //F8 or Alt-T
+      chatbar = !chatbar;
+      this.controller.eventDepot.fire("toggleChatbar", { show: chatbar });
     }
+  };
 
-    controlsLocked() {
-        this.instructions.style.display = 'none';
-        this.blocker.style.display = 'none';
-        document.addEventListener( 'mousedown', this.onMouseDown, false );
-        document.addEventListener( 'mouseup', this.onMouseUp, false );
-        document.addEventListener( 'wheel', this.onMouseWheel, false );
-        document.addEventListener( 'click', this.onMouseClick, false );
-    }
+  onKeyDown = (event) => {
+    switch (event.keyCode) {
+      case 38: // up
+      case 87: // w
+        if (this.controller.hero) this.controller.hero.moveForward = true;
+        break;
 
-    controlsUnlocked() {
-        this.blocker.style.display = 'block';
-        this.instructions.style.display = '';
-        document.removeEventListener( 'mousedown', this.onMouseDown, false );
-        document.removeEventListener( 'mouseup', this.onMouseUp, false );
-        document.removeEventListener( 'wheel', this.onMouseWheel, false );
-        document.removeEventListener( 'click', this.onMouseClick, false );
-    }
+      case 37: // left
+      case 65: // a
+        if (this.controller.hero) this.controller.hero.moveLeft = true;
+        break;
 
-    /** Separate keyhandling for F8 because it controls other keyhandler */
-    onF8 = ( event ) => {
+      case 40: // down
+      case 83: // s
+        if (this.controller.hero) this.controller.hero.moveBackward = true;
+        break;
 
-        if (event.keyCode == 119 || (event.altKey && event.keyCode == 84)) {  //F8 or Alt-T
-            chatbar = !chatbar;
-            this.controller.eventDepot.fire('toggleChatbar', { show: chatbar }); 
-        }
-    }
-    
-    onKeyDown = ( event ) => {
-    
-        switch ( event.keyCode ) {
+      case 39: // right
+      case 68: // d
+        if (this.controller.hero) this.controller.hero.moveRight = true;
+        break;
 
-            case 38: // up
-            case 87: // w
-                if (this.controller.hero) this.controller.hero.moveForward = true;
-                break;
-
-            case 37: // left
-            case 65: // a
-                if (this.controller.hero) this.controller.hero.moveLeft = true;
-                break;
-
-            case 40: // down
-            case 83: // s
-                if (this.controller.hero) this.controller.hero.moveBackward = true;
-                break;
-
-            case 39: // right
-            case 68: // d
-                if (this.controller.hero) this.controller.hero.moveRight = true;
-                break;
-
-            case 32: // space
-                
-                if (this.controller.hero?.mountedUpon) {
-                    this.controller.eventDepot.fire('descend', { vehicle: this.controller.hero.mountedUpon.objectName });
-                } else {
-                    this.controller.eventDepot.fire('jump', {});
-                }
-                break;
-
-            case 73: // i
-                this.controller.hero.cacheHero(); // saves updated location in template
-                this.controller.eventDepot.fire('modal', { type: 'inventory', title: 'Inventory' });
-                this.controller.eventDepot.fire('halt', {});
-                break;
-                
-            case 77: // m
-                minimap = !minimap;
-                this.controller.eventDepot.fire('minimap', {});
-                break;
-
-            case 72: // h
-                sidebar = !sidebar;
-                
-                if (sidebar) this.controller.eventDepot.fire('refreshSidebar', { equipped: this.controller.hero.equipped });
-                this.controller.eventDepot.fire('toggleSidebar', { show: sidebar });
-                break;
-            case 49: // 1
-            case 50:
-            case 51:
-            case 52:
-            case 53:
-            case 54:
-            case 55:
-            case 56: // 8
-                this.controller.eventDepot.fire('hotkey', { key: event.keyCode - 48 })
-                break;
-
-        }
-
-    };
-
-    onKeyUp = ( event ) => {
-
-        switch ( event.keyCode ) {
-
-            case 38: // up
-            case 87: // w
-                if (this.controller.hero) this.controller.hero.moveForward = false;
-                break;
-
-            case 37: // left
-            case 65: // a
-                if (this.controller.hero) this.controller.hero.moveLeft = false;
-                break;
-
-            case 40: // down
-            case 83: // s
-                if (this.controller.hero) this.controller.hero.moveBackward = false;
-                break;
-
-            case 39: // right
-            case 68: // d
-                if (this.controller.hero) this.controller.hero.moveRight = false;
-                break;
-
-        }
-
-    };
-
-    onMouseClick() {
-        if (this.controls) {
-            let x = this.controls.getObject().position;
-            console.log(`${this.controller.level}: ${x.x}, ${x.y}, ${x.z}`);
-        }
-    }
-
-    /**
-     * 
-     */
-    onMouseWheel(e) {
-        // if (this.camera.position.z < cameraDistanceDefault - 10) {
-        // if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height - 10) {
-
-        if (e.shiftKey) {
-            this.controller.eventDepot.fire('wheel', e);
+      case 32: // space
+        if (this.controller.hero?.mountedUpon) {
+          this.controller.eventDepot.fire("descend", {
+            vehicle: this.controller.hero.mountedUpon.objectName,
+          });
         } else {
-            this.camera.position.z += e.deltaY;  // set limits?
-            if (this.camera.position.y > cameraElevationDefault + this.controller.hero.attributes.height + 10) {
-                this.camera.position.y += e.deltaY/5;
-            }
+          this.controller.eventDepot.fire("jump", {});
         }
+        break;
+
+      case 73: // i
+        this.controller.hero.cacheHero(); // saves updated location in template
+        this.controller.eventDepot.fire("modal", {
+          type: "inventory",
+          title: "Inventory",
+        });
+        this.controller.eventDepot.fire("halt", {});
+        break;
+
+      case 77: // m
+        minimap = !minimap;
+        this.controller.eventDepot.fire("minimap", {});
+        break;
+
+      case 72: // h
+        sidebar = !sidebar;
+
+        if (sidebar)
+          this.controller.eventDepot.fire("refreshSidebar", {
+            equipped: this.controller.hero.equipped,
+          });
+        this.controller.eventDepot.fire("toggleSidebar", { show: sidebar });
+        break;
+      case 49: // 1
+      case 50:
+      case 51:
+      case 52:
+      case 53:
+      case 54:
+      case 55:
+      case 56: // 8
+        this.controller.eventDepot.fire("hotkey", { key: event.keyCode - 48 });
+        break;
     }
+  };
 
-    onMouseDown(e) {
-        if (this.controller.hero) {
+  onKeyUp = (event) => {
+    switch (event.keyCode) {
+      case 38: // up
+      case 87: // w
+        if (this.controller.hero) this.controller.hero.moveForward = false;
+        break;
 
-            switch (e.button) {
+      case 37: // left
+      case 65: // a
+        if (this.controller.hero) this.controller.hero.moveLeft = false;
+        break;
 
-                case 0:
-                    this.controller.eventDepot.fire('mouse0click', event.shiftKey );
-                    break;
-                case 1:
-                    this.controller.eventDepot.fire('mouse1click', {});
-                    break;
-                case 2:
-                    this.controller.eventDepot.fire('mouse2click', event.shiftKey );
-                    // this.controller.hero.moveForward = true;
-                    break;
-            }
-        }
+      case 40: // down
+      case 83: // s
+        if (this.controller.hero) this.controller.hero.moveBackward = false;
+        break;
+
+      case 39: // right
+      case 68: // d
+        if (this.controller.hero) this.controller.hero.moveRight = false;
+        break;
     }
+  };
 
-    onMouseUp(e) {
-        if (this.controller.hero) {
-            switch (e.button) {
-
-                case 0:
-                    // this.helper.visible = false;
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    this.controller.hero.moveForward = false;
-                    break;
-            }
-        }
+  onMouseClick() {
+    if (this.controls) {
+      let x = this.controls.getObject().position;
+      console.log(`${this.controller.level}: ${x.x}, ${x.y}, ${x.z}`);
     }
+  }
 
-    onWindowResize() {
-        this.camera.aspect = window.innerWidth / (window.innerHeight - navbarHeight);
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize( window.innerWidth, (window.innerHeight - navbarHeight) );
+  /**
+   *
+   */
+  onMouseWheel(e) {
+    // if (this.camera.position.z < cameraDistanceDefault - 10) {
+    // if (this.camera.position.y < cameraElevationDefault + this.controller.hero.attributes.height - 10) {
+
+    if (e.shiftKey) {
+      this.controller.eventDepot.fire("wheel", e);
+    } else {
+      this.camera.position.z += e.deltaY; // set limits?
+      if (
+        this.camera.position.y >
+        cameraElevationDefault + this.controller.hero.attributes.height + 10
+      ) {
+        this.camera.position.y += e.deltaY / 5;
+      }
     }
+  }
+
+  onMouseDown(e) {
+    if (this.controller.hero) {
+      switch (e.button) {
+        case 0:
+          this.controller.eventDepot.fire("mouse0click", event.shiftKey);
+          break;
+        case 1:
+          this.controller.eventDepot.fire("mouse1click", {});
+          break;
+        case 2:
+          this.controller.eventDepot.fire("mouse2click", event.shiftKey);
+          // this.controller.hero.moveForward = true;
+          break;
+      }
+    }
+  }
+
+  onMouseUp(e) {
+    if (this.controller.hero) {
+      switch (e.button) {
+        case 0:
+          // this.helper.visible = false;
+          break;
+        case 1:
+          break;
+        case 2:
+          this.controller.hero.moveForward = false;
+          break;
+      }
+    }
+  }
+
+  onWindowResize() {
+    this.camera.aspect =
+      window.innerWidth / (window.innerHeight - navbarHeight);
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight - navbarHeight);
+  }
 }
 
-export {Scene};
+export { Scene };
