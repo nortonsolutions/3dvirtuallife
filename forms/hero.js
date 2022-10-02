@@ -322,6 +322,10 @@ export class Hero extends IntelligentForm {
                 if (tool) {
                     this.drawMinerals(tool,oreName);
                 }
+            } else {
+                // print current location
+                let pos = this.model.position;
+                console.log(`x: ${pos.x}, y: ${pos.y}, z: ${pos.z}`);
             }
         }
     }
@@ -582,7 +586,7 @@ export class Hero extends IntelligentForm {
                         var tool;
                         // animate weapon (if applicable) and launch item
                         if (this.animatedSubforms.length > 0) {
-                            let tool = this.animatedSubforms.find(el => el[0] == bodyPart)[1];
+                            tool = this.animatedSubforms.find(el => el[0] == bodyPart)[1];
                             if (tool) tool.runActiveAction(2);
                             
                             this.fadeToAction(this.launcherActions[getRndInteger(0,this.launcherActions.length-1)], 0.2);
@@ -592,7 +596,7 @@ export class Hero extends IntelligentForm {
                         
                         setTimeout(() => {
                             this.launch(item, null, [bodyPart, tool? tool.objectName: null]);
-                        }, 500)
+                        }, 500);
                     })
                 } else {
                     Object.entries(this.equipped).forEach(([bodyPart,value]) => {
@@ -741,7 +745,12 @@ export class Hero extends IntelligentForm {
             this.velocity.z -= this.velocity.z * 10.0 * delta;
 
             if (!this.balloonRide && !this.mountedUpon) {
-                this.velocity.y -= 39.8 * 100.0 * delta; // 100.0 = mass
+                this.velocity.y -= 60; // 39.8 * 100.0 * delta; // 100.0 = mass
+
+                // log current velocity.y
+                console.log(`${this.objectName} velocity.y: ${this.velocity.y}`);
+                
+
             }
 
             this.direction.z = Number( this.moveBackward ) - Number( this.moveForward );
@@ -773,6 +782,8 @@ export class Hero extends IntelligentForm {
 
             // entity.translateY( this.mixers[uniqueId].velocity.y * delta );
             if (this.setElevation() == -1) {
+
+                console.log(`${this.objectName} is falling!`);
 
                 this.model.translateX( -this.velocity.x * delta );
                 this.model.translateY( -this.velocity.y * delta );
@@ -1098,7 +1109,7 @@ export class Hero extends IntelligentForm {
                 let pondLine = this.determinePondElevation();
                 let floorLine = this.determineElevationFromBase();
                 baseline = pondLine + this.mountedUpon.attributes.height;
-                if (floorLine > pondLine) {
+                if (floorLine > baseline) {
                     let data = {}
                     data.vehicle = this.mountedUpon.objectName;
                     data.type = this.mountedUpon.objectType;

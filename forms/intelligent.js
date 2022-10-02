@@ -36,8 +36,16 @@ export class IntelligentForm extends AnimatedForm{
         this.spells = this.template.spells;
         this.equipped = this.template.equipped? this.template.equipped: [];
 
-        this.movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3(), 0, this.attributes.length/2 + 35 );
+        // Identify the max distance at which we want the raycaster to detect objects
+        let movementBouncer = this.attributes.length/2 + 25;
 
+        // create a THREE.Vector3 to represent a rotation of 10 degrees upward
+        let upRotation = new THREE.Vector3(0, 0, 0);
+        upRotation.x = THREE.Math.degToRad(10);
+        
+        this.movementRaycaster = new THREE.Raycaster( new THREE.Vector3(), upRotation, 0, movementBouncer );
+        // this.movementRaycaster.ray.direction.set( 0, -1, 0 ).applyEuler( this.model.rotation );
+        
     }
 
     /** load is for loading the model and animations specifically */
@@ -345,7 +353,7 @@ export class IntelligentForm extends AnimatedForm{
         let weapon = this.equipped[bodyPart]? this.equipped[bodyPart][0] : bodyPart;
         this.positionWeapon = weapon==bodyPart? this.model.getObjectByName(bodyPart).getWorldPosition(this.positionWeapon) : this.model.getObjectByProperty("objectName", weapon).getWorldPosition(this.positionWeapon);
         
-        for (const entity of this.sceneController.allEnemiesInRange(100, this.model.position)) {
+        for (const entity of this.sceneController.allEnemiesInRange(100, this.positionWeapon)) {
 
             let entityPosition = new THREE.Vector3();
             entityPosition.copy(entity.model.position);

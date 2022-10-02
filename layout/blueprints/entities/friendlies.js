@@ -1008,7 +1008,7 @@ export const Friendlies = {
         defaultState: "trade",
         state: "trade",
         trade: {
-          wants: ["bagOfGems", "gold"],
+          wants: ["bagOfGems", "gold","aluminium","iron","dragonPelt"],
           speech: "Welcome to my shop, my friend."
         },
         comeback: {

@@ -564,7 +564,15 @@ export class DialogScreen {
                 this.hero.addToInventory("keyToHouse", 0, this.tab.items[item], keyCode);
             }
 
-            this.hero.addToInventory(item, 0, this.tab.items[item], keyCode);
+            let itemTemplate = this.hero.sceneController.getTemplateByName(item);
+            let quantityMultiplier = itemTemplate.attributes.quantity? itemTemplate.attributes.quantity : 1            
+
+            let baseItem = item;
+            if (quantityMultiplier > 1) {
+                baseItem = itemTemplate.attributes.baseItemName
+            }
+
+            this.hero.addToInventory(baseItem, 0, this.tab.items[item]*quantityMultiplier, keyCode);
         });
 
         Object.keys(this.payment).forEach(item => {

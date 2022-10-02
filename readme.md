@@ -44,7 +44,7 @@ When you're on the inventory screen, drop an item by dragging it to the red squa
 * Gain enough money to buy the fishing pole and go fishing at the lake
 * Take the elevator up and see the sights by mounting the hot-air balloon
 * Plant a sunseed, fill the watering can at a water source, and water the seed
-* Use sunfruit to feed a horse and gain his loyalty for a while
+* Use sunfruit or animal meat to feed a horse and gain his loyalty for a while
 * If you find some ore on the ground, it's probably a good place to mine for more...
 * Can you find the swamp or the lava field?  How about the kingdom or snowy land?
 * Buy a house from the elfgirl in the outer kingdom and place it wherever you want, with a personalized key

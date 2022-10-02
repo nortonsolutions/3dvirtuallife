@@ -119,7 +119,7 @@ export const Spells = {
         description: 'A rock projectile spell',
         type: 'spell',
         attributes: {
-            manaCost: 1,
+            manaCost: 0,
             effect: "generalDamage/2",
             range: 30,
             animates: false,

@@ -647,7 +647,7 @@ class Scene {
     if (this.running) {
       if (this.controls.isLocked === true && this.running) {
         this.time = performance.now();
-        this.delta = Math.min(this.time - this.prevTime, 250) / 1000;
+        this.delta = Math.min(this.time - this.prevTime, 25) / 1000;
 
         this.prevTime = this.time;
 

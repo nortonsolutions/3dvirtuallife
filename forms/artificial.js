@@ -92,7 +92,10 @@ export class ArtificialForm extends IntelligentForm{
                     // INERTIA
                     this.velocity.x -= this.velocity.x * 10.0 * delta;
                     this.velocity.z -= this.velocity.z * 10.0 * delta;
-                    this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+                    this.velocity.y -= 60; //9.8 * 100.0 * delta; // 100.0 = mass
+
+                    // log
+                    // console.log(`${this.objectName}: ${this.velocity.x}, ${this.velocity.y}, ${this.velocity.z}`);
 
                     if (Math.random() < .4) { // percentage of changing direction
                         this.direction.z = getRandomArbitrary(0,10);
@@ -120,31 +123,31 @@ export class ArtificialForm extends IntelligentForm{
 
                 super.move(delta);
 
-                if (this.objectType == "beast") {
+                if (this.objectType == "beast" && this.objectType != "fish") {
                     
-                        let d = closestHeroPosition.distance;
+                    let d = closestHeroPosition.distance;
 
-                        if (d < 100) {
-                            this.facePosition(closestHeroPosition.position);
-                            if (!this.attributes.docile) this.attackHero(closestHeroPosition.heroLayoutId);
-                            this.stopAndBackup(delta);
-                        } else if (d < 400 && this.attributes.rangedSpell) {
-                            this.facePosition(closestHeroPosition.position);
-                            
-                            if (Math.random()<.05) {
-                                let action = this.throwActions[getRndInteger(0,this.throwActions.length-1)]
-                                this.fadeToAction(action, 0.2);
-                                setTimeout(() => {
-                                    this.castSpell(this.sceneController.getTemplateByName(this.attributes.rangedSpell), true, true);
-                                }, 1000);
-                            } else {
-                                this.moveToward(delta);
-                            }
-
-                        } else if (d < 700) {
-                            this.facePosition(closestHeroPosition.position);
+                    if (d < 100) {
+                        this.facePosition(closestHeroPosition.position);
+                        if (!this.attributes.docile) this.attackHero(closestHeroPosition.heroLayoutId);
+                        this.stopAndBackup(delta);
+                    } else if (d < 400 && this.attributes.rangedSpell) {
+                        this.facePosition(closestHeroPosition.position);
+                        
+                        if (Math.random()<.05) {
+                            let action = this.throwActions[getRndInteger(0,this.throwActions.length-1)]
+                            this.fadeToAction(action, 0.2);
+                            setTimeout(() => {
+                                this.castSpell(this.sceneController.getTemplateByName(this.attributes.rangedSpell), true, true);
+                            }, 1000);
+                        } else {
                             this.moveToward(delta);
-                        } 
+                        }
+
+                    } else if (d < 700) {
+                        this.facePosition(closestHeroPosition.position);
+                        this.moveToward(delta);
+                    } 
                     
                 } else if (this.attributes.follower) {
 

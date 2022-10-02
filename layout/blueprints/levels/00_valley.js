@@ -43,6 +43,11 @@ export const Valley = {
     { name: "miningHammer", location: { x: 1, y: 0, z: 0 } },
     { name: "bow", location: { x: 1, y: 0, z: -1 } },
     { name: "arrow25", location: { x: 2, y: 0, z: 0 } },
+    { name: "gold10", location: { x: 2, y: 0, z: 0 } },
+    { name: "gold10", location: { x: 2, y: 0, z: 0 } },
+    { name: "gold10", location: { x: 2, y: 0, z: 0 } },
+    { name: "gold25", location: { x: 2, y: 0, z: 0 } },
+    { name: "gold25", location: { x: 2, y: 0, z: 0 } },
     { name: "gold3" },
     { name: "gold10" },
     { name: "smallSword"},  
@@ -171,6 +176,6 @@ export const Valley = {
     { name: "catFish", location: { x: -8, y: 0, z: 56 } },
     { name: "carp", location: { x: -7, y: 0, z: 54 } },
     { name: "carp", location: { x: -7.5, y: 0, z: 54 } },
-    { name: "cosmichorse", location: { x: -1, y: 0, z: 1 } },
+    { name: "whitehorse", location: { x: -1, y: 0, z: 1 } },
   ]
 };

@@ -156,7 +156,7 @@ export class SceneController {
      */
     takeItemFromScene(data, local = true) {
 
-        if (parseInt(data.layoutId) != "NaN") {
+        if (data.layoutId != undefined && parseInt(data.layoutId) != "NaN") {
             this.scene.removeFromScenebyLayoutId(data.layoutId);
             this.forms = this.forms.filter(el => {
                 return el.model.attributes.layoutId != data.layoutId;
