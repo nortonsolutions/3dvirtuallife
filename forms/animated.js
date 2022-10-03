@@ -53,7 +53,7 @@ export class AnimatedForm extends StandardForm{
         super.load(() => {
 
             this.mixer = new THREE.AnimationMixer( this.model );
-
+            
             let firstAnimationName = '';
             this.animations.forEach((animation,index) => {
                 
@@ -142,9 +142,20 @@ export class AnimatedForm extends StandardForm{
 
                 if (controlled && controlled.attributes.animates) {
 
+                    let idleTimeScale = 1;
+                    let walkingTimeScale = 1;
+                    let runningTimeScale = 1;
+
+                    if (controlled.attributes.mixerTimeScale) { // 1/2/2 (idle/walk/run)
+                        let timeScales = controlled.attributes.mixerTimeScale.split('/');
+                        idleTimeScale = timeScales[0];
+                        walkingTimeScale = timeScales[1];
+                        runningTimeScale = timeScales[2];
+                    } 
+
                     this.absVelocity = Math.max(Math.abs(this.velocity.x), Math.abs(this.velocity.z));
                     if (this.absVelocity < .1 && controlled.activeActionName != 'Idle' && controlled.activeActionName != 'Flopping') {
-                        controlled.fadeToAction( 'Idle', 0.2);
+                        controlled.fadeToAction( 'Idle', 0.2, idleTimeScale);
                     } else if (this.absVelocity >= .1 && this.absVelocity < 250 && (controlled.activeActionName == 'Idle' || controlled.activeActionName == 'Running')) {
                         switch (controlled.objectName) {
                             
@@ -157,9 +168,9 @@ export class AnimatedForm extends StandardForm{
                                 break;
                             default:
                                 if (this.swimming) {
-                                    controlled.fadeToAction( 'Swimming', 0.2);
+                                    controlled.fadeToAction( 'Swimming', 0.2, walkingTimeScale);
                                 } else {
-                                    controlled.fadeToAction( 'Walking', 0.2);
+                                    controlled.fadeToAction( 'Walking', 0.2, walkingTimeScale);
                                 }
                                 break;
                         }
@@ -173,9 +184,9 @@ export class AnimatedForm extends StandardForm{
                             })
                         } else {
                             if (this.swimming) {
-                                controlled.fadeToAction( 'Swimming', 0.2);
+                                controlled.fadeToAction( 'Swimming', 0.2, walkingTimeScale);
                             } else {
-                                controlled.fadeToAction( 'Running', 0.2);
+                                controlled.fadeToAction( 'Running', 0.2, runningTimeScale);
                             }
                         }
                     }
@@ -191,7 +202,7 @@ export class AnimatedForm extends StandardForm{
         }
     }
 
-    fadeToAction( actionName, duration ) {
+    fadeToAction( actionName, duration, timeScale = 1 ) {
 
         // console.log(`${this.objectName} fading to ${actionName}`);
         if (!this.actions[actionName]) { // if animation doesn't exist, fadeOut and set activeActionName
@@ -224,7 +235,7 @@ export class AnimatedForm extends StandardForm{
                 } else if (this.kickAttacksR.includes(this.activeActionName)) {
                   this.kickAttackL = true;
                 }
-
+                this.activeAction.timeScale = timeScale || 1;
                 this.activeAction
                   .reset()
                   .fadeIn(duration)

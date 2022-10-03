@@ -240,6 +240,7 @@ export const Animals = {
       elevation: 0,
       equippedScale: 30,
       scale: 30,
+      mixerTimeScale: ".25/2/3", // idle/walk/run
       stats: {
         health: "4/4/0",
         mana: "0/0/0",
