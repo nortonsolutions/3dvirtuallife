@@ -138,6 +138,11 @@ database(mongoose, (db) => {
 
     const notifyRoomMembers = function (roomNumber, messageType, data) {
 
+      // log unless messageType is updateHeroPosition
+      if (messageType != 'updateHeroPosition' && messageType != 'updateEntityPositions' && messageType != 'addSprites') {
+        console.log(`notifyRoomMembers: ${roomNumber}, ${messageType} - type: ${data.type}, layoutId: ${data.layoutId}`);
+      }
+
       let sender = socket.id;
       let nsp = socket.nsp.name;
 
@@ -206,6 +211,8 @@ database(mongoose, (db) => {
     }
     
     const updateHeroTemplate = function (room,heroTemplate) {
+      // log
+      console.log(`updateHeroTemplate - ${socket.id} - ${heroTemplate.attributes.layoutId} = ${heroTemplate.name}`);
       let x = app.rooms[socket.nsp.name][room].find(el => el[0] == socket.id);
       if (x) x[1] = heroTemplate;
     }
@@ -353,18 +360,20 @@ database(mongoose, (db) => {
 
     socket.on('death', data => {
       
-      app.layouts[socket.nsp.name][data.level][0].entities = app.layouts[socket.nsp.name][data.level][0].entities.filter(el => el.attributes.layoutId != data.layoutId);
-      notifyRoomMembers(data.level, 'death', data);
+      if (data.level) {
+        app.layouts[socket.nsp.name][data.level][0].entities = app.layouts[socket.nsp.name][data.level][0].entities.filter(el => el.attributes.layoutId != data.layoutId);
+        notifyRoomMembers(data.level, 'death', data);
+      }
 
-      // if (data.hero) {  // remove from room/layouts
-      //   removeFromRooms();
-      // }
+      if (data.hero) {  // remove hero completely (a bit overkill but it works)
+        removeFromRooms();
+      }
     });
 
     const updateHeroAttributes = function (room,payload) {
       let x = app.rooms[socket.nsp.name][room].find(el => el[0] == socket.id);
       if (x) x[1].attributes = {...x[1].attributes, ...payload};
-      // notifyRoomMembers(room, "updateHeroAttributes", x[1]);
+      notifyRoomMembers(room, "updateHeroAttributes", x[1]);
     }
 
     socket.on('cleanupForms', room => {

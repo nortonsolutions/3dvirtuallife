@@ -22,7 +22,7 @@ class Chatbar {
         this.socket.on('chat', (data) => {
 
             this.messageThread.push(data);
-            if (this.messageThread.length > 5) this.messageThread.unshift();
+            if (this.messageThread.length > 5) this.messageThread.shift();
             this.refreshChatbar();
         })
 
@@ -101,6 +101,8 @@ class Chatbar {
 
         handleGet(`/views/chatbar.hbs`, response => {
             let template = Handlebars.compile(response);
+
+
             this.chatbarElement.innerHTML = template(data);
             if (callback) callback();
         });

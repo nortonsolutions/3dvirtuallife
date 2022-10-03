@@ -8,7 +8,7 @@ export const Snowyland = {
   terrain: {
     name: "floor",
     type: "floor",
-    description: "swamp",
+    description: "snowyland",
     gltf: "snowyland.glb",
     attributes: {
       snowflakes: true,

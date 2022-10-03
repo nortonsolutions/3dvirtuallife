@@ -1250,8 +1250,8 @@ export const Friendlies = {
       stats: {
         health: "20/20/0",
         mana: "0/0/0",
-        strength: "2/2/0",
-        agility: "3/3/0",
+        strength: "3/2/0",
+        agility: "5/5/0",
         defense: "7/7/0", // rock, weapon, arrow damage defense
         fire: "1/1/0",
         ice: "1/1/0",

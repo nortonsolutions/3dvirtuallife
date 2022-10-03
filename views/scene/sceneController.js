@@ -76,6 +76,9 @@ export class SceneController {
         // this.refractors = [];
         // this.dudvMap = new THREE.TextureLoader().load( '/textures/waterdudv.jpg' );
         // this.dudvMap.wrapS = this.dudvMap.wrapT = THREE.RepeatWrapping;
+
+        // proximity to nearest Hero to animate
+        this.proximityToAnimate = 0;
     }
 
     addToIntervals(minutes, recurring, fn) {
@@ -125,6 +128,7 @@ export class SceneController {
 
         this.scene = new Scene(this);
         this.scene.init(() => {
+            this.proximityToAnimate = this.scene.cameraReach/4;
             this.addFloor(() => {
                 this.scene.animate();
                 this.addWater(() => {
@@ -848,6 +852,7 @@ export class SceneController {
             if (this.hero) this.hero.move(delta);
             if (this.hero) this.hero.animate(delta);
             
+            // Only the firstInRoom can move the AI entities to avoid competing updates
             if (this.firstInRoom) { 
                 
                 this.entities.forEach(entity => {  
@@ -871,7 +876,15 @@ export class SceneController {
             this.forms.forEach(form => {
                 
                 if (form.attributes.animates && !form.attributes.controlled) {
-                    form.animate(delta);
+                    // if the entity is within this.proximityToAnimate of the hero, animate it
+                    if (form.model.position.distanceTo(this.hero.model.position) < this.proximityToAnimate) {
+                        // log all the variables
+                        // console.log(`entity ${form.objectName} is within ${this.proximityToAnimate} of hero ${this.hero.objectName}`);
+                        if (!form.attributes.shouldAnimate) form.attributes.shouldAnimate = true;
+                        form.animate(delta);
+                    } else {
+                        if (form.attributes.shouldAnimate) form.attributes.shouldAnimate = false;
+                    }
                 }
             });
             
@@ -957,9 +970,9 @@ export class SceneController {
             entityPosition.y += entity.attributes.height;
             diff.subVectors(position, entityPosition);
 
-            if (diff.length() < 60) {
-                console.log(`entityPosition: ${entityPosition.x},${entityPosition.y},${entityPosition.z}; proPosition: ${position.x},${position.y},${position.z}, diff: ${diff.length()}; range: ${range}`)
-            }
+            // if (diff.length() < 60) {
+            //     console.log(`entityPosition: ${entityPosition.x},${entityPosition.y},${entityPosition.z}; proPosition: ${position.x},${position.y},${position.z}, diff: ${diff.length()}; range: ${range}`)
+            // }
             if ( diff.length() < range ) {
                 response.push(entity);
             }
@@ -979,9 +992,9 @@ export class SceneController {
             entityPosition.y += entity.attributes.height;
             
             
-            if (range < 100 && position.distanceTo(entityPosition) < 60) {
-                console.log(`entityPosition: ${entityPosition.x},${entityPosition.y},${entityPosition.z}; proPosition: ${position.x},${position.y},${position.z}, diff: ${position.distanceTo(entityPosition)}; range: ${range}`)
-            }
+            // if (range < 100 && position.distanceTo(entityPosition) < 60) {
+            //     console.log(`entityPosition: ${entityPosition.x},${entityPosition.y},${entityPosition.z}; proPosition: ${position.x},${position.y},${position.z}, diff: ${position.distanceTo(entityPosition)}; range: ${range}`)
+            // }
             if (position.distanceTo(entityPosition) < range) {
                 response.push(entity);
             }

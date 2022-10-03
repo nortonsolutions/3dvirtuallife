@@ -844,6 +844,8 @@ export class IntelligentForm extends AnimatedForm{
             this.launch(spell.name, null, [], local, null, hostile);
         } else {
             if (local && spell.attributes.affectAllInParty) { // general effect against all in range
+                // log this.model.position
+                console.log(`position: ${this.model.position.x}, ${this.model.position.y}, ${this.model.position.z}`);
                 let inRange = this.sceneController.allFriendliesInRange(spell.attributes.range, this.model.position);
                 inRange.forEach(entity => {
                     this.sceneController.socket.emit('castSpell', { level: this.sceneController.level, layoutId: entity.attributes.layoutId, spell, hostile });    

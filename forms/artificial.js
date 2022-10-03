@@ -6,9 +6,8 @@ export class ArtificialForm extends IntelligentForm{
     constructor(template, sceneController) {
         super(template, sceneController);
 
-        // proximity to nearest Hero to animate
+        // proximity to nearest Hero to move
         this.proximityToMove = 800;
-        this.proximityToAnimate = this.sceneController.scene.cameraReach;
         
     }
 
@@ -49,7 +48,6 @@ export class ArtificialForm extends IntelligentForm{
                 if (heroDistance <= this.proximityToMove) {
                     // console.log(`${this.objectName}: shouldMove = true`);
                     this.updateAttributes({shouldMove: true});
-                    
                 }
             } else { // as of last cycle, should move
                 if (heroDistance > this.proximityToMove) {
@@ -62,22 +60,22 @@ export class ArtificialForm extends IntelligentForm{
                 }
             }
 
-            // Perform calculations for animation as well, since local instance has the heroDistance
-            if (!this.attributes.shouldAnimate) { // as of last cycle, should not animate
-                if (heroDistance <= this.proximityToAnimate) {
-                    // console.log(`${this.objectName}: shouldAnimate = true`);
-                    this.updateAttributes({shouldAnimate: true});
-                    // this.updateAttributes({paused: false});
+            // // Perform calculations for animation as well, since local instance has the heroDistance
+            // if (!this.attributes.shouldAnimate) { // as of last cycle, should not animate
+            //     if (heroDistance <= this.proximityToAnimate) {
+            //         // console.log(`${this.objectName}: shouldAnimate = true`);
+            //         this.updateAttributes({shouldAnimate: true});
+            //         // this.updateAttributes({paused: false});
                     
-                }
-            } else { // as of last cycle, should animate
-                if (heroDistance > this.proximityToAnimate) {
-                    // console.log(`${this.objectName}: shouldAnimate = false`)
-                    this.updateAttributes({shouldAnimate: false});
+            //     }
+            // } else { // as of last cycle, should animate
+            //     if (heroDistance > this.proximityToAnimate) {
+            //         // console.log(`${this.objectName}: shouldAnimate = false`)
+            //         this.updateAttributes({shouldAnimate: false});
                     
-                    // this.updateAttributes({paused: true});
-                }
-            }
+            //         // this.updateAttributes({paused: true});
+            //     }
+            // }
 
             if (this.attributes.shouldMove) {
 
@@ -246,15 +244,18 @@ export class ArtificialForm extends IntelligentForm{
         }
 
         let others = [...this.sceneController?.hero?.party, ...this.sceneController?.others];
-        others.filter(el => el != this).forEach(other => {
-            let p = other.model.position
-            let d = this.model.position.distanceTo(p);
-            if (d < distance) {
-                distance = d;
-                heroLayoutId = other.attributes.layoutId;
-                position.copy(p);
-            }
-        })
+
+        if (others && others.length > 0) {
+            others.filter(el => el != this).forEach(other => {
+                let p = other.model.position
+                let d = this.model.position.distanceTo(p);
+                if (d < distance) {
+                    distance = d;
+                    heroLayoutId = other.attributes.layoutId;
+                    position.copy(p);
+                }
+            })
+        }   
 
         if (distance == Infinity) {
             return { distance };

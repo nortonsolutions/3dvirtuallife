@@ -322,10 +322,6 @@ export class Hero extends IntelligentForm {
                 if (tool) {
                     this.drawMinerals(tool,oreName);
                 }
-            } else {
-                // print current location
-                let pos = this.model.position;
-                console.log(`x: ${pos.x}, y: ${pos.y}, z: ${pos.z}`);
             }
         }
     }
@@ -748,9 +744,7 @@ export class Hero extends IntelligentForm {
                 this.velocity.y -= 60; // 39.8 * 100.0 * delta; // 100.0 = mass
 
                 // log current velocity.y
-                console.log(`${this.objectName} velocity.y: ${this.velocity.y}`);
-                
-
+                // console.log(`${this.objectName} velocity.y: ${this.velocity.y}`);
             }
 
             this.direction.z = Number( this.moveBackward ) - Number( this.moveForward );
@@ -829,6 +823,7 @@ export class Hero extends IntelligentForm {
         
         if (this.standingUpon && this.standingUpon.attributes.routeTo && typeof this.standingUpon.attributes.routeTo.level == "number") {
             if (!this.standingUpon.attributes.locked) {
+                this.sceneController.scene.removeFromScenebyLayoutId(this.attributes.layoutId);
                 this.sceneController.eventDepot.fire('unlockControls', {});
                 this.sceneController.eventDepot.fire('cacheLayout', {});
 
@@ -838,7 +833,6 @@ export class Hero extends IntelligentForm {
                     location: this.standingUpon.attributes.routeTo.location,
                 }
 
-                this.sceneController.scene.removeFromScenebyLayoutId(this.attributes.layoutId);
                 this.sceneController.eventDepot.fire('loadLevel', loadData);
             }
         } else if (this.standingUpon && this.standingUpon.attributes.footControls && !(typeof this.standingUpon.attributes.locked == "boolean")) {
@@ -1146,7 +1140,7 @@ export class Hero extends IntelligentForm {
 
     removeFromParty(entity) {
         this.party = this.party.filter(el => el != entity);
-        this.partyTemplates = this.partyTemplates.filter(el => el.name != name);
+        this.partyTemplates = this.partyTemplates.filter(el => el.name != entity.objectName);
         this.cacheHero();
     }
 }
