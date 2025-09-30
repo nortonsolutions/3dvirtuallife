@@ -1,31 +1,97 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-    <a class="navbar-brand quitGame" href="#">Norton's Adventure</a>
-    <button class="navbar-toggler hidden-lg-up" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
-        aria-expanded="false" aria-label="Toggle navigation"></button>
+<nav class="navbar navbar-expand-lg navbar-dark bg-gradient fixed-top">
+    <a class="navbar-brand quitGame" href="#" style="font-weight: 600;">
+        <i class="fas fa-gamepad mr-2"></i>Norton's Adventure
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavId" 
+        aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-    
     <div class="collapse navbar-collapse" id="collapsibleNavId">
       <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="dropdownId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Game</a>
+            <a class="nav-link dropdown-toggle" href="#" id="dropdownId" data-toggle="dropdown" 
+                aria-haspopup="true" aria-expanded="false" role="button">
+                <i class="fas fa-dice-d20 mr-1"></i>Game
+            </a>
             <div class="dropdown-menu" aria-labelledby="dropdownId">
-                <a class="dropdown-item saveGame" href="#">Save</a>
-                <a class="dropdown-item loadGame" href="#">Load</a>
-                <a class="dropdown-item joinGame" href="#">Join</a>
-                <a class="dropdown-item quitGame" href="#">Quit</a>
+                <a class="dropdown-item saveGame" href="#" role="button">
+                    <i class="fas fa-save mr-2"></i>Save
+                </a>
+                <a class="dropdown-item loadGame" href="#" role="button">
+                    <i class="fas fa-folder-open mr-2"></i>Load
+                </a>
+                <a class="dropdown-item joinGame" href="#" role="button">
+                    <i class="fas fa-users mr-2"></i>Join
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item quitGame text-danger" href="#" role="button">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Quit
+                </a>
             </div>
         </li>
         <li class="nav-item nav1">
-            <a class="nav-link inventoryLink" href="#">Inventory</a>
+            <a class="nav-link inventoryLink" href="#" role="button">
+                <i class="fas fa-backpack mr-1"></i>Inventory
+            </a>
         </li>
-
       </ul>
 
+      <div id="heroStats" class="d-none ml-auto">
+        <div class="d-flex align-items-center text-white">
+            <span class="mr-3">
+                <i class="fas fa-heart text-danger mr-1"></i>
+                <meter id="health" low="30" high="70" max="100" value="0" optimum="90" 
+                    class="meter-custom" aria-label="Health"></meter>
+            </span>
+            <span class="mr-3">
+                <i class="fas fa-magic text-info mr-1"></i>
+                <meter id="mana" low="30" high="70" max="100" value="0" optimum="90" 
+                    class="meter-custom" aria-label="Mana"></meter>
+            </span>
+            <span>
+                <i class="fas fa-star text-warning mr-1"></i>
+                <span id="xp" class="font-weight-bold">0</span>
+            </span>
+        </div>
+      </div>
     </div>
-    <div id="heroStats" class="d-none">
-        Health: <meter id="health" low="30" high="70" max="100" value="0" optimum="90"></meter>
-        Mana: <meter id="mana" low="30" high="70" max="100" value="0" optimum="90"></meter>
-        XP: <span id="xp"></span>
-    </div>
-  </nav>
+</nav>
 
+<style>
+.navbar.bg-gradient {
+    background: linear-gradient(135deg, var(--primary-color, #667eea), var(--secondary-color, #764ba2)) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+.navbar .dropdown-item {
+    transition: all 0.2s ease;
+}
+
+.navbar .dropdown-item:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+    padding-left: 2rem;
+}
+
+.meter-custom {
+    width: 80px;
+    height: 16px;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .meter-custom {
+        width: 60px;
+        height: 14px;
+    }
+    #heroStats .mr-3 {
+        margin-right: 0.5rem !important;
+    }
+}
+</style>
