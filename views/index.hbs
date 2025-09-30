@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>3D Virtual Life - Epic Adventure Awaits</title>
+        <title>3D Virtual Life - Epic Adventure Awaits (beta)</title>
         {{>headerStuff fontAwesome=true jQuery=true bootStrap=true handlebars=true}}
         <style>
             body {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 min-height: 100vh;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 overflow-y: auto;
@@ -21,35 +20,35 @@
             }
             
             .hero-header {
-                background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-                padding: 30px;
+                background: linear-gradient(45deg, #512262, #4ecdc4);
+                padding: 20px;
                 text-align: center;
                 color: white;
             }
             
             .hero-title {
-                font-size: 3.5rem;
+                font-size: 2.5rem;
                 font-weight: bold;
                 text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-                margin-bottom: 10px;
+                margin-bottom: 8px;
             }
             
             .hero-subtitle {
-                font-size: 1.5rem;
+                font-size: 1.2rem;
                 opacity: 0.9;
-                margin-bottom: 20px;
+                margin-bottom: 15px;
             }
             
             .game-preview {
                 position: relative;
-                margin: 20px 0;
+                margin: 10px 0;
             }
             
             .game-preview img {
                 width: 100%;
-                max-width: 600px;
-                border-radius: 15px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                max-width: 350px;
+                border-radius: 10px;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
                 transition: transform 0.3s ease;
             }
             
@@ -58,32 +57,25 @@
             }
             
             .content-wrapper {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 30px;
-                padding: 30px;
+                padding: 20px;
             }
             
             .login-section {
-                flex: 1;
-                min-width: 300px;
                 background: rgba(255, 255, 255, 0.95);
                 border-radius: 15px;
-                padding: 30px;
+                padding: 20px;
                 box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             }
             
             .info-section {
-                flex: 1;
-                min-width: 300px;
                 color: white;
             }
             
             .github-card {
                 background: rgba(255, 255, 255, 0.1);
-                border-radius: 15px;
-                padding: 25px;
-                margin-bottom: 25px;
+                border-radius: 10px;
+                padding: 15px;
+                margin-bottom: 15px;
                 backdrop-filter: blur(10px);
                 border: 1px solid rgba(255, 255, 255, 0.2);
                 transition: transform 0.3s ease, background 0.3s ease;
@@ -172,93 +164,108 @@
             <div class="hero-section">
                 <div class="hero-header">
                     <h1 class="hero-title">{{ welcomeMessage }}</h1>
-                    <p class="hero-subtitle">Epic 3D Multiplayer Adventure Awaits</p>
-                    <div class="game-preview">
-                        <img src="https://github.com/nortonsolutions/3dvirtuallife/raw/main/3dvirtuallife_1.png" alt="3D Virtual Life Game Screenshot" class="img-fluid">
-                    </div>
+                    <p class="hero-subtitle">Playable Game Demo: Epic 3D Multiplayer Adventure Awaits!</p>
                 </div>
                 
                 <div class="content-wrapper">
-                    <div class="info-section">
-                        <div class="github-card">
-                            <a href="https://github.com/nortonsolutions/3DvirtualLife" target="_blank" class="github-link">
-                                <i class="fab fa-github github-icon"></i>
-                                <div>
-                                    <h4 style="margin: 0;">View on GitHub</h4>
-                                    <p style="margin: 5px 0 0 0; opacity: 0.8;">Explore the source code and contribute</p>
-                                </div>
-                            </a>
+                    <!-- First Row: Game Preview and Login -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="game-preview text-center">
+                                <img src="https://github.com/nortonsolutions/3dvirtuallife/raw/main/3dvirtuallife_1.png" alt="3D Virtual Life Game Screenshot" class="img-fluid">
+                            </div>
                         </div>
-                        
-                        <h3>🎮 Game Features</h3>
-                        <ul class="feature-list">
-                            <li>Immersive 3D multiplayer experience</li>
-                            <li>Real-time adventure gameplay</li>
-                            <li>Character progression system</li>
-                            <li>Interactive world exploration</li>
-                            <li>Built with THREE.js & Node.js</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="login-section">
+                        <div class="col-md-6">
+                            <div class="login-section">
                         {{#if showLogin}}
                         <div id="loginForm">
-                            <h3 style="color: #333; margin-bottom: 20px;">🚪 Enter the Adventure</h3>
+                            <h4 style="color: #333; margin-bottom: 15px;">🚪 Enter the Adventure</h4>
                             <form action="/login" method="post">
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="username" class="form-label">Username</label>
-                                    <input class="form-control" type="text" id="username" name="username" placeholder="Enter your username" required>
+                                    <input class="form-control form-control-sm" type="text" id="username" name="username" placeholder="Enter your username" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="password" class="form-label">Password</label>
-                                    <input class="form-control" type="password" name="password" id="password" placeholder="Enter your password" required>
+                                    <input class="form-control form-control-sm" type="password" name="password" id="password" placeholder="Enter your password" required>
                                 </div>
                                 <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary btn-lg">🎯 Start Adventure</button>
+                                    <button type="submit" class="btn btn-primary">🎯 Start Adventure</button>
                                 </div>
                                 {{#if alertText}}
-                                <div class="alert alert-info mt-3">{{ alertText }}</div>
+                                <div class="alert alert-info mt-2 py-1">{{ alertText }}</div>
                                 {{/if}}
                             </form>
-                            <div class="text-center mt-3">
-                                <span class="toggle-link" id="newUser">New adventurer? Create account</span>
+                            <div class="text-center mt-2">
+                                <small class="toggle-link" id="newUser">New adventurer? Create account</small>
                             </div>
                         </div>
                         {{else}}
-                        <div class="alert alert-warning">
-                            <h4>⚠️ Maintenance Mode</h4>
-                            <p>Logins are temporarily disabled while we enhance your adventure experience.</p>
+                        <div class="alert alert-warning py-2">
+                            <h5>⚠️ Maintenance Mode</h5>
+                            <p class="mb-0">Logins are temporarily disabled.</p>
                         </div>
                         {{/if}}
 
                         <div id="newUserRegistrationForm" class="d-none">
-                            <h3 style="color: #333; margin-bottom: 20px;">⚔️ Join the Quest</h3>
+                            <h4 style="color: #333; margin-bottom: 15px;">⚔️ Join the Quest</h4>
                             <form action="/register" method="post">
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="reg-username" class="form-label">Username</label>
-                                    <input class="form-control" type="text" id="reg-username" name="username" placeholder="Choose a username" required>
+                                    <input class="form-control form-control-sm" type="text" id="reg-username" name="username" placeholder="Choose a username" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="firstname" class="form-label">First Name</label>
-                                    <input class="form-control" type="text" id="firstname" name="firstname" placeholder="Your first name" required>
+                                    <input class="form-control form-control-sm" type="text" id="firstname" name="firstname" placeholder="Your first name" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="surname" class="form-label">Last Name</label>
-                                    <input class="form-control" type="text" id="surname" name="surname" placeholder="Your last name" required>
+                                    <input class="form-control form-control-sm" type="text" id="surname" name="surname" placeholder="Your last name" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="reg-password" class="form-label">Password</label>
-                                    <input class="form-control" type="password" name="password" id="reg-password" placeholder="Create a strong password" required>
+                                    <input class="form-control form-control-sm" type="password" name="password" id="reg-password" placeholder="Create a strong password" required>
                                 </div>
                                 <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary btn-lg">🛡️ Create Character</button>
+                                    <button type="submit" class="btn btn-primary">🛡️ Create Character</button>
                                 </div>
                                 {{#if alertText}}
-                                <div class="alert alert-info mt-3">{{ alertText }}</div>
+                                <div class="alert alert-info mt-2 py-1">{{ alertText }}</div>
                                 {{/if}}
                             </form>
-                            <div class="text-center mt-3">
-                                <span class="toggle-link" id="login">Already have an account? Login</span>
+                            <div class="text-center mt-2">
+                                <small class="toggle-link" id="login">Already have an account? Login</small>
+                            </div>
+                        </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Second Row: GitHub and Features -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <div class="github-card">
+                                    <a href="https://github.com/nortonsolutions/3DvirtualLife" target="_blank" class="github-link">
+                                        <i class="fab fa-github github-icon mr-2"></i>
+                                        <div>
+                                            <h5 style="margin: 0;">View on GitHub</h5>
+                                            <small style="opacity: 0.8;">Explore the source code</small>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <h5 class="mb-2">🎮 Game Features</h5>
+                                <ul class="feature-list" style="font-size: 0.9rem;">
+                                    <li style="padding: 5px 0;">3D Multiplayer Experience</li>
+                                    <li style="padding: 5px 0;">Real-time Adventure</li>
+                                    <li style="padding: 5px 0;">Character Progression</li>
+                                    <li style="padding: 5px 0;">Interactive World and Trading</li>
+                                    <li style="padding: 5px 0;">THREE.js, Node.js, socket.io, Express.js</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
