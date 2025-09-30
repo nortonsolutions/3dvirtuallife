@@ -188,7 +188,7 @@ export const app = () => {
         // let uniqueNamespace = heroTemplate.name + getRndInteger(1,1000000);
         if (!socket) {
             // if (socket) socket.disconnect('http://localhost:3001'); socket = null;
-            socket = io.connect(`http://davidandrewnorton.com:3001${namespace}`);
+            socket = io.connect(`https://silvermedal.online${namespace}`);
         } else {
             // there is already a socket, so make sure the hero has been completely removed before re-adding
             socket.emit('death', { hero: true});
