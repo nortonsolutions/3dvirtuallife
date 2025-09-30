@@ -27,9 +27,24 @@ const database                 = require('./database.js');
 const socket                   = require('socket.io');
 dotenv.config({ path: './.env'});
 
+// Global error handlers for uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('[Process] Uncaught Exception:', error);
+  // Log error but don't exit in production
+  if (process.env.NODE_ENV !== 'production') {
+    process.exit(1);
+  }
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[Process] Unhandled Rejection at:', promise, 'reason:', reason);
+  // Log error but don't exit in production
+});
+
 const app = express();
 
-// TODO: Thread safety may become a concern for app.rooms
+// NOTE: app.rooms uses array-based tracking with Socket.io room keys for efficiency
+// Format: app.rooms[namespace][level] = [[socketId, heroTemplate, firstInRoom], ...]
 
 app.gameStarts = {}; // catalog of startTime per namespace
 app.gameTimes = {}; // catalog of periodSinceStart intervals per namespace
@@ -72,16 +87,27 @@ database(mongoose, (db) => {
   apiRoutes(app, db);
   
   
-  //404 Not Found Middleware
+  // 404 Not Found Middleware
   app.use(function(req, res, next) {
     res.status(404)
       .type('text')
       .send('Not Found');
   });
+
+  // Global error handler
+  app.use(function(err, req, res, next) {
+    console.error('[Express] Error:', err.stack);
+    res.status(err.status || 500).json({
+      error: process.env.NODE_ENV === 'production' 
+        ? 'Something went wrong!' 
+        : err.message
+    });
+  });
     
-  //Start our server and tests!
+  // Start our server and tests!
   var server = app.listen(process.env.PORT || 3001, function () {
-    console.log("Listening on port " + process.env.PORT);
+    console.log(`[Server] Listening on port ${process.env.PORT || 3001}`);
+    console.log(`[Server] Environment: ${process.env.NODE_ENV || 'development'}`);
     if(process.env.NODE_ENV==='test') {
       console.log('Running Tests...');
       setTimeout(function () {
@@ -96,8 +122,21 @@ database(mongoose, (db) => {
     }
   });
 
-  // Socket setup
-  var io = socket(server);
+  // Socket setup with optimizations
+  var io = socket(server, {
+    cors: {
+      origin: process.env.CORS_ORIGIN || "*",
+      methods: ["GET", "POST"]
+    },
+    transports: ['websocket', 'polling'],
+    // Enable compression for better performance
+    perMessageDeflate: {
+      threshold: 1024 // Compress messages larger than 1KB
+    },
+    // Connection timeout
+    pingTimeout: 60000,
+    pingInterval: 25000
+  });
 
   /**  
    * Allow regex for multiple namespaces in future socket.io release:
@@ -107,8 +146,23 @@ database(mongoose, (db) => {
    * For now, I'll use just one universal namespace (i.e. one game per server).
    *   -Dave 
    */
+  
+  // Global error handler for socket.io
+  io.on('connect_error', (error) => {
+    console.error('Socket.io connection error:', error);
+  });
+
   io.on('connection', (socket) => {
-    console.log(`Made socket connection - ${socket.id}`);
+    console.log(`[Socket.io] New connection - ${socket.id} from ${socket.handshake.address}`);
+
+    // Add error handler for this socket
+    socket.on('error', (error) => {
+      console.error(`[Socket.io] Error on socket ${socket.id}:`, error);
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error(`[Socket.io] Connect error for ${socket.id}:`, error);
+    });
 
     // provides a phase of the day, 0-3, based on time since server start
     const checkDayPhase = function(roomNumber) {
@@ -137,35 +191,32 @@ database(mongoose, (db) => {
     }
 
     const notifyRoomMembers = function (roomNumber, messageType, data) {
-
       // log unless messageType is updateHeroPosition
       if (messageType != 'updateHeroPosition' && messageType != 'updateEntityPositions' && messageType != 'addSprites') {
-        console.log(`notifyRoomMembers: ${roomNumber}, ${messageType} - type: ${data.type}, layoutId: ${data.layoutId}`);
+        console.log(`[Socket.io] notifyRoomMembers: room ${roomNumber}, ${messageType}`);
       }
 
-      let sender = socket.id;
       let nsp = socket.nsp.name;
+      const roomKey = `${nsp}_room_${roomNumber}`;
+      
+      // Use Socket.io's built-in room broadcasting (more efficient)
+      socket.to(roomKey).emit(messageType, data);
 
+      // Still maintain app.rooms for backward compatibility and member tracking
       if (!app.rooms[nsp]) app.rooms[nsp] = [];
       if (app.rooms[nsp][roomNumber]) {
-        app.rooms[nsp][roomNumber].forEach(member => {
-          if (member[0] != sender) socket.to(member[0]).emit(messageType, data);
-        });
+        // Only check day phase occasionally to reduce overhead
+        if (Math.random() < 0.05) checkDayPhase(roomNumber);
       }
-
-      if (Math.random()<.05) checkDayPhase(roomNumber);
     }
 
     // notify all including the original socket
     const notifyAllRoomMembers = function (roomNumber, messageType, data) {
       let nsp = socket.nsp.name;
-      if (!app.rooms[nsp]) app.rooms[nsp] = [];
-      if (app.rooms[nsp][roomNumber]) {
-        app.rooms[nsp][roomNumber].forEach(member => {
-          socket.to(member[0]).emit(messageType, data);
-        });
-        socket.emit(messageType, data);
-      }
+      const roomKey = `${nsp}_room_${roomNumber}`;
+      
+      // Use Socket.io's built-in room broadcasting (includes sender)
+      io.to(roomKey).emit(messageType, data);
     }
 
     const getSocketByLayoutId = function (roomNumber, layoutId) {
@@ -239,39 +290,70 @@ database(mongoose, (db) => {
      * these updates are broadcast only to others in the same room.
      */
     socket.on('joinroom', (data, callback) => {
-      
-      // Join up with the room:
-      if (!app.rooms[socket.nsp.name][data.level]) app.rooms[socket.nsp.name][data.level] = [];
-      
-      // Am I the first in the room?
-      let firstInRoom = app.rooms[socket.nsp.name][data.level].length == 0;
-      app.rooms[socket.nsp.name][data.level].push([socket.id,null,firstInRoom]);
+      try {
+        const nsp = socket.nsp.name;
+        const roomKey = `${nsp}_room_${data.level}`;
+        
+        // Initialize rooms structure
+        if (!app.rooms[nsp]) app.rooms[nsp] = [];
+        if (!app.rooms[nsp][data.level]) app.rooms[nsp][data.level] = [];
+        
+        // Am I the first in the room?
+        let firstInRoom = app.rooms[nsp][data.level].length === 0;
+        
+        // Join Socket.io room (native room support)
+        socket.join(roomKey);
+        console.log(`[Socket.io] Socket ${socket.id} joined room ${roomKey}`);
+        
+        // Add to app.rooms for member tracking
+        app.rooms[nsp][data.level].push([socket.id, null, firstInRoom]);
 
-      // Exit other rooms:
-      app.rooms[socket.nsp.name].forEach((key,index) => {
-        if (index != data.level) {
-          app.rooms[socket.nsp.name][index] = app.rooms[socket.nsp.name][index].filter(el => el[0] != socket.id);
-        }
-      })
+        // Exit other rooms
+        app.rooms[nsp].forEach((key, index) => {
+          if (index != data.level) {
+            const oldRoomKey = `${nsp}_room_${index}`;
+            socket.leave(oldRoomKey);
+            app.rooms[nsp][index] = app.rooms[nsp][index].filter(el => el[0] != socket.id);
+          }
+        });
 
-      if (!firstInRoom) socket.nsp.emit('multiplayer', true);
-      callback(firstInRoom);
-
+        if (!firstInRoom) socket.nsp.emit('multiplayer', true);
+        callback(firstInRoom);
+      } catch (error) {
+        console.error('[Socket.io] Error in joinroom:', error);
+        callback(false);
+      }
     });
 
     socket.on('pullOthers', (level, callback) => {
-      // If room contains others, callback with array of heroTemplates
-      let others = othersInRoom(level);
-      callback(others);
+      try {
+        // If room contains others, callback with array of heroTemplates
+        let others = othersInRoom(level);
+        callback(others);
+      } catch (error) {
+        console.error('[Socket.io] Error in pullOthers:', error);
+        callback(null);
+      }
     });
 
     socket.on('updateHeroTemplate', (data) => {
-      updateHeroTemplate(data.level, data.heroTemplate);
-      notifyRoomMembers(data.level, "updateHeroTemplate", data.heroTemplate);
+      try {
+        updateHeroTemplate(data.level, data.heroTemplate);
+        notifyRoomMembers(data.level, "updateHeroTemplate", data.heroTemplate);
+      } catch (error) {
+        console.error('[Socket.io] Error in updateHeroTemplate:', error);
+      }
     });
 
     socket.on('nextLayoutId', (roomNumber, callback) => {
-      callback(app.layouts[socket.nsp.name][roomNumber][1]++);
+      try {
+        if (!app.layouts[socket.nsp.name]) app.layouts[socket.nsp.name] = [];
+        if (!app.layouts[socket.nsp.name][roomNumber]) app.layouts[socket.nsp.name][roomNumber] = [{}, 1];
+        callback(app.layouts[socket.nsp.name][roomNumber][1]++);
+      } catch (error) {
+        console.error('[Socket.io] Error in nextLayoutId:', error);
+        callback(1);
+      }
     });
 
     socket.on('dropItemToScene',  (data) => {
@@ -348,13 +430,28 @@ database(mongoose, (db) => {
     });
 
     socket.on('disconnect', (reason) => {
+      console.log(`[Socket.io] Socket ${socket.id} disconnecting: ${reason}`);
+      
+      try {
+        // Clean up namespace games if empty
+        if (Object.keys(socket.nsp.sockets).length === 0) {
+          delete app.games[socket.nsp.name];
+          console.log(`[Socket.io] Cleaned up empty game namespace: ${socket.nsp.name}`);
+        }
 
-      if (Object.keys(socket.nsp.sockets).length == 0) {
-        delete app.games[socket.nsp.name];
+        // Leave all Socket.io rooms
+        const rooms = Array.from(socket.rooms);
+        rooms.forEach(room => {
+          if (room !== socket.id) { // Don't try to leave own socket room
+            socket.leave(room);
+          }
+        });
+
+        // Clean up app.rooms tracking
+        removeFromRooms();
+      } catch (error) {
+        console.error('[Socket.io] Error during disconnect cleanup:', error);
       }
-
-      removeFromRooms();
-      console.log(`Disconnecting ${socket.id}`)
     });
 
 
