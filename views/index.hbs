@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
+    <!-- Inject server-side environment variables for client-side use -->
+    <script>
+        window.base_url = {{{ jsonStringify base_url }}};
+    </script>    
     <head>
         <title>3D Virtual Life - Epic Adventure Awaits (beta)</title>
         {{>headerStuff fontAwesome=true jQuery=true bootStrap=true handlebars=true}}
@@ -53,7 +58,26 @@
             }
             
             .game-preview img:hover {
-                transform: scale(1.05);
+                transform: scale(1.02);
+            }
+            
+            .carousel-control-prev,
+            .carousel-control-next {
+                width: 5%;
+                opacity: 0.7;
+            }
+            
+            .carousel-control-prev:hover,
+            .carousel-control-next:hover {
+                opacity: 1;
+            }
+            
+            .carousel-indicators li {
+                background-color: rgba(255, 255, 255, 0.5);
+            }
+            
+            .carousel-indicators .active {
+                background-color: #4ecdc4;
             }
             
             .content-wrapper {
@@ -163,8 +187,9 @@
         <main>
             <div class="hero-section">
                 <div class="hero-header">
-                    <h1 class="hero-title">{{ welcomeMessage }}</h1>
-                    <p class="hero-subtitle">Playable Game Demo: Epic 3D Multiplayer Adventure Awaits!</p>
+                    <h3 class="hero-subtitle">{{ PRE_WELCOME_MESSAGE }}</h3>
+                    <h1 class="hero-title">{{ WELCOME_MESSAGE }}</h1>
+                    <p class="hero-subtitle">{{ WELCOME_SUBTITLE }}</p>
                 </div>
                 
                 <div class="content-wrapper">
@@ -172,7 +197,38 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="game-preview text-center">
-                                <img src="https://github.com/nortonsolutions/3dvirtuallife/raw/main/3dvirtuallife_1.png" alt="3D Virtual Life Game Screenshot" class="img-fluid">
+                                <div id="gameCarousel" class="carousel slide" data-ride="carousel" data-interval="4000">
+                                    {{#if GAME_PREVIEW_IMAGES}}
+                                    <!-- Indicators -->
+                                    <ol class="carousel-indicators">
+                                        {{#each GAME_PREVIEW_IMAGES}}
+                                        <li data-target="#gameCarousel" data-slide-to="{{@index}}" {{#if @first}}class="active"{{/if}}></li>
+                                        {{/each}}
+                                    </ol>
+                                    
+                                    <!-- Slides -->
+                                    <div class="carousel-inner">
+                                        {{#each GAME_PREVIEW_IMAGES}}
+                                        <div class="carousel-item {{#if @first}}active{{/if}}">
+                                            <img src="{{this}}" alt="3D Virtual Life Game Screenshot {{@index}}" class="img-fluid">
+                                        </div>
+                                        {{/each}}
+                                    </div>
+                                    
+                                    <!-- Controls -->
+                                    <a class="carousel-control-prev" href="#gameCarousel" role="button" data-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                    <a class="carousel-control-next" href="#gameCarousel" role="button" data-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                    {{else}}
+                                    <!-- Fallback single image -->
+                                    <img src="https://github.com/nortonsolutions/3dvirtuallife/raw/main/3dvirtuallife_1.png" alt="3D Virtual Life Game Screenshot" class="img-fluid">
+                                    {{/if}}
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -272,6 +328,7 @@
                 </div>
             </div>
         </main>
+
 
         <script>
             document.getElementById('newUser').addEventListener('click', (e) => {

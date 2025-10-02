@@ -31,8 +31,9 @@ module.exports = function (app, db) {
     app.route('/')
         .get((req,res) => {
             var options = {
-                welcomeMessage: "Welcome to Adventure!",
-                showLogin: true
+                showLogin: true,
+                ...app.dpConfig,
+                base_url: app.dpConfig.base_url
             }
             res.render(process.cwd() + '/views/index.hbs', options);
         })
@@ -231,10 +232,12 @@ module.exports = function (app, db) {
     app.route('/main')
         // Get and render the main view:
         .get(ensureAuthenticated, (req,res) => {
-        res.render(process.cwd() + '/views/main.hbs', {
-            showWelcome: true,
-            user: req.user,
-            admin: req.user.roles.includes('admin')
+            res.render(process.cwd() + '/views/main.hbs', {
+                showWelcome: true,
+                user: req.user,
+                admin: req.user.roles.includes('admin'),
+                ...app.dpConfig,
+                base_url: app.dpConfig.base_url
         });
     })
 }

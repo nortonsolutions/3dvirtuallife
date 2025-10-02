@@ -192,6 +192,12 @@
     <div id="chatbar"></div>
 
     </body>
+    
+    <!-- Inject server-side environment variables for client-side use -->
+    <script>
+        window.base_url = {{{ jsonStringify base_url }}};
+    </script>
+    
     <script type="module">
 
        import { app } from '/app.js'
