@@ -25,9 +25,27 @@ const passport                 = require('passport');
 const runner                   = require('./test-runner');
 const database                 = require('./database.js');
 const socket                   = require('socket.io');
-dotenv.config({ path: './.env'});
+const envResult                = dotenv.config({ path: './.env' });
+
 
 const app = express();
+const dotenvVars = envResult.error ? {} : envResult.parsed;
+const base_url = `${dotenvVars.PROTOCOL}://${dotenvVars.HOSTNAME}:${dotenvVars.PORT}`;
+
+console.log(`Base URL: ${base_url}`);
+
+app.dpConfig = {
+  GAME_PREVIEW_IMAGES:  [
+    "https://github.com/nortonsolutions/3dvirtuallife/raw/main/3dvirtuallife_1.png",
+    "https://github.com/nortonsolutions/3dvirtuallife/raw/main/3dvirtuallife_2.png",
+    "https://github.com/nortonsolutions/3dvirtuallife/raw/main/3dvirtuallife_3.png",
+    "https://github.com/nortonsolutions/3dvirtuallife/raw/main/3dvirtuallife_4.png",
+    "https://github.com/nortonsolutions/3dvirtuallife/raw/main/3dvirtuallife_5.png"
+  ],
+
+  base_url,
+  ...dotenvVars
+}
 
 // TODO: Thread safety may become a concern for app.rooms
 
@@ -70,7 +88,6 @@ database(mongoose, (db) => {
 
   auth(app, db.models.User);
   apiRoutes(app, db);
-  
   
   //404 Not Found Middleware
   app.use(function(req, res, next) {

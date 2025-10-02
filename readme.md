@@ -1,9 +1,5 @@
-
-
-
 ## 3D Virtual Life
 #### Copyright Dave Norton 2022
-#### Testing framework (Chai/Mocha) from FCC, though not used much
 #### pointerLockControls concept from mrdoob & Mugen87
 
 <img src="3dvirtuallife_1.png" width="400"/>
@@ -23,7 +19,7 @@ Use or activate the selected object (like switches)
 *Only when in attack range*
 left/right attack (hold shift for kick attacks if the model supports)
 
-*middle mouse button* - launch/throw/toss item equipped in hand 
+*middle mouse button* - launch/throw/toss item equipped in hand
 (e.g. planting sunseeds, watering from watercan, or firing arrows with bow equipped)
 
 *arrow keys* - movement
@@ -32,11 +28,12 @@ left/right attack (hold shift for kick attacks if the model supports)
 *h* - hotkey sidebar (shows the items/spells that have been equipped to hotkeys)
 *1-8* - hotkeys; use the item/spell for each mapped key
 *m* - mini-map
-*alt-t* - toggle chat 
+*alt-t* - toggle chat
 
 When you're on the inventory screen, drop an item by dragging it to the red square.  This is also how you place a house.
 
 ##Things to beginners to try:
+
 * Talk and trade with friendlies
 * Attack beasts at close range (or launch arrows)
 * Pick up the key and open the hatch to the dungeon
@@ -52,8 +49,16 @@ When you're on the inventory screen, drop an item by dragging it to the red squa
 
 This is still just a demo and may never finish entirely.  I'm putting this on ice for a while!  It was a good learning experience, challenging and fun.
 
-This production version assumes MongoDB is up and running on port 27017 
-and uses the DB called "nortonAdventure" (wiredtiger) by default.
+This production version assumes MongoDB is up and running on port 27017 and uses the DB called "nortonAdventure" (wiredtiger) by default.  the mongodb+srv format will work as well in your .env.  Sample configuration:
+
+```bash
+PORT=3001
+DB=mongodb+srv://norton:GyGUjtrkt.mongodb.net/3dvirtuallife?retryWrites=true&w=majority
+NODE_ENV=development
+PRE_WELCOME_MESSAGE=Привет!
+WELCOME_MESSAGE=Welcome to my 🪙nline game!
+WELCOME_SUBTITLE=Эпическое 3D-многопользовательское приключение ждет вас!
+```
 
 Unzip cdn.zip, png.zip, and 3d.zip in their respective directories for stock libraries/graphics.
 You may need to rename some graphics to lowercase the extensions, etc.  I'm too lazy to go re-zip
@@ -72,12 +77,14 @@ Also change the references to localhost to your own public IP address for socket
 
 Thanks to the graphics team: Mike Tidwell, Chris Lobato, Rodney Thinn, and Steve Leavitt.
 
------
+---
 
 # Only applicable for auto-startup with pm2:
+
 To configure auto-startup for pm2.exe service with pm2-windows-service module:
 
 Launch Git Bash in Administrative Mode, then run the following:
+
 ```
 [ /c/util/courseApp/utils/yarn-pm2-windows-service/node_modules/pm2-windows-service ]
 
@@ -102,13 +109,14 @@ $ sc \\DESKTOP-83JAE79 config pm2.exe depend= MongoDB
 To check pm2 services, login to cmd or bash in Administrative mode.
 
 ```
-$ pm2 start /c/3Dvirtuallife/server.js -i 1 --name 3Dvirtuallife
+$ cd <project root>
+$ pm2 start ./runner.sh --name 3DvirtualLife
 $ pm2 save
 ```
 
 (The 'pm2 save' will cause pm2 to pick up from where it leaves off on the next restart.)
 
------
+---
 
 Manual startup of the production server (pm2 only):
 
@@ -120,7 +128,7 @@ pm2 start 3Dvirtuallife
 
 Logs are in utils/node/logs
 
-----
+---
 
 Manual startup of the production server (standard node):
 
@@ -128,20 +136,18 @@ Manual startup of the production server (standard node):
 node server.js
 ```
 
------
+---
 
-
-
------
+---
 
 Development mode (only if you have the /utils directory):
 
-If you want to run in development mode with a standalone DB (mmapv1), 
-you can startup a local MongoDB using 'startDB.bat' instead (port 27018).  
+If you want to run in development mode with a standalone DB (mmapv1),
+you can startup a local MongoDB using 'startDB.bat' instead (port 27018).
 Use F5 in Visual Studio Code to launch with .env settings.
 
------
+---
 
-Express-Session Warning: connect.session() MemoryStore 
-is not designed for a production environment, as it will leak memory, 
+Express-Session Warning: connect.session() MemoryStore
+is not designed for a production environment, as it will leak memory,
 and will not scale past a single process.
