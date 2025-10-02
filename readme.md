@@ -60,6 +60,14 @@ WELCOME_MESSAGE=Welcome to my 🪙nline game!
 WELCOME_SUBTITLE=Эпическое 3D-многопользовательское приключение ждет вас!
 ```
 
+To create a pm2 startup for mongo, I use something like this:
+```bash
+pm2 start "bash -c 'mongod --dbpath ~norton/mongo/data/db'" --name "mongo"
+```
+
+Or you can combine mongo and 3DvirtualLife into one PM2 ecosystem as I've done in *ecosystem.config.js* (sample provided; just modify the NVM_DIR and PATH locations)
+
+
 Unzip cdn.zip, png.zip, and 3d.zip in their respective directories for stock libraries/graphics.
 You may need to rename some graphics to lowercase the extensions, etc.  I'm too lazy to go re-zip
 this massive file or change the references.  I was running on Windows before (case-insensitive)
