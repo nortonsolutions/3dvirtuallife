@@ -119,10 +119,11 @@ database(mongoose, (db) => {
         : err.message
     });
   });
-    
+var server = app.listen(process.env.INTERNAL_PORT || 3001, function () {
+console.log("Listening on port " + process.env.INTERNAL_PORT);    
   // Start our server and tests!
-  var server = app.listen(process.env.PORT || 3001, function () {
-    console.log(`[Server] Listening on port ${process.env.PORT || 3001}`);
+  var server = app.listen(process.env.INTERNAL_PORT || 3001, function () {
+    console.log(`[Server] Listening on port ${process.env.INTERNAL_PORT || 3001}`);
     console.log(`[Server] Environment: ${process.env.NODE_ENV || 'development'}`);
     if(process.env.NODE_ENV==='test') {
       console.log('Running Tests...');
