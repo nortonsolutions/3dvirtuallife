@@ -119,8 +119,7 @@ database(mongoose, (db) => {
         : err.message
     });
   });
-var server = app.listen(process.env.INTERNAL_PORT || 3001, function () {
-console.log("Listening on port " + process.env.INTERNAL_PORT);    
+  
   // Start our server and tests!
   var server = app.listen(process.env.INTERNAL_PORT || 3001, function () {
     console.log(`[Server] Listening on port ${process.env.INTERNAL_PORT || 3001}`);
@@ -327,7 +326,7 @@ console.log("Listening on port " + process.env.INTERNAL_PORT);
         if (!app.rooms[nsp][data.level]) app.rooms[nsp][data.level] = [];
         
         // Am I the first in the room?
-        let firstInRoom = app.rooms[nsp][data.level]?.length == 0;
+        let firstInRoom = app.rooms[nsp][data.level].length === 0;
         
         // TODO: Socket.io native room support (newer version) might optimize performance later (previous imp)
         // const roomKey = `${nsp}_room_${data.level}`;
