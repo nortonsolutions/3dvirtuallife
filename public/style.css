@@ -2,7 +2,13 @@ body {
     margin: 0;
     height: 100vh;
     overflow: hidden;
-    min-width: 655px;
+    min-width: 320px; /* Mobile-friendly minimum width */
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
 }
 
 video {
@@ -175,33 +181,87 @@ img {
 #minimap {
     display: none;
     position: fixed;
-    right: 0;
-    bottom: 0;
+    right: 10px;
+    bottom: 10px;
     width: 200px;
     height: 200px;
     z-index: 200;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px var(--shadow-dark);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    #minimap {
+        width: 150px;
+        height: 150px;
+        right: 5px;
+        bottom: 5px;
+    }
 }
 
 #message {
     position: absolute;
-    display:block;
+    display: block;
     left: 50%;
     top: 70px;
     transform: translateX(-50%);
     z-index: 10;
     color: white;
     font-size: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow-dark);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease;
 }
 
 #statusUpdates {
     position: absolute;
-    display:block;
+    display: block;
     left: 20px;
     top: 70px;
     z-index: 10;
     color: white;
-    font-size: 20px;
+    font-size: 18px;
     width: 15%;
+    min-width: 200px;
+}
+
+#statusUpdates > div {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 8px var(--shadow-dark);
+    backdrop-filter: blur(5px);
+    animation: slideInLeft 0.3s ease;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 768px) {
+    #message {
+        font-size: 16px;
+        padding: 8px 16px;
+    }
+    #statusUpdates {
+        font-size: 14px;
+        width: 25%;
+        min-width: 150px;
+        left: 10px;
+    }
 }
 
 canvas { 
@@ -223,65 +283,84 @@ main {
     background-color: #ffffff;
     margin: 0;
     overflow: hidden;
-    font-family: arial;
-    min-width: 655px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-width: 320px; /* Mobile-friendly */
+}
+
+/* Design system colors */
+:root {
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --success-color: #4ecdc4;
+    --danger-color: #f38181;
+    --dark-bg: #1a1a2e;
+    --light-text: #ffffff;
+    --accent: #512262;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.2);
+    --shadow-dark: rgba(0, 0, 0, 0.3);
 }
 
 #blocker {
-
     position: absolute;
-
     width: 100%;
     height: 100%;
-
-    background-color: rgba(0,0,0,0.5);
-
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
+    backdrop-filter: blur(10px);
 }
 
 #instructions {
-
     width: 100%;
     height: 100%;
-
-    display: -webkit-box;
-    display: -moz-box;
-    display: box;
-
-    -webkit-box-orient: horizontal;
-    -moz-box-orient: horizontal;
-    box-orient: horizontal;
-
-    -webkit-box-pack: center;
-    -moz-box-pack: center;
-    box-pack: center;
-
-    -webkit-box-align: center;
-    -moz-box-align: center;
-    box-align: center;
-
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     color: #ffffff;
     text-align: center;
-
     cursor: pointer;
+    padding: 2rem;
+}
+
+#instructions h1 {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+#instructions p {
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 1rem auto;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    #instructions h1 {
+        font-size: 2rem;
+    }
+    #instructions p {
+        font-size: 1rem;
+    }
 }
 
 /* The Modal (background) */
 .myModal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 50%;
     top: 56px;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,1); /* Black w/ opacity */
-    -webkit-animation-name: fadeIn; /* Fade in the background */
-    -webkit-animation-duration: 0.4s;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.85);
+    -webkit-animation-name: fadeIn;
+    -webkit-animation-duration: 0.3s;
     animation-name: fadeIn;
-    animation-duration: 0.4s;
+    animation-duration: 0.3s;
     transform: translate(-50%);
+    backdrop-filter: blur(5px);
 }
 
 /* Modal Content */
@@ -292,10 +371,19 @@ main {
     background-color: #fefefe;
     width: 100%;
     max-width: 800px;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 -5px 30px var(--shadow-dark);
     -webkit-animation-name: slideIn;
-    -webkit-animation-duration: 0.4s;
+    -webkit-animation-duration: 0.3s;
     animation-name: slideIn;
-    animation-duration: 0.4s
+    animation-duration: 0.3s;
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        max-width: 100%;
+        border-radius: 0;
+    }
 }
 
 /* The Close Button */
@@ -304,6 +392,7 @@ main {
     float: right;
     font-size: 28px;
     font-weight: bold;
+    transition: all 0.2s ease;
 }
 
 .close:hover,
@@ -311,20 +400,33 @@ main {
     color: #000;
     text-decoration: none;
     cursor: pointer;
+    transform: scale(1.1);
 }
 
 .modal-header {
-    padding: 2px 16px;
-    background-color: #58b1d4;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
+    border-radius: 10px 10px 0 0;
 }
 
-.modal-body {padding: 2px 16px;}
+.modal-body {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
 
 .modal-footer {
-    padding: 2px 16px;
-    background-color: #58b1d4;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
+    border-radius: 0 0 10px 10px;
+}
+
+@media (max-width: 768px) {
+    .modal-header, .modal-footer {
+        border-radius: 0;
+    }
 }
 
 /* Add Animation */
@@ -354,10 +456,52 @@ main {
 
 .btn-standard {
     width: 40px;
+    transition: all 0.2s ease;
+}
+
+.btn-standard:hover {
+    transform: scale(1.05);
 }
 
 .btn-wide {
     width: 100px;
+    transition: all 0.2s ease;
+}
+
+.btn-wide:hover {
+    transform: scale(1.05);
+}
+
+/* Loading spinner */
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner-overlay.active {
+    display: flex;
+}
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid var(--success-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .maxHeight240 {
@@ -368,11 +512,15 @@ main {
     display: none;
     flex-direction: column;
     position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
+    left: 10px;
+    top: 70px;
+    height: calc(100vh - 80px);
     width: 70px;
-    background-color: white;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px var(--shadow-dark);
+    backdrop-filter: blur(10px);
+    padding: 8px 0;
 }
 
 #chatbar {
@@ -382,18 +530,47 @@ main {
     bottom: 0;
     width: 100vw;
     color: white;
-    /* background-color: white; */
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    backdrop-filter: blur(10px);
 }
 
 #chatInput {
     display: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    border: 2px solid var(--primary-color);
 }
 
+#chatInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
 
 .hotkey {
     height: 12%;
     width: 100%;
     max-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 4px 0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.hotkey:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        width: 60px;
+        left: 5px;
+        top: 60px;
+    }
 }
 
 .response:hover {
