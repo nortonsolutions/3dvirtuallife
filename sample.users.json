@@ -1,0 +1,26 @@
+[{
+  "_id": {
+    "$oid": "62af9fe7f934173b22bf1491"
+  },
+  "username": "dave",
+  "password": "$2b$12$VF90YdauCq1cTg3QHIYEzeq6NwOLWtPUyHYr904lT1.0D6vVVHW8S",
+  "roles": [
+    "player"
+  ],
+  "firstname": "David",
+  "surname": "Norton",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67b8559b210cc998c6413519"
+  },
+  "username": "cena",
+  "password": "$2b$12$zsMty2L2IMvyo5mkNk6PTu2G5AgWD9iwE55cgiPTfbcxCerXmpHZe",
+  "roles": [
+    "player"
+  ],
+  "firstname": "<script>alert(\"hi\");</script>",
+  "surname": "<script>alert(\"hi\");</script>",
+  "__v": 0
+}]
