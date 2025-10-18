@@ -2,14 +2,14 @@ require('dotenv').config();
 var pm2 = require('pm2');
 
 // load environment variables
-var PRODUCTION_START_SCRIPT = process.env.PRODUCTION_START_SCRIPT || '/home/dave/projects/3DvirtualLife/server.js'
+var PRODUCTION_START_SCRIPT = process.env.PRODUCTION_START_SCRIPT || '/Users/norton/projects/3DvirtualLife/server.js'
 
 var instances = process.env.INSTANCES || 1;
 var pm2AppName = process.env.PM2_APP_NAME || '3DvirtualLife';
-var nodeBin = '/home/dave/.nvm/versions/node/v14.21.3/bin';
+var nodeBin = '/Users/norton/.nvm/versions/node/v14.21.3/bin';
 var maxMemory = process.env.MAX_MEMORY || '390M';
-var nvmDir = process.env.NVM_DIR || '/home/dave/.nvm';
-var projectDir = '/home/dave/projects/3DvirtualLife';
+var nvmDir = process.env.NVM_DIR || '/Users/norton/.nvm';
+var projectDir = '/Users/norton/projects/3DvirtualLife';
 
 pm2.connect(function() {
   pm2.start(
@@ -29,13 +29,13 @@ pm2.connect(function() {
         NODE_ENV: 'production',
         PORT: 3001,
         NVM_DIR: nvmDir,
-        PATH: nvmHome + ":" + process.env.PATH
+        PATH: nvmDir + ":" + process.env.PATH
       },
       env_development: {
         NODE_ENV: 'development',
         PORT: 3001,
         NVM_DIR: nvmDir,
-        PATH: nvmHome + process.env.PATH
+        PATH: nvmDir + process.env.PATH
       }
   }, function() {
     console.log(

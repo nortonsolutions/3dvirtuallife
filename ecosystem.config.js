@@ -1,19 +1,6 @@
 module.exports = {
   apps: [
     {
-      name: 'mongo',
-      script: 'mongod',
-      args: '--dbpath /Users/norton/mongo/data/db',
-      exec_mode: 'fork',
-      instances: 1,
-      autorestart: true,
-      watch: false,
-      max_memory_restart: '384M',
-      env: {
-        NODE_ENV: 'production'
-      }
-    },
-    {
       name: '3DvirtualLife',
       script: './server.js',
       exec_mode: 'fork',
