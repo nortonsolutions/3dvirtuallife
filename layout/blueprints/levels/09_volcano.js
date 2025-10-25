@@ -13,7 +13,7 @@ export const Volcano = {
     attributes: {
       emissiveIntensity: 10,
       cutScenes: {
-        intro: "volcanoIntro.mkv"
+        intro: "volcanoIntro.m4v"
       },
       scale: 100,
       borderTrees: false,

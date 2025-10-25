@@ -1117,7 +1117,7 @@ export const Friendlies = {
         }
       },
       cutScenes: {
-        acceptDeal: "smithing.mkv"
+        acceptDeal: "smithing.m4v"
       },
       stats: {
         health: "2/2/0",

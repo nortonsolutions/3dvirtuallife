@@ -12,7 +12,7 @@ export const Kingdom = {
     gltf: "kingdom.glb",
     attributes: {
       cutScenes: {
-        intro: "volcanoIntro.mkv"
+        intro: "volcanoIntro.m4v"
       },
       animates: false,
       scale: 200,

@@ -14,7 +14,7 @@ export const Valley = {
       alwaysDaytime: true,
       snowflakes: false,
       cutScenes: {
-        intro: "volcanoIntro.mkv"
+        intro: "volcanoIntro.m4v"
       },
       addPonds: true,
       scale: 100,

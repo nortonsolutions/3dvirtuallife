@@ -13,7 +13,7 @@ export const Snowyland = {
     attributes: {
       snowflakes: true,
       cutScenes: {
-        intro: "volcanoIntro.mkv"
+        intro: "volcanoIntro.m4v"
       },
       scale: 100,
       borderTrees: true,

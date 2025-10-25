@@ -12,7 +12,7 @@ export const Elvandor = {
     gltf: "elvandor.glb",
     attributes: {
       cutScenes: {
-        intro: "volcanoIntro.mkv"
+        intro: "volcanoIntro.m4v"
       },
       emissiveIntensity: 10,
       scale: 40,

@@ -12,7 +12,7 @@ export const Swamp = {
     gltf: "swamp.glb",
     attributes: {
       cutScenes: {
-        intro: "volcanoIntro.mkv"
+        intro: "volcanoIntro.m4v"
       },
       scale: 100,
       borderTrees: false,
