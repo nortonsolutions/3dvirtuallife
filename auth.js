@@ -24,21 +24,20 @@ module.exports = function (app, UserModel) {
     function(username, password, done) {
       UserModel.findOne({ username: username }, function (err, user) {
         console.log('User '+ username +' attempted to log in.');
-	console.log('Error ' + err + ', password=' + password + '; user.password=' + user.password);
-        if (err) { return done(err, false); }
-        if (!user) { return done(null, false); }
+	      if (err) { return done(err, false); }
+        if (!user || !user.password) { return done(new Error("User not found or password missing"), false); }
 
-	bcrypt.hash(password,12).then(hash => {
-	    console.log(hash)
-	});
+	      bcrypt.hash(password,12).then(hash => {
+	        console.log(hash)
+	      });
         
         bcrypt.compare(password, user.password).then(success => {
           if (!success) {
             return (null, false);
           } else {
-	    console.log("Success with " + password + " and returning user " + user);
-	    return done(null, user);
-	  }
+	          console.log("Success with " + password + " and returning user " + user);
+	          return done(null, user);
+          }
         });
       });
     }

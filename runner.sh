@@ -1,4 +1,4 @@
-#!/bin/bash - alternate startup script using nvm
+#!/bin/bash
 # DEPRECATED; use pm2 start ecosystem.config.js --env production instead
 # YMMV with the pm2Start.js script depending on your environment
 

@@ -6,6 +6,18 @@
     "configurations": [
 
         {
+            "name": "DEBUG Node 3DvirtualLife Server",
+            "program": "${workspaceFolder}/server.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node",
+            "runtimeExecutable": "/Users/norton/.nvm/versions/node/v14.21.3/bin/node"
+        },
+
+
+        {
             "name": "Attach by Process ID",
             "processId": "${command:PickProcess}",
             "request": "attach",

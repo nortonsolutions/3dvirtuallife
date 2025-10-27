@@ -343,6 +343,7 @@ database(mongoose, (db) => {
             // const oldRoomKey = `${nsp}_room_${index}`;
             // socket.leave(oldRoomKey);
             app.rooms[nsp][index] = app.rooms[nsp][index].filter(el => el[0] != socket.id);
+            socket.rooms.delete(socket.id)
           }
         });
 
@@ -460,30 +461,10 @@ database(mongoose, (db) => {
 
     socket.on('disconnect', (reason) => {
       console.log(`[Socket.io] Socket ${socket.id} disconnecting: ${reason}`);
-      
       try {
-        // Clean up namespace games if empty
-        if (Object.keys(socket.nsp.sockets).length === 0) {
-          delete app.games[socket.nsp.name];
-          console.log(`[Socket.io] Cleaned up empty game namespace: ${socket.nsp.name}`);
-        }
-
-        // Leave all Socket.io rooms
-        let rooms;
-        if (typeof socket.rooms.forEach === 'function') {
-          // Likely a Set (v4+)
-          rooms = Array.from(socket.rooms);
-        } else {
-          // Likely an object (v2.x)
-          rooms = Object.keys(socket.rooms);
-        }
-        rooms.forEach(room => {
-          if (room !== socket.id) { // Don't try to leave own socket room
-            socket.leave(room);
+          if (socket.nsp.sockets?.size == 0) {
+            delete app.games[socket.nsp.name];
           }
-        });
-
-        // Clean up app.rooms tracking
         removeFromRooms();
       } catch (error) {
         console.error('[Socket.io] Error during disconnect cleanup:', error);
